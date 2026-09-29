@@ -1,0 +1,510 @@
+{
+  "className": "Model",
+  "attributes": {
+    "PlotId": 4
+  },
+  "children": [
+    {
+      "name": "Base",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          50,
+          1,
+          50
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              35,
+              1.5,
+              35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            200,
+            200,
+            200
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    },
+    {
+      "name": "OwnerSign",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          12,
+          6,
+          1
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              35,
+              5,
+              12
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            230,
+            230,
+            230
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      },
+      "children": [
+        {
+          "name": "OwnerLabel",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  14,
+                  0
+                ],
+                [
+                  3,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              4.5,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Unclaimed",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DropperSpot",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              17,
+              8,
+              35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "Conveyor",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          34,
+          1,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              32,
+              2.5,
+              35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            40,
+            40,
+            40
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    },
+    {
+      "name": "Collector",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          6,
+          1,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              52,
+              2.5,
+              35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            75,
+            151,
+            75
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    },
+    {
+      "name": "CollectPad",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          5,
+          0.4,
+          5
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              52,
+              2.2,
+              47
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            0,
+            255,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      },
+      "children": [
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  6,
+                  0
+                ],
+                [
+                  1.5,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              2,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Collect",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuyDropperButton",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          0.4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              17,
+              2.2,
+              47
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      },
+      "children": [
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  8,
+                  0
+                ],
+                [
+                  1.5,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              2,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Buy Dropper",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
