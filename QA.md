@@ -30,15 +30,15 @@ Record the date and result when you run a case.
 | -- | ---- | -------- | ------ |
 | T1 | Player joins. | One plot's sign shows "<DisplayName>'s Tycoon"; that plot's `OwnerUserId` = player's UserId. | |
 | T2 | Other plots. | Signs show "Unclaimed"; no `OwnerUserId` attribute. | |
-| T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot. | ⏳ |
+| T3 | Player 2 steps on Player 1's Buy button. | Nothing happens to either player's cash or plot; button stays red. | |
 
 ## Purchase
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| U1 | Player with $100 steps on own Buy Dropper button. | Cash → 0; dropper activates. | ⏳ |
-| U2 | Player with less than $100 steps on the button. | Nothing is bought; cash unchanged. | ⏳ |
-| U3 | After buying, step on the button again (repeatedly). | No second dropper; no cash removed. | ⏳ |
+| U1 | Player with $100 steps on own Buy Dropper button. | Cash → 0; button turns gray and says "Purchased"; `DropperService.Start` runs (until the dropper is built, Output shows "DropperService.Start is not implemented yet"). | |
+| U2 | Player with less than $100 steps on the button. (To test now: in **Server** view, set your `leaderstats.Cash` to 50 first.) | Nothing is bought; cash stays 50; button stays red. | |
+| U3 | After buying, step on the button again (repeatedly). | No second dropper; no cash removed; Output shows the not-implemented warning only once. | |
 
 ## Economy
 
@@ -75,6 +75,6 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed. | |
+| L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; Buy button back to red "Buy Dropper". | |
 | L2 | Leave after buying the dropper. | Dropper stops, drops are removed, stored cash is cleared. | ⏳ |
 | L3 | A new player joins after L1. | They can be given the released plot. | |

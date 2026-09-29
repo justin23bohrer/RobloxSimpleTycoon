@@ -17,8 +17,8 @@ user's approval first.
 ## MVP
 
 - [ ] Verify the foundation in Studio (QA: B1–B2, P1–P2, T1–T2, E1, M1, R1, L1, L3).
-- [ ] Dropper purchase: implement `TycoonService.TryPurchaseDropper` and the Buy button trigger.
-- [ ] Show a simple dropper at `DropperSpot` once purchased.
+- [x] Dropper purchase: implement `TycoonService.TryPurchaseDropper` and the Buy button trigger (needs Studio test: QA U1–U3, T3).
+- [ ] Show a simple dropper at `DropperSpot` once purchased (part of DropperService.Start).
 - [ ] DropperService: spawn server-owned `$10` drops every 2 seconds; clean up on stop.
 - [ ] Conveyor movement.
 - [ ] CollectorService: store drop value at the collector; owner-only payout on the Collect pad.
