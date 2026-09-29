@@ -5,9 +5,9 @@ A tiny Roblox tycoon, built as a clean starting point:
 > join → get $100 → get a plot → buy a dropper → drops ride a conveyor →
 > collect the cash
 
-The full design is in [GAME_DESIGN.md](GAME_DESIGN.md). **Current status:** cash, plots,
-ownership, the map, and buying the dropper are built. The dropper itself,
-drops, and collection are stubs; see [TODO.md](TODO.md).
+The full design is in [GAME_DESIGN.md](GAME_DESIGN.md). **Current status:** the full MVP
+loop is built (cash, plots, buying the dropper, drops, conveyor, collection)
+and is waiting on Studio testing; see [TODO.md](TODO.md) and [QA.md](QA.md).
 
 ## How the project works
 
