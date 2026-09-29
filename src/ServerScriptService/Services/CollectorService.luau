@@ -11,8 +11,9 @@
 -- STATUS: stub. The functions below define the interface TycoonService uses.
 --
 -- Implementation notes for the next agent:
--- * Only accept drops created by DropperService for THIS plot, and read the
---   drop's value from the server, never from the client.
+-- * On Collector.Touched, call DropperService.ClaimDrop(hit, plot). It returns
+--   the drop's server-side value (or nil for anything that isn't a valid drop
+--   from THIS plot). Never read a value from the part itself.
 -- * Only pay out if plot:GetAttribute("OwnerUserId") == player.UserId.
 -- * Set stored cash to 0 BEFORE paying out so a double touch cannot pay twice.
 
