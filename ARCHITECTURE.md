@@ -73,14 +73,14 @@ reach the server.
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases. | Ownership implemented; `TryPurchaseDropper` is a stub |
 | `DropperService` | Runs a plot's dropper: shows the dropper, creates drops, sets their value on the server, moves them on the conveyor, and hands a drop's value to the collector (`ClaimDrop`). | Stub (`Start`, `Stop`, `ClaimDrop`) |
-| `CollectorService` | Stores drop value when drops hit the collector; pays the owner on the Collect pad. | Stub (`SetupPlot`, `ResetPlot`) |
+| `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`; shows "Collect $<stored>" on the pad. | Implemented (`SetupPlot`, `ResetPlot`); needs `DropperService` drops to do anything |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
 Dependencies (no cycles): `TycoonService` → `DropperService`,
 `CollectorService` (and `EconomyService` once purchases are built).
-`CollectorService` → `DropperService` (`ClaimDrop`) and `EconomyService` (once built). `EconomyService` →
+`CollectorService` → `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.

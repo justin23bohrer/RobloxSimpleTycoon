@@ -21,13 +21,13 @@ user's approval first.
 - [ ] Show a simple dropper at `DropperSpot` once purchased.
 - [ ] DropperService: spawn server-owned `$10` drops every 2 seconds; clean up on stop.
 - [ ] Conveyor movement.
-- [ ] CollectorService: store drop value at the collector; owner-only payout on the Collect pad.
+- [x] CollectorService: store drop value at the collector; owner-only payout on the Collect pad (code done; Studio test waits on DropperService).
+- [x] Show the plot's stored (uncollected) cash on the Collect pad label (approved with the collector task).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
 
 ## Post-MVP (needs approval)
 
 - [ ] Show the price on the Buy button from `Config`.
-- [ ] Show the plot's stored (uncollected) cash.
 - [ ] Teleport players to their plot on join/respawn.
 - [ ] Handle a full server more gracefully than a warning.
 - [ ] DataStore persistence for cash and purchases.

@@ -31,6 +31,7 @@ Record the date and result when you run a case.
 | T1 | Player joins. | One plot's sign shows "<DisplayName>'s Tycoon"; that plot's `OwnerUserId` = player's UserId. | |
 | T2 | Other plots. | Signs show "Unclaimed"; no `OwnerUserId` attribute. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot. | ⏳ |
+| T4 | Player joins; look at the Collect pads. | Every pad label reads "Collect". Stepping on your own pad with nothing stored does nothing. | |
 
 ## Purchase
 
@@ -47,6 +48,9 @@ Record the date and result when you run a case.
 | E1 | In the **Client** view, change your `leaderstats.Cash` value. Switch to **Server** view. | Server value is unchanged. Buying still uses the server value. | |
 | E2 | Code review: search for writes to `Cash`. | Only `EconomyService` changes cash. | |
 | E3 | Collection. | Payout equals (number of drops that reached the collector) × `DropValue`, paid once. | ⏳ |
+| E4 | Let 3 drops reach the collector. | Pad label reads "Collect $30" (increases by `DropValue` per drop); cash unchanged. | ⏳ |
+| E5 | Step on your own Collect pad after E4, then stand/jump on it. | Cash +30 exactly once; label back to "Collect". | ⏳ |
+| E6 | Drop an unrelated part (e.g. from the Explorer in Server view) onto a collector. | Label and stored cash unchanged. | ⏳ |
 
 ## Dropper
 
@@ -61,7 +65,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | M1 | Two players join. | Each gets a different plot; both signs show the right names. | |
-| M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's stored cash is unchanged. | ⏳ |
+| M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's pad label and stored cash are unchanged. | ⏳ |
 | M3 | Both buy droppers. | Each dropper only fills its own collector. | ⏳ |
 
 ## Respawn
@@ -76,5 +80,5 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed. | |
-| L2 | Leave after buying the dropper. | Dropper stops, drops are removed, stored cash is cleared. | ⏳ |
+| L2 | Leave after buying the dropper. | Dropper stops, drops are removed, stored cash is cleared; pad label back to "Collect". | ⏳ |
 | L3 | A new player joins after L1. | They can be given the released plot. | |
