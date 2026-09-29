@@ -71,19 +71,19 @@ reach the server.
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join; forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases. | Ownership implemented; `TryPurchaseDropper` is a stub |
-| `DropperService` | Runs a plot's dropper: creates drops, sets their value on the server, moves them on the conveyor. | Stub (`Start`, `Stop`) |
+| `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases. | Implemented (ownership + dropper purchase) |
+| `DropperService` | Runs a plot's dropper: shows the dropper, creates drops, sets their value on the server, moves them on the conveyor, and hands a drop's value to the collector (`ClaimDrop`). | Stub (`Start`, `Stop`, `ClaimDrop`) |
 | `CollectorService` | Stores drop value when drops hit the collector; pays the owner on the Collect pad. | Stub (`SetupPlot`, `ResetPlot`) |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
 Dependencies (no cycles): `TycoonService` → `DropperService`,
-`CollectorService` (and `EconomyService` once purchases are built).
-`CollectorService` → `EconomyService` (once built). `EconomyService` →
+`CollectorService`, `EconomyService`.
+`CollectorService` → `DropperService` (`ClaimDrop`) and `EconomyService` (once built). `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
-`OwnerUserId` attribute.
+`OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
 
 ## Shared modules
 
@@ -144,6 +144,11 @@ type Tycoon = {
 - Money enters the game only through collection (`AddCash`).
 - Money leaves only through purchases (`TrySpend`, which fails without
   changing anything if the player cannot afford it).
+- Purchase flow: owner touches their plot's `BuyDropperButton` (server
+  `Touched`) → `TycoonService.TryPurchaseDropper` checks the player has a
+  plot, has not already bought it, and `TrySpend(DropperCost)` succeeds →
+  marks `Purchased.Dropper`, turns the button gray ("Purchased"), and calls
+  `DropperService.Start`. Touches from non-owners are ignored.
 - Drop values are set by the server from `Config.DropValue`, never taken from
   the client or from a property a client could change.
 

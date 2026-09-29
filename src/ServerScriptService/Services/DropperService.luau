@@ -15,8 +15,9 @@
 -- * Move drops by setting plot.Conveyor.AssemblyLinearVelocity to
 --   Config.ConveyorSpeed along the conveyor (anchored conveyor, unanchored drops).
 -- * Destroy drops after Config.DropLifetime seconds so they cannot pile up.
--- * Tag each drop with its plot so CollectorService only accepts drops from
---   the same plot.
+-- * Remember each drop's plot on the server so ClaimDrop only accepts drops
+--   from the same plot.
+-- * Start also shows a simple dropper part at plot.DropperSpot; Stop removes it.
 -- * Stop(plot) must stop the loop and destroy that plot's drops.
 
 local DropperService = {}
@@ -29,6 +30,14 @@ end
 -- Stops the dropper on a plot and removes its drops. Safe to call if not running.
 function DropperService.Stop(plot: Model)
 	-- Not implemented yet. Nothing is running, so there is nothing to stop.
+end
+
+-- Called by CollectorService when a part touches a plot's Collector.
+-- If `drop` is a live drop created by this service for `plot`, destroys it and
+-- returns its server-side value. Otherwise returns nil and changes nothing.
+-- A drop can only be claimed once.
+function DropperService.ClaimDrop(drop: BasePart, plot: Model): number?
+	return nil -- Not implemented yet. No drops exist.
 end
 
 return DropperService
