@@ -1,4 +1,24 @@
+# Roblox Studio lock/temp files
 *.rbxl.lock
 *.rbxlx.lock
-.DS_Store
+*.rbxm.lock
+*.rbxmx.lock
+
+# Places built by `rojo build` (regenerate them from source)
+build/
+*.rbxlx
+
+# Rojo / editor tooling output
 .rojo
+sourcemap.json
+
+# Secrets (never commit)
+.env
+.env.*
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
