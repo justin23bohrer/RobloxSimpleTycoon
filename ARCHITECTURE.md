@@ -72,7 +72,7 @@ reach the server.
 | `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join; forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases. | Implemented (ownership + dropper purchase) |
-| `DropperService` | Runs a plot's dropper: shows the dropper, creates drops, sets their value on the server, moves them on the conveyor, and hands a drop's value to the collector (`ClaimDrop`). | Stub (`Start`, `Stop`, `ClaimDrop`) |
+| `DropperService` | Runs a plot's dropper: places a `Dropper` part at `DropperSpot`, spawns `Drop` parts into the plot's `Drops` folder every `DropInterval`, moves them with the conveyor, destroys them after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. | Implemented (`Start`, `Stop`, `ClaimDrop`) |
 | `CollectorService` | Stores drop value when drops hit the collector; pays the owner on the Collect pad. | Stub (`SetupPlot`, `ResetPlot`) |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
