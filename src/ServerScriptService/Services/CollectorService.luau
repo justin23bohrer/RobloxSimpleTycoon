@@ -4,7 +4,8 @@
 --      (uncollected) cash. DropperService.ClaimDrop validates and destroys it.
 --   2. The plot's owner touching plot.CollectPad moves the stored cash into
 --      their cash via EconomyService.AddCash.
--- The CollectPad label shows "Collect $<stored>" (or "Collect" when empty).
+-- The stored amount is never shown as text. CollectorDisplay shows it as
+-- gold cubes filling the CashTank behind the pad (presentation only).
 --
 -- Named CollectorService (not CollectionService) to avoid confusion with
 -- Roblox's built-in game:GetService("CollectionService") tagging service.
@@ -18,6 +19,7 @@
 
 local Players = game:GetService("Players")
 
+local CollectorDisplay = require(script.Parent.CollectorDisplay)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 
@@ -25,21 +27,13 @@ local CollectorService = {}
 
 local storedCashByPlot: { [Model]: number } = {}
 
-local function updateLabel(plot: Model)
-	local label = plot.CollectPad:FindFirstChild("TextLabel", true)
-	if label and label:IsA("TextLabel") then
-		local stored = storedCashByPlot[plot] or 0
-		label.Text = if stored > 0 then `Collect ${stored}` else "Collect"
-	end
-end
-
 local function onCollectorTouched(plot: Model, hit: BasePart)
 	local value = DropperService.ClaimDrop(hit, plot)
 	if value == nil then
 		return
 	end
 	storedCashByPlot[plot] = (storedCashByPlot[plot] or 0) + value
-	updateLabel(plot)
+	CollectorDisplay.AddCube(plot)
 end
 
 local function onCollectPadTouched(plot: Model, hit: BasePart)
@@ -55,10 +49,12 @@ local function onCollectPadTouched(plot: Model, hit: BasePart)
 
 	storedCashByPlot[plot] = 0
 	if not EconomyService.AddCash(player, amount) then
-		-- Payout failed (e.g. player data missing); keep the cash on the plot.
+		-- Payout failed (e.g. player data missing); keep the cash (and the
+		-- cubes in the tank) on the plot.
 		storedCashByPlot[plot] += amount
+		return
 	end
-	updateLabel(plot)
+	CollectorDisplay.Clear(plot, true)
 end
 
 -- Connects the Collector and CollectPad touch handlers for a plot. Called once
@@ -68,7 +64,7 @@ function CollectorService.SetupPlot(plot: Model)
 		return -- already set up; never connect twice
 	end
 	storedCashByPlot[plot] = 0
-	updateLabel(plot)
+	CollectorDisplay.Setup(plot)
 
 	plot.Collector.Touched:Connect(function(hit)
 		onCollectorTouched(plot, hit)
@@ -81,7 +77,7 @@ end
 -- Clears a plot's stored cash (called when the plot is released).
 function CollectorService.ResetPlot(plot: Model)
 	storedCashByPlot[plot] = 0
-	updateLabel(plot)
+	CollectorDisplay.Clear(plot, false)
 end
 
 return CollectorService

@@ -65,8 +65,22 @@ There are four droppers (`Config.Droppers`), each with its own buy button:
 - Objects that reach the plot's collector add their value to that plot's
   stored cash.
 - The owning player collects the stored cash by stepping on the green
-  **Collect** pad.
+  **Collect** pad (label "COLLECT!").
 - Other players cannot collect it.
+
+### Cash tank (collect area look)
+
+The stored amount is **not** shown as text. Instead:
+
+- Behind the Collect pad is a purple wall with a gold frame, a pink
+  "CASH TANK" sign, and a glass tank on an orange stand.
+- Each drop that reaches the collector drops one gold cube into the tank, so
+  the tank fills up as cash waits (it stops adding cubes at 60, when it looks
+  full; the cash itself keeps adding up).
+- While cash is waiting, the pad sparkles gold and glows.
+- A gold arrow always bounces above the pad.
+- Collecting empties the tank with a burst of gold sparkles.
+- All of this is looks only; the server's stored cash decides the payout.
 
 ## Plot layout (prototype)
 
@@ -82,6 +96,7 @@ with a darker ring underneath as an outline:
 | `Conveyor`         | Dark strip that carries drops.                       |
 | `Collector`        | Green block at the end of the conveyor.              |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cash. |
+| `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. Cubes go in a `TankCubes` folder made at runtime. |
 | `SpawnLocation`    | Round blue pad with a dark blue ring, in `Map` (not the plot). Where players appear. |
 
 ### Pad style (copy this for new pads)

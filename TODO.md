@@ -22,7 +22,7 @@ user's approval first.
 - [x] DropperService: spawn server-owned `$10` drops every 2 seconds; clean up on stop. (code done; Studio test pending)
 - [x] Conveyor movement. (code done; Studio test pending)
 - [x] CollectorService: store drop value at the collector; owner-only payout on the Collect pad (code done; Studio test waits on DropperService).
-- [x] Show the plot's stored (uncollected) cash on the Collect pad label (approved with the collector task).
+- [x] Show the plot's stored (uncollected) cash at the Collect pad (now shown as cubes in the cash tank, not text).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
 - [x] Round, outlined pads for the Buy button, Collect pad, and spawn (approved 2026-09-30; Studio visual check pending).
 
@@ -33,6 +33,7 @@ user's approval first.
 - [x] Restyle the new buy buttons to match the round, outlined pads (done by the lead while merging).
 - [x] Bought buy buttons disappear instead of turning gray; they come back on plot reset. (code done; Studio test pending: QA U1, U3, U4, U7, L1)
 - [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
+- [x] Fun collect area: cash tank wall behind the Collect pad that fills with a gold cube per collected drop, pad sparkles/glow/bouncing arrow, no amount text (approved 2026-09-30). (code done; Studio test pending: QA CT1–CT7)
 
 ## Post-MVP (needs approval)
 
