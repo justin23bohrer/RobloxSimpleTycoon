@@ -24,6 +24,7 @@ user's approval first.
 - [x] CollectorService: store drop value at the collector; owner-only payout on the Collect pad (code done; Studio test waits on DropperService).
 - [x] Show the plot's stored (uncollected) cash on the Collect pad label (approved with the collector task).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
+- [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
 
 ## Post-MVP (needs approval)
 
@@ -34,7 +35,7 @@ user's approval first.
 
 ## Polish (needs approval)
 
-- [ ] Simple cash UI and purchase/collect feedback (sounds, effects).
+- [ ] Purchase/collect feedback (sounds, effects). (The cash display itself is done, see MVP.)
 - [ ] Cleaner prototype visuals (still no theme until approved).
 
 ## Future features (needs approval)

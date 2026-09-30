@@ -19,8 +19,9 @@ src/
 │       ├── DropperService.luau
 │       └── CollectorService.luau
 ├── StarterPlayer/
-│   └── StarterPlayerScripts/   → client LocalScripts (none yet)
-├── StarterGui/                 → client UI (none yet)
+│   └── StarterPlayerScripts/   → client LocalScripts
+│       └── CashDisplay.client.luau → LocalScript: bottom-center cash panel
+├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
         ├── Ground.model.json
@@ -84,6 +85,19 @@ Dependencies (no cycles): `TycoonService` → `DropperService`,
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
+
+## Client
+
+Client code is presentation only. It reads replicated state and never
+changes cash, ownership, or purchases, and never talks to the server.
+
+| Script | What it does |
+| ------ | ------------ |
+| `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cash`, shows it as `$1,250` (comma separators), and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a text "$" coin). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
+
+UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
+session) rather than stored as instances in `StarterGui`. Colors and sizes
+that are purely visual stay in the script; gameplay numbers stay in `Config`.
 
 ## Shared modules
 

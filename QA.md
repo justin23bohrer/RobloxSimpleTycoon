@@ -60,6 +60,15 @@ Record the date and result when you run a case.
 | D2 | Watch a drop. | It rides the conveyor into the collector. | |
 | D3 | Drops that fall off. | They are removed after `DropLifetime` seconds. | |
 
+## Cash display (client UI)
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| C1 | Player joins. | A yellow rounded panel with a thick dark outline, a green "$" coin, and white "$100" appears at the bottom-center. The player list (top right) still shows Cash 100. No errors in Output. | |
+| C2 | Buy the dropper, then collect (or in **Server** view set `leaderstats.Cash` to 1250, then 1234567). | Text updates right away and matches the player list: "$0", "$1,250", "$1,234,567". The panel does a quick bounce each time. | |
+| C3 | Test → Device emulator: a phone (e.g. iPhone SE, landscape) and a large PC resolution. | Panel stays centered at the bottom, keeps its shape, text is readable and inside the panel, and it does not cover the thumbstick or jump button. | |
+| C4 | Reset character (Esc → Reset). | Only one cash panel; it still shows the correct amount and still updates. | |
+
 ## Multiplayer (2 players)
 
 | ID | Test | Expected | Status |
