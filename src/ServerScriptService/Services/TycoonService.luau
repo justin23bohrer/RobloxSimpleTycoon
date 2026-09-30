@@ -2,9 +2,12 @@
 -- Owns plot ownership and each player's tycoon data.
 --
 -- * Finds the plots in Workspace.Map.Plots at startup.
--- * Gives each joining player the first free plot.
+-- * A player claims a free plot by stepping on its ClaimPad (one plot each).
 -- * Releases the plot (and stops its systems) when the player leaves.
--- * Is the single place that decides purchases for a tycoon.
+-- * Is the single place that decides purchases for a tycoon. Droppers unlock
+--   in Config.Droppers order: only the next one can be bought.
+-- * Tells PlotStages what to show: only the ClaimPad while unclaimed, then the
+--   collect area and the first buy button, then one more button per purchase.
 --
 -- Public ownership marker: each plot Model has an "OwnerUserId" attribute set
 -- by this service (nil when unclaimed). Other services and the client may read
@@ -19,6 +22,7 @@ local BuyButtons = require(script.Parent.BuyButtons)
 local CollectorService = require(script.Parent.CollectorService)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
+local PlotStages = require(script.Parent.PlotStages)
 
 local TycoonService = {}
 
@@ -38,6 +42,7 @@ export type Tycoon = {
 -- DropperSpotN and BuyButtonN for each entry in Config.Droppers.
 local REQUIRED_PARTS = {
 	"Base",
+	"ClaimPad",
 	"OwnerSign",
 	"Conveyor",
 	"Collector",
@@ -78,9 +83,29 @@ local function setOwnerSign(plot: Model, text: string)
 	end
 end
 
-local function onBuyButtonTouched(plot: Model, hit: BasePart, dropperId: string)
+local function getPlayerFromHit(hit: BasePart): Player?
 	local character = hit.Parent
-	local player = character and Players:GetPlayerFromCharacter(character)
+	return character and Players:GetPlayerFromCharacter(character)
+end
+
+-- Stops the plot's systems and puts it back to its unclaimed look.
+local function resetPlot(plot: Model)
+	DropperService.StopAll(plot)
+	CollectorService.ResetPlot(plot)
+	plot:SetAttribute("OwnerUserId", nil)
+	setOwnerSign(plot, "Unclaimed")
+	PlotStages.ShowUnclaimed(plot)
+end
+
+local function onClaimPadTouched(plot: Model, hit: BasePart)
+	local player = getPlayerFromHit(hit)
+	if player then
+		TycoonService.TryClaimPlot(player, plot)
+	end
+end
+
+local function onBuyButtonTouched(plot: Model, hit: BasePart, dropperId: string)
+	local player = getPlayerFromHit(hit)
 	if not player or ownerByPlot[plot] ~= player then
 		return -- not a player, or not this plot's owner
 	end
@@ -112,37 +137,38 @@ function TycoonService.Start()
 	end
 
 	for _, plot in plots do
-		setOwnerSign(plot, "Unclaimed")
-		BuyButtons.ResetAll(plot)
-		CollectorService.SetupPlot(plot)
+		CollectorService.SetupPlot(plot) -- before resetPlot: it builds the pad's effects
+		resetPlot(plot)
+		plot.ClaimPad.Touched:Connect(function(hit)
+			onClaimPadTouched(plot, hit)
+		end)
 		BuyButtons.Connect(plot, function(hit, dropperId)
 			onBuyButtonTouched(plot, hit, dropperId)
 		end)
 	end
 end
 
--- Called by ServerMain when a player joins. Assigns the first free plot.
-function TycoonService.OnPlayerAdded(player: Player)
-	if tycoonsByPlayer[player] then
-		return -- already has a plot; never assign two
+-- Gives the plot to the player if it is free and they have no plot yet.
+-- Returns true on success. Called when a player touches a plot's ClaimPad.
+function TycoonService.TryClaimPlot(player: Player, plot: Model): boolean
+	if tycoonsByPlayer[player] or ownerByPlot[plot] or not table.find(plots, plot) then
+		return false -- already owns a plot, plot taken, or not a real plot
+	end
+	if player.Parent ~= Players then
+		return false -- leaving; a late touch must not claim a plot nobody will free
 	end
 
-	for _, plot in plots do
-		if not ownerByPlot[plot] then
-			tycoonsByPlayer[player] = {
-				PlotId = plot:GetAttribute("PlotId"),
-				Plot = plot,
-				Owner = player,
-				Purchased = {},
-			}
-			ownerByPlot[plot] = player
-			plot:SetAttribute("OwnerUserId", player.UserId)
-			setOwnerSign(plot, `{player.DisplayName}'s Tycoon`)
-			return
-		end
-	end
-
-	warn(`TycoonService: no free plot for {player.Name}. Set the server's max players to {#plots}.`)
+	tycoonsByPlayer[player] = {
+		PlotId = plot:GetAttribute("PlotId"),
+		Plot = plot,
+		Owner = player,
+		Purchased = {},
+	}
+	ownerByPlot[plot] = player
+	plot:SetAttribute("OwnerUserId", player.UserId)
+	setOwnerSign(plot, `{player.DisplayName}'s Tycoon`)
+	PlotStages.ShowClaimed(plot)
+	return true
 end
 
 -- Called by ServerMain when a player leaves. Stops systems and frees the plot.
@@ -152,15 +178,10 @@ function TycoonService.OnPlayerRemoving(player: Player)
 		return
 	end
 
-	DropperService.StopAll(tycoon.Plot)
-	CollectorService.ResetPlot(tycoon.Plot)
-
 	tycoonsByPlayer[player] = nil
 	ownerByPlot[tycoon.Plot] = nil
 	lastBuyTouch[player] = nil
-	tycoon.Plot:SetAttribute("OwnerUserId", nil)
-	setOwnerSign(tycoon.Plot, "Unclaimed")
-	BuyButtons.ResetAll(tycoon.Plot)
+	resetPlot(tycoon.Plot)
 end
 
 -- Returns the player's tycoon, or nil if they have no plot.
@@ -181,25 +202,30 @@ end
 
 -- Buys one dropper (a Config.Droppers Id) for the player's own plot.
 -- Returns true on success. Called when the owner touches a BuyButtonN.
--- Droppers can be bought in any order; the price comes only from Config.
+-- Droppers must be bought in Config.Droppers order; the price comes only from
+-- Config. A Cost of 0 is free (nothing is spent).
 function TycoonService.TryPurchaseDropper(player: Player, dropperId: string): boolean
 	local tycoon = tycoonsByPlayer[player]
-	if not tycoon then
-		return false -- player has no plot
+	if not tycoon or typeof(dropperId) ~= "string" then
+		return false -- player has no plot, or a bad id
 	end
-	local dropper = typeof(dropperId) == "string" and DropperService.GetConfig(dropperId)
-	if not dropper then
+	local dropper, index = DropperService.GetConfig(dropperId)
+	if not dropper or not index then
 		return false -- not a real dropper id
 	end
 	if tycoon.Purchased[dropperId] then
 		return false -- already bought; never charge twice
 	end
-	if not EconomyService.TrySpend(player, dropper.Cost) then
+	local previous = Config.Droppers[index - 1]
+	if previous and not tycoon.Purchased[previous.Id] then
+		return false -- not unlocked yet; buy the one before it first
+	end
+	if dropper.Cost > 0 and not EconomyService.TrySpend(player, dropper.Cost) then
 		return false -- cannot afford it; cash unchanged
 	end
 
 	tycoon.Purchased[dropperId] = true
-	BuyButtons.SetPurchased(tycoon.Plot, dropperId)
+	PlotStages.ShowAfterPurchase(tycoon.Plot, index)
 	DropperService.Start(tycoon.Plot, dropperId)
 	return true
 end

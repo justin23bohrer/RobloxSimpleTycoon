@@ -9,14 +9,14 @@ local Config = {
 	-- Cash every player starts each session with.
 	StartingCash = 100,
 
-	-- The droppers a player can buy, in order. Entry N uses the plot's
+	-- The droppers a player can buy, in order: each one unlocks the next. Entry N uses the plot's
 	-- DropperSpotN and BuyButtonN parts, so the map must have one of each per
 	-- entry (TycoonService checks this at startup).
 	--   Id        - purchase id (tycoon.Purchased[Id]); must be unique.
-	--   Cost      - price, spent through EconomyService.TrySpend.
+	--   Cost      - price, spent through EconomyService.TrySpend. 0 = free.
 	--   DropValue - cash value of each physical drop this dropper creates.
 	Droppers = table.freeze({
-		table.freeze({ Id = "Dropper1", Cost = 100, DropValue = 10 }),
+		table.freeze({ Id = "Dropper1", Cost = 0, DropValue = 10 }),
 		table.freeze({ Id = "Dropper2", Cost = 300, DropValue = 25 }),
 		table.freeze({ Id = "Dropper3", Cost = 1000, DropValue = 60 }),
 		table.freeze({ Id = "Dropper4", Cost = 3000, DropValue = 150 }),
