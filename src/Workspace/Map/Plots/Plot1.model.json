@@ -16,7 +16,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -35,
+              0,
               1.5,
               -35
             ],
@@ -64,7 +64,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -35,
+              0,
               5,
               -58
             ],
@@ -166,7 +166,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -53,
+              -18,
               8,
               -35
             ],
@@ -218,7 +218,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -38,
+              -3,
               2.5,
               -35
             ],
@@ -266,7 +266,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -18,
+              17,
               2.5,
               -35
             ],
@@ -314,7 +314,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -18,
+              17,
               2.2,
               -23
             ],
@@ -416,7 +416,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -53,
+              -18,
               2.2,
               -23
             ],

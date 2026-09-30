@@ -17,9 +17,11 @@ collector → player steps on the Collect pad → cash increases.
 
 ## Tycoon
 
-- There are **4** identical plots (`Config.NumberOfTycoonPlots`).
-- A joining player is automatically given the first available plot.
-- That player owns the plot. Other players cannot use it.
+- There is **1** plot (`Config.NumberOfTycoonPlots`), directly in front of
+  the spawn. We build one tycoon at a time.
+- The first player to join is automatically given the plot.
+- That player owns the plot. Other players cannot use it. Anyone who joins
+  while it is taken gets no plot (the server logs a warning).
 - The plot's sign shows the owner's name, or "Unclaimed".
 - When the player leaves, the plot is released and reset for the next player.
 
@@ -51,7 +53,7 @@ Plain parts only, no theme:
 
 | Part               | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
-| `Base`             | Plot floor. 20-stud gaps separate plots.             |
+| `Base`             | Plot floor, in front of the spawn.                   |
 | `OwnerSign`        | Shows the owner's name.                              |
 | `BuyDropperButton` | Red pad. Buys the dropper.                           |
 | `DropperSpot`      | Transparent yellow block where the dropper goes.     |
