@@ -31,7 +31,7 @@ Record the date and result when you run a case.
 | T1 | Player joins. | One plot's sign shows "<DisplayName>'s Tycoon"; that plot's `OwnerUserId` = player's UserId. | |
 | T2 | Look at the map. | Exactly one plot, in front of the spawn. No other plots. | |
 | T3 | Player 2 steps on Player 1's Buy buttons / Collect pad. | Nothing happens to either player's cash or plot; buttons stay red. | |
-| T4 | Player joins; look at the Collect pads. | Every pad label reads "Collect". Stepping on your own pad with nothing stored does nothing. | |
+| T4 | Player joins; look at the Collect pad. | Label reads "COLLECT!"; the cash tank is empty. Stepping on your own pad with nothing stored does nothing. | |
 
 ## Purchase
 
@@ -53,9 +53,9 @@ Record the date and result when you run a case.
 | E1 | In the **Client** view, change your `leaderstats.Cash` value. Switch to **Server** view. | Server value is unchanged. Buying still uses the server value. | |
 | E2 | Code review: search for writes to `Cash`. | Only `EconomyService` changes cash. | |
 | E3 | Collection. | Payout equals the sum of the values of the drops that reached the collector, paid once. | |
-| E4 | With only Dropper 1, let 3 drops reach the collector. | Pad label reads "Collect $30" (increases by 10 per drop); cash unchanged. | |
-| E5 | Step on your own Collect pad after E4, then stand/jump on it. | Cash +30 exactly once; label back to "Collect". | |
-| E6 | Drop an unrelated part (e.g. from the Explorer in Server view) onto a collector. | Label and stored cash unchanged. | |
+| E4 | With only Dropper 1, let 3 drops reach the collector. | 3 gold cubes in the cash tank; no amount text anywhere; cash unchanged. | |
+| E5 | Step on your own Collect pad after E4, then stand/jump on it. | Cash +30 exactly once; tank empties. | |
+| E6 | Drop an unrelated part (e.g. from the Explorer in Server view) onto a collector. | No cube added; stored cash unchanged. | |
 
 ## Dropper
 
@@ -79,6 +79,13 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | V1 | Look at the spawn, Buy button, and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
+| CT1 | Look behind the Collect pad. | Purple wall with a gold frame, pink "CASH TANK" sign readable from the pad side, glass tank on an orange stand. The wall doesn't block walking onto the pad. | |
+| CT2 | Look above the pad. | A gold ▼ arrow bounces up and down, always. | |
+| CT3 | Buy Dropper 1; watch a drop reach the collector. | One gold cube falls into the tank per drop; pad starts sparkling and glowing. | |
+| CT4 | Buy several droppers; let 60+ drops arrive. | Tank fills, stops at about 60 cubes, nothing spills out; collecting still pays the full stored amount. | |
+| CT5 | Step on the pad with cubes in the tank. | Gold sparkle burst; tank empties; sparkles/glow stop until the next drop. | |
+| CT6 | In a 2-player test, Player 2 watches Player 1's tank fill and empty. | Player 2 sees the same cubes, sparkles, and burst. | |
+| CT7 | Try to jump into the tank. | The glass lid and walls keep you out; the cubes don't pay anything if touched. | |
 | V2 | Walk across the rings only (not the pad centers). | Nothing is bought or collected; only touching the pad itself does. | |
 
 ## Cash display (client UI)
@@ -95,7 +102,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | M1 | Two players join. | Player 1 gets the plot (sign shows their name). Player 2 gets no plot; Output shows a "no free plot" warning. | |
-| M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's pad label and stored cash are unchanged. | |
+| M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's tank cubes and stored cash are unchanged. | |
 | M3 | Player 2 steps on Player 1's Buy button. | Nothing happens; Player 2's cash stays 100. | |
 
 ## Respawn
@@ -110,5 +117,5 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; all Buy buttons back to red "Dropper N - $Cost". | |
-| L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; pad label back to "Collect". | |
+| L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; cash tank empty, pad sparkles/glow off. | |
 | L3 | A new player joins after L1. | They are given the released plot. (A player who was already in the game without a plot does not get it automatically.) | |

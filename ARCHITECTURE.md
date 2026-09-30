@@ -18,7 +18,8 @@ src/
 │       ├── TycoonService.luau
 │       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches)
 │       ├── DropperService.luau
-│       └── CollectorService.luau
+│       ├── CollectorService.luau
+│       └── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
 │       └── CashDisplay.client.luau → LocalScript: bottom-center cash panel
@@ -76,14 +77,15 @@ reach the server.
 | `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`). | Implemented (ownership + dropper purchases) |
 | `BuyButtons` (helper) | Used only by `TycoonService`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost"), grays out bought ones. Decides nothing. | Implemented |
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns `Drop` parts worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
-| `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`; shows "Collect $<stored>" on the pad. | Implemented (`SetupPlot`, `ResetPlot`) |
+| `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
+| `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a gold cube into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
 Dependencies (no cycles): `TycoonService` → `BuyButtons`, `DropperService`,
 `CollectorService`, `EconomyService`. `BuyButtons` → `DropperService` (`GetConfig`).
-`CollectorService` → `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
+`CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.

@@ -585,7 +585,7 @@
               "name": "TextLabel",
               "className": "TextLabel",
               "properties": {
-                "Text": "Collect",
+                "Text": "COLLECT!",
                 "Size": {
                   "UDim2": [
                     [
@@ -605,10 +605,461 @@
                   1,
                   1
                 ],
-                "TextStrokeTransparency": 0
+                "TextStrokeTransparency": 0,
+                "Font": "FredokaOne"
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "CashTank",
+      "className": "Model",
+      "children": [
+        {
+          "name": "TankWallBorder",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13,
+              13,
+              0.6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  8.5,
+                  -30.1
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankWall",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              12,
+              12,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  8.5,
+                  -29.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                70,
+                230
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankSign",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              10,
+              2.2,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  13.2,
+                  -28.8
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                90,
+                160
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "SignGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "PixelsPerStud": 50
+              },
+              "children": [
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "CASH TANK",
+                    "Size": {
+                      "UDim2": [
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextScaled": true,
+                    "BackgroundTransparency": 1,
+                    "Font": "FredokaOne",
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 0
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "TankStand",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6.8,
+              2.4,
+              2.8
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  3.2,
+                  -27.6
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                170,
+                0
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              7,
+              2.8
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  13.8,
+                  7.9,
+                  -27.6
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                180,
+                230,
+                255
+              ]
+            },
+            "Anchored": true,
+            "Material": "Glass",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Transparency": 0.6,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              7,
+              2.8
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  20.2,
+                  7.9,
+                  -27.6
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                180,
+                230,
+                255
+              ]
+            },
+            "Anchored": true,
+            "Material": "Glass",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Transparency": 0.6,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6.8,
+              7,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  7.9,
+                  -26.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                180,
+                230,
+                255
+              ]
+            },
+            "Anchored": true,
+            "Material": "Glass",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Transparency": 0.6,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TankLid",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6.8,
+              0.4,
+              2.8
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  11.6,
+                  -27.6
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                180,
+                230,
+                255
+              ]
+            },
+            "Anchored": true,
+            "Material": "Glass",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Transparency": 0.6,
+            "CanTouch": false,
+            "CanQuery": false
+          }
         }
       ]
     },
