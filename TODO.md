@@ -30,7 +30,8 @@ user's approval first.
 
 - [x] Four droppers with increasing prices (`Config.Droppers`), one buy button each, label shows name and price from `Config`. (code done; Studio test pending: QA U1–U7, D4)
 - [x] Studio-only unlimited cash for testing (`Config.DevUnlimitedCash`). (code done; Studio test pending: QA DV1–DV2)
-- [ ] Restyle the new buy buttons to match the round, outlined pads once `feature/pad-style` merges.
+- [x] Restyle the new buy buttons to match the round, outlined pads (done by the lead while merging).
+- [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
 
 ## Post-MVP (needs approval)
 
@@ -40,7 +41,7 @@ user's approval first.
 
 ## Polish (needs approval)
 
-- [ ] Simple cash UI and purchase/collect feedback (sounds, effects).
+- [ ] Purchase/collect feedback (sounds, effects). (The cash display itself is done, see MVP.)
 - [ ] Cleaner prototype visuals (still no theme until approved).
 
 ## Future features (needs approval)

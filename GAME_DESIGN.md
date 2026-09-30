@@ -13,7 +13,9 @@ the next, more expensive dropper.
 ## Player
 
 - Starts each session with **$100** (`Config.StartingCash`).
-- Cash is shown in the Roblox player list (`leaderstats`).
+- Cash is shown in the Roblox player list (`leaderstats`) and in a cartoony
+  panel at the bottom-center of the screen (e.g. "$1,250") that bounces when
+  the amount changes.
 - No saving between sessions yet.
 
 ## Tycoon
