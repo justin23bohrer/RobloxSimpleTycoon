@@ -60,6 +60,13 @@ Record the date and result when you run a case.
 | D2 | Watch a drop. | It rides the conveyor into the collector. | |
 | D3 | Drops that fall off. | They are removed after `DropLifetime` seconds. | |
 
+## Visuals
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| V1 | Look at the spawn, Buy button, and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
+| V2 | Walk across the rings only (not the pad centers). | Nothing is bought or collected; only touching the pad itself does. | |
+
 ## Multiplayer (2 players)
 
 | ID | Test | Expected | Status |

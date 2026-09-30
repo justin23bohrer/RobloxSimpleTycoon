@@ -49,14 +49,28 @@ collector → player steps on the Collect pad → cash increases.
 
 ## Plot layout (prototype)
 
-Plain parts only, no theme:
+Plain parts only, no theme. The spots players step on are flat round pads
+with a darker ring underneath as an outline:
 
 | Part               | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
 | `Base`             | Plot floor, in front of the spawn.                   |
 | `OwnerSign`        | Shows the owner's name.                              |
-| `BuyDropperButton` | Red pad. Buys the dropper.                           |
+| `BuyDropperButton` | Round red pad with a dark red ring. Buys the dropper. |
 | `DropperSpot`      | Transparent yellow block where the dropper goes.     |
 | `Conveyor`         | Dark strip that carries drops.                       |
 | `Collector`        | Green block at the end of the conveyor.              |
-| `CollectPad`       | Bright green pad. Pays the owner their stored cash.  |
+| `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cash. |
+| `SpawnLocation`    | Round blue pad with a dark blue ring, in `Map` (not the plot). Where players appear. |
+
+### Pad style (copy this for new pads)
+
+| Piece | Setting |
+| ----- | ------- |
+| Pad (the part players touch) | `Part`, `Shape = Cylinder`, CFrame rotated 90° around Z (orientation `[[0,-1,0],[1,0,0],[0,0,1]]`) so the round face points up. Plot pads: `Size = [0.4, 6, 6]` (height, diameter, diameter), bottom resting on `Base` (Y = 2.2). SmoothPlastic, bold color. |
+| Ring (outline) | A child of the pad named `<PadName>Ring`. Same shape and rotation, half the pad's height, 1.5 studs wider (plot pads: `Size = [0.2, 7.5, 7.5]`, Y = 2.1), darker shade of the pad color. `Anchored`, `CanTouch = false`, `CanQuery = false`. |
+| Label | `BillboardGui` named `Label` on the pad, `StudsOffset = [0, 3, 0]`, white `TextScaled` text with a black stroke. |
+
+Buy button colors: pad `255,0,0` (TycoonService resets the button to this
+exact red), ring `110,0,0`. Collect pad: `0,220,70` / ring `0,95,35`.
+Spawn (14 studs wide): `70,160,255` / ring `20,60,150`.
