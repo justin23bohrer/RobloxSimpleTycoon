@@ -3,6 +3,9 @@
 -- dropper buy buttons. It never decides a purchase; it only reports touches
 -- to the callback TycoonService passes in.
 --
+-- A bought button disappears (pad, ring, and label hidden, no collisions or
+-- touches) and comes back when the plot is reset.
+--
 -- Button N (BuyButtonN in the plot) belongs to Config.Droppers[N]. Its label
 -- text ("Dropper N - $Cost") is built from Config so prices live in one place.
 
@@ -15,24 +18,31 @@ local BuyButtons = {}
 
 -- Looks only. The map's buttons start red.
 local FOR_SALE_COLOR = Color3.fromRGB(255, 0, 0)
-local PURCHASED_COLOR = Color3.fromRGB(80, 80, 80)
-local PURCHASED_TEXT = "Purchased"
 
 -- Name of the plot part for the dropper at this position in Config.Droppers.
 function BuyButtons.PartName(index: number): string
 	return `BuyButton{index}`
 end
 
-local function setButton(plot: Model, index: number, color: Color3, text: string)
+local function getButton(plot: Model, index: number): BasePart?
 	local button = plot:FindFirstChild(BuyButtons.PartName(index))
-	if not button or not button:IsA("BasePart") then
-		return
+	if button and button:IsA("BasePart") then
+		return button
 	end
-	button.Color = color
-	local label = button:FindFirstChild("TextLabel", true)
-	if label and label:IsA("TextLabel") then
-		label.Text = text
+	return nil
+end
+
+-- Shows or hides a button together with its ring and floating label.
+local function setVisible(button: BasePart, visible: boolean)
+	for _, item in { button :: Instance, table.unpack(button:GetDescendants()) } do
+		if item:IsA("BasePart") then
+			item.Transparency = if visible then 0 else 1
+			item.CanCollide = visible
+		elseif item:IsA("BillboardGui") then
+			item.Enabled = visible
+		end
 	end
+	button.CanTouch = visible
 end
 
 -- Calls onTouched(hit, dropperId) whenever a part touches one of the plot's
@@ -46,18 +56,27 @@ function BuyButtons.Connect(plot: Model, onTouched: (hit: BasePart, dropperId: s
 	end
 end
 
--- Puts every buy button on the plot back to "for sale".
+-- Puts every buy button on the plot back to "for sale" and makes it visible.
 function BuyButtons.ResetAll(plot: Model)
 	for index, entry in Config.Droppers do
-		setButton(plot, index, FOR_SALE_COLOR, `Dropper {index} - ${entry.Cost}`)
+		local button = getButton(plot, index)
+		if button then
+			button.Color = FOR_SALE_COLOR
+			local label = button:FindFirstChild("TextLabel", true)
+			if label and label:IsA("TextLabel") then
+				label.Text = `Dropper {index} - ${entry.Cost}`
+			end
+			setVisible(button, true)
+		end
 	end
 end
 
--- Grays out one dropper's button and labels it "Purchased".
+-- Makes one dropper's button disappear after it is bought.
 function BuyButtons.SetPurchased(plot: Model, dropperId: string)
 	local _, index = DropperService.GetConfig(dropperId)
-	if index then
-		setButton(plot, index, PURCHASED_COLOR, PURCHASED_TEXT)
+	local button = if index then getButton(plot, index) else nil
+	if button then
+		setVisible(button, false)
 	end
 end
 

@@ -44,8 +44,8 @@ There are four droppers (`Config.Droppers`), each with its own buy button:
 - Droppers can be bought in any order.
 - The player must have enough cash.
 - The purchase is decided on the server.
-- Each dropper can only be bought once per plot. A bought button turns gray
-  and says "Purchased". All buttons reset when the plot is released.
+- Each dropper can only be bought once per plot. A bought button disappears
+  (pad, ring, and label). All buttons come back when the plot is released.
 
 ## Droppers
 
