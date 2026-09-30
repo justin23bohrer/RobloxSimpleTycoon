@@ -1,18 +1,21 @@
 -- BuyButtons (server only)
--- Helper for TycoonService: finds, labels, recolors, and connects a plot's
+-- Helper for TycoonService: finds, labels, shows/hides, and connects a plot's
 -- dropper buy buttons. It never decides a purchase; it only reports touches
 -- to the callback TycoonService passes in.
 --
--- A bought button disappears (pad, ring, and label hidden, no collisions or
--- touches) and comes back when the plot is reset.
+-- Buttons are hidden until TycoonService unlocks them one at a time (see
+-- PlotStages). A shown button appears together with its DropperSpotN, so the
+-- player sees where that dropper will go. A bought button and its spot
+-- disappear. Hidden buttons cannot be touched.
 --
 -- Button N (BuyButtonN in the plot) belongs to Config.Droppers[N]. Its label
--- text ("Dropper N - $Cost") is built from Config so prices live in one place.
+-- text ("Dropper N - $Cost", or "FREE") is built from Config so prices live in
+-- one place.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
-local DropperService = require(script.Parent.DropperService)
+local PlotVisibility = require(script.Parent.PlotVisibility)
 
 local BuyButtons = {}
 
@@ -32,17 +35,18 @@ local function getButton(plot: Model, index: number): BasePart?
 	return nil
 end
 
--- Shows or hides a button together with its ring and floating label.
-local function setVisible(button: BasePart, visible: boolean)
-	for _, item in { button :: Instance, table.unpack(button:GetDescendants()) } do
-		if item:IsA("BasePart") then
-			item.Transparency = if visible then 0 else 1
-			item.CanCollide = visible
-		elseif item:IsA("BillboardGui") then
-			item.Enabled = visible
-		end
+-- The button and the dropper spot that appear and disappear together.
+local function getParts(plot: Model, index: number): { Instance }
+	local parts = {}
+	local button = getButton(plot, index)
+	if button then
+		table.insert(parts, button)
 	end
-	button.CanTouch = visible
+	local spot = plot:FindFirstChild(`DropperSpot{index}`)
+	if spot then
+		table.insert(parts, spot)
+	end
+	return parts
 end
 
 -- Calls onTouched(hit, dropperId) whenever a part touches one of the plot's
@@ -56,27 +60,35 @@ function BuyButtons.Connect(plot: Model, onTouched: (hit: BasePart, dropperId: s
 	end
 end
 
--- Puts every buy button on the plot back to "for sale" and makes it visible.
-function BuyButtons.ResetAll(plot: Model)
+-- Puts every buy button back to "for sale" and hides it and its spot.
+function BuyButtons.HideAll(plot: Model)
 	for index, entry in Config.Droppers do
 		local button = getButton(plot, index)
 		if button then
 			button.Color = FOR_SALE_COLOR
 			local label = button:FindFirstChild("TextLabel", true)
 			if label and label:IsA("TextLabel") then
-				label.Text = `Dropper {index} - ${entry.Cost}`
+				local price = if entry.Cost == 0 then "FREE" else `${entry.Cost}`
+				label.Text = `Dropper {index} - {price}`
 			end
-			setVisible(button, true)
+		end
+		for _, part in getParts(plot, index) do
+			PlotVisibility.Hide(part)
 		end
 	end
 end
 
--- Makes one dropper's button disappear after it is bought.
-function BuyButtons.SetPurchased(plot: Model, dropperId: string)
-	local _, index = DropperService.GetConfig(dropperId)
-	local button = if index then getButton(plot, index) else nil
-	if button then
-		setVisible(button, false)
+-- Shows button N and the spot where its dropper will go.
+function BuyButtons.Show(plot: Model, index: number)
+	for _, part in getParts(plot, index) do
+		PlotVisibility.Show(part)
+	end
+end
+
+-- Makes button N and its spot disappear after the dropper is bought.
+function BuyButtons.SetPurchased(plot: Model, index: number)
+	for _, part in getParts(plot, index) do
+		PlotVisibility.Hide(part)
 	end
 end
 

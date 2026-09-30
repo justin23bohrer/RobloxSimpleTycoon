@@ -16,7 +16,9 @@ src/
 │       ├── PlayerDataService.luau
 │       ├── EconomyService.luau
 │       ├── TycoonService.luau
-│       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches)
+│       ├── PlotStages.luau     → helper for TycoonService (what a plot shows at each stage)
+│       ├── PlotVisibility.luau → helper: hide/show a part or model and restore it
+│       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches/visibility)
 │       ├── DropperService.luau
 │       ├── CollectorService.luau
 │       └── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
@@ -67,15 +69,18 @@ reach the server.
 `ServerMain.server.luau` is the only server Script. It calls
 `TycoonService.Start()`, then routes join/leave in a fixed order:
 
-- Join: `PlayerDataService.OnPlayerAdded` → `TycoonService.OnPlayerAdded`
+- Join: `PlayerDataService.OnPlayerAdded` (no plot yet; plots are claimed on
+  the `ClaimPad`, see TycoonService)
 - Leave: `TycoonService.OnPlayerRemoving` → `PlayerDataService.OnPlayerRemoving`
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`). | Implemented (ownership + dropper purchases) |
-| `BuyButtons` (helper) | Used only by `TycoonService`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost"), hides bought ones and shows them again on reset. Decides nothing. | Implemented |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`; in `Config.Droppers` order only; `Cost = 0` spends nothing). Tells `PlotStages` what to show. | Implemented (claiming + ordered dropper purchases) |
+| `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and buy button 1), `ShowAfterPurchase(plot, index)` (hides button N, shows button N+1). Decides nothing. | Implemented |
+| `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
+| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost" / "FREE"), and hides/shows each button together with its `DropperSpotN` (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns `Drop` parts worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
 | `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a gold cube into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
@@ -83,8 +88,9 @@ reach the server.
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
-Dependencies (no cycles): `TycoonService` → `BuyButtons`, `DropperService`,
-`CollectorService`, `EconomyService`. `BuyButtons` → `DropperService` (`GetConfig`).
+Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `DropperService`,
+`CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`.
+`BuyButtons` → `PlotVisibility`.
 `CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
@@ -167,13 +173,19 @@ type Tycoon = {
 - Money enters the game only through collection (`AddCash`).
 - Money leaves only through purchases (`TrySpend`, which fails without
   changing anything if the player cannot afford it).
+- Claim flow: a player touches a plot's `ClaimPad` (server `Touched`) →
+  `TycoonService.TryClaimPlot(player, plot)` checks the player has no plot and
+  the plot is free → records the tycoon, sets `OwnerUserId` and the sign, and
+  calls `PlotStages.ShowClaimed`.
 - Purchase flow: owner touches their plot's `BuyButtonN` (server `Touched`,
   wired by `BuyButtons`) → `TycoonService.TryPurchaseDropper(player, dropperId)`
   checks the player has a plot, the id is a real `Config.Droppers` id, it has
-  not already been bought, and `TrySpend(entry.Cost)` succeeds → marks
-  `Purchased[dropperId]`, hides that button (pad, ring, label; no collisions or touches), and calls
-  `DropperService.Start(plot, dropperId)`. Droppers can be bought in any order.
-  Touches from non-owners are ignored. On release all buttons reset.
+  not already been bought, the previous dropper (N-1) **has** been bought, and
+  `TrySpend(entry.Cost)` succeeds (skipped when `Cost` is 0) → marks
+  `Purchased[dropperId]`, calls `PlotStages.ShowAfterPurchase` (hide button N,
+  show button N+1), and calls `DropperService.Start(plot, dropperId)`.
+  Touches from non-owners are ignored. On release the plot goes back to
+  `ShowUnclaimed`.
 - Drop values are set by the server from the dropper's `Config.Droppers`
   `DropValue`, never taken from the client or from a property a client could change.
 - Dev cash: `DevUnlimitedCash` only changes the *starting* amount, and only

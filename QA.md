@@ -24,26 +24,28 @@ Record the date and result when you run a case.
 | P1 | Player joins. | Player spawns on the center spawn; no errors in Output. | |
 | P2 | Check the player list (with `DevUnlimitedCash = false`). | Cash shows **100**. | |
 
-## Tycoon
+## Tycoon (claiming and unlocking)
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| T1 | Player joins. | One plot's sign shows "<DisplayName>'s Tycoon"; that plot's `OwnerUserId` = player's UserId. | |
+| T1 | Player joins; look at the plot. | Only the floor and a round blue "Claim Tycoon" pad show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
 | T2 | Look at the map. | Exactly one plot, in front of the spawn. No other plots. | |
-| T3 | Player 2 steps on Player 1's Buy buttons / Collect pad. | Nothing happens to either player's cash or plot; buttons stay red. | |
-| T4 | Player joins; look at the Collect pad. | Label reads "COLLECT!"; the cash tank is empty. Stepping on your own pad with nothing stored does nothing. | |
+| T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays. | |
+| T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 - FREE", with yellow spot 1 above the conveyor. | |
+| T5 | Stepping on your own Collect pad right after claiming. | Nothing happens (nothing stored). | |
+| T6 | Press Play and check Output before anyone claims. | No warnings about a missing `ClaimPad` or other plot parts; no "no free plot" warning on join. | |
 
 ## Purchase
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| U0 | Player joins; look at the four buy buttons. | Red, labeled "Dropper 1 - $100", "Dropper 2 - $300", "Dropper 3 - $1000", "Dropper 4 - $3000". | |
-| U1 | Player with $100 steps on own "Dropper 1" button. | Cash → 0; the button (red pad, dark ring, and label) disappears and you can walk over the spot; a gray dropper appears at yellow spot 1. | |
-| U2 | Player with less than $100 steps on "Dropper 1". (In **Server** view, set your `leaderstats.Cash` to 50 first.) | Nothing is bought; cash stays 50; button stays red. | |
-| U3 | After buying, walk over where the button was (repeatedly). | No second dropper; no cash removed. | |
-| U4 | Buy in order: set Server cash to 4400, buy Dropper 1, 2, 3, 4. | Cash 4400 → 4300 → 4000 → 3000 → 0. Each button disappears; a dropper appears at each matching spot. | |
-| U5 | Buy out of order: set Server cash to 3000, step on "Dropper 4" first. | Cash → 0; only Dropper 4 is bought (spot 4). Other buttons stay red. | |
-| U6 | Can't afford: with $299 (Server view), step on "Dropper 2". | Nothing bought; cash stays 299; button stays red. | |
+| U0 | Claim the plot. | Only "Dropper 1 - FREE" is showing. | |
+| U1 | Step on "Dropper 1 - FREE" with $100. | Cash stays **100**. Button 1 and yellow spot 1 disappear; a gray dropper appears at spot 1; the conveyor starts and drops fall every 2 s. The "Dropper 2 - $300" button and yellow spot 2 appear. Buttons 3 and 4 are still hidden. | |
+| U2 | Can't afford: with $299 (Server view), step on "Dropper 2". | Nothing bought; cash stays 299; button 2 stays. | |
+| U3 | After buying, walk over where button 1 was (repeatedly). | No second dropper; no cash removed. | |
+| U4 | Buy in order: set Server cash to 4300, buy Dropper 1, 2, 3, 4. | Cash 4300 → 4300 → 4000 → 3000 → 0. Each purchase hides that button and shows the next one; after Dropper 4 no buttons remain. A dropper appears at each spot. | |
+| U5 | Order is enforced by the server: before buying Dropper 1, in **Server** view select `BuyButton2` and set `Transparency = 0`, `CanTouch = true`, then step on it with cash ≥ 300. | Nothing is bought; cash unchanged. (Only the next dropper can be bought.) | |
+| U6 | Walk across the spots where the hidden buttons 2–4 are, before unlocking them. | Nothing happens; no cash removed. | |
 | U7 | Can't buy twice: after buying Dropper 3, walk over where its button was, repeatedly (with cash ≥ 1000). | No cash removed; still one dropper at spot 3; the button stays hidden. | |
 
 ## Economy
@@ -70,7 +72,7 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| DV1 | Set `DevUnlimitedCash = true` in `Config.luau`, Play in Studio. | Output shows one "[DEV] Unlimited cash is ON" line; cash shows 1000000000. Buying a dropper subtracts its cost. | |
+| DV1 | Set `DevUnlimitedCash = true` in `Config.luau`, Play in Studio. | Output shows one "[DEV] Unlimited cash is ON" line; cash shows 1000000000. Buying a dropper subtracts its cost (Dropper 1 is free). | |
 | DV2 | Set `DevUnlimitedCash = false`, Play. | No "[DEV]" line; cash shows 100. | |
 | DV3 | Code review: dev cash is gated by `RunService:IsStudio()` in `PlayerDataService`, and `DevUnlimitedCash` is `false` in the committed `Config.luau`. | Both true. | |
 
@@ -78,7 +80,7 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| V1 | Look at the spawn, Buy button, and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
+| V1 | Look at the spawn and Claim pad; then claim and look at the Buy button and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
 | CT1 | Look behind the Collect pad. | Purple wall with a gold frame, pink "CASH TANK" sign readable from the pad side, glass tank on an orange stand. The wall doesn't block walking onto the pad. | |
 | CT2 | Look above the pad. | A gold ▼ arrow bounces up and down, always. | |
 | CT3 | Buy Dropper 1; watch a drop reach the collector. | One gold cube falls into the tank per drop; pad starts sparkling and glowing. | |
@@ -93,7 +95,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | C1 | Player joins. | A yellow rounded panel with a thick dark outline, a green "$" coin, and white "$100" appears at the bottom-center. The player list (top right) still shows Cash 100. No errors in Output. | |
-| C2 | Buy the dropper, then collect (or in **Server** view set `leaderstats.Cash` to 1250, then 1234567). | Text updates right away and matches the player list: "$0", "$1,250", "$1,234,567". The panel does a quick bounce each time. | |
+| C2 | Claim, buy Dropper 1, then collect (or in **Server** view set `leaderstats.Cash` to 1250, then 1234567). | Text updates right away and matches the player list: e.g. "$130", "$1,250", "$1,234,567". The panel does a quick bounce each time. | |
 | C3 | Test → Device emulator: a phone (e.g. iPhone SE, landscape) and a large PC resolution. | Panel stays centered at the bottom, keeps its shape, text is readable and inside the panel, and it does not cover the thumbstick or jump button. | |
 | C4 | Reset character (Esc → Reset). | Only one cash panel; it still shows the correct amount and still updates. | |
 
@@ -101,9 +103,10 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| M1 | Two players join. | Player 1 gets the plot (sign shows their name). Player 2 gets no plot; Output shows a "no free plot" warning. | |
+| M1 | Two players join; Player 1 steps on the Claim pad, then Player 2 walks to where it was. | Player 1 gets the plot (sign shows their name). The Claim pad is gone, so Player 2 cannot claim; Player 2 has no plot. No warnings in Output. | |
 | M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's tank cubes and stored cash are unchanged. | |
-| M3 | Player 2 steps on Player 1's Buy button. | Nothing happens; Player 2's cash stays 100. | |
+| M3 | Player 2 steps on Player 1's Buy button (the one showing). | Nothing happens; Player 2's cash stays 100; the button stays. |
+| M4 | Both players step on the Claim pad at the same moment. | Exactly one of them owns the plot; the other has none. | |
 
 ## Respawn
 
@@ -116,6 +119,6 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; all Buy buttons visible again, red, labeled "Dropper N - $Cost". | |
+| L1 | In a 2-player test, after Player 1 buys some droppers, close Player 1's window. | The plot goes back to the T1 look: only the floor and the Claim Tycoon pad; droppers, drops, buttons, sign, and collect area are gone; `OwnerUserId` removed. | |
 | L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; cash tank empty, pad sparkles/glow off. | |
-| L3 | A new player joins after L1. | They are given the released plot. (A player who was already in the game without a plot does not get it automatically.) | |
+| L3 | After L1, Player 2 (already in the game) steps on the Claim pad. | Player 2 gets the plot and sees exactly the T4 look: collect area and only "Dropper 1 - FREE" (nothing left over from Player 1). | |

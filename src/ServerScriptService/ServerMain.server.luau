@@ -10,9 +10,9 @@ local TycoonService = require(Services.TycoonService)
 
 TycoonService.Start()
 
+-- Players get a plot by stepping on a ClaimPad (TycoonService), not on join.
 local function onPlayerAdded(player: Player)
-	PlayerDataService.OnPlayerAdded(player) -- cash first
-	TycoonService.OnPlayerAdded(player) -- then a plot
+	PlayerDataService.OnPlayerAdded(player)
 end
 
 local function onPlayerRemoving(player: Player)

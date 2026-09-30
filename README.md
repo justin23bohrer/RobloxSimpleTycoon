@@ -2,8 +2,8 @@
 
 A tiny Roblox tycoon, built as a clean starting point:
 
-> join → get $100 → get a plot → buy droppers → drops ride a conveyor →
-> collect the cash → buy bigger droppers
+> join → get $100 → claim a plot → free first dropper → unlock and buy the
+> next droppers one by one → drops ride a conveyor → collect the cash
 
 The full design is in [GAME_DESIGN.md](GAME_DESIGN.md). **Current status:** the full MVP
 loop is built (cash, plots, buying the dropper, drops, conveyor, collection)
