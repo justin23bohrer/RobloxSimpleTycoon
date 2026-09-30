@@ -2,9 +2,9 @@
   "className": "SpawnLocation",
   "properties": {
     "Size": [
-      12,
       1,
-      12
+      14,
+      14
     ],
     "CFrame": {
       "CFrame": {
@@ -15,13 +15,13 @@
         ],
         "orientation": [
           [
-            1,
             0,
+            -1,
             0
           ],
           [
-            0,
             1,
+            0,
             0
           ],
           [
@@ -34,14 +34,68 @@
     },
     "Color": {
       "Color3uint8": [
-        163,
-        162,
-        165
+        70,
+        160,
+        255
       ]
     },
     "Anchored": true,
     "Material": "SmoothPlastic",
     "TopSurface": "Smooth",
-    "BottomSurface": "Smooth"
-  }
+    "BottomSurface": "Smooth",
+    "Shape": "Cylinder"
+  },
+  "children": [
+    {
+      "name": "SpawnLocationRing",
+      "className": "Part",
+      "properties": {
+        "Shape": "Cylinder",
+        "Size": [
+          0.5,
+          15.5,
+          15.5
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              0,
+              1.25,
+              0
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            20,
+            60,
+            150
+          ]
+        },
+        "Anchored": true,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    }
+  ]
 }

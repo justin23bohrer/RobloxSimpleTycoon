@@ -24,6 +24,7 @@ user's approval first.
 - [x] CollectorService: store drop value at the collector; owner-only payout on the Collect pad (code done; Studio test waits on DropperService).
 - [x] Show the plot's stored (uncollected) cash on the Collect pad label (approved with the collector task).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
+- [x] Round, outlined pads for the Buy button, Collect pad, and spawn (approved 2026-09-30; Studio visual check pending).
 
 ## Post-MVP (needs approval)
 

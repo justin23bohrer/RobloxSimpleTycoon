@@ -307,9 +307,9 @@
       "className": "Part",
       "properties": {
         "Size": [
-          5,
           0.4,
-          5
+          6,
+          6
         ],
         "CFrame": {
           "CFrame": {
@@ -320,13 +320,13 @@
             ],
             "orientation": [
               [
-                1,
                 0,
+                -1,
                 0
               ],
               [
-                0,
                 1,
+                0,
                 0
               ],
               [
@@ -340,16 +340,68 @@
         "Color": {
           "Color3uint8": [
             0,
-            255,
-            0
+            220,
+            70
           ]
         },
         "Anchored": true,
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
-        "BottomSurface": "Smooth"
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
       },
       "children": [
+        {
+          "name": "CollectPadRing",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  17,
+                  2.1,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                0,
+                95,
+                35
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
         {
           "name": "Label",
           "className": "BillboardGui",
@@ -368,7 +420,7 @@
             },
             "StudsOffset": [
               0,
-              2,
+              3,
               0
             ]
           },
@@ -409,9 +461,9 @@
       "className": "Part",
       "properties": {
         "Size": [
-          4,
           0.4,
-          4
+          6,
+          6
         ],
         "CFrame": {
           "CFrame": {
@@ -422,13 +474,13 @@
             ],
             "orientation": [
               [
-                1,
                 0,
+                -1,
                 0
               ],
               [
-                0,
                 1,
+                0,
                 0
               ],
               [
@@ -449,9 +501,61 @@
         "Anchored": true,
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
-        "BottomSurface": "Smooth"
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
       },
       "children": [
+        {
+          "name": "BuyDropperButtonRing",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -18,
+                  2.1,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
         {
           "name": "Label",
           "className": "BillboardGui",
@@ -470,7 +574,7 @@
             },
             "StudsOffset": [
               0,
-              2,
+              3,
               0
             ]
           },
