@@ -25,9 +25,14 @@ user's approval first.
 - [x] Show the plot's stored (uncollected) cash on the Collect pad label (approved with the collector task).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
 
+## Approved 2026-09-30
+
+- [x] Four droppers with increasing prices (`Config.Droppers`), one buy button each, label shows name and price from `Config`. (code done; Studio test pending: QA U1–U7, D4)
+- [x] Studio-only unlimited cash for testing (`Config.DevUnlimitedCash`). (code done; Studio test pending: QA DV1–DV2)
+- [ ] Restyle the new buy buttons to match the round, outlined pads once `feature/pad-style` merges.
+
 ## Post-MVP (needs approval)
 
-- [ ] Show the price on the Buy button from `Config`.
 - [ ] Teleport players to their plot on join/respawn.
 - [ ] Handle a full server more gracefully than a warning.
 - [ ] DataStore persistence for cash and purchases.
@@ -39,5 +44,5 @@ user's approval first.
 
 ## Future features (needs approval)
 
-- [ ] More droppers and upgrades.
+- [ ] Upgrades (more droppers beyond the four are just new `Config.Droppers` entries + map parts).
 - [ ] Anything else (monetization, rebirths, pets, etc.) only after the MVP is playable and tested.

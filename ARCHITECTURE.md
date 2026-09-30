@@ -16,6 +16,7 @@ src/
 │       ├── PlayerDataService.luau
 │       ├── EconomyService.luau
 │       ├── TycoonService.luau
+│       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches)
 │       ├── DropperService.luau
 │       └── CollectorService.luau
 ├── StarterPlayer/
@@ -69,17 +70,18 @@ reach the server.
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
-| `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join; forgets it on leave. | Implemented |
+| `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases. | Implemented (ownership + dropper purchase) |
-| `DropperService` | Runs a plot's dropper: places a `Dropper` part at `DropperSpot`, spawns `Drop` parts into the plot's `Drops` folder every `DropInterval`, moves them with the conveyor, destroys them after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. | Implemented (`Start`, `Stop`, `ClaimDrop`) |
+| `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`). | Implemented (ownership + dropper purchases) |
+| `BuyButtons` (helper) | Used only by `TycoonService`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost"), grays out bought ones. Decides nothing. | Implemented |
+| `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns `Drop` parts worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
 | `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`; shows "Collect $<stored>" on the pad. | Implemented (`SetupPlot`, `ResetPlot`) |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
-Dependencies (no cycles): `TycoonService` → `DropperService`,
-`CollectorService`, `EconomyService`.
+Dependencies (no cycles): `TycoonService` → `BuyButtons`, `DropperService`,
+`CollectorService`, `EconomyService`. `BuyButtons` → `DropperService` (`GetConfig`).
 `CollectorService` → `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
@@ -93,9 +95,14 @@ read everything in ReplicatedStorage.
 
 ## Configuration
 
-`Config.luau` holds every tunable value (`StartingCash`, `DropperCost`,
-`DropValue`, `DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`,
-`DropLifetime`). It is frozen, so code cannot change it at runtime.
+`Config.luau` holds every tunable value (`StartingCash`, `Droppers`,
+`DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`, `DropLifetime`,
+`DevUnlimitedCash`, `DevStartingCash`). It is frozen (including each
+`Droppers` entry), so code cannot change it at runtime.
+
+`Droppers` is an ordered list of `{ Id, Cost, DropValue }`. Entry N uses the
+plot parts `DropperSpotN` and `BuyButtonN`; TycoonService requires one of each
+per entry. To add a dropper: add an entry and add the two parts to the map.
 `NumberOfTycoonPlots` must match the plot models in the map; TycoonService
 warns if it does not.
 
@@ -122,17 +129,17 @@ type Tycoon = {
 	PlotId: number,                  -- from the plot's PlotId attribute
 	Plot: Model,                     -- Workspace.Map.Plots.PlotN
 	Owner: Player,
-	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper = true
+	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper2 = true
 }
 ```
 
 - **Ownership:** TycoonService keeps `player → Tycoon` and `plot → player`
   tables, and mirrors the owner into the plot's `OwnerUserId` attribute
   (read-only for everyone else).
-- **Purchased upgrades:** `Purchased` is a set of purchase ids. The MVP has
-  one: `"Dropper"`.
+- **Purchased upgrades:** `Purchased` is a set of purchase ids: the
+  `Config.Droppers` ids (`"Dropper1"` … `"Dropper4"`).
 - **Active systems:** a purchase activates a system by calling its service
-  (`DropperService.Start(plot)`). Each system service keeps its own runtime
+  (`DropperService.Start(plot, dropperId)`). Each system service keeps its own runtime
   state keyed by plot and must clean up in its stop/reset function.
 - **Lifetime:** data lasts for the session. On leave, systems stop, the plot
   is released and reset. Respawning does not touch any of it (cash lives on
@@ -144,13 +151,17 @@ type Tycoon = {
 - Money enters the game only through collection (`AddCash`).
 - Money leaves only through purchases (`TrySpend`, which fails without
   changing anything if the player cannot afford it).
-- Purchase flow: owner touches their plot's `BuyDropperButton` (server
-  `Touched`) → `TycoonService.TryPurchaseDropper` checks the player has a
-  plot, has not already bought it, and `TrySpend(DropperCost)` succeeds →
-  marks `Purchased.Dropper`, turns the button gray ("Purchased"), and calls
-  `DropperService.Start`. Touches from non-owners are ignored.
-- Drop values are set by the server from `Config.DropValue`, never taken from
-  the client or from a property a client could change.
+- Purchase flow: owner touches their plot's `BuyButtonN` (server `Touched`,
+  wired by `BuyButtons`) → `TycoonService.TryPurchaseDropper(player, dropperId)`
+  checks the player has a plot, the id is a real `Config.Droppers` id, it has
+  not already been bought, and `TrySpend(entry.Cost)` succeeds → marks
+  `Purchased[dropperId]`, turns that button gray ("Purchased"), and calls
+  `DropperService.Start(plot, dropperId)`. Droppers can be bought in any order.
+  Touches from non-owners are ignored. On release all buttons reset.
+- Drop values are set by the server from the dropper's `Config.Droppers`
+  `DropValue`, never taken from the client or from a property a client could change.
+- Dev cash: `DevUnlimitedCash` only changes the *starting* amount, and only
+  in Studio. Purchases still go through `EconomyService.TrySpend`.
 
 ## Adding a feature (for future agents)
 
@@ -159,7 +170,7 @@ type Tycoon = {
 3. Put logic in the service that owns that responsibility. Create a new
    service only for a genuinely new responsibility, and wire it from
    `ServerMain` or from the service that owns it.
-4. New map parts: edit the `.model.json` files (keep all plots identical) and
+4. New map parts: edit the `.model.json` files and
    update `REQUIRED_PARTS` in TycoonService if code depends on them.
 5. Only add a remote if the rules above say you need one.
 6. Update this file, `GAME_DESIGN.md`, `QA.md`, and `TODO.md`.

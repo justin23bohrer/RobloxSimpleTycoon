@@ -15,6 +15,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local BuyButtons = require(script.Parent.BuyButtons)
 local CollectorService = require(script.Parent.CollectorService)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
@@ -26,28 +27,26 @@ export type Tycoon = {
 	PlotId: number,
 	Plot: Model,
 	Owner: Player,
-	-- Purchase id -> true once bought. The MVP has one id: "Dropper".
+	-- Purchase id -> true once bought. Ids are Config.Droppers[N].Id
+	-- ("Dropper1", "Dropper2", ...).
 	-- Add new upgrades as new ids; the service that runs the upgrade keeps its
 	-- own runtime state keyed by plot.
 	Purchased: { [string]: boolean },
 }
 
--- Parts every plot model must contain (see src/Workspace/Map/Plots).
+-- Parts every plot model must contain (see src/Workspace/Map/Plots), plus a
+-- DropperSpotN and BuyButtonN for each entry in Config.Droppers.
 local REQUIRED_PARTS = {
 	"Base",
 	"OwnerSign",
-	"DropperSpot",
 	"Conveyor",
 	"Collector",
 	"CollectPad",
-	"BuyDropperButton",
 }
-
--- Buy button looks. The map's button starts red with the label "Buy Dropper".
-local BUY_BUTTON_COLOR = Color3.fromRGB(255, 0, 0)
-local BUY_BUTTON_TEXT = "Buy Dropper"
-local PURCHASED_BUTTON_COLOR = Color3.fromRGB(80, 80, 80)
-local PURCHASED_BUTTON_TEXT = "Purchased"
+for index in Config.Droppers do
+	table.insert(REQUIRED_PARTS, `DropperSpot{index}`)
+	table.insert(REQUIRED_PARTS, BuyButtons.PartName(index))
+end
 
 -- Seconds a player must wait between buy-button touches. Touched fires many
 -- times per step; this only reduces spam. Double purchases are blocked by
@@ -79,16 +78,7 @@ local function setOwnerSign(plot: Model, text: string)
 	end
 end
 
-local function setBuyButton(plot: Model, color: Color3, text: string)
-	local button = plot.BuyDropperButton :: BasePart
-	button.Color = color
-	local label = button:FindFirstChild("TextLabel", true)
-	if label and label:IsA("TextLabel") then
-		label.Text = text
-	end
-end
-
-local function onBuyButtonTouched(plot: Model, hit: BasePart)
+local function onBuyButtonTouched(plot: Model, hit: BasePart, dropperId: string)
 	local character = hit.Parent
 	local player = character and Players:GetPlayerFromCharacter(character)
 	if not player or ownerByPlot[plot] ~= player then
@@ -101,7 +91,7 @@ local function onBuyButtonTouched(plot: Model, hit: BasePart)
 	end
 	lastBuyTouch[player] = now
 
-	TycoonService.TryPurchaseDropper(player)
+	TycoonService.TryPurchaseDropper(player, dropperId)
 end
 
 -- Called once by ServerMain before any players are handled.
@@ -123,12 +113,10 @@ function TycoonService.Start()
 
 	for _, plot in plots do
 		setOwnerSign(plot, "Unclaimed")
-		setBuyButton(plot, BUY_BUTTON_COLOR, BUY_BUTTON_TEXT)
+		BuyButtons.ResetAll(plot)
 		CollectorService.SetupPlot(plot)
-
-		local button = plot.BuyDropperButton :: BasePart
-		button.Touched:Connect(function(hit)
-			onBuyButtonTouched(plot, hit)
+		BuyButtons.Connect(plot, function(hit, dropperId)
+			onBuyButtonTouched(plot, hit, dropperId)
 		end)
 	end
 end
@@ -164,7 +152,7 @@ function TycoonService.OnPlayerRemoving(player: Player)
 		return
 	end
 
-	DropperService.Stop(tycoon.Plot)
+	DropperService.StopAll(tycoon.Plot)
 	CollectorService.ResetPlot(tycoon.Plot)
 
 	tycoonsByPlayer[player] = nil
@@ -172,7 +160,7 @@ function TycoonService.OnPlayerRemoving(player: Player)
 	lastBuyTouch[player] = nil
 	tycoon.Plot:SetAttribute("OwnerUserId", nil)
 	setOwnerSign(tycoon.Plot, "Unclaimed")
-	setBuyButton(tycoon.Plot, BUY_BUTTON_COLOR, BUY_BUTTON_TEXT)
+	BuyButtons.ResetAll(tycoon.Plot)
 end
 
 -- Returns the player's tycoon, or nil if they have no plot.
@@ -191,23 +179,28 @@ function TycoonService.HasPurchased(player: Player, purchaseId: string): boolean
 	return tycoon ~= nil and tycoon.Purchased[purchaseId] == true
 end
 
--- Buys the dropper for the player's own plot. Returns true on success.
--- Called when the owner touches their plot's BuyDropperButton.
-function TycoonService.TryPurchaseDropper(player: Player): boolean
+-- Buys one dropper (a Config.Droppers Id) for the player's own plot.
+-- Returns true on success. Called when the owner touches a BuyButtonN.
+-- Droppers can be bought in any order; the price comes only from Config.
+function TycoonService.TryPurchaseDropper(player: Player, dropperId: string): boolean
 	local tycoon = tycoonsByPlayer[player]
 	if not tycoon then
 		return false -- player has no plot
 	end
-	if tycoon.Purchased.Dropper then
+	local dropper = typeof(dropperId) == "string" and DropperService.GetConfig(dropperId)
+	if not dropper then
+		return false -- not a real dropper id
+	end
+	if tycoon.Purchased[dropperId] then
 		return false -- already bought; never charge twice
 	end
-	if not EconomyService.TrySpend(player, Config.DropperCost) then
+	if not EconomyService.TrySpend(player, dropper.Cost) then
 		return false -- cannot afford it; cash unchanged
 	end
 
-	tycoon.Purchased.Dropper = true
-	setBuyButton(tycoon.Plot, PURCHASED_BUTTON_COLOR, PURCHASED_BUTTON_TEXT)
-	DropperService.Start(tycoon.Plot)
+	tycoon.Purchased[dropperId] = true
+	BuyButtons.SetPurchased(tycoon.Plot, dropperId)
+	DropperService.Start(tycoon.Plot, dropperId)
 	return true
 end
 

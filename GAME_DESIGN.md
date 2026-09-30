@@ -5,9 +5,10 @@ scope until the user approves it (see `TODO.md`).
 
 ## Core loop
 
-Player joins → receives $100 → is given a plot → buys the dropper for $100 →
-the dropper makes $10 drops every 2 seconds → drops ride a conveyor to the
-collector → player steps on the Collect pad → cash increases.
+Player joins → receives $100 → is given a plot → buys Dropper 1 for $100 →
+it makes $10 drops every 2 seconds → drops ride a conveyor to the
+collector → player steps on the Collect pad → cash increases → saves up for
+the next, more expensive dropper.
 
 ## Player
 
@@ -27,17 +28,35 @@ collector → player steps on the Collect pad → cash increases.
 
 ## Purchase
 
-- The dropper costs **$100** (`Config.DropperCost`).
-- The owner buys it by stepping on their plot's red **Buy Dropper** button.
+There are four droppers (`Config.Droppers`), each with its own buy button:
+
+| Dropper   | Cost   | Value per drop |
+| --------- | ------ | -------------- |
+| Dropper 1 | $100   | $10            |
+| Dropper 2 | $300   | $25            |
+| Dropper 3 | $1000  | $60            |
+| Dropper 4 | $3000  | $150           |
+
+- The owner buys a dropper by stepping on its red button. The label shows the
+  name and price, e.g. "Dropper 2 - $300" (text comes from `Config`).
+- Droppers can be bought in any order.
 - The player must have enough cash.
 - The purchase is decided on the server.
-- The dropper can only be bought once per plot.
+- Each dropper can only be bought once per plot. A bought button turns gray
+  and says "Purchased". All buttons reset when the plot is released.
 
-## Dropper
+## Droppers
 
-- Produces one physical **$10** object (`Config.DropValue`) every
-  **2 seconds** (`Config.DropInterval`).
-- Objects travel along the plot's conveyor.
+- Each bought dropper produces one physical object worth its value every
+  **2 seconds** (`Config.DropInterval`, shared by all droppers).
+- Objects travel along the plot's one conveyor to the one collector.
+
+## Testing: unlimited cash (Studio only)
+
+- `Config.DevUnlimitedCash = true` makes players start with
+  `Config.DevStartingCash` ($1,000,000,000) instead of $100, **only** in
+  Roblox Studio. It never applies in a published game. Buying still spends
+  cash normally. Must be `false` in commits.
 
 ## Collector
 
@@ -55,8 +74,8 @@ Plain parts only, no theme:
 | ------------------ | ---------------------------------------------------- |
 | `Base`             | Plot floor, in front of the spawn.                   |
 | `OwnerSign`        | Shows the owner's name.                              |
-| `BuyDropperButton` | Red pad. Buys the dropper.                           |
-| `DropperSpot`      | Transparent yellow block where the dropper goes.     |
+| `BuyButton1`–`4`   | Red pads in a row beside the conveyor. Buy droppers 1–4. |
+| `DropperSpot1`–`4` | Transparent yellow blocks above the conveyor where each dropper goes. |
 | `Conveyor`         | Dark strip that carries drops.                       |
 | `Collector`        | Green block at the end of the conveyor.              |
 | `CollectPad`       | Bright green pad. Pays the owner their stored cash.  |
