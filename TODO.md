@@ -11,7 +11,7 @@ user's approval first.
 - [x] PlayerDataService: $100 starting cash via `leaderstats`.
 - [x] EconomyService: validated `AddCash` / `TrySpend`.
 - [x] TycoonService: plot validation, assign on join, release on leave, owner sign.
-- [x] Prototype map: spawn, 4 plots with button, dropper spot, conveyor, collector, collect pad.
+- [x] Prototype map: spawn, one plot with button, dropper spot, conveyor, collector, collect pad (reduced from 4 plots to 1 on 2026-09-30).
 - [x] Project docs (AGENTS, ARCHITECTURE, GAME_DESIGN, QA, README).
 
 ## MVP

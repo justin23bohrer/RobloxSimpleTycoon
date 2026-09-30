@@ -26,7 +26,7 @@ src/
         ├── Ground.model.json
         ├── SpawnLocation.model.json
         └── Plots/
-            └── Plot1..Plot4.model.json
+            └── Plot1.model.json      → the one tycoon plot
 ```
 
 Rojo file naming (important):

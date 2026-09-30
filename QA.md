@@ -29,7 +29,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | T1 | Player joins. | One plot's sign shows "<DisplayName>'s Tycoon"; that plot's `OwnerUserId` = player's UserId. | |
-| T2 | Other plots. | Signs show "Unclaimed"; no `OwnerUserId` attribute. | |
+| T2 | Look at the map. | Exactly one plot, in front of the spawn. No other plots. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays red. | |
 | T4 | Player joins; look at the Collect pads. | Every pad label reads "Collect". Stepping on your own pad with nothing stored does nothing. | |
 
@@ -64,9 +64,9 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| M1 | Two players join. | Each gets a different plot; both signs show the right names. | |
+| M1 | Two players join. | Player 1 gets the plot (sign shows their name). Player 2 gets no plot; Output shows a "no free plot" warning. | |
 | M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's pad label and stored cash are unchanged. | |
-| M3 | Both buy droppers. | Each dropper only fills its own collector. | |
+| M3 | Player 2 steps on Player 1's Buy button. | Nothing happens; Player 2's cash stays 100. | |
 
 ## Respawn
 
@@ -81,4 +81,4 @@ Record the date and result when you run a case.
 | -- | ---- | -------- | ------ |
 | L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; Buy button back to red "Buy Dropper". | |
 | L2 | Leave after buying the dropper. | Dropper stops, drops are removed, stored cash is cleared; pad label back to "Collect". | |
-| L3 | A new player joins after L1. | They can be given the released plot. | |
+| L3 | A new player joins after L1. | They are given the released plot. (A player who was already in the game without a plot does not get it automatically.) | |
