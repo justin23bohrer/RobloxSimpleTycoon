@@ -2,10 +2,11 @@
 -- Runs droppers: creates physical drops on an interval and moves them along
 -- the plot's conveyor toward its Collector.
 --
--- * Start(plot) places a plain "Dropper" part at plot.DropperSpot, sets the
+-- * Start(plot, dropperId) places a plain part named dropperId at the plot's
+--   DropperSpotN (N = the dropper's position in Config.Droppers), sets the
 --   conveyor moving toward +X (plots are unrotated; the Collector is at +X),
---   and every Config.DropInterval seconds creates a "Drop" part in the plot's
---   "Drops" folder.
+--   and every Config.DropInterval seconds creates a "Drop" part worth that
+--   dropper's Config DropValue in the plot's "Drops" folder.
 -- * Each drop's value and plot live only in server-side tables keyed by the
 --   part. Nothing is read from the part or the client, so a client cannot
 --   change a drop's value or move it to another plot.
@@ -13,8 +14,10 @@
 --   Config.DropLifetime seconds.
 -- * CollectorService calls ClaimDrop(drop, plot) to take a drop's value. A
 --   drop can only be claimed once, and only by its own plot.
--- * Stop(plot) stops the loop and removes the dropper, the drops, and the
---   conveyor movement. Safe to call if not running.
+-- * Stop(plot, dropperId) stops one dropper; its drops already on the conveyor
+--   keep going. StopAll(plot) stops every dropper on the plot and removes the
+--   drops and the conveyor movement. The conveyor moves while any dropper runs.
+--   Both are safe to call if nothing is running.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -28,22 +31,29 @@ local DROP_COLOR = Color3.fromRGB(245, 205, 48)
 local DROPPER_COLOR = Color3.fromRGB(120, 120, 120)
 local DROP_GAP = 0.1 -- studs between the dropper's bottom and a new drop
 
-type Running = {
-	Dropper: BasePart,
+type PlotRun = {
 	Drops: Folder,
+	Droppers: { [string]: BasePart }, -- dropperId -> placed Dropper part
 }
 
-local runningByPlot: { [Model]: Running } = {}
+local runningByPlot: { [Model]: PlotRun } = {}
 local dropValues: { [BasePart]: number } = {}
 local dropPlots: { [BasePart]: Model } = {}
+
+
+local function setConveyorMoving(plot: Model, moving: boolean)
+	local conveyor = plot:FindFirstChild("Conveyor")
+	if conveyor and conveyor:IsA("BasePart") then
+		conveyor.AssemblyLinearVelocity = if moving then Vector3.new(Config.ConveyorSpeed, 0, 0) else Vector3.zero
+	end
+end
 
 local function forgetDrop(drop: BasePart)
 	dropValues[drop] = nil
 	dropPlots[drop] = nil
 end
 
-local function spawnDrop(plot: Model, running: Running)
-	local dropper = running.Dropper
+local function spawnDrop(plot: Model, run: PlotRun, dropper: BasePart, value: number)
 	local offsetY = dropper.Size.Y / 2 + DROP_SIZE.Y / 2 + DROP_GAP
 
 	local drop = Instance.new("Part")
@@ -53,15 +63,15 @@ local function spawnDrop(plot: Model, running: Running)
 	drop.Anchored = false
 	drop.CFrame = dropper.CFrame * CFrame.new(0, -offsetY, 0)
 
-	dropValues[drop] = Config.DropValue
+	dropValues[drop] = value
 	dropPlots[drop] = plot
-	-- Covers every way a drop can disappear (lifetime, claim, Stop, falling
+	-- Covers every way a drop can disappear (lifetime, claim, StopAll, falling
 	-- out of the world).
 	drop.Destroying:Connect(function()
 		forgetDrop(drop)
 	end)
 
-	drop.Parent = running.Drops
+	drop.Parent = run.Drops
 	drop:SetNetworkOwner(nil)
 
 	task.delay(Config.DropLifetime, function()
@@ -72,52 +82,73 @@ local function spawnDrop(plot: Model, running: Running)
 	end)
 end
 
--- Starts the dropper on a plot. Does nothing if it is already running.
-function DropperService.Start(plot: Model)
-	if runningByPlot[plot] then
+-- Returns a dropper's Config.Droppers entry and its position in the list, or
+-- nil if the id is unknown.
+function DropperService.GetConfig(dropperId: string): (any, number?)
+	for index, entry in Config.Droppers do
+		if entry.Id == dropperId then
+			return entry, index
+		end
+	end
+	return nil, nil
+end
+
+-- Starts one dropper on a plot. Does nothing if it is already running or the
+-- id is not in Config.Droppers.
+function DropperService.Start(plot: Model, dropperId: string)
+	local entry, index = DropperService.GetConfig(dropperId)
+	if not entry then
+		warn(`DropperService: unknown dropper id '{dropperId}'`)
+		return
+	end
+	local run = runningByPlot[plot]
+	if run and run.Droppers[dropperId] then
 		return
 	end
 
-	local spot = plot:FindFirstChild("DropperSpot") :: BasePart?
-	local conveyor = plot:FindFirstChild("Conveyor") :: BasePart?
-	if not spot or not conveyor then
-		warn(`DropperService: {plot.Name} is missing DropperSpot or Conveyor`)
+	local spot = plot:FindFirstChild(`DropperSpot{index}`) :: BasePart?
+	if not spot or not plot:FindFirstChild("Conveyor") then
+		warn(`DropperService: {plot.Name} is missing DropperSpot{index} or Conveyor`)
 		return
 	end
+
+	if not run then
+		local drops = Instance.new("Folder")
+		drops.Name = "Drops"
+		drops.Parent = plot
+		run = { Drops = drops, Droppers = {} }
+		runningByPlot[plot] = run
+	end
+	local plotRun = run :: PlotRun
 
 	local dropper = Instance.new("Part")
-	dropper.Name = "Dropper"
+	dropper.Name = dropperId -- "Dropper1", "Dropper2", ...
 	dropper.Size = spot.Size
 	dropper.CFrame = spot.CFrame
 	dropper.Color = DROPPER_COLOR
 	dropper.Anchored = true
 	dropper.Parent = plot
+	plotRun.Droppers[dropperId] = dropper
 
-	local drops = Instance.new("Folder")
-	drops.Name = "Drops"
-	drops.Parent = plot
+	setConveyorMoving(plot, true)
 
-	local running: Running = { Dropper = dropper, Drops = drops }
-	runningByPlot[plot] = running
-
-	conveyor.AssemblyLinearVelocity = Vector3.new(Config.ConveyorSpeed, 0, 0)
-
+	local value = entry.DropValue
 	task.spawn(function()
 		while true do
 			task.wait(Config.DropInterval)
-			-- Stop (or a Stop then Start) replaces this entry; end this loop.
-			if runningByPlot[plot] ~= running then
+			-- Stop/StopAll (or a stop then Start) replaces these entries; end this loop.
+			if runningByPlot[plot] ~= plotRun or plotRun.Droppers[dropperId] ~= dropper then
 				return
 			end
-			spawnDrop(plot, running)
+			spawnDrop(plot, plotRun, dropper, value)
 		end
 	end)
 end
 
--- Stops the dropper on a plot and removes its drops. Safe to call if not running.
-function DropperService.Stop(plot: Model)
-	local running = runningByPlot[plot]
-	if not running then
+-- Stops every dropper on a plot and removes its drops. Safe to call if not running.
+function DropperService.StopAll(plot: Model)
+	local run = runningByPlot[plot]
+	if not run then
 		return
 	end
 	runningByPlot[plot] = nil
@@ -127,12 +158,27 @@ function DropperService.Stop(plot: Model)
 			forgetDrop(drop)
 		end
 	end
-	running.Drops:Destroy()
-	running.Dropper:Destroy()
+	run.Drops:Destroy()
+	for _, dropper in run.Droppers do
+		dropper:Destroy()
+	end
 
-	local conveyor = plot:FindFirstChild("Conveyor")
-	if conveyor and conveyor:IsA("BasePart") then
-		conveyor.AssemblyLinearVelocity = Vector3.zero
+	setConveyorMoving(plot, false)
+end
+
+-- Stops one dropper on a plot. Drops it already made stay on the conveyor.
+-- If it was the last one running, behaves like StopAll. Safe to call if not running.
+function DropperService.Stop(plot: Model, dropperId: string)
+	local run = runningByPlot[plot]
+	local dropper = run and run.Droppers[dropperId]
+	if not run or not dropper then
+		return
+	end
+	run.Droppers[dropperId] = nil
+	dropper:Destroy()
+
+	if next(run.Droppers) == nil then
+		DropperService.StopAll(plot)
 	end
 end
 

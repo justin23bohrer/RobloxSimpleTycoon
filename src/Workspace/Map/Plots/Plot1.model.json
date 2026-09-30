@@ -155,7 +155,7 @@
       ]
     },
     {
-      "name": "DropperSpot",
+      "name": "DropperSpot1",
       "className": "Part",
       "properties": {
         "Size": [
@@ -167,6 +167,162 @@
           "CFrame": {
             "position": [
               -18,
+              8,
+              -35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "DropperSpot2",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -11,
+              8,
+              -35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "DropperSpot3",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -4,
+              8,
+              -35
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "DropperSpot4",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              3,
               8,
               -35
             ],
@@ -457,7 +613,7 @@
       ]
     },
     {
-      "name": "BuyDropperButton",
+      "name": "BuyButton1",
       "className": "Part",
       "properties": {
         "Size": [
@@ -468,7 +624,7 @@
         "CFrame": {
           "CFrame": {
             "position": [
-              -18,
+              -20,
               2.2,
               -23
             ],
@@ -506,7 +662,7 @@
       },
       "children": [
         {
-          "name": "BuyDropperButtonRing",
+          "name": "BuyButton1Ring",
           "className": "Part",
           "properties": {
             "Shape": "Cylinder",
@@ -518,7 +674,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  -18,
+                  -20,
                   2.1,
                   -23
                 ],
@@ -563,7 +719,7 @@
             "Size": {
               "UDim2": [
                 [
-                  8,
+                  7,
                   0
                 ],
                 [
@@ -583,7 +739,469 @@
               "name": "TextLabel",
               "className": "TextLabel",
               "properties": {
-                "Text": "Buy Dropper",
+                "Text": "Dropper 1",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuyButton2",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -12,
+              2.2,
+              -23
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton2Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -12,
+                  2.1,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  1.5,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Dropper 2",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuyButton3",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -4,
+              2.2,
+              -23
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton3Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4,
+                  2.1,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  1.5,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Dropper 3",
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "TextScaled": true,
+                "BackgroundTransparency": 1,
+                "TextColor3": [
+                  1,
+                  1,
+                  1
+                ],
+                "TextStrokeTransparency": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuyButton4",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              4,
+              2.2,
+              -23
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton4Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  4,
+                  2.1,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  1.5,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3,
+              0
+            ]
+          },
+          "children": [
+            {
+              "name": "TextLabel",
+              "className": "TextLabel",
+              "properties": {
+                "Text": "Dropper 4",
                 "Size": {
                   "UDim2": [
                     [

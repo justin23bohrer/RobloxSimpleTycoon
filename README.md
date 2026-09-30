@@ -2,8 +2,8 @@
 
 A tiny Roblox tycoon, built as a clean starting point:
 
-> join → get $100 → get a plot → buy a dropper → drops ride a conveyor →
-> collect the cash
+> join → get $100 → get a plot → buy droppers → drops ride a conveyor →
+> collect the cash → buy bigger droppers
 
 The full design is in [GAME_DESIGN.md](GAME_DESIGN.md). **Current status:** the full MVP
 loop is built (cash, plots, buying the dropper, drops, conveyor, collection)
@@ -60,6 +60,20 @@ you can rebuild it anytime.
 > `Place1.rbxl` is the original place file. It has its own Baseplate and
 > SpawnLocation, so syncing into it would give you two spawns. Use the built
 > place above instead.
+
+## Testing with unlimited cash (Studio only)
+
+To try every dropper without grinding for cash:
+
+1. Open `src/ReplicatedStorage/Shared/Config.luau` and set
+   `DevUnlimitedCash = true`.
+2. Rebuild (`mkdir -p build && rojo build default.project.json --output build/SimpleTycoon.rbxlx`)
+   and reopen the place, or let `rojo serve` sync it into Studio.
+3. Press **Play**. Output shows `[DEV] Unlimited cash is ON ...` and you start
+   with `DevStartingCash` ($1,000,000,000). Buying still spends cash normally.
+
+It only works inside Roblox Studio (`RunService:IsStudio()`), never in a
+published game. Set it back to `false` before committing.
 
 ## Using OpenCode
 

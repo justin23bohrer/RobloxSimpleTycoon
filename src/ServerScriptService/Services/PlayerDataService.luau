@@ -9,12 +9,23 @@
 -- EconomyService.GetCash.
 --
 -- No DataStore persistence yet: every session starts at Config.StartingCash.
+--
+-- Testing only: if Config.DevUnlimitedCash is true AND the game is running in
+-- Roblox Studio, players start with Config.DevStartingCash instead. The
+-- RunService:IsStudio() check means this can never apply in a published game.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 
 local PlayerDataService = {}
+
+local startingCash = Config.StartingCash
+if Config.DevUnlimitedCash and RunService:IsStudio() then
+	startingCash = Config.DevStartingCash
+	print(`[DEV] Unlimited cash is ON (Studio only): players start with ${startingCash}. Set Config.DevUnlimitedCash = false to turn it off.`)
+end
 
 local cashValues: { [Player]: IntValue } = {}
 
@@ -29,7 +40,7 @@ function PlayerDataService.OnPlayerAdded(player: Player)
 
 	local cash = Instance.new("IntValue")
 	cash.Name = "Cash"
-	cash.Value = Config.StartingCash
+	cash.Value = startingCash
 	cash.Parent = leaderstats
 
 	leaderstats.Parent = player
