@@ -74,7 +74,7 @@ reach the server.
 | `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, assigns a free plot on join, releases it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`). | Implemented (ownership + dropper purchases) |
-| `BuyButtons` (helper) | Used only by `TycoonService`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost"), grays out bought ones. Decides nothing. | Implemented |
+| `BuyButtons` (helper) | Used only by `TycoonService`: connects each `BuyButtonN` touch to a callback with the dropper id, sets labels from `Config` ("Dropper N - $Cost"), hides bought ones and shows them again on reset. Decides nothing. | Implemented |
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns `Drop` parts worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
 | `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`; shows "Collect $<stored>" on the pad. | Implemented (`SetupPlot`, `ResetPlot`) |
 
@@ -169,7 +169,7 @@ type Tycoon = {
   wired by `BuyButtons`) → `TycoonService.TryPurchaseDropper(player, dropperId)`
   checks the player has a plot, the id is a real `Config.Droppers` id, it has
   not already been bought, and `TrySpend(entry.Cost)` succeeds → marks
-  `Purchased[dropperId]`, turns that button gray ("Purchased"), and calls
+  `Purchased[dropperId]`, hides that button (pad, ring, label; no collisions or touches), and calls
   `DropperService.Start(plot, dropperId)`. Droppers can be bought in any order.
   Touches from non-owners are ignored. On release all buttons reset.
 - Drop values are set by the server from the dropper's `Config.Droppers`

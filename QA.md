@@ -38,13 +38,13 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | U0 | Player joins; look at the four buy buttons. | Red, labeled "Dropper 1 - $100", "Dropper 2 - $300", "Dropper 3 - $1000", "Dropper 4 - $3000". | |
-| U1 | Player with $100 steps on own "Dropper 1" button. | Cash → 0; button turns gray and says "Purchased"; a gray dropper appears at yellow spot 1. | |
+| U1 | Player with $100 steps on own "Dropper 1" button. | Cash → 0; the button (red pad, dark ring, and label) disappears and you can walk over the spot; a gray dropper appears at yellow spot 1. | |
 | U2 | Player with less than $100 steps on "Dropper 1". (In **Server** view, set your `leaderstats.Cash` to 50 first.) | Nothing is bought; cash stays 50; button stays red. | |
-| U3 | After buying, step on the same button again (repeatedly). | No second dropper; no cash removed. | |
-| U4 | Buy in order: set Server cash to 4400, buy Dropper 1, 2, 3, 4. | Cash 4400 → 4300 → 4000 → 3000 → 0. Each button grays out; a dropper appears at each matching spot. | |
+| U3 | After buying, walk over where the button was (repeatedly). | No second dropper; no cash removed. | |
+| U4 | Buy in order: set Server cash to 4400, buy Dropper 1, 2, 3, 4. | Cash 4400 → 4300 → 4000 → 3000 → 0. Each button disappears; a dropper appears at each matching spot. | |
 | U5 | Buy out of order: set Server cash to 3000, step on "Dropper 4" first. | Cash → 0; only Dropper 4 is bought (spot 4). Other buttons stay red. | |
 | U6 | Can't afford: with $299 (Server view), step on "Dropper 2". | Nothing bought; cash stays 299; button stays red. | |
-| U7 | Can't buy twice: after buying Dropper 3, step on it repeatedly (with cash ≥ 1000). | No cash removed; still one dropper at spot 3. | |
+| U7 | Can't buy twice: after buying Dropper 3, walk over where its button was, repeatedly (with cash ≥ 1000). | No cash removed; still one dropper at spot 3; the button stays hidden. | |
 
 ## Economy
 
@@ -109,6 +109,6 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; all Buy buttons back to red "Dropper N - $Cost". | |
+| L1 | In a 2-player test, close Player 1's window. | Player 1's plot sign returns to "Unclaimed"; `OwnerUserId` removed; all Buy buttons visible again, red, labeled "Dropper N - $Cost". | |
 | L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; pad label back to "Collect". | |
 | L3 | A new player joins after L1. | They are given the released plot. (A player who was already in the game without a plot does not get it automatically.) | |
