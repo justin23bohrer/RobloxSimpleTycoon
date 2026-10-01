@@ -23,8 +23,8 @@ local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
-local CalebEventUIBuild = require(script.Parent.CalebEventUIBuild)
-local CalebEventFX = require(script.Parent.CalebEventFX)
+local CalebEventUIBuild = require(script.Parent:WaitForChild("CalebEventUIBuild"))
+local CalebEventFX = require(script.Parent:WaitForChild("CalebEventFX"))
 
 local State = CalebEvent.State
 local NAME = string.upper(Config.StatueName)

@@ -19,7 +19,7 @@ local Workspace = game:GetService("Workspace")
 
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
-local CookieRainLook = require(script.Parent.CookieRainLook)
+local CookieRainLook = require(script.Parent:WaitForChild("CookieRainLook"))
 
 local player = Players.LocalPlayer
 local statue = Workspace:WaitForChild("Map"):WaitForChild("Statue")

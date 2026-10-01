@@ -25,7 +25,7 @@ local Workspace = game:GetService("Workspace")
 local CalebBody = require(ReplicatedStorage.Shared.CalebBody)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
-local CalebPoses = require(script.Parent.CalebPoses)
+local CalebPoses = require(script.Parent:WaitForChild("CalebPoses"))
 
 local State = CalebEvent.State
 local map = Workspace:WaitForChild("Map")
