@@ -54,7 +54,11 @@ src/
 │       ├── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
 │       ├── CalebLeaderboard.client.luau → LocalScript: "CALEB'S TOP FEEDERS" boards on the podium
 │       ├── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects
-│       └── TrophyPrompt.client.luau → LocalScript: hides the trophy claim prompt for non-eligible players; claim messages
+│       ├── TrophyPrompt.client.luau → LocalScript: hides the trophy claim prompt for non-eligible players; claim messages
+│       ├── TrophyInventory.client.luau → LocalScript: "🏆 TROPHIES" button + "MY CALEB TROPHIES" panel (equip/unequip)
+│       ├── TrophyInventoryUI.luau  → ModuleScript: builds that panel once (+ grid tiles for the pool)
+│       ├── TrophyInventoryIcon.luau → ModuleScript: tiny trophy icon drawn from frames, recolored per variant
+│       └── TrophyInventoryData.luau → ModuleScript: pure helpers (parse the attributes, sort, powers line)
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -192,8 +196,8 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 
 Client code is presentation only. It reads replicated state and never
 changes cash, ownership, or purchases, and never talks to the server
-(except the `FeedStatue` remote and Roblox's own `ProximityPrompt`
-triggering, which the server validates).
+(except the `FeedStatue` and `TrophyEquip` remotes and Roblox's own
+`ProximityPrompt` triggering, which the server validates).
 
 | Script | What it does |
 | ------ | ------------ |
@@ -205,6 +209,7 @@ triggering, which the server validates).
 | `StarterPlayerScripts/CalebLeaderboard.client.luau` | Builds one `SurfaceGui` (in PlayerGui, `Face = Front`, 40 px/stud, `LightInfluence = 0`) per `Board` part in the statue's `Podium/Leaderboard<corner>` models, once, and re-adorns it when the board streams back in. Shows "CALEB'S TOP FEEDERS", up to `Config.CalebLeaderboardSize` rows from the statue's `CalebTopFeeders` JSON (decoded in `pcall`; bad data = empty), gold/silver/bronze badges for the top 3, the local player's row highlighted, "Be the first to feed Caleb!" when empty, "FINAL RESULTS" in `TrophyClaim`, and `CookiesEaten / CalebMaxCookies` (fallback `CalebEvent.MaxCookies()`). Refreshes on those attributes and `CalebState`. Names are plain text (`RichText = false`, fixed size, truncated). No remotes; decides nothing. |
 | `StarterPlayerScripts/CalebAudio.client.luau` | Caleb Full Event sound effects (no music). Creates one `Sound` per non-empty `Config.CalebSounds` id, once, in a `SoundService.CalebAudio` folder (volumes from `Config.CalebSoundVolumes`), and reuses them. Driven only by attributes: `CalebState` → `Full` plays Full; → `Celebration` plays CelebrationStart and starts the looping CookieRain; leaving `Celebration` fades the loop out (0.8 s, then `Stop`) and plays EventEnd; `CookiesEaten` going up in `Normal` plays Grow (at most every `Config.CalebGrowSoundInterval` s); the local player's `CalebTrophyClaimed` turning true plays TrophyClaim. A late joiner hears no old one-shots; only the loop starts if it is mid-Celebration. Empty ids are skipped (one info print in Studio). Touches no other sounds. |
 
+| `StarterPlayerScripts/TrophyInventory.client.luau` + `TrophyInventoryUI.luau` + `TrophyInventoryIcon.luau` + `TrophyInventoryData.luau` | The trophy inventory. `TrophyInventoryUI.Build` makes one `TrophyInventory` ScreenGui (`ResetOnSpawn = false`, `DisplayOrder` 4: under the event UI and the feed pop-up) with a yellow "🏆 TROPHIES" button at the left middle (clear of the cookie counter and the phone thumbstick) and a hidden centered panel (scale + `UIAspectRatioConstraint` 1.7 + `UISizeConstraint` 400×235 – 880×518): "MY CALEB TROPHIES", "🏆 COLLECTION N / M" (distinct collectable variants owned / `TrophyVariants.CollectableCount()`, or the count of `Weight > 0` definitions if that function is missing), "ACTIVE TROPHIES: n / Max", an orange "Build your Trophy Case…" note when `CaseBuilt` is false, a scrolling grid (`UIGridLayout`, 3–6 columns sized from the grid width), a details pane, an "Active powers: …" line from `TrophyStats`, and "Saving is off this session" when `Saved` is false. Grid tiles are created on demand and **pooled** (hidden, never destroyed; one `Activated` connection each); the order is equipped first, then rarest, then newest. Each tile: rarity-colored border, frame-drawn icon (`TrophyInventoryIcon`: Base/Figure colors, hat, sparkle), rarity, name, green "EQUIPPED" badge. Details: icon, name, "⭐ RARITY" in the rarity color, `PowerText`, `"Description"`, a message line and EQUIP / UNEQUIP (grey "Case full (n/Max)" when full). The button invokes `Remotes.TrophyEquip` (`"Equip"`/`"Unequip"`, instanceId) in a `pcall`, one request at a time and at most every `Config.TrophyEquipCooldown`, shows the server's reason on failure, and otherwise just waits for the attribute. Reads the `TrophyInventory` / `TrophyStats` attributes at start and on change (JSON decoded in `pcall`; missing/bad = empty inventory, bad records skipped, `Equipped` ids not in `Owned` ignored). Missing definition fields / unknown rarities fall back (name "Mystery Caleb", light grey rarity color, "No power"). Decides nothing. |
 | `StarterPlayerScripts/TrophyPrompt.client.luau` | Watches `Workspace.Map` for `CalebClaimTrophy` (and its descendants, for streaming) and sets its `ProximityPrompt.Enabled` **locally** to whether this player is eligible (`CalebFed > 0` and not `CalebTrophyClaimed`), updating on those attributes; the server re-checks every claim. On `CalebTrophyNotice` changes, shows a `StarterGui:SetCore("SendNotification")` with the result: the variant's name + rarity (saved, or "couldn't be saved"), "already have this round's trophy", or "only players who fed Caleb this round". No remotes. |
 
 **Client requires:** LocalScripts in `StarterPlayerScripts` start running
