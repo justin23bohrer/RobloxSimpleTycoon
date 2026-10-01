@@ -1,9 +1,11 @@
 -- TrophyModel (server only)
 -- Builds a small cartoony Caleb Trophy Model from a variant
--- (Shared/TrophyVariants): a plinth with a gold "CALEB TROPHY" nameplate,
--- a mini Caleb in the statue's style (big round head, shaggy hair cap, big
--- eyes, wide grin, round belly) in the variant's color and pose, its
--- accessories (TrophyAccessories), and its effect (sparkles or a glow).
+-- (Shared/TrophyVariants): a plinth with a trim in its rarity's color and a
+-- gold "CALEB TROPHY" nameplate, a mini Caleb in the statue's style (big
+-- round head, shaggy hair cap, big eyes, wide grin, round belly) in the
+-- variant's color and pose, its accessories (TrophyAccessories) and props
+-- (TrophyProps), its effect (sparkles, a glow, or a small flame), and a soft
+-- light for rarities with Glow (Mythic).
 -- Used by TrophyService for both the big claim trophy on Caleb's podium and
 -- the small ones in each house's Trophy Case. Presentation only.
 --
@@ -16,6 +18,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TrophyVariants = require(ReplicatedStorage.Shared.TrophyVariants)
 local TrophyAccessories = require(script.Parent.TrophyAccessories)
+local TrophyEffects = require(script.Parent.TrophyEffects)
+local TrophyProps = require(script.Parent.TrophyProps)
 
 local TrophyModel = {}
 
@@ -35,6 +39,8 @@ local POSES = {
 	BellyPat = { Right = { 50, -35 }, Left = { 50, 35 } },
 	HandOnHip = { Right = { 0, 10 }, Left = { -10, -45 } },
 	HoldCookie = { Right = { 80, 8 }, Left = { 0, -12 } },
+	Run = { Right = { 60, 8 }, Left = { -60, -8 } },
+	Think = { Right = { 140, 30 }, Left = { 50, 35 } }, -- right hand on his cheek
 }
 
 local function addNameplate(plate: BasePart, title: string, color: Color3)
@@ -60,22 +66,6 @@ local function addNameplate(plate: BasePart, title: string, color: Color3)
 	label("Title", "CALEB TROPHY", 0.04, 0.4, DARK, 1)
 	label("VariantName", title, 0.46, 0.5, color, 0)
 	gui.Parent = plate
-end
-
-local function addEffect(model: Model, variant: TrophyVariants.Variant, scale: number)
-	local head = model:FindFirstChild("Head")
-	local torso = model:FindFirstChild("Torso")
-	if variant.Effect == "Sparkles" and head then
-		local sparkles = Instance.new("Sparkles")
-		sparkles.SparkleColor = variant.EffectColor
-		sparkles.Parent = head
-	elseif variant.Effect == "Glow" and torso then
-		local light = Instance.new("PointLight")
-		light.Color = variant.EffectColor
-		light.Brightness = 2
-		light.Range = math.clamp(4 * scale, 4, 40)
-		light.Parent = torso
-	end
 end
 
 -- Builds the trophy for a variant Id (unknown Ids use the fallback look).
@@ -106,32 +96,40 @@ function TrophyModel.Build(variantId: string, scale: number?, label: string?): M
 		return part
 	end
 
-	-- Plinth with a gold trim and nameplate.
+	-- Plinth with a trim in the rarity's color, and a gold nameplate.
 	local base = variant.Base
+	local rarity = TrophyVariants.GetRarity(variant.Rarity)
 	make("Plinth", Vector3.new(1.7, 0.5, 1.7), CFrame.new(0, 0.25, 0), base.Color, base.Material)
-	make("PlinthTrim", Vector3.new(1.78, 0.08, 1.78), CFrame.new(0, 0.5, 0), GOLD, Enum.Material.SmoothPlastic)
+	make("PlinthTrim", Vector3.new(1.78, 0.08, 1.78), CFrame.new(0, 0.5, 0), rarity.PlinthTrimColor, rarity.TrimMaterial)
 	local plate = make("Nameplate", Vector3.new(1.3, 0.34, 0.04), CFrame.new(0, 0.26, -0.87), GOLD)
-	local rarity = TrophyVariants.Rarities[variant.Rarity] or TrophyVariants.Rarities.Common
 	addNameplate(plate, label or variant.DisplayName, rarity.Color)
+
+	-- Everything below is built standing on the plinth, then raised by `lift`
+	-- (e.g. onto springs).
+	local lift = TrophyProps.Lift(variant.Accessories)
+	local raise = CFrame.new(0, lift, 0)
+	local function fig(name: string, size: Vector3, cframe: CFrame, color: Color3, material: Enum.Material?, shape: Enum.PartType?): BasePart
+		return make(name, size, raise * cframe, color, material, shape)
+	end
 
 	-- Mini Caleb (one color, like a cast statue), standing on the plinth.
 	local color, material = variant.Figure.Color, variant.Figure.Material
 	local hair = color:Lerp(Color3.new(0, 0, 0), 0.3)
 	for _, side in { -1, 1 } do
 		local tag = if side < 0 then "Left" else "Right"
-		make(`{tag}Shoe`, Vector3.new(0.3, 0.14, 0.42), CFrame.new(side * 0.17, 0.57, -0.05), color, material)
-		make(`{tag}Leg`, Vector3.new(0.26, 0.5, 0.28), CFrame.new(side * 0.17, 0.89, 0), color, material)
-		make(`{tag}Ear`, Vector3.new(0.2, 0.2, 0.2), CFrame.new(HEAD + Vector3.new(side * 0.5, -0.02, 0.03)), color, material, BALL)
-		make(`{tag}Eye`, Vector3.new(0.3, 0.3, 0.3), CFrame.new(HEAD + Vector3.new(side * 0.16, 0.08, -0.4)), Color3.new(1, 1, 1), nil, BALL)
-		make(`{tag}Pupil`, Vector3.new(0.09, 0.09, 0.09), CFrame.new(HEAD + Vector3.new(side * 0.15, 0.1, -0.55)), DARK, nil, BALL)
+		fig(`{tag}Shoe`, Vector3.new(0.3, 0.14, 0.42), CFrame.new(side * 0.17, 0.57, -0.05), color, material)
+		fig(`{tag}Leg`, Vector3.new(0.26, 0.5, 0.28), CFrame.new(side * 0.17, 0.89, 0), color, material)
+		fig(`{tag}Ear`, Vector3.new(0.2, 0.2, 0.2), CFrame.new(HEAD + Vector3.new(side * 0.5, -0.02, 0.03)), color, material, BALL)
+		fig(`{tag}Eye`, Vector3.new(0.3, 0.3, 0.3), CFrame.new(HEAD + Vector3.new(side * 0.16, 0.08, -0.4)), Color3.new(1, 1, 1), nil, BALL)
+		fig(`{tag}Pupil`, Vector3.new(0.09, 0.09, 0.09), CFrame.new(HEAD + Vector3.new(side * 0.15, 0.1, -0.55)), DARK, nil, BALL)
 	end
-	make("Torso", Vector3.new(0.8, 0.72, 0.5), CFrame.new(0, 1.5, 0), color, material)
-	make("Belly", Vector3.new(0.62, 0.62, 0.62), CFrame.new(0, 1.42, -0.12), color, material, BALL)
-	make("Belt", Vector3.new(0.82, 0.08, 0.52), CFrame.new(0, 1.18, 0), hair, material)
-	make("Head", Vector3.new(1, 1, 1), CFrame.new(HEAD), color, material, BALL)
-	make("HairCap", Vector3.new(1, 1, 1), CFrame.new(HEAD + Vector3.new(0, 0.2, 0.1)), hair, material, BALL)
-	make("Mouth", Vector3.new(0.4, 0.1, 0.06), CFrame.new(HEAD + Vector3.new(0, -0.2, -0.46)), DARK)
-	make("Teeth", Vector3.new(0.32, 0.04, 0.04), CFrame.new(HEAD + Vector3.new(0, -0.17, -0.49)), Color3.new(1, 1, 1))
+	fig("Torso", Vector3.new(0.8, 0.72, 0.5), CFrame.new(0, 1.5, 0), color, material)
+	fig("Belly", Vector3.new(0.62, 0.62, 0.62), CFrame.new(0, 1.42, -0.12), color, material, BALL)
+	fig("Belt", Vector3.new(0.82, 0.08, 0.52), CFrame.new(0, 1.18, 0), hair, material)
+	fig("Head", Vector3.new(1, 1, 1), CFrame.new(HEAD), color, material, BALL)
+	fig("HairCap", Vector3.new(1, 1, 1), CFrame.new(HEAD + Vector3.new(0, 0.2, 0.1)), hair, material, BALL)
+	fig("Mouth", Vector3.new(0.4, 0.1, 0.06), CFrame.new(HEAD + Vector3.new(0, -0.2, -0.46)), DARK)
+	fig("Teeth", Vector3.new(0.32, 0.04, 0.04), CFrame.new(HEAD + Vector3.new(0, -0.17, -0.49)), Color3.new(1, 1, 1))
 
 	-- Arms in the variant's pose; remember where the right hand ends up.
 	local pose = POSES[variant.Pose] or POSES.Down
@@ -142,25 +140,33 @@ function TrophyModel.Build(variantId: string, scale: number?, label: string?): M
 		local shoulder = CFrame.new(side * 0.5, SHOULDER_Y, 0)
 			* CFrame.Angles(0, 0, math.rad(angles[2]))
 			* CFrame.Angles(math.rad(angles[1]), 0, 0)
-		make(`{tag}Arm`, Vector3.new(0.22, 0.56, 0.22), shoulder * CFrame.new(0, -0.28, 0), color, material)
-		local hand = make(`{tag}Hand`, Vector3.new(0.26, 0.26, 0.26), shoulder * CFrame.new(0, -0.6, 0), color, material, BALL)
+		fig(`{tag}Arm`, Vector3.new(0.22, 0.56, 0.22), shoulder * CFrame.new(0, -0.28, 0), color, material)
+		local hand = shoulder * CFrame.new(0, -0.6, 0)
+		fig(`{tag}Hand`, Vector3.new(0.26, 0.26, 0.26), hand, color, material, BALL)
 		if side > 0 then
 			rightHand = hand.Position
 		end
 	end
 
-	TrophyAccessories.Add(make, variant.Accessories, {
+	local anchors: TrophyAccessories.Anchors = {
 		Head = HEAD,
 		Neck = Vector3.new(0, 1.84, -0.27),
 		RightHand = rightHand,
-	})
+		Back = Vector3.new(0, 1.5, 0.25),
+		Ground = 0.54 - lift, -- the plinth top, in the raised figure's space
+		Lift = lift,
+		Color = color,
+		Material = material,
+	}
+	TrophyAccessories.Add(fig, variant.Accessories, anchors)
+	TrophyProps.Add(fig, variant.Accessories, anchors)
 
 	model.WorldPivot = CFrame.new() -- bottom center of the plinth
 	local s = scale or 1
 	if s ~= 1 then
 		model:ScaleTo(s)
 	end
-	addEffect(model, variant, s)
+	TrophyEffects.Add(model, variant, s)
 	return model
 end
 
