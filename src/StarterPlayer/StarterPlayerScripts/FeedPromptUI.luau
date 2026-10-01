@@ -84,6 +84,54 @@ local function button(parent: GuiObject, name: string, position: UDim2, size: UD
 	return b
 end
 
+-- The cookie progress bar: a white rounded track with a dark outline, and
+-- the Preview + Fill frames (both start empty; set their Size X scale to
+-- fill them). Also used by the bar above the statue (StatueBar) so the two
+-- look the same.
+function FeedPromptUI.ProgressBar(parent: GuiObject, position: UDim2, size: UDim2): (Frame, Frame, Frame)
+	local track = Instance.new("Frame")
+	track.Name = "ProgressTrack"
+	track.Position = position
+	track.Size = size
+	track.BackgroundColor3 = TEXT_COLOR
+	track.Parent = parent
+	corner(track, UDim.new(0.5, 0))
+	stroke(track, 3, Enum.ApplyStrokeMode.Border)
+
+	-- The fill and preview live in this inner area, inset BAR_INSET px from
+	-- the track on every side, so they always sit inside the outline with a
+	-- small white gap. (ClipsDescendants only clips to a rectangle, not to
+	-- rounded corners, so a full-height fill used to poke into the outline.)
+	local inner = Instance.new("Frame")
+	inner.Name = "Inner"
+	inner.AnchorPoint = Vector2.new(0.5, 0.5)
+	inner.Position = UDim2.fromScale(0.5, 0.5)
+	inner.Size = UDim2.new(1, -BAR_INSET * 2, 1, -BAR_INSET * 2)
+	inner.BackgroundTransparency = 1
+	inner.Parent = track
+
+	-- Drawn under the fill, so only the part past the current fill shows.
+	local preview = Instance.new("Frame")
+	preview.Name = "Preview"
+	preview.Size = UDim2.fromScale(0, 1)
+	preview.BackgroundColor3 = PREVIEW_COLOR
+	preview.BorderSizePixel = 0
+	preview.ZIndex = 1
+	preview.Parent = inner
+	corner(preview, UDim.new(0.5, 0))
+
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill"
+	fill.Size = UDim2.fromScale(0, 1)
+	fill.BackgroundColor3 = COOKIE_COLOR
+	fill.BorderSizePixel = 0
+	fill.ZIndex = 2
+	fill.Parent = inner
+	corner(fill, UDim.new(0.5, 0))
+
+	return track, fill, preview
+end
+
 function FeedPromptUI.Build(parent: Instance): Parts
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "FeedPrompt"
@@ -119,45 +167,7 @@ function FeedPromptUI.Build(parent: Instance): Parts
 
 	local progress = label(panel, "Progress", UDim2.fromScale(0.06, 0.25), UDim2.fromScale(0.88, 0.09), "")
 
-	local track = Instance.new("Frame")
-	track.Name = "ProgressTrack"
-	track.Position = UDim2.fromScale(0.06, 0.36)
-	track.Size = UDim2.fromScale(0.88, 0.07)
-	track.BackgroundColor3 = TEXT_COLOR
-	track.Parent = panel
-	corner(track, UDim.new(0.5, 0))
-	stroke(track, 3, Enum.ApplyStrokeMode.Border)
-
-	-- The fill and preview live in this inner area, inset BAR_INSET px from
-	-- the track on every side, so they always sit inside the outline with a
-	-- small white gap. (ClipsDescendants only clips to a rectangle, not to
-	-- rounded corners, so a full-height fill used to poke into the outline.)
-	local inner = Instance.new("Frame")
-	inner.Name = "Inner"
-	inner.AnchorPoint = Vector2.new(0.5, 0.5)
-	inner.Position = UDim2.fromScale(0.5, 0.5)
-	inner.Size = UDim2.new(1, -BAR_INSET * 2, 1, -BAR_INSET * 2)
-	inner.BackgroundTransparency = 1
-	inner.Parent = track
-
-	-- Drawn under the fill, so only the part past the current fill shows.
-	local preview = Instance.new("Frame")
-	preview.Name = "Preview"
-	preview.Size = UDim2.fromScale(0, 1)
-	preview.BackgroundColor3 = PREVIEW_COLOR
-	preview.BorderSizePixel = 0
-	preview.ZIndex = 1
-	preview.Parent = inner
-	corner(preview, UDim.new(0.5, 0))
-
-	local fill = Instance.new("Frame")
-	fill.Name = "Fill"
-	fill.Size = UDim2.fromScale(0, 1)
-	fill.BackgroundColor3 = COOKIE_COLOR
-	fill.BorderSizePixel = 0
-	fill.ZIndex = 2
-	fill.Parent = inner
-	corner(fill, UDim.new(0.5, 0))
+	local _, fill, preview = FeedPromptUI.ProgressBar(panel, UDim2.fromScale(0.06, 0.36), UDim2.fromScale(0.88, 0.07))
 
 	local box = Instance.new("TextBox")
 	box.Name = "Amount"
