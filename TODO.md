@@ -24,7 +24,8 @@ user's approval first.
 - [x] CollectorService: store drop value at the collector; owner-only payout on the Collect pad (code done; Studio test waits on DropperService).
 - [x] Show the plot's stored (uncollected) cash at the Collect pad (now shown as cubes in the cash tank, not text).
 - [ ] Run the full `QA.md` in Studio, including 2-player tests.
-- [x] Round, outlined pads for the Buy button, Collect pad, and spawn (approved 2026-09-30; Studio visual check pending).
+- [x] Round, outlined pads for the Buy button and Collect pad (approved 2026-09-30; Studio visual check pending).
+- [x] Spawns are invisible spawn areas flush with the grass (no blue discs or rings); spawns 2–4 regenerated (requested by the user 2026-10-01; Studio check pending: QA SP1–SP2).
 
 ## Approved 2026-09-30
 
