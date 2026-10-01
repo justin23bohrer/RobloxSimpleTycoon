@@ -399,3 +399,30 @@ Services** ON (published place) except TR8. Watch Output (Server view).
 | TR13 | 6 trophies (repeat TR12, or temporarily set the fast goal low). | The case shows the newest 5; the oldest isn't shown but is still in the save (`DataService.GetTrophies`). | |
 | TR14 | Variant look check: run several cycles (or in the command bar: `require(game.ServerScriptService.Services.TrophyModel).Build("GoldenCaleb", 3).Parent = workspace`, for each Id in `TrophyVariants.List` and an unknown Id like `"Nope"`). | Each looks like a mini cartoony Caleb (big round head, hair cap, big eyes, grin, belly) in its color, pose, accessories (crown, party hat, chef hat, sunglasses, cookie in hand, bow tie), and effect (sparkles/glow). The unknown Id shows a gray "Mystery Caleb". Nothing collides or can be clicked. | |
 | TR15 | Server shutdown right after claiming (API ON): claim, then Stop within 2 s. | Next session the trophy is there (saved right after the claim, and in BindToClose). | |
+
+## Trophy inventory UI
+
+Needs the Inventory + Powers server work merged (the `TrophyInventory` and
+`TrophyStats` attributes and the `TrophyEquip` handler). To get trophies
+quickly use `DevCalebFastCycle = true` (see Caleb Trophies), or in the Server
+command bar set a test attribute, e.g.
+`game.Players.Player1:SetAttribute("TrophyInventory", '{"Owned":[{"InstanceId":"a","Variant":"GoldenCaleb","EventId":"1","EarnedAt":1}],"Equipped":[],"CaseBuilt":false,"Max":5,"Saved":true}')`
+(the server overwrites it on its next publish). Check on PC and with the
+Device emulator (a phone in landscape).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| TI1 | Join with no trophies. Look at the screen; click "🏆 TROPHIES". | A yellow "🏆 TROPHIES" button at the left middle, not over the cookie counter, chat, or the phone thumbstick. The panel opens with a small pop: "MY CALEB TROPHIES", "🏆 COLLECTION 0 / M" (M = collectable trophies), "ACTIVE TROPHIES: 0 / 5", "No trophies yet! Feed Caleb to earn one 🏆", "Tap a trophy to see its power!", "Active powers: none". | |
+| TI2 | Click the button again; open again and click the red X. | Each closes the panel; the button reopens it. Respawning (Esc → Reset) keeps the button (no duplicate GUI). | |
+| TI3 | Claim a trophy (TR2) with the panel open. | A tile appears right away (no reopening needed): icon in the trophy's colors (hat for crown/party/chef, ✨ for effects), rarity in its color, name, border in the rarity color. Collection goes to 1 / M. | |
+| TI4 | Tap the tile. | It turns yellow and pops. Details: icon, name, "⭐ RARITY" in the rarity color, the power in big text, the description in quotes, green EQUIP. | |
+| TI5 | EQUIP it. | The button shows "..." briefly, then "Equipped!" and red UNEQUIP; the tile gets a green "EQUIPPED" badge and moves to the front; "ACTIVE TROPHIES: 1 / 5". With the case built, the trophy appears in the Trophy Case and "Active powers" lists its power. | |
+| TI6 | UNEQUIP it. | "Unequipped.", EQUIP again, badge gone, active count back down, trophy leaves the case, its power leaves the list. | |
+| TI7 | Equip 5 trophies, select a 6th. | Grey "Case full (5/5)"; clicking it does nothing (no request). Unequip one → the 6th can be equipped. | |
+| TI8 | Spam-click EQUIP / UNEQUIP very fast. | Only one request at a time (button "..."); no errors; the final state matches the server (badge, count, case). If the server refuses (rate limit), its reason shows in red under the description. | |
+| TI9 | Trophy Case not built (or plot released). | Orange note "Build your Trophy Case at home to activate trophy powers!"; EQUIP still works; "Active powers: none". Build the case → the note disappears and powers appear without reopening the panel. | |
+| TI10 | API access OFF (unsaved, TR8). | "Saving is off this session" at the bottom right; everything else works. | |
+| TI11 | Many trophies: in the Server command bar publish a test `TrophyInventory` with 120 records (any variants). | The grid scrolls smoothly; every tile shows; no lag spike when it updates again; equipped first, then rarest, then newest. | |
+| TI12 | Bad data: set `TrophyInventory` to `"oops"`, then to `'{"Owned":[{"InstanceId":5}],"Equipped":["zzz"]}'`, and a record with Variant `"Nope"`. | No errors. Bad JSON / bad records = empty or skipped; unknown Equipped ids ignored; "Nope" shows as a grey "Mystery Caleb". | |
+| TI13 | Selected trophy disappears (publish a `TrophyInventory` without it). | Details go back to "Tap a trophy to see its power!"; no errors. | |
+| TI14 | Phone (Device emulator, e.g. iPhone landscape) and a big PC window. Open the panel while the feed pop-up is open, and during the Caleb event banners. | Panel fits the screen and stays readable (text scales, clamps); tiles are 3+ per row. The feed pop-up and event banners draw over the panel, not under it. | |
