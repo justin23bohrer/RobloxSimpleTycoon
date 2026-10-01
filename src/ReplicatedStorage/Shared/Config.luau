@@ -113,6 +113,17 @@ local Config = {
 	-- per client, and the radius (studs, around the statue) they fall in.
 	CookieRainMaxCookies = 120,
 	CookieRainRadius = 150,
+	-- New cookies per second (fewer if CookieRainMaxCookies are all in use),
+	-- fall speed (studs/s), height above the landing spot they start at
+	-- (studs), and spin (radians/s); each cookie varies these a little.
+	CookieRainPerSecond = 25,
+	CookieRainFallSpeed = 30,
+	CookieRainHeight = 80,
+	CookieRainSpinSpeed = 3,
+	-- Share (0..1) of cookies aimed within NearPlayerRadius studs of the local
+	-- player, so everyone sees plenty around them; the rest fall anywhere.
+	CookieRainNearPlayerShare = 0.6,
+	CookieRainNearPlayerRadius = 45,
 	-- Sound effects (client only). Each is a Roblox audio asset id string
 	-- ("rbxassetid://123..."). Empty = that sound is skipped. See
 	-- tools/audio/ for the original effects to upload. Music comes later.
@@ -124,6 +135,20 @@ local Config = {
 		TrophyClaim = "",
 		EventEnd = "",
 	}),
+	-- Event UI + screen effects (client only, CalebEventUI.client.luau).
+	-- TickSeconds: how often the countdowns refresh. ConfettiCount: pooled
+	-- UI confetti pieces per burst (capped at 100). Shake: camera shake
+	-- strength (studs) and length when Caleb gets full. ClosedMessage: how
+	-- long "TROPHY CLAIM CLOSED" stays. Party*: Celebration lighting
+	-- (ColorCorrection saturation, Bloom intensity, fade in/out seconds).
+	CalebUITickSeconds = 0.25,
+	CalebConfettiCount = 60,
+	CalebShakeStuds = 0.6,
+	CalebShakeSeconds = 0.5,
+	CalebClosedMessageSeconds = 4,
+	CalebPartySaturation = 0.25,
+	CalebPartyBloom = 0.4,
+	CalebPartyFadeSeconds = 1.5,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",

@@ -59,10 +59,10 @@ user's approval first.
 Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user will pick a track); sound effects only for now.
 
 - [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
-- [ ] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id.
+- [x] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id. (code done; Studio test pending: QA CE1–CE10)
 - [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
-- [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
-- [ ] Cookie rain (client, pooled).
+- [x] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed. (code done; Studio test pending: QA EV1–EV14)
+- [x] Cookie rain (client, pooled): `CookieRain.client` + `CookieRainLook`. Visual only, not collectable. (code done; Studio test pending: QA CR1–CR10)
 - [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
 - [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
