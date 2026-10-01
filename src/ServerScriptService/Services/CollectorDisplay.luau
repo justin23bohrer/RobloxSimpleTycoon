@@ -2,9 +2,10 @@
 -- Helper for CollectorService: the fun, presentation-only side of a plot's
 -- collect area. It never reads or changes cash.
 --
--- * Every drop the Collector accepts drops a gold cube into the plot's glass
---   CashTank (on the wall behind the CollectPad), so the tank fills up as
---   cash waits to be picked up. No amounts are shown as text.
+-- * Every drop the Collector accepts drops a small cookie into the plot's
+--   glass CashTank (the "COOKIE JAR" on the wall behind the CollectPad), so
+--   the jar fills up as cookies wait to be picked up. No amounts are shown as
+--   text.
 -- * While cash is waiting, the CollectPad sparkles and glows.
 -- * A bouncing arrow above the pad invites the owner to step on it.
 -- * On payout the tank empties with a burst of gold sparkles.
@@ -17,9 +18,9 @@ local TweenService = game:GetService("TweenService")
 local CollectorDisplay = {}
 
 -- Looks only; not gameplay tuning.
-local MAX_TANK_CUBES = 60 -- tank looks full past this; stops adding cubes
-local CUBE_SIZE = Vector3.new(0.9, 0.9, 0.9)
-local CUBE_COLOR = Color3.fromRGB(245, 205, 48)
+local MAX_TANK_CUBES = 60 -- tank looks full past this; stops adding cookies
+local CUBE_SIZE = Vector3.new(0.3, 0.9, 0.9) -- a Cylinder: X is the cookie's thickness
+local CUBE_COLOR = Color3.fromRGB(214, 160, 90) -- same dough color as the drops
 local GOLD = Color3.fromRGB(255, 215, 60)
 -- Where new cubes appear, relative to the TankLid's center: just under the
 -- lid, anywhere across the tank's inside (x 14..20, z -29..-26.6) with room
@@ -123,7 +124,7 @@ function CollectorDisplay.Setup(plot: Model)
 	}
 end
 
--- Shows one more collected drop: a gold cube falls into the tank and the pad
+-- Shows one more collected drop: a cookie falls into the tank and the pad
 -- starts sparkling.
 function CollectorDisplay.AddCube(plot: Model)
 	local display = displayByPlot[plot]
@@ -144,14 +145,15 @@ function CollectorDisplay.AddCube(plot: Model)
 		+ Vector3.new((math.random() * 2 - 1) * CUBE_SPREAD_X, 0, (math.random() * 2 - 1) * CUBE_SPREAD_Z)
 
 	local cube = Instance.new("Part")
-	cube.Name = "TankCube"
+	cube.Name = "TankCookie"
+	cube.Shape = Enum.PartType.Cylinder
 	cube.Size = CUBE_SIZE
 	cube.Color = CUBE_COLOR
 	cube.Material = Enum.Material.SmoothPlastic
 	cube.CanTouch = false -- never reaches the Collector or any Touched handler
 	cube.CanQuery = false
 	cube.CFrame = CFrame.new(lid.Position + offset)
-		* CFrame.Angles(0, math.random() * math.pi, 0) -- tumbles once it lands on the pile
+		* CFrame.Angles(0, math.random() * math.pi, math.pi / 2 + (math.random() - 0.5)) -- roughly flat, tilted; tumbles onto the pile
 	cube.Parent = cubes
 	cube:SetNetworkOwner(nil)
 end

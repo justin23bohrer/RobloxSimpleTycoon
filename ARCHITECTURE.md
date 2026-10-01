@@ -24,7 +24,7 @@ src/
 │       └── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
-│       └── CashDisplay.client.luau → LocalScript: bottom-center cash panel
+│       └── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -60,7 +60,7 @@ instances added there only in Studio will be removed on sync.
 | Dropper production and drop values   | Presentation               |
 | Collection rewards                   |                            |
 
-The client can *read* replicated state (`leaderstats.Cash`, the plot
+The client can *read* replicated state (`leaderstats.Cookies`, the plot
 `OwnerUserId` attribute, `Config`). Changes a client makes to those never
 reach the server.
 
@@ -75,15 +75,15 @@ reach the server.
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
-| `PlayerDataService` | Creates `leaderstats.Cash` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
+| `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`; in `Config.Droppers` order only; `Cost = 0` spends nothing). Tells `PlotStages` what to show. | Implemented (claiming + ordered dropper purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and buy button 1), `ShowAfterPurchase(plot, index)` (hides button N, shows button N+1). Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
-| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects each `BuyButtonN` touch to a callback with the dropper id, sets RichText labels from `Config` ("Dropper N" over a yellow "$Cost" / "FREE!"), and hides/shows each button together with its `DropperSpotN` (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
-| `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns `Drop` parts worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
+| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects each `BuyButtonN` touch to a callback with the dropper id, sets RichText labels from `Config` ("Dropper N" over a yellow "🍪 Cost" / "FREE!"), and hides/shows each button together with its `DropperSpotN` (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
+| `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
 | `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
-| `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a gold cube into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
+| `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
@@ -103,7 +103,7 @@ changes cash, ownership, or purchases, and never talks to the server.
 
 | Script | What it does |
 | ------ | ------------ |
-| `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cash`, shows it as `$1,250` (comma separators), and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a text "$" coin). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
+| `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cookies`, shows it as `1,250` (comma separators) next to a cookie icon, and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a cookie icon drawn from round `Frame`s). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
@@ -169,7 +169,11 @@ type Tycoon = {
 
 ## Economy model
 
-- Cash is an integer in `leaderstats.Cash`, changed only via EconomyService.
+- Players see the currency as **cookies**; code and `Config` call it
+  "cash" (`StartingCash`, `GetCash`/`AddCash`/`TrySpend`). The leaderstat is
+  named `Cookies`. Keep new code consistent with this: "cash" in identifiers,
+  "cookies" in anything a player reads.
+- Cash is an integer in `leaderstats.Cookies`, changed only via EconomyService.
 - Money enters the game only through collection (`AddCash`).
 - Money leaves only through purchases (`TrySpend`, which fails without
   changing anything if the player cannot afford it).

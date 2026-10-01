@@ -6,7 +6,9 @@
 --   DropperSpotN (N = the dropper's position in Config.Droppers), sets the
 --   conveyor moving toward +X (plots are unrotated; the Collector is at +X),
 --   and every Config.DropInterval seconds creates a "Drop" part worth that
---   dropper's Config DropValue in the plot's "Drops" folder.
+--   dropper's Config DropValue in the plot's "Drops" folder. A drop looks like
+--   a chocolate chip cookie: a flat disc with a few welded chip parts that
+--   cannot touch anything, so only the disc itself reaches the Collector.
 -- * Each drop's value and plot live only in server-side tables keyed by the
 --   part. Nothing is read from the part or the client, so a client cannot
 --   change a drop's value or move it to another plot.
@@ -26,8 +28,21 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local DropperService = {}
 
 -- Looks only; not gameplay tuning.
-local DROP_SIZE = Vector3.new(1, 1, 1)
-local DROP_COLOR = Color3.fromRGB(245, 205, 48)
+-- A Cylinder's round faces are on its X axis, so X is the cookie's thickness
+-- and FLAT turns it to lie flat (X pointing up).
+local COOKIE_THICKNESS = 0.4
+local DROP_SIZE = Vector3.new(COOKIE_THICKNESS, 1.4, 1.4)
+local FLAT = CFrame.Angles(0, 0, math.pi / 2)
+local DROP_COLOR = Color3.fromRGB(214, 160, 90) -- golden-brown dough
+local CHIP_COLOR = Color3.fromRGB(70, 40, 20) -- chocolate
+local CHIP_SIZE = Vector3.new(0.3, 0.3, 0.3)
+-- Chip positions on the cookie's top face, in the disc's local Y/Z plane.
+local CHIP_SPOTS = {
+	Vector2.new(0.3, 0.2),
+	Vector2.new(-0.3, 0.3),
+	Vector2.new(0.05, -0.35),
+	Vector2.new(-0.35, -0.15),
+}
 local DROPPER_COLOR = Color3.fromRGB(120, 120, 120)
 local DROP_GAP = 0.1 -- studs between the dropper's bottom and a new drop
 
@@ -53,15 +68,42 @@ local function forgetDrop(drop: BasePart)
 	dropPlots[drop] = nil
 end
 
+-- Chocolate chips welded on top of a cookie drop. Looks only: they cannot
+-- touch, collide, or be found by raycasts, and add no mass.
+local function addChips(drop: BasePart)
+	for _, spot in CHIP_SPOTS do
+		local chip = Instance.new("Part")
+		chip.Name = "Chip"
+		chip.Shape = Enum.PartType.Ball
+		chip.Size = CHIP_SIZE
+		chip.Color = CHIP_COLOR
+		chip.Material = Enum.Material.SmoothPlastic
+		chip.CanCollide = false
+		chip.CanTouch = false
+		chip.CanQuery = false
+		chip.Massless = true
+		chip.CFrame = drop.CFrame * CFrame.new(COOKIE_THICKNESS / 2, spot.X, spot.Y)
+
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = drop
+		weld.Part1 = chip
+		weld.Parent = chip
+		chip.Parent = drop
+	end
+end
+
 local function spawnDrop(plot: Model, run: PlotRun, dropper: BasePart, value: number)
-	local offsetY = dropper.Size.Y / 2 + DROP_SIZE.Y / 2 + DROP_GAP
+	local offsetY = dropper.Size.Y / 2 + COOKIE_THICKNESS / 2 + DROP_GAP
 
 	local drop = Instance.new("Part")
 	drop.Name = "Drop"
+	drop.Shape = Enum.PartType.Cylinder
 	drop.Size = DROP_SIZE
 	drop.Color = DROP_COLOR
+	drop.Material = Enum.Material.SmoothPlastic
 	drop.Anchored = false
-	drop.CFrame = dropper.CFrame * CFrame.new(0, -offsetY, 0)
+	drop.CFrame = dropper.CFrame * CFrame.new(0, -offsetY, 0) * FLAT
+	addChips(drop)
 
 	dropValues[drop] = value
 	dropPlots[drop] = plot

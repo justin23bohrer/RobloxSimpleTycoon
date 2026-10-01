@@ -4,7 +4,7 @@ Syncs into Studio as `StarterPlayer.StarterPlayerScripts`. (Rojo ignores this RE
 
 Client code goes here as `Name.client.luau` (a LocalScript).
 
-- `CashDisplay.client.luau` — bottom-center cash panel (display only).
+- `CashDisplay.client.luau` — bottom-center cookie counter (display only).
 
 Client code may handle input, visual effects, and presentation. It must never
 be trusted for cash, ownership, purchases, drops, or collection.

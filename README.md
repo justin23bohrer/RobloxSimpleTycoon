@@ -2,11 +2,11 @@
 
 A tiny Roblox tycoon, built as a clean starting point:
 
-> join → get $100 → claim a plot → free first dropper → unlock and buy the
-> next droppers one by one → drops ride a conveyor → collect the cash
+> join → get 100 cookies → claim a plot → free first dropper → unlock and buy
+> the next droppers one by one → cookies ride a conveyor → collect the cookies
 
 The full design is in [GAME_DESIGN.md](GAME_DESIGN.md). **Current status:** the full MVP
-loop is built (cash, plots, buying the dropper, drops, conveyor, collection)
+loop is built (cookies, plots, buying the dropper, drops, conveyor, collection)
 and is waiting on Studio testing; see [TODO.md](TODO.md) and [QA.md](QA.md).
 
 ## How the project works
@@ -51,7 +51,7 @@ rojo serve
 
 3. In Studio: **File → Open from File…** → `build/SimpleTycoon.rbxlx`.
 4. **Plugins → Rojo → Connect** (default `localhost:34872`).
-5. Press **Play** to test. Cash appears in the player list at the top right.
+5. Press **Play** to test. Cookies appear in the player list at the top right.
 
 When you change a file, Rojo updates Studio within a second. Stop Play mode
 first; changes don't apply to a running test. `build/` is ignored by Git, so
@@ -61,16 +61,17 @@ you can rebuild it anytime.
 > SpawnLocation, so syncing into it would give you two spawns. Use the built
 > place above instead.
 
-## Testing with unlimited cash (Studio only)
+## Testing with unlimited cookies (Studio only)
 
-To try every dropper without grinding for cash:
+The currency players see is cookies; in code it is still called "cash".
+To try every dropper without grinding for cookies:
 
 1. Open `src/ReplicatedStorage/Shared/Config.luau` and set
    `DevUnlimitedCash = true`.
 2. Rebuild (`mkdir -p build && rojo build default.project.json --output build/SimpleTycoon.rbxlx`)
    and reopen the place, or let `rojo serve` sync it into Studio.
 3. Press **Play**. Output shows `[DEV] Unlimited cash is ON ...` and you start
-   with `DevStartingCash` ($1,000,000,000). Buying still spends cash normally.
+   with `DevStartingCash` (1,000,000,000 cookies). Buying still spends cookies normally.
 
 It only works inside Roblox Studio (`RunService:IsStudio()`), never in a
 published game. Set it back to `false` before committing.

@@ -5,7 +5,7 @@
 --   2. The plot's owner touching plot.CollectPad moves the stored cash into
 --      their cash via EconomyService.AddCash.
 -- The stored amount is never shown as text. CollectorDisplay shows it as
--- gold cubes filling the CashTank behind the pad (presentation only).
+-- small cookies filling the CashTank ("COOKIE JAR") behind the pad (presentation only).
 --
 -- Named CollectorService (not CollectionService) to avoid confusion with
 -- Roblox's built-in game:GetService("CollectionService") tagging service.

@@ -1,7 +1,10 @@
 -- PlayerDataService (server only)
 -- Creates and removes each player's session data.
 --
--- Cash is stored in player.leaderstats.Cash (an IntValue). Roblox shows
+-- The currency players see is Cookies. In code it is still called "cash"
+-- (StartingCash, AddCash, ...); only the leaderstat and the text are cookies.
+--
+-- Cash is stored in player.leaderstats.Cookies (an IntValue). Roblox shows
 -- leaderstats in the player list automatically, and changes made by a client
 -- never replicate back to the server, so the server's value is the real one.
 --
@@ -24,7 +27,7 @@ local PlayerDataService = {}
 local startingCash = Config.StartingCash
 if Config.DevUnlimitedCash and RunService:IsStudio() then
 	startingCash = Config.DevStartingCash
-	print(`[DEV] Unlimited cash is ON (Studio only): players start with ${startingCash}. Set Config.DevUnlimitedCash = false to turn it off.`)
+	print(`[DEV] Unlimited cash is ON (Studio only): players start with {startingCash} cookies. Set Config.DevUnlimitedCash = false to turn it off.`)
 end
 
 local cashValues: { [Player]: IntValue } = {}
@@ -39,7 +42,7 @@ function PlayerDataService.OnPlayerAdded(player: Player)
 	leaderstats.Name = "leaderstats"
 
 	local cash = Instance.new("IntValue")
-	cash.Name = "Cash"
+	cash.Name = "Cookies"
 	cash.Value = startingCash
 	cash.Parent = leaderstats
 

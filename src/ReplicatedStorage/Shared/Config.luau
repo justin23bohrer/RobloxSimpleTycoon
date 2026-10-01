@@ -5,8 +5,11 @@
 -- to show a price). The client cannot change the server's copy, and the server
 -- never trusts numbers sent by the client.
 
+-- Currency: players see "Cookies". In code and here it is called "cash"
+-- (StartingCash, DropValue, Cost are all counted in cookies).
+
 local Config = {
-	-- Cash every player starts each session with.
+	-- Cookies every player starts each session with.
 	StartingCash = 100,
 
 	-- The droppers a player can buy, in order: each one unlocks the next. Entry N uses the plot's
@@ -14,7 +17,7 @@ local Config = {
 	-- entry (TycoonService checks this at startup).
 	--   Id        - purchase id (tycoon.Purchased[Id]); must be unique.
 	--   Cost      - price, spent through EconomyService.TrySpend. 0 = free.
-	--   DropValue - cash value of each physical drop this dropper creates.
+	--   DropValue - cookies each physical cookie drop from this dropper is worth.
 	Droppers = table.freeze({
 		table.freeze({ Id = "Dropper1", Cost = 0, DropValue = 10 }),
 		table.freeze({ Id = "Dropper2", Cost = 300, DropValue = 25 }),

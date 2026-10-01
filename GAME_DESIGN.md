@@ -3,20 +3,27 @@
 This is the complete scope of the MVP. Anything not listed here is out of
 scope until the user approves it (see `TODO.md`).
 
+## Currency: cookies
+
+The game's currency is **cookies** (🍪), not money. Droppers drop cookies,
+everything costs cookies, and the player's total is shown as Cookies. In
+code and config the currency is still called "cash" (`StartingCash`,
+`EconomyService.AddCash`, ...); only what players see says cookies.
+
 ## Core loop
 
-Player joins → receives $100 → steps on the blue **Claim Tycoon** pad →
+Player joins → receives 100 cookies → steps on the blue **Claim Tycoon** pad →
 their collect area and a FREE Dropper 1 button appear → buys Dropper 1 →
-it makes $10 drops every 2 seconds → drops ride a conveyor to the
-collector → player steps on the Collect pad → cash increases → the next,
-more expensive dropper's button has appeared, so they save up for it.
+it drops a 10-cookie cookie every 2 seconds → cookies ride a conveyor to the
+collector → player steps on the Collect pad → their cookies increase → the
+next, more expensive dropper's button has appeared, so they save up for it.
 
 ## Player
 
-- Starts each session with **$100** (`Config.StartingCash`).
-- Cash is shown in the Roblox player list (`leaderstats`) and in a cartoony
-  panel at the bottom-center of the screen (e.g. "$1,250") that bounces when
-  the amount changes.
+- Starts each session with **100 cookies** (`Config.StartingCash`).
+- Cookies are shown in the Roblox player list (`leaderstats.Cookies`) and in
+  a cartoony panel at the bottom-center of the screen (a drawn chocolate chip
+  cookie and e.g. "1,250") that bounces when the amount changes.
 - No saving between sessions yet.
 
 ## Tycoon
@@ -33,7 +40,7 @@ more expensive dropper's button has appeared, so they save up for it.
   | When | What appears | What disappears |
   | ---- | ------------ | --------------- |
   | Unclaimed | Floor and the Claim Tycoon pad only. | Everything else. |
-  | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cash tank, and the **Dropper 1 / FREE!** button with its yellow spot. | The Claim pad. |
+  | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cookie jar, and the **Dropper 1 / FREE!** button with its yellow spot. | The Claim pad. |
   | Dropper N bought | The dropper at its spot, and the next dropper's button and yellow spot. | Button N and its yellow spot. |
   | Dropper 4 bought | Nothing new (all droppers bought). | Button 4. |
 
@@ -44,20 +51,20 @@ more expensive dropper's button has appeared, so they save up for it.
 
 There are four droppers (`Config.Droppers`), each with its own buy button:
 
-| Dropper   | Cost   | Value per drop |
-| --------- | ------ | -------------- |
-| Dropper 1 | FREE   | $10            |
-| Dropper 2 | $300   | $25            |
-| Dropper 3 | $1000  | $60            |
-| Dropper 4 | $3000  | $150           |
+| Dropper   | Cost (cookies) | Value per drop (cookies) |
+| --------- | -------------- | ------------------------ |
+| Dropper 1 | FREE           | 10                       |
+| Dropper 2 | 300            | 25                       |
+| Dropper 3 | 1000           | 60                       |
+| Dropper 4 | 3000           | 150                      |
 
 - The owner buys a dropper by stepping on its red button. The label shows the
-  name with the price under it in yellow, e.g. "Dropper 2 / $300", or
+  name with the price under it in yellow, e.g. "Dropper 2 / 🍪 300", or
   "Dropper 1 / FREE!" (text comes
   from `Config`; a `Cost` of 0 is free).
 - Droppers unlock **in order**: only the next dropper's button is shown, and
   the server refuses to sell a dropper before the one before it is bought.
-- The player must have enough cash (the free dropper needs none).
+- The player must have enough cookies (the free dropper needs none).
 - The purchase is decided on the server.
 - Each dropper can only be bought once per plot. A bought button disappears
   (pad, ring, label, and its yellow spot). All buttons are hidden again when
@@ -65,38 +72,39 @@ There are four droppers (`Config.Droppers`), each with its own buy button:
 
 ## Droppers
 
-- Each bought dropper produces one physical object worth its value every
-  **2 seconds** (`Config.DropInterval`, shared by all droppers).
-- Objects travel along the plot's one conveyor to the one collector.
+- Each bought dropper drops one physical **cookie** worth its value every
+  **2 seconds** (`Config.DropInterval`, shared by all droppers). A cookie is
+  a flat golden-brown disc with chocolate chips (built from plain parts).
+- Cookies travel along the plot's one conveyor to the one collector.
 
-## Testing: unlimited cash (Studio only)
+## Testing: unlimited cookies (Studio only)
 
 - `Config.DevUnlimitedCash = true` makes players start with
-  `Config.DevStartingCash` ($1,000,000,000) instead of $100, **only** in
+  `Config.DevStartingCash` (1,000,000,000 cookies) instead of 100, **only** in
   Roblox Studio. It never applies in a published game. Buying still spends
-  cash normally. Must be `false` in commits.
+  cookies normally. Must be `false` in commits.
 
 ## Collector
 
-- Objects that reach the plot's collector add their value to that plot's
-  stored cash.
-- The owning player collects the stored cash by stepping on the green
+- Cookies that reach the plot's collector add their value to that plot's
+  stored cookies.
+- The owning player collects the stored cookies by stepping on the green
   **Collect** pad (label "COLLECT!").
 - Other players cannot collect it.
 
-### Cash tank (collect area look)
+### Cookie jar (collect area look)
 
 The stored amount is **not** shown as text. Instead:
 
 - Behind the Collect pad is a purple wall with a gold frame, a pink
-  "CASH TANK" sign, and a glass tank on an orange stand.
-- Each drop that reaches the collector drops one gold cube into the tank, so
-  the tank fills up as cash waits (it stops adding cubes at 60, when it looks
-  full; the cash itself keeps adding up).
-- While cash is waiting, the pad sparkles gold and glows.
+  "COOKIE JAR" sign, and a glass tank on an orange stand (the `CashTank` model).
+- Each drop that reaches the collector drops one small cookie into the jar,
+  so it fills up as cookies wait (it stops adding at 60, when it looks
+  full; the stored cookies keep adding up).
+- While cookies are waiting, the pad sparkles gold and glows.
 - A gold arrow always bounces above the pad.
 - Collecting empties the tank with a burst of gold sparkles.
-- All of this is looks only; the server's stored cash decides the payout.
+- All of this is looks only; the server's stored cookies decide the payout.
 
 ## Plot layout (prototype)
 
@@ -112,8 +120,8 @@ with a darker ring underneath as an outline:
 | `DropperSpot1`–`4` | Transparent yellow blocks above the conveyor where each dropper goes. |
 | `Conveyor`         | Dark strip that carries drops.                       |
 | `Collector`        | Green block at the end of the conveyor.              |
-| `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cash. |
-| `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. Cubes go in a `TankCubes` folder made at runtime. |
+| `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
+| `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime. |
 | `SpawnLocation`    | Round blue pad with a dark blue ring, in `Map` (not the plot). Where players appear. |
 
 ### Pad style (copy this for new pads)
