@@ -163,7 +163,7 @@
                   0
                 ],
                 [
-                  1.5,
+                  2,
                   0
                 ]
               ]
@@ -172,14 +172,14 @@
               0,
               3,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "Claim Tycoon",
                 "Size": {
                   "UDim2": [
                     [
@@ -192,15 +192,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  0.0,
+                  0.635,
+                  1.0
                 ],
-                "TextStrokeTransparency": 0
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "CLAIM TYCOON!",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -719,27 +806,27 @@
             "Size": {
               "UDim2": [
                 [
-                  6,
+                  6.5,
                   0
                 ],
                 [
-                  1.5,
+                  1.8,
                   0
                 ]
               ]
             },
             "StudsOffset": [
               0,
-              3,
+              2.8,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "COLLECT!",
                 "Size": {
                   "UDim2": [
                     [
@@ -752,16 +839,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  0.0,
+                  0.784,
+                  0.314
                 ],
-                "TextStrokeTransparency": 0,
-                "Font": "FredokaOne"
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "COLLECT!",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -1328,23 +1501,23 @@
                   0
                 ],
                 [
-                  1.5,
+                  2.8,
                   0
                 ]
               ]
             },
             "StudsOffset": [
               0,
-              3,
+              3.6,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "Dropper 1",
                 "Size": {
                   "UDim2": [
                     [
@@ -1357,15 +1530,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
                 ],
-                "TextStrokeTransparency": 0
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 1",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -1482,23 +1742,23 @@
                   0
                 ],
                 [
-                  1.5,
+                  2.8,
                   0
                 ]
               ]
             },
             "StudsOffset": [
               0,
-              3,
+              3.6,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "Dropper 2",
                 "Size": {
                   "UDim2": [
                     [
@@ -1511,15 +1771,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
                 ],
-                "TextStrokeTransparency": 0
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 2",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -1636,23 +1983,23 @@
                   0
                 ],
                 [
-                  1.5,
+                  2.8,
                   0
                 ]
               ]
             },
             "StudsOffset": [
               0,
-              3,
+              3.6,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "Dropper 3",
                 "Size": {
                   "UDim2": [
                     [
@@ -1665,15 +2012,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
                 ],
-                "TextStrokeTransparency": 0
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 3",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -1790,23 +2224,23 @@
                   0
                 ],
                 [
-                  1.5,
+                  2.8,
                   0
                 ]
               ]
             },
             "StudsOffset": [
               0,
-              3,
+              3.6,
               0
-            ]
+            ],
+            "LightInfluence": 0
           },
           "children": [
             {
-              "name": "TextLabel",
-              "className": "TextLabel",
+              "name": "Panel",
+              "className": "Frame",
               "properties": {
-                "Text": "Dropper 4",
                 "Size": {
                   "UDim2": [
                     [
@@ -1819,15 +2253,102 @@
                     ]
                   ]
                 },
-                "TextScaled": true,
-                "BackgroundTransparency": 1,
-                "TextColor3": [
-                  1,
-                  1,
-                  1
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
                 ],
-                "TextStrokeTransparency": 0
-              }
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 4",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

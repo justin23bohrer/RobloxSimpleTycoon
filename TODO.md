@@ -33,6 +33,7 @@ user's approval first.
 - [x] Restyle the new buy buttons to match the round, outlined pads (done by the lead while merging).
 - [x] Bought buy buttons disappear instead of turning gray; they come back on plot reset. (code done; Studio test pending: QA U1, U3, U4, U7, L1)
 - [x] Claim pad + step-by-step unlocks: plot shows only a Claim pad until claimed; claiming shows the collect area and a FREE Dropper 1 button; each purchase reveals the next dropper's button; order enforced on the server (approved by the user 2026-09-30). (code done; Studio test pending: QA T1, T4–T6, U0–U7, M1, M3–M4, L1, L3)
+- [x] Fun cartoony signs above the Claim, Buy, and Collect pads in the cash display's style (FredokaOne, rounded panel, dark outline); buy price on its own yellow line (approved by the user 2026-09-30). (code done; Studio test pending: QA V3)
 - [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
 - [x] Fun collect area: cash tank wall behind the Collect pad that fills with a gold cube per collected drop, pad sparkles/glow/bouncing arrow, no amount text (approved 2026-09-30). (code done; Studio test pending: QA CT1–CT7)
 

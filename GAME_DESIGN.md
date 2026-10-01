@@ -33,7 +33,7 @@ more expensive dropper's button has appeared, so they save up for it.
   | When | What appears | What disappears |
   | ---- | ------------ | --------------- |
   | Unclaimed | Floor and the Claim Tycoon pad only. | Everything else. |
-  | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cash tank, and the **Dropper 1 - FREE** button with its yellow spot. | The Claim pad. |
+  | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cash tank, and the **Dropper 1 / FREE!** button with its yellow spot. | The Claim pad. |
   | Dropper N bought | The dropper at its spot, and the next dropper's button and yellow spot. | Button N and its yellow spot. |
   | Dropper 4 bought | Nothing new (all droppers bought). | Button 4. |
 
@@ -52,7 +52,8 @@ There are four droppers (`Config.Droppers`), each with its own buy button:
 | Dropper 4 | $3000  | $150           |
 
 - The owner buys a dropper by stepping on its red button. The label shows the
-  name and price, e.g. "Dropper 2 - $300", or "Dropper 1 - FREE" (text comes
+  name with the price under it in yellow, e.g. "Dropper 2 / $300", or
+  "Dropper 1 / FREE!" (text comes
   from `Config`; a `Cost` of 0 is free).
 - Droppers unlock **in order**: only the next dropper's button is shown, and
   the server refuses to sell a dropper before the one before it is bought.
@@ -105,7 +106,7 @@ with a darker ring underneath as an outline:
 | Part               | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
 | `Base`             | Plot floor, in front of the spawn. Always visible.   |
-| `ClaimPad`         | Round blue pad with a dark blue ring at the front of the plot, label "Claim Tycoon". Shown only while the plot is unclaimed. |
+| `ClaimPad`         | Round blue pad with a dark blue ring at the front of the plot, label "CLAIM TYCOON!". Shown only while the plot is unclaimed. |
 | `OwnerSign`        | Shows the owner's name.                              |
 | `BuyButton1`–`4`   | Round red pads with dark red rings, in a row beside the conveyor. Buy droppers 1–4. |
 | `DropperSpot1`–`4` | Transparent yellow blocks above the conveyor where each dropper goes. |
@@ -121,9 +122,11 @@ with a darker ring underneath as an outline:
 | ----- | ------- |
 | Pad (the part players touch) | `Part`, `Shape = Cylinder`, CFrame rotated 90° around Z (orientation `[[0,-1,0],[1,0,0],[0,0,1]]`) so the round face points up. Plot pads: `Size = [0.4, 6, 6]` (height, diameter, diameter), bottom resting on `Base` (Y = 2.2). SmoothPlastic, bold color. |
 | Ring (outline) | A child of the pad named `<PadName>Ring`. Same shape and rotation, half the pad's height, 1.5 studs wider (plot pads: `Size = [0.2, 7.5, 7.5]`, Y = 2.1), darker shade of the pad color. `Anchored`, `CanTouch = false`, `CanQuery = false`. |
-| Label | `BillboardGui` named `Label` on the pad, `StudsOffset = [0, 3, 0]`, white `TextScaled` text with a black stroke. |
+| Label | Cartoony sign that matches the cash display. `BillboardGui` named `Label` on the pad (`LightInfluence = 0`, about 3 studs up) → `Frame` `Panel` in the pad's bright color with `UICorner` (0.35 scale) and a 4 px `UIStroke` border in the dark outline color `40,28,20` → `TextLabel` named `TextLabel` (white, `FredokaOne`, `TextScaled`, `RichText`, 88%×80% centered) with a 2.5 px Contextual `UIStroke` in the same dark color. Code finds the text with `FindFirstChild("TextLabel", true)`, so keep exactly one TextLabel per pad. |
 
 Buy button colors: pad `255,0,0` (BuyButtons.luau resets the buttons to this
 exact red), ring `110,0,0`. Collect pad: `0,220,70` / ring `0,95,35`.
 Spawn (14 studs wide): `70,160,255` / ring `20,60,150`.
 Claim pad: `0,162,255` / ring `0,70,140`.
+Label panels: Claim `0,162,255` "CLAIM TYCOON!"; Buy `255,60,60` "Dropper N" +
+yellow (`#FFE14D`) price; Collect `0,200,80` "COLLECT!".

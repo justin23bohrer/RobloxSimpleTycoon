@@ -28,10 +28,10 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| T1 | Player joins; look at the plot. | Only the floor and a round blue "Claim Tycoon" pad show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
+| T1 | Player joins; look at the plot. | Only the floor and a round blue pad with a "CLAIM TYCOON!" sign show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
 | T2 | Look at the map. | Exactly one plot, in front of the spawn. No other plots. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays. | |
-| T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 - FREE", with yellow spot 1 above the conveyor. | |
+| T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 / FREE!", with yellow spot 1 above the conveyor. | |
 | T5 | Stepping on your own Collect pad right after claiming. | Nothing happens (nothing stored). | |
 | T6 | Press Play and check Output before anyone claims. | No warnings about a missing `ClaimPad` or other plot parts; no "no free plot" warning on join. | |
 
@@ -39,8 +39,8 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| U0 | Claim the plot. | Only "Dropper 1 - FREE" is showing. | |
-| U1 | Step on "Dropper 1 - FREE" with $100. | Cash stays **100**. Button 1 and yellow spot 1 disappear; a gray dropper appears at spot 1; the conveyor starts and drops fall every 2 s. The "Dropper 2 - $300" button and yellow spot 2 appear. Buttons 3 and 4 are still hidden. | |
+| U0 | Claim the plot. | Only "Dropper 1 / FREE!" is showing. | |
+| U1 | Step on "Dropper 1 / FREE!" with $100. | Cash stays **100**. Button 1 and yellow spot 1 disappear; a gray dropper appears at spot 1; the conveyor starts and drops fall every 2 s. The "Dropper 2 / $300" button and yellow spot 2 appear. Buttons 3 and 4 are still hidden. | |
 | U2 | Can't afford: with $299 (Server view), step on "Dropper 2". | Nothing bought; cash stays 299; button 2 stays. | |
 | U3 | After buying, walk over where button 1 was (repeatedly). | No second dropper; no cash removed. | |
 | U4 | Buy in order: set Server cash to 4300, buy Dropper 1, 2, 3, 4. | Cash 4300 → 4300 → 4000 → 3000 → 0. Each purchase hides that button and shows the next one; after Dropper 4 no buttons remain. A dropper appears at each spot. | |
@@ -89,6 +89,7 @@ Record the date and result when you run a case.
 | CT6 | In a 2-player test, Player 2 watches Player 1's tank fill and empty. | Player 2 sees the same cubes, sparkles, and burst. | |
 | CT7 | Try to jump into the tank. | The glass lid and walls keep you out; the cubes don't pay anything if touched. | |
 | V2 | Walk across the rings only (not the pad centers). | Nothing is bought or collected; only touching the pad itself does. | |
+| V3 | Look at the signs above the Claim pad, then (after claiming) the buy button and Collect pad. Check from close up and ~40 studs away, in daylight and at night (Lighting `ClockTime = 0`). | Each sign is a bright rounded panel with a thick dark outline and white chunky text (same font as the cash display) with a dark outline: blue "CLAIM TYCOON!", red "Dropper N" with the price in yellow underneath ("FREE!" for Dropper 1), green "COLLECT!". Text stays inside the panel; no raw tags like `<font>` show; colors are not darkened at night; the Collect sign doesn't overlap the bouncing arrow. | |
 
 ## Cash display (client UI)
 
@@ -121,4 +122,4 @@ Record the date and result when you run a case.
 | -- | ---- | -------- | ------ |
 | L1 | In a 2-player test, after Player 1 buys some droppers, close Player 1's window. | The plot goes back to the T1 look: only the floor and the Claim Tycoon pad; droppers, drops, buttons, sign, and collect area are gone; `OwnerUserId` removed. | |
 | L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; cash tank empty, pad sparkles/glow off. | |
-| L3 | After L1, Player 2 (already in the game) steps on the Claim pad. | Player 2 gets the plot and sees exactly the T4 look: collect area and only "Dropper 1 - FREE" (nothing left over from Player 1). | |
+| L3 | After L1, Player 2 (already in the game) steps on the Claim pad. | Player 2 gets the plot and sees exactly the T4 look: collect area and only "Dropper 1 / FREE!" (nothing left over from Player 1). | |
