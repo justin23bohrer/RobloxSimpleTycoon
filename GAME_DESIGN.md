@@ -424,6 +424,23 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
   Display only (`CalebLeaderboard.client.luau` reads the statue's
   `CalebTopFeeders` attribute). Names are plain text, never markup.
 
+### Caleb Full Event sounds
+
+Original, cartoony sound effects (synthesized by `tools/audio/generate_sfx.py`,
+no copyrighted audio). Each player hears them on their own client; no music
+yet (the user will pick a track).
+
+- Caleb is fed: a short, quiet rising "bloop" (at most about 3 per second, however many feeds).
+- Caleb is full: a big "boing" + burp + fanfare hit.
+- Celebration starts: a party horn, rising chime arpeggio, and a cymbal-ish
+  splash, then a soft sparkle/patter loop plays quietly for the whole
+  Celebration (it fades out when the Celebration ends).
+- Celebration ends: a gentle descending chime.
+- You claim your trophy: a bright "ta-da" (only you hear yours).
+- Joining mid-event plays no old sounds; mid-Celebration you just hear the loop.
+- A sound whose id in `Config.CalebSounds` is empty is silent. Volumes are
+  `Config.CalebSoundVolumes`.
+
 ### Pad style (copy this for new pads)
 
 | Piece | Setting |

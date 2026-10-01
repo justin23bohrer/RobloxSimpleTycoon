@@ -189,6 +189,25 @@ Needs the Core agent's `CalebCycle` publishing `CalebTopFeeders`. Tip: `DevCaleb
 | LB8 | Wait for the reset to Normal. | List cleared ("Be the first to feed Caleb!"), total "🍪 0 / …", subtitle back to "Cookies fed this round". | |
 | LB9 | Walk far away (to a plot) and back; reset character. | Boards still show the list (re-attach after streaming); no duplicate boards; no errors in Output. | |
 
+## Caleb sounds
+
+Needs the WAVs uploaded and their ids in `Config.CalebSounds` (see
+`tools/audio/README.md`), except CS1. Use `Config.DevCalebFastCycle = true`
+(Studio only) to get through the event quickly.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CS0 | Run `python3 tools/audio/generate_sfx.py`. | Six WAVs in `tools/audio/out/` (16-bit, 44.1 kHz, mono), all under 300 KB. Re-running gives identical files. | |
+| CS1 | All `CalebSounds` ids empty; Play; run a full fast cycle. | Silent. Output has at most one `[CalebAudio] no sound id ...` line and no errors or warnings. | |
+| CS2 | Feed Caleb a few times quickly. | A quiet rising "bloop" per feed, never more than about 3 per second; the other game sounds are unchanged. | |
+| CS3 | Feed until the goal. | The "boing/burp/fanfare" plays once when he is Full. | |
+| CS4 | Wait for the Celebration. | Party horn + arpeggio + splash once, then a quiet sparkle loop with no audible click at the loop point. | |
+| CS5 | Wait for the Celebration to end (TrophyClaim starts). | The loop fades out and stops; the descending chime plays once. Nothing keeps playing. In Explorer, `SoundService.CalebAudio.CookieRain.IsPlaying` is false. | |
+| CS6 | Claim your trophy (2 players: only Player 1 claims). | Player 1 hears the "ta-da"; Player 2 does not. | |
+| CS7 | 2 players: Player 2 joins mid-Celebration. | Player 2 hears only the loop (no Full/CelebrationStart); it stops at the end like CS5. | |
+| CS8 | Player 2 joins during TrophyClaim, or after already claiming (rejoin). | No sounds play on join. | |
+| CS9 | Reset character during the Celebration; let the cycle run twice. | Still exactly one `SoundService.CalebAudio` folder; sounds play again in the next cycle; no duplicates. | |
+
 ## Purchase
 
 | ID | Test | Expected | Status |
