@@ -402,3 +402,26 @@ Services** ON (published place) except TR8. Watch Output (Server view).
 | TR16 | Trophy Case nameplates: case built, 1+ trophies shown. Walk up close, then back to the Collect pad, then 60+ studs away. | Each trophy has a small tilted gold-rimmed plaque in front of it with its name in its rarity color (Common white, Rare blue, ...) and, if the trophy has a power, the power line (e.g. "2x COOKIE PRODUCTION") in white; readable at night (not dimmed). Plaques disappear beyond ~60 studs. The plaque doesn't hide the trophy. | |
 | TR17 | Trophy Case lighting: case built, with and without trophies; day and night (`Lighting.ClockTime`). | With trophies shown: a soft warm light inside each row, no glare, no bright Neon. Before the case is bought, and after the plot is released: no light on the back wall. | |
 | TR18 | Slot order: with equipping (Inventory), equip 1, then 2, ... 5 trophies; unequip one. | Slot 1 (bottom-row middle) = first equipped, then left, right, far left, far right; unequipping rebuilds the row in the new order. (Before the Inventory change: TrophyService passes oldest first, so slot 1 = oldest.) Plot2–4: same, case against each house's back wall facing in. | |
+
+## Trophy powers
+
+Needs the Trophy Case built and trophies equipped (Inventory UI). For quick
+checks, in the Server command bar:
+`require(game.ServerScriptService.Services.PowerService).SetDisplayed(game.Players.<Name>, { "<VariantId>", ... })`
+(TrophyService resets it on the next equip change). Read `TrophyStats` /
+`CanDoubleJump` on the player in the Properties window.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PW1 | No trophies displayed. | `TrophyStats` = `[]` or `{}`, `CanDoubleJump` = false; drops worth exactly `DropValue`, one drop per `DropInterval`, payout = stored; normal WalkSpeed (16) / JumpHeight (7.2). | |
+| PW2 | CookieMultiplier: display a +1.0 cookie trophy. | Collected cookies per drop double (Dropper1: 20 instead of 10) from the next drop. | |
+| PW3 | DropperSpeed: display a DropperSpeed trophy. | Drops come out faster (+1.0 → one per 1 s instead of 2 s) from the next drop. | |
+| PW4 | ExtraCookieChance: display one (or set a high value temporarily in a test definition). | Sometimes two cookies fall at once (one just below the other); both are counted. Never three. | |
+| PW5 | LuckyCookieChance: display one. | Sometimes a **gold** cookie; it adds 5× the normal value. | |
+| PW6 | CollectBonus: display +0.5, collect 100 stored. | Cookies +150 (rounded down for odd amounts). | |
+| PW7 | WalkSpeed / JumpHeight: display them. | Visibly faster / higher right away; Humanoid `UseJumpPower` = false. Unequip → back to normal right away. | |
+| PW8 | DoubleJump: display Rocket Caleb. | `CanDoubleJump` = true; press jump, then again in the air → a second jump; only one per air time; landing resets. Holding jump does not fire both at once. Unequip → no air jump. | |
+| PW9 | Caps: display several trophies of one stat whose sum exceeds the cap. | `TrophyStats` shows the cap (e.g. CookieMultiplier 2 → 3× cookies), never more. Two copies of the same definition count once. | |
+| PW10 | Respawn (reset character) with speed/jump trophies. | Same boosted WalkSpeed / JumpHeight after respawn; not compounded (reset twice → same values). | |
+| PW11 | 2 players (Clients and Servers): only Player 1 has trophies. | Player 2's drops, payouts, speed, jump and `TrophyStats` are unaffected; Player 1's bonuses apply only on Player 1's plot. | |
+| PW12 | Unequip every trophy (or release the plot / leave). | All bonuses gone from the next drop; `TrophyStats` empty; movement normal. | |

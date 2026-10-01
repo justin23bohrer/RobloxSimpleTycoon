@@ -30,6 +30,7 @@ src/
 │       ├── DropperCup.luau     → helper for DropperService (builds the red cup dropper)
 │       ├── CollectorService.luau
 │       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
+│       ├── PowerService.luau   → active Caleb Trophy powers per player (+ movement)
 │       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
 │       ├── CalebCycle.luau     → Caleb Full Event state machine (total, contributions, trophy eligibility)
 │       ├── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
@@ -40,6 +41,7 @@ src/
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
+│       ├── DoubleJump.client.luau  → LocalScript: Rocket Caleb's air jump (CanDoubleJump)
 │       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
 │       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
@@ -162,6 +164,7 @@ reach the server.
 | `TrophyModel` (helper) | Used only by `TrophyService`; presentation only. `Build(variantId, scale?, label?)` returns an anchored, non-colliding Model (pivot = bottom center of the plinth, facing -Z): plinth + gold trim + "CALEB TROPHY" nameplate (variant name in its rarity color, or `label`), a mini Caleb in the statue's style in the variant's color/material and pose (arm angles per pose), accessories, and effect (`Sparkles` on the head or a `PointLight` glow). Unknown variant ids use `TrophyVariants.Fallback`. | Implemented |
 | `TrophyCaseDisplay` (helper) | Used only by `TrophyService`; presentation only. `Show(plot, case, records)` shows `records` **in slot order** (slot 1 = `records[1]`), up to `Config.TrophyCaseSlots`: each is built with `TrophyModel` (`Config.TrophyCaseScale`), stood on `TrophySlotN` facing the slot's LookVector, with a tilted gold-rimmed `Nameplate` part at the slot's front edge (SurfaceGui, `LightInfluence = 0`, `MaxDistance = 60`: `DisplayName` in `TrophyVariants.Rarities[rarity].Color` (white if missing) and the definition's `PowerText` if it has one), all in a runtime `CaseTrophies` folder in the plot (outside the `TrophyCase` model, so `PlotVisibility` never tracks them); then it enables the case's `Light`s. Built once per call, no loops. `Clear(plot)` destroys that folder and disables the plot's `TrophyCase` lights. | Implemented |
 | `TrophyAccessories` (helper) | Used only by `TrophyModel`: `Add(make, names, anchors)` builds `Crown`, `PartyHat`, `ChefHat`, `Sunglasses`, `Cookie` (right hand), `BowTie`; unknown names are skipped. | Implemented |
+| `PowerService` | A player's active Caleb Trophy powers. `SetDisplayed(player, variantIds)` (called by `TrophyService`) stores `TrophyPowers.Compute(variantIds)`, publishes the `TrophyStats` (JSON) and `CanDoubleJump` player attributes, and applies movement: `WalkSpeed = base × (1 + WalkSpeed)`, `JumpHeight = base × (1 + JumpHeight)` with `UseJumpPower = false`; the base is the Humanoid's own spawn value, saved as `BaseWalkSpeed` / `BaseJumpHeight` attributes on it so re-applying never compounds. `Get(player, stat)` is the capped total (0 if none). `OnPlayerAdded` re-applies on every `CharacterAdded`; `OnPlayerRemoving` forgets. Event-driven, no loops. | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -176,7 +179,8 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `CollectorService`, `EconomyService`, `DataService`. `DataService` → `DataSchema`, `Purchases`, `Config`
 (never `TycoonService`). `DataSchema` → `Purchases`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
 `BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
-`CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
+`CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`), `EconomyService` and `PowerService` (`Get`). `DropperService` → `DropperCup`, `PowerService` (`Get`).
+`PowerService` → Shared only (`TrophyPowers`, which requires `Config` and, lazily inside `Compute`, `TrophyVariants`). `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
@@ -541,6 +545,29 @@ button + panel, trophy details (name, rarity, PowerText, Description),
 EQUIP / UNEQUIP via `TrophyEquip`, "ACTIVE TROPHIES: n / 5", and a note when
 the Trophy Case isn't built. `DoubleJump.client`: second jump when
 `CanDoubleJump` is true.
+
+### Power formulas (PowerService, DropperService, CollectorService)
+
+Every bonus is the **plot owner's** (`OwnerUserId` → `Players:GetPlayerByUserId`;
+no owner in the server = no bonus), read when it is used, so equip changes
+apply from the next drop / collect. Values stay server-side.
+
+| Stat | Applied | At the cap |
+| ---- | ------- | ---------- |
+| CookieMultiplier | drop value = round(DropValue × (1 + total)) | 3× |
+| LuckyCookieChance | that drop × `TrophyLuckyCookieMultiplier` (5), drawn gold | 25% → average 1 + 0.25 × 4 = 2× |
+| ExtraCookieChance | one more drop (same value rules, never another extra) | 50% → average 1.5× drops |
+| DropperSpeed | wait = `DropInterval` / (1 + total), read every cycle | 2× drop rate |
+| CollectBonus | payout = floor(stored × (1 + total)) | 1.5× |
+| WalkSpeed / JumpHeight | base × (1 + total) | 1.5× / 2× |
+| DoubleJump | `CanDoubleJump` flag → one air jump (client) | — |
+
+Most cookies a player can earn per second vs. no trophies, everything at its
+cap: 3 × 2 × 1.5 × 2 × 1.5 = **27×** on average. Each factor is a capped
+(1 + total) of summed bonuses, so it is a fixed product of five numbers, never
+exponential in the number of trophies. Movement is client-simulated in Roblox
+(character physics is owned by the client), so speed / jump / double jump are
+not security-relevant.
 
 ## Adding a feature (for future agents)
 
