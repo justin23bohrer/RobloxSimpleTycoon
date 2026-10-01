@@ -87,3 +87,15 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 
 - [ ] Upgrades (more droppers beyond the four are just new `Config.Droppers` entries + map parts).
 - [ ] Anything else (monetization, rebirths, pets, etc.) only after the MVP is playable and tested.
+
+## Trophy Collection + Powers (approved by the user 2026-10-01)
+
+Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
+
+- [x] Contract: `Shared/TrophyPowers`, `Remotes/TrophyEquip`, Config (`TrophyActiveSlots`, `TrophyRarityChances`, `TrophyStatCaps`, ...) (lead).
+- [ ] Definitions: 6 rarities, Description/Powers/PowerText, new trophies, `RollReward`, looks.
+- [ ] Inventory: saved InstanceIds + Equipped (Version 2), equip remote, reward roll at claim, display rules.
+- [ ] Powers: `PowerService`, drop/collect/movement hooks, double jump.
+- [ ] Inventory UI.
+- [ ] Big Trophy Case + nameplates.
+

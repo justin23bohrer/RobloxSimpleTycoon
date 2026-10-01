@@ -226,6 +226,35 @@ local Config = {
 	-- Trophy Case (a build in every house): how many trophies it shows (the
 	-- newest ones), and the size of each trophy in it (1 = about 3.5 studs tall).
 	TrophyCaseSlots = 5,
+	-- Trophy powers (TrophyPowers / PowerService). How many trophies a player
+	-- can have equipped (displayed in their Trophy Case) at once; only those
+	-- give powers, and only while the TrophyCase build is bought.
+	TrophyActiveSlots = 5,
+	-- Claim reward: chance (percent) of each rarity, then a trophy of that
+	-- rarity (preferring ones the player doesn't own). Server-side only.
+	TrophyRarityChances = table.freeze({
+		Common = 60,
+		Uncommon = 20,
+		Rare = 10,
+		Epic = 6,
+		Legendary = 3,
+		Mythic = 1,
+	}),
+	-- Most a stat's total bonus can reach (see TrophyPowers for stacking).
+	TrophyStatCaps = table.freeze({
+		CookieMultiplier = 2, -- at most 3x cookies
+		DropperSpeed = 1, -- at most 2x drop rate
+		ExtraCookieChance = 0.5,
+		LuckyCookieChance = 0.25,
+		CollectBonus = 0.5,
+		WalkSpeed = 0.5,
+		JumpHeight = 1,
+		DoubleJump = 1,
+	}),
+	-- A "lucky" drop (LuckyCookieChance) is worth this many times its value.
+	TrophyLuckyCookieMultiplier = 5,
+	-- Fewest seconds between two equip/unequip requests from one player.
+	TrophyEquipCooldown = 0.25,
 	TrophyCaseScale = 1.2,
 	-- The big claim trophy on Caleb's pedestal during TrophyClaim
 	-- (TrophyService): its size, and its "Claim Caleb Trophy" prompt (studs
