@@ -62,7 +62,7 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD1 | Turn around at the spawn; walk around the statue. | Four round orange pads with "FEED CALEB!" signs: in front of, behind, and on both sides of the pedestal. | |
 | FD2 | Step on any feed pad. | The pop-up appears with a little bounce: yellow rounded panel, thick dark outline, FredokaOne text: "How many cookies do you want to feed Caleb?", "Caleb has eaten 0 / 1,000,000", empty bar, "You have N", amount box, 10 / 100 / 1K / ALL, Cancel, FEED!. | |
 | FD3 | Type `abc12x3` in the amount box. | Only digits stay: `123`. | |
-| FD4 | With 100 cookies, press 10 → FEED!. | Cookies 100 → 90 (counter pops). "Caleb ate 10 cookies! Yum!". Progress "10 / 1,000,000"; Caleb visibly gets a bit fatter (belly, cheeks, chin, wider body) with a bouncy grow. Pop-up closes after ~1.5 s. | |
+| FD4 | With 100 cookies, press 10 → FEED!. | Cookies 100 → 90 (counter pops). "Caleb ate 10 cookies! Yum!". Progress "10 / 1,000,000" and the bar slides to about 1/6; Caleb visibly gets a bit fatter (belly, cheeks, chin, wider body) with a bouncy grow. Pop-up closes after ~1.5 s. | |
 | FD5 | Feed more than you have (e.g. type 5000 with 90). | "You don't have that many cookies!"; cookies unchanged; Caleb unchanged. | |
 | FD6 | Press Cancel; then walk off and back onto the pad. | Cancel closes it. It doesn't reopen while you stand there, but reopens after stepping off and back on. | |
 | FD7 | Open the pop-up, then walk ~15 studs away. | It closes by itself. | |
@@ -72,6 +72,10 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD11 | Security (code review / Server view): the client can't feed from far away or feed fractions/negatives. | `StatueService` rejects non-whole, < 1, and players not within `StatueFeedRange` of a pad; only `EconomyService.TrySpend` takes cookies. | |
 | FD12 | Phone (Device emulator): open the pop-up. | Fits the screen, text readable, buttons tappable, keyboard opens for the amount box. | |
 | FD13 | Reset character with the pop-up open; leave and rejoin the server. | Pop-up closes when you walk/teleport away; nothing breaks. Caleb's size stays for the server session (resets only on a new server). | |
+| FD14 | Open the pop-up; click **1K** twice, then **10**. | Amount box reads 2010 (each click adds). Progress text shows "(+2,010)". | |
+| FD15 | With Caleb at 0, click **10** once. | A lighter section appears in the bar, about 1/6 of the way (same curve as the statue). Each extra click grows it; clearing the box makes it slide back. | |
+| FD16 | Pick more than you have (e.g. 1K with 50 cookies). | The preview section turns red. FEED! still says "You don't have that many cookies!" from the server. | |
+| FD17 | Feed 100 cookies to a fresh Caleb. | The bar's filled part slides to about 1/3, the same amount Caleb visibly grew; feeding 10,000 total brings it to about 2/3. | |
 
 ## Purchase
 
