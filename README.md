@@ -76,6 +76,15 @@ To try every dropper without grinding for cookies:
 It only works inside Roblox Studio (`RunService:IsStudio()`), never in a
 published game. Set it back to `false` before committing.
 
+## Testing saving (Studio)
+
+The player's house and Caleb trophies are saved with a DataStore (cookies
+are not). In Studio this needs a published place and **Game Settings →
+Security → Enable Studio Access to API Services**. Without it the game
+still runs, unsaved, and Output shows one warning: "Enable Studio Access to
+API Services to test saving". Studio saves go to the real DataStore of the
+published place.
+
 ## Using OpenCode
 
 ```bash

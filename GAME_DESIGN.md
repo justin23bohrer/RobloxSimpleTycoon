@@ -24,7 +24,14 @@ next, more expensive dropper's button has appeared, so they save up for it.
 - Cookies are shown in the Roblox player list (`leaderstats.Cookies`) and in
   a cartoony panel at the bottom-center of the screen (a drawn chocolate chip
   cookie and e.g. "1,250") that bounces when the amount changes.
-- No saving between sessions yet.
+- **Saving** (approved by the user 2026-10-01): the player's **house** (every
+  dropper and build they bought) and their **Caleb trophies** are saved
+  between sessions. Cookies are **not** saved: every session starts at 100.
+  When a returning player claims any free plot, their house comes back
+  exactly as they left it (built parts, running droppers, the right next
+  buy buttons), for free. If their data can't be loaded (Roblox DataStore
+  down, or Studio without API access), they play unsaved that session and
+  their old save is left untouched.
 
 ## Tycoon
 
