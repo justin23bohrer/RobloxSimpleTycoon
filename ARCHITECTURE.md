@@ -9,7 +9,8 @@ src/
 ├── ReplicatedStorage/          → ReplicatedStorage (server + client can read)
 │   ├── Shared/
 │   │   ├── Config.luau         → ModuleScript: all tunable numbers
-│   │   └── StatueGrowth.luau   → statue fatness curve (used by StatueService)
+│   │   ├── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
+│   │   └── StatueGrowth.luau   → old statue fatness curve (unused since StatueShape takes progress; remove)
 │   └── Remotes/                → Folder: remotes
 │       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
@@ -27,13 +28,15 @@ src/
 │       ├── CollectorService.luau
 │       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 │       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
-│       └── StatueShape.luau    → helper for StatueService (makes the statue fatter)
+│       └── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
 │       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
-│       └── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       ├── CalebAnimator.client.luau → LocalScript: Caleb's "I'm full" animation + dance (from CalebState)
+│       └── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -111,7 +114,7 @@ reach the server.
 | `DropperCup` (helper) | Used only by `DropperService`; presentation only. `Build(spot, name)` returns a Model that fills the spot's box (stacked red cylinders narrowing toward the top, two darker ridges, a rolled lip, a white inside disc) and the CFrame of the center of its open rim, where drops start. Parts are anchored with `CanTouch`/`CanQuery` off. | Implemented |
 | `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
 | `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, and room left under `StatueMaxCookies`; spends with `EconomyService.TrySpend` (only what Caleb still has room for); adds to the session total, mirrors it to the statue's `CookiesEaten` attribute, and calls `StatueShape.Apply`. Pad signs say "CALEB IS FULL!" at the max. Total is per server session (no saving). | Implemented (`Start`, `OnPlayerRemoving`) |
-| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. Fatness comes from `Shared/StatueGrowth` (log(1+eaten)/log(1+max)). | Implemented |
+| `StatueShape` (helper) | Presentation only. `Setup(statue)` remembers every body part's map position/size (body = `Shared/CalebBody`: not `Pedestal*`, `FeedPads`, `Podium`) and the pedestal top. `Apply(progress 0..1, seconds)` (progress = cookies / goal) tweens, from the original map values: fatness (Torso/Belt wider and deeper, arms/legs out and thicker, the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin` grow out, chain stays on the belly) with fatness = log(1 + p·`CalebFatnessCurve`)/log(1 + `CalebFatnessCurve`) (front-loaded), then scales every body part about the pedestal top by `CalebMinScale` → `CalebMaxScale` (p^`CalebScaleCurve`, plus a last `CalebFinalPopScale` jump at exactly the goal). `SetHidden(hidden)` hides/shows the body with `PlotVisibility`. | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -129,7 +132,7 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
-`StatueService` → `EconomyService`, `StatueShape`; nothing requires `StatueService` except `ServerMain`.
+`StatueService` → `EconomyService`, `StatueShape`; `StatueShape` → `PlotVisibility`, `Shared/CalebBody`; nothing requires `StatueService` except `ServerMain`.
 
 ## Client
 

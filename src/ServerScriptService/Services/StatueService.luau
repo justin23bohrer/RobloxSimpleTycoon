@@ -10,23 +10,20 @@
 --   EconomyService.TrySpend.
 -- * Total cookies eaten is shared by all players for this server session (no
 --   saving yet). It is mirrored into the statue's "CookiesEaten" attribute so
---   clients can show it. Caleb stops eating at Config.StatueMaxCookies; a
+--   clients can show it. Caleb stops eating at CalebEvent.MaxCookies(); a
 --   bigger feed only spends what he still has room for.
--- * The more he has eaten, the fatter he gets (StatueShape). How fat comes
---   from Shared/StatueGrowth (log scale). The feed pop-up's progress bar is
---   exact (cookies eaten / max) instead.
+-- * The more he has eaten, the fatter and bigger he gets: StatueShape.Apply
+--   with progress = eaten / CalebEvent.MaxCookies().
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
-local StatueGrowth = require(ReplicatedStorage.Shared.StatueGrowth)
+local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local EconomyService = require(script.Parent.EconomyService)
 local StatueShape = require(script.Parent.StatueShape)
 
 local StatueService = {}
-
-local GROW_SECONDS = 0.8 -- looks only
 
 local statue: Model? = nil
 local pads: { BasePart } = {}
@@ -75,7 +72,7 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 		return false, "Stand on a feed pad first."
 	end
 
-	local room = Config.StatueMaxCookies - eaten
+	local room = CalebEvent.MaxCookies() - eaten
 	if room <= 0 then
 		return false, `{Config.StatueName} is FULL!`
 	end
@@ -86,8 +83,8 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 
 	eaten += cookies
 	statue:SetAttribute("CookiesEaten", eaten)
-	StatueShape.Apply(StatueGrowth.Fatness(eaten), GROW_SECONDS)
-	if eaten >= Config.StatueMaxCookies then
+	StatueShape.Apply(eaten / CalebEvent.MaxCookies(), Config.CalebGrowSeconds)
+	if eaten >= CalebEvent.MaxCookies() then
 		setPadLabels(`{string.upper(Config.StatueName)} IS FULL!`)
 	end
 	return true, cookies

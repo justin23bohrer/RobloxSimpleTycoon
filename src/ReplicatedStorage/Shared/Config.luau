@@ -105,6 +105,45 @@ local Config = {
 	CalebMinScale = 1,
 	CalebMaxScale = 1.6,
 	CalebGrowSeconds = 1.2,
+	-- Growth curves (StatueShape, progress = cookies / goal, 0..1):
+	--   fatness = log(1 + progress * FatnessCurve) / log(1 + FatnessCurve)
+	--     (front-loaded: the first feeds show; bigger = more front-loaded)
+	--   scale = MinScale + (MaxScale - MinScale - FinalPopScale) * progress ^ ScaleCurve
+	--     below the goal, and exactly MaxScale at the goal (a last visible pop).
+	CalebFatnessCurve = 100_000,
+	CalebScaleCurve = 2,
+	CalebFinalPopScale = 0.1,
+	-- Caleb's animations (CalebAnimator.client, client only, looks only).
+	-- Degrees are angles; Height/Bounce/Jiggle are studs.
+	-- Full: "I'm completely full" over CalebEvent.Duration("Full") seconds:
+	-- a waddle that dies down, leaning back with arms out, belly bouncing,
+	-- then a puff (burp) at PuffAt (0..1 of the way through) and his head
+	-- jolts back.
+	CalebFullAnim = table.freeze({
+		WobbleDegrees = 7,
+		WobblesPerSecond = 2.5,
+		LeanBackDegrees = 12,
+		ArmsOutDegrees = 40,
+		BellyBounce = 1.6,
+		BellyBouncesPerSecond = 2,
+		PuffAt = 0.55,
+		HeadJoltDegrees = 14,
+		PuffParticles = 30,
+	}),
+	-- Celebration: a dance loop. One sway to a side and one hop per beat,
+	-- arms take turns waving, head bobs, belly jiggles, and a full spin every
+	-- SpinEverySeconds (lasting SpinSeconds).
+	CalebDance = table.freeze({
+		BeatSeconds = 0.55,
+		SwayDegrees = 9,
+		HopHeight = 1.5,
+		ArmDegrees = 75,
+		ArmWiggleDegrees = 12,
+		HeadBobDegrees = 7,
+		BellyJiggle = 0.8,
+		SpinEverySeconds = 8,
+		SpinSeconds = 1.2,
+	}),
 	-- Podium "CALEB'S TOP FEEDERS" board: how many rows, and the fewest
 	-- seconds between leaderboard updates (feeds in between are batched).
 	CalebLeaderboardSize = 10,
