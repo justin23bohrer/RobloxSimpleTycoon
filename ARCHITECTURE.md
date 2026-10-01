@@ -9,7 +9,7 @@ src/
 ├── ReplicatedStorage/          → ReplicatedStorage (server + client can read)
 │   ├── Shared/
 │   │   ├── Config.luau         → ModuleScript: all tunable numbers
-│   │   └── StatueGrowth.luau   → statue fatness curve (used by StatueService)
+│   │   └── CalebEvent.luau     → Caleb Full Event contract (state names, attributes, timing)
 │   └── Remotes/                → Folder: remotes
 │       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
@@ -27,6 +27,7 @@ src/
 │       ├── CollectorService.luau
 │       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 │       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
+│       ├── CalebCycle.luau     → Caleb Full Event state machine (total, contributions, trophy eligibility)
 │       └── StatueShape.luau    → helper for StatueService (makes the statue fatter)
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
@@ -110,8 +111,9 @@ reach the server.
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places an upside-down red cup (a Model named after the id, built by `DropperCup`) at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; each dropper drops onto its Config `Conveyor` (`Conveyor` or `Conveyor2`), and a conveyor moves while any of its droppers runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. `CollectorFor(conveyorName)` names a conveyor's collector (`Conveyor2` → `Collector2`); `CollectorNames()` lists every collector the droppers use. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`, `CollectorFor`, `CollectorNames`) |
 | `DropperCup` (helper) | Used only by `DropperService`; presentation only. `Build(spot, name)` returns a Model that fills the spot's box (stacked red cylinders narrowing toward the top, two darker ridges, a rolled lip, a white inside disc) and the CFrame of the center of its open rim, where drops start. Parts are anchored with `CanTouch`/`CanQuery` off. | Implemented |
 | `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
-| `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, and room left under `StatueMaxCookies`; spends with `EconomyService.TrySpend` (only what Caleb still has room for); adds to the session total, mirrors it to the statue's `CookiesEaten` attribute, and calls `StatueShape.Apply`. Pad signs say "CALEB IS FULL!" at the max. Total is per server session (no saving). | Implemented (`Start`, `OnPlayerRemoving`) |
-| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. Fatness comes from `Shared/StatueGrowth` (log(1+eaten)/log(1+max)). | Implemented |
+| `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, `CalebCycle.CanFeed()` (Normal only), and room left under `CalebEvent.MaxCookies()`; spends with `EconomyService.TrySpend` (only what Caleb still has room for), then `CalebCycle.AddCookies` (which owns the total and `CookiesEaten`), and calls `StatueShape.Apply(eaten / goal, Config.CalebGrowSeconds)`. On `CalebCycle.StateChanged`: pad signs "FEED CALEB!" in Normal, "CALEB IS FULL!" otherwise; `StatueShape.SetHidden(true)` in TrophyClaim; `SetHidden(false)` + `Apply(0)` on reset. Total is per server session (no saving). | Implemented (`Start(): Model?`, `OnPlayerRemoving`) |
+| `CalebCycle` | Caleb Full Event state machine (see "Caleb Full Event (contract)"). Owns the shared total, contributions by UserId (+ display name), trophy claims, cycle id, and the timed states (`task.delay` timers guarded by cycle id + state). Publishes all statue/player attributes; `CalebTopFeeders` is throttled to `Config.CalebLeaderboardInterval` (batched, last value always published, immediate on reset). | Implemented |
+| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. `StatueService` passes progress = eaten / goal (linear). | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -129,7 +131,8 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
-`StatueService` → `EconomyService`, `StatueShape`; nothing requires `StatueService` except `ServerMain`.
+`StatueService` → `EconomyService`, `StatueShape`, `CalebCycle`; nothing requires `StatueService` except `ServerMain`.
+`CalebCycle` → `CalebEvent`, `Config` only (it changes no cash); `ServerMain` starts it with the statue `StatueService.Start()` returns.
 
 ## Client
 

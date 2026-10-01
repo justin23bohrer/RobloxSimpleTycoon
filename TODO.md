@@ -59,7 +59,7 @@ user's approval first.
 Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user will pick a track); sound effects only for now.
 
 - [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
-- [ ] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id.
+- [x] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id. (code done; Studio test pending: QA CE1–CE10)
 - [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
 - [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
 - [ ] Cookie rain (client, pooled).
