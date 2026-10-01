@@ -59,13 +59,13 @@ user's approval first.
 Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user will pick a track); sound effects only for now.
 
 - [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
-- [ ] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id.
-- [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
-- [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
-- [ ] Cookie rain (client, pooled).
+- [x] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id. (code done; Studio test pending: QA CE1–CE10)
+- [x] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim (`StatueShape`, `CalebAnimator.client`). (code done; Studio test pending: QA CG1–CG10; `SetHidden` is called by StatueService on CalebCycle.StateChanged)
+- [x] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed. (code done; Studio test pending: QA EV1–EV14)
+- [x] Cookie rain (client, pooled): `CookieRain.client` + `CookieRainLook`. Visual only, not collectable. (code done; Studio test pending: QA CR1–CR10)
 - [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
 - [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
-- [ ] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01).
+- [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.
 - [ ] Celebration music (ask the user for a track).
 

@@ -81,6 +81,25 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD20 | Open the pop-up; pick a small amount (10), a medium one (100,000), and feed until the bar is full. Check up close and on a phone (Device emulator). | The cookie-colored fill and the lighter preview always stay inside the white track with a thin white gap; they never touch or cover the dark outline, and the rounded ends stay clean. | |
 | FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
 
+## Caleb growth and animations
+
+Tip: set `DevCalebFastCycle = true` in Studio (goal 1,000 cookies; Full 3 s,
+Celebration 20 s, TrophyClaim 30 s) and `DevUnlimitedCash = true`. Set both
+back before committing. Feed amounts below are for the 1,000 goal.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CG1 | Press Play; look at Caleb (0 fed). | Normal size, thin, feet on the pedestal; nothing floating or sunk into the pedestal. | |
+| CG2 | Feed up to 250, 500, 750, 900, 990 total, looking at him from the same spot after each. | Every step is visibly bigger than the last (fatter first, then clearly taller/wider); feet always stay on the pedestal top; belly, cheeks, chin, chain, arms, and hair stay attached at every size. Each change is a bouncy grow. | |
+| CG3 | Feed the last 10 (to 1,000). | A visible final jump to max size (1.6×). Then the Full animation starts. | |
+| CG4 | Watch the Full state. | He waddles, leans back with arms out, belly bounces, puffs a white cloud from his mouth with a head jolt, settles. Looks funny, nothing detaches or flies off. | |
+| CG5 | Watch Celebration. | He dances the whole time: sway + hop per beat, arms alternate waving, head bobs, belly jiggles, a full spin every ~8 s. Only Caleb moves: pedestal, feed pads, podium stay put. No errors in Output. | |
+| CG6 | Wait for TrophyClaim. | Caleb's body is gone (invisible, can walk through where he was); the pedestal, the 4 feed pads, and the podium are still there. The cartoon outline doesn't draw a ghost of him. | |
+| CG7 | Wait for the reset (back to Normal). | Caleb is back, at his smallest, thin, in his normal pose, feet on the pedestal; not stuck in a dance pose. | |
+| CG8 | 2 players: Player 2 joins in the middle of Celebration. | Player 2 sees him dancing right away, at the same moment of the dance as Player 1 (spins line up). When it ends both see him stop in the normal pose. | |
+| CG9 | During Celebration, walk far away (until the statue streams out) and come back; also reset your character mid-dance. | He is dancing again when you come back; no part stays offset or frozen; one dance only (no double speed). | |
+| CG10 | Performance: in Normal and TrophyClaim, check the MicroProfiler / Script Performance for `CalebAnimator`. | No per-frame work outside Full/Celebration. | |
+
 ## Statue progress bar
 
 | ID | Test | Expected | Status |
@@ -93,6 +112,66 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | SB6 | 2 players: Player 1 feeds. | Player 2's bar updates at the same time, wherever Player 2 is. | |
 | SB7 | 2 players: Player 1 feeds some cookies, then Player 2 joins (late joiner). | Player 2's bar shows the current total right away, not 0. | |
 | SB8 | Reset character; phone (Device emulator). | The bar stays (no duplicate bars after respawn); readable on a phone. No errors in Output. | |
+
+## Caleb Full Event (core)
+
+Tip: set `DevCalebFastCycle = true` (and `DevUnlimitedCash = true`) in Studio for these; set both back to false before committing. With fast cycle the goal is 1,000 and the states last 3 s / 20 s / 30 s. Watch the statue's attributes (`CookiesEaten`, `CalebState`, `CalebCycleId`, `CalebStateEndsAt`, `CalebTopFeeders`) and each player's `CalebFed` / `CalebTrophyClaimed` in the Properties panel (server view).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CE1 | Fast cycle on. Press Play. | Statue: `CalebState = Normal`, `CalebMaxCookies = 1000`, `CookiesEaten = 0`, a GUID `CalebCycleId`, `CalebStateEndsAt = 0`, `CalebTopFeeders = []`. Player: `CalebFed = 0`, `CalebTrophyClaimed = false`. | |
+| CE2 | Feed 100, then 50. | `CookiesEaten = 150`, your `CalebFed = 150`. Within ~1 s `CalebTopFeeders` lists you with 150 (one update for quick feeds in a row, never more than once a second, and the last value always shows up). | |
+| CE3 | 2 players (Clients and Servers), both at 900 total: both feed 500 at the same moment. | The total ends at exactly 1,000. The first feed spends 100 (room left), the second is refused "Caleb is FULL!" with no cookies spent. Each player's `CalebFed` matches what they actually spent. | |
+| CE4 | Reach the goal. | `CalebState` goes Full → (3 s) Celebration → (20 s) TrophyClaim → (30 s) Normal, each exactly once (no double jumps). `CalebStateEndsAt` is about now + the state's length. Pad signs say "CALEB IS FULL!" until reset. Caleb is hidden during TrophyClaim. | |
+| CE5 | Try to feed during Full, Celebration, and TrophyClaim. | Refused "Caleb is FULL!"; no cookies spent; total stays at the goal. | |
+| CE6 | Reach the goal only once; wait the whole event. | Only one event runs; nothing starts a second Full while one is running. | |
+| CE7 | Player A feeds this cycle, leaves before TrophyClaim, rejoins the same server. | After rejoining, `CalebFed` is restored (same number) and `CalebTrophyClaimed` is unchanged; during TrophyClaim A is still eligible (`CalebCycle.IsEligible(A.UserId)`). | |
+| CE8 | Player B joins after the goal is reached (during Full/Celebration/TrophyClaim). | B's `CalebFed = 0`; B is not eligible. | |
+| CE9 | After the reset (back to Normal). | New `CalebCycleId`; `CookiesEaten = 0`; `CalebTopFeeders = []` right away; everyone's `CalebFed = 0` and `CalebTrophyClaimed = false`; Caleb visible at his smallest size; pads say "FEED CALEB!"; feeding works again and the next goal starts a new event. | |
+| CE10 | Fast cycle off (normal). | Goal 1,000,000; Full 5 s, Celebration 115 s, TrophyClaim 300 s. `DevCalebFastCycle` has no effect in a published game. | |
+
+## Cookie rain (Caleb Full Event)
+
+Needs the Caleb cycle (`CalebCycle`) merged. Set `Config.DevCalebFastCycle = true`
+(Studio only; Celebration lasts 20 s) and dev cash, then feed Caleb to the goal.
+Without CalebCycle you can fake it: in the **Server** view, set the attribute
+`CalebState` on `Workspace.Map.Statue` to `Celebration`, then back to `Normal`.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CR1 | Before the goal (state `Normal`), and during `Full`. | No cookies fall. No `CookieRain` folder in Workspace (client view). | |
+| CR2 | Reach the goal; wait for `Celebration`. | Cookies start falling from the sky all around the statue and the plots: round golden-brown cookies with dark chips (like the dropper cookies, a bit bigger). They spin and wobble while falling; on landing (ground, roofs, pads) they hop a little, give a small dusty puff, and fade out. Plenty land around you wherever you stand inside the map. | |
+| CR3 | Walk into a house and to the far edge of the map during Celebration. | Cookies keep falling near you, landing on roofs/floors (not under the ground, not floating in mid-air nearby). Nothing falls farther than `CookieRainRadius` (150) from the statue. | |
+| CR4 | Walk/jump into falling and landed cookies; click them. | You pass straight through; nothing to pick up; cookies counter unchanged (visual only). | |
+| CR5 | Wait for `Celebration` to end (`TrophyClaim`). | No new cookies; the ones in the air land and fade. A few seconds later the client's `Workspace.CookieRain` folder and the `CookieRainPuff` attachment in `Workspace.Terrain` are gone. Nothing left over. | |
+| CR6 | Count during the rain: in the client view, the number of `Cookie` parts in `Workspace.CookieRain`. | Never more than `CookieRainMaxCookies` (120) cookies (each cookie = 1 `Cookie` + 5 `Chip` parts, so at most 720 parts). The count stops growing after a few seconds (parts are reused, not created per cookie). | |
+| CR7 | Server view during the rain. | No `CookieRain` folder and no rain cookies on the server (client-only). | |
+| CR8 | 2 players: Player 2 joins in the middle of `Celebration`. | Player 2 sees the rain start right away and stop when it ends, same as Player 1. | |
+| CR9 | Two cycles in a row (fast cycle). | The rain works again in the second Celebration; no duplicate folders. | |
+| CR10 | 4 players (Test > Clients and Servers), all near the statue during the rain; check FPS (Shift+F5 / MicroProfiler). | FPS stays smooth on every client; no errors or warnings in Output. | |
+
+## Caleb event UI
+
+Set `DevCalebFastCycle = true` (Studio only) to run the event quickly
+(goal 1,000; Full 3 s, Celebration 20 s, TrophyClaim 30 s). Needs the Core
+`CalebCycle` to be merged to drive the states.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| EV1 | Play; stay in Normal. | No event UI on screen; only the bar above Caleb ("Caleb: N / goal 🍪", goal from `CalebMaxCookies`). | |
+| EV2 | Feed Caleb to the goal. | "🍪 CALEB IS FULLLL!!! 🍪" slams in (huge and tilted → normal, then a short wobble), quick white flash, small camera shake that ends with the camera back where it was, confetti falls and disappears. Bar above Caleb: "Caleb is FULL!". | |
+| EV3 | Full ends → Celebration. | Big text fades out. Pink "🎉 COOKIE PARTY! 🎉" banner pops in at the top (below the Roblox top bar) with m:ss counting down a few times per second. The world gets a light warm tint + glow. Bar above Caleb: "🎉 COOKIE PARTY! 🎉". | |
+| EV4 | Celebration → TrophyClaim, as a player who fed. | Party banner gone; lighting fades back to normal. Gold banner: "🏆 CALEB TROPHY AVAILABLE!", "You helped feed Caleb!", "Claim your trophy on Caleb's podium before time runs out!", "TROPHY CLAIM: m:ss" counting down. Bar: "Caleb is resting... 💤". | |
+| EV5 | Claim the trophy on the podium (needs TrophyService). | Gold banner replaced by a small "Trophy claimed! 🏆". | |
+| EV6 | 2 players: only Player 1 fed. During TrophyClaim, look at Player 2. | Player 2 sees the small "CALEB IS RESTING — new round soon  m:ss", not the trophy banner. | |
+| EV7 | TrophyClaim ends (new round). | "TROPHY CLAIM CLOSED" for about 4 s (`CalebClosedMessageSeconds`), then nothing. Bar back to "Caleb: 0 / goal 🍪". | |
+| EV8 | After the event: check Lighting in the Explorer (client view). | `CalebPartyColor` and `CalebPartyBloom` are disabled (neutral); colors look exactly as before the party. Only one of each exists after several rounds. | |
+| EV9 | 2 players: Player 2 joins during Celebration. | Party banner with the correct time left (matches Player 1 within a second) and party lighting, right away. | |
+| EV10 | Player 2 joins during TrophyClaim (did not feed). | "CALEB IS RESTING — new round soon" with the correct countdown. | |
+| EV11 | Player who fed leaves during Celebration and rejoins during TrophyClaim. | Trophy banner (their `CalebFed` is restored). | |
+| EV12 | Join during Full. | The big text and confetti show; no flash or camera shake. | |
+| EV13 | Reset your character during Celebration / TrophyClaim. | Banners stay (no duplicates); no errors. | |
+| EV14 | Phone (Device emulator) during each state. | Banners readable, inside the screen, not covering the cookie counter. No errors in Output. | |
 
 ## Caleb leaderboard (podium)
 
@@ -243,3 +322,21 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | L1 | In a 2-player test, after Player 1 buys some droppers, close Player 1's window. | The plot goes back to the T1 look: only the floor and the Claim Tycoon pad; droppers, drops, buttons, sign, and collect area are gone; `OwnerUserId` removed. | |
 | L2 | Leave after buying some droppers. | All droppers stop, drops are removed, conveyor stops, stored cash is cleared; cash tank empty, pad sparkles/glow off. | |
 | L3 | After L1, Player 2 (already in the game) steps on the Claim pad. | Player 2 gets the plot and sees exactly the T4 look: collect area and only "Dropper 1 / FREE!" (nothing left over from Player 1). | |
+
+## Saving (DataService)
+
+Needs a published place with **Game Settings → Security → Enable Studio
+Access to API Services** ON, except SV2. Watch Output (Server view).
+Cookies are never saved: every session starts at 100.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| SV1 | API access ON. Claim, buy Dropper 1–4, Walls, Stairs (Dev cash on). Stop. Play again, claim any plot. | Within a moment the plot shows exactly what you had: walls + stairs built, 4 cups dropping on the conveyor, and the **2nd Floor** button showing (not Dropper 1–4, Walls, Stairs). Cookies are back at the starting amount; nothing was charged for the restore. No warnings. | |
+| SV2 | API access OFF. Press Play, claim, buy Dropper 1. | Exactly **one** warning: "DataService: saving is OFF … Enable Studio Access to API Services to test saving …". No errors; the game plays normally. Stop/Play again: plot starts fresh. | |
+| SV3 | After SV1, buy SecondFloor and Dropper 5, then Stop right away (within 2 s). | Next Play + claim shows the 2nd floor and Dropper 5 (BindToClose saved them). Stop does not hang longer than ~25 s. | |
+| SV4 | Test > Clients and Servers, 2 players, API ON. Player 1 restores (SV1) on Plot2, leaves, rejoins, claims **Plot4**. | Plot2 resets to its Claim pad on leave; after rejoin Plot4 shows Player 1's full house. Player 2's plot is unaffected; Player 2's house is their own. | |
+| SV5 | Load failure never overwrites. After SV1, temporarily make the first line of `DataSchema.FromStored` `return nil, "test"`. Play, claim, buy Dropper 1, Stop. Undo the edit, Play again, claim. | Failing session: one warning "could not load … They play UNSAVED …", plot starts fresh, gameplay works. Next normal session: the SV1 house comes back (the failing session wrote nothing). |  |
+| SV6 | Claim the plot and step on the Dropper 1 button immediately while data is still loading (e.g. with a slow first load). | You are never charged for something you already own; once loaded the house appears and buttons work normally. | |
+| SV7 | Unknown saved id. After SV1, temporarily remove the `Stairs` entry from `Config.Builds` (and its `After` users) in a local copy, Play, claim. Undo afterwards. | `Stairs` is ignored (and anything that needed it is skipped); everything else restores; no errors. | |
+| SV8 | Autosave. Buy something, wait > `DataAutosaveSeconds` (120 s), then Stop. | No DataStore errors in Output; the purchase is restored next time. | |
+| SV9 | Respawn (Esc → Reset) after a restore. | House unchanged; nothing restored twice; cookies unchanged. | |
