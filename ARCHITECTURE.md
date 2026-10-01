@@ -19,6 +19,7 @@ src/
 │       ├── PlotStages.luau     → helper for TycoonService (what a plot shows at each stage)
 │       ├── PlotVisibility.luau → helper: hide/show a part or model and restore it
 │       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches/visibility)
+│       ├── Purchases.luau      → read-only catalog of droppers + builds (ids, buttons, unlock order)
 │       ├── DropperService.luau
 │       ├── CollectorService.luau
 │       └── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
@@ -82,25 +83,26 @@ reach the server.
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchaseDropper(player, dropperId)`; in `Config.Droppers` order only; `Cost = 0` spends nothing). Tells `PlotStages` what to show. | Implemented (claiming + ordered dropper purchases) |
-| `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and buy button 1), `ShowAfterPurchase(plot, index)` (hides button N, shows button N+1). Decides nothing. | Implemented |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`). Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
+| `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
-| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects each `BuyButtonN` touch to a callback with the dropper id, sets RichText labels from `Config` ("Dropper N" over a yellow "🍪 Cost" / "FREE!"), and hides/shows each button together with its `DropperSpotN` (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
-| `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; the conveyor moves while any dropper runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`) |
-| `CollectorService` | Stores drop value per plot (server-side table) when `DropperService.ClaimDrop` accepts a drop at the collector; pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
+| `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds`: `Get(id)`, `All()`, `UnlockedBy(id?)`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
+| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects every purchase button's touch to a callback with the purchase id, sets RichText labels from `Config` ("Dropper N" or the build's `Name`, over a yellow "🍪 Cost" / "FREE!"), resets colors (droppers red, builds orange), and hides/shows each button (a dropper's together with its `DropperSpotN`) by purchase id (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
+| `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; each dropper drops onto its Config `Conveyor` (`Conveyor` or `Conveyor2`), and a conveyor moves while any of its droppers runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. `CollectorFor(conveyorName)` names a conveyor's collector (`Conveyor2` → `Collector2`); `CollectorNames()` lists every collector the droppers use. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`, `CollectorFor`, `CollectorNames`) |
+| `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
-Conveyor direction: `DropperService` moves the conveyor toward the plot's
-`Collector` (flat unit vector from the `Conveyor`'s center to the
-`Collector`'s center), so the map can lay the conveyor out in any horizontal
-direction. Layout and positions are in `GAME_DESIGN.md` → Plot layout.
+Conveyor direction: `DropperService` moves each conveyor toward its
+collector (flat unit vector from the conveyor's center to the collector's
+center; `ConveyorN` pairs with `CollectorN`), so the map can lay a conveyor
+out in any horizontal direction. Layout and positions are in `GAME_DESIGN.md` → Plot layout.
 
-Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `DropperService`,
-`CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`.
-`BuyButtons` → `PlotVisibility`.
+Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purchases`, `DropperService`,
+`CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
+`BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
 `CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
@@ -127,14 +129,20 @@ read everything in ReplicatedStorage.
 
 ## Configuration
 
-`Config.luau` holds every tunable value (`StartingCash`, `Droppers`,
+`Config.luau` holds every tunable value (`StartingCash`, `Droppers`, `Builds`,
 `DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`, `DropLifetime`,
 `DevUnlimitedCash`, `DevStartingCash`). It is frozen (including each
-`Droppers` entry), so code cannot change it at runtime.
+`Droppers` and `Builds` entry), so code cannot change it at runtime.
 
-`Droppers` is an ordered list of `{ Id, Cost, DropValue }`. Entry N uses the
-plot parts `DropperSpotN` and `BuyButtonN`; TycoonService requires one of each
-per entry. To add a dropper: add an entry and add the two parts to the map.
+`Droppers` is a list of `{ Id, Cost, DropValue, After, Conveyor }`. Entry N
+uses the plot parts `DropperSpotN` and `BuyButtonN`, and drops onto the part
+named by `Conveyor` (whose collector is `CollectorFor(Conveyor)`).
+`Builds` is a list of `{ Id, Name, Cost, After, Parts }`. Entry N uses the
+plot part `BuildButtonN`; `Parts` are the plot parts/models it shows when
+built. `After` (both lists) is the purchase id that must be bought first
+(`nil` = available as soon as the plot is claimed); ids are unique across
+both lists. TycoonService requires every part these entries name. To add a
+dropper or build: add an entry and its parts to the map.
 `NumberOfTycoonPlots` must match the plot models in the map; TycoonService
 warns if it does not.
 
@@ -161,7 +169,7 @@ type Tycoon = {
 	PlotId: number,                  -- from the plot's PlotId attribute
 	Plot: Model,                     -- Workspace.Map.Plots.PlotN
 	Owner: Player,
-	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper2 = true
+	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper2 = true, Purchased.Walls = true
 }
 ```
 
@@ -169,7 +177,8 @@ type Tycoon = {
   tables, and mirrors the owner into the plot's `OwnerUserId` attribute
   (read-only for everyone else).
 - **Purchased upgrades:** `Purchased` is a set of purchase ids: the
-  `Config.Droppers` ids (`"Dropper1"` … `"Dropper4"`).
+  `Config.Droppers` ids (`"Dropper1"` … `"Dropper8"`) and `Config.Builds` ids
+  (`"Walls"`, `"Stairs"`, `"SecondFloor"`).
 - **Active systems:** a purchase activates a system by calling its service
   (`DropperService.Start(plot, dropperId)`). Each system service keeps its own runtime
   state keyed by plot and must clean up in its stop/reset function.
@@ -191,13 +200,15 @@ type Tycoon = {
   `TycoonService.TryClaimPlot(player, plot)` checks the player has no plot and
   the plot is free → records the tycoon, sets `OwnerUserId` and the sign, and
   calls `PlotStages.ShowClaimed`.
-- Purchase flow: owner touches their plot's `BuyButtonN` (server `Touched`,
-  wired by `BuyButtons`) → `TycoonService.TryPurchaseDropper(player, dropperId)`
-  checks the player has a plot, the id is a real `Config.Droppers` id, it has
-  not already been bought, the previous dropper (N-1) **has** been bought, and
+- Purchase flow: owner touches their plot's `BuyButtonN` or `BuildButtonN`
+  (server `Touched`, wired by `BuyButtons`) →
+  `TycoonService.TryPurchase(player, purchaseId)` checks the player has a
+  plot, the id is a real purchase id, it has not already been bought, the
+  purchase named in its `After` **has** been bought, and
   `TrySpend(entry.Cost)` succeeds (skipped when `Cost` is 0) → marks
-  `Purchased[dropperId]`, calls `PlotStages.ShowAfterPurchase` (hide button N,
-  show button N+1), and calls `DropperService.Start(plot, dropperId)`.
+  `Purchased[purchaseId]`, calls `PlotStages.ShowAfterPurchase` (hide that
+  button, show a build's parts, show the next button), and for a dropper
+  calls `DropperService.Start(plot, purchaseId)`.
   Touches from non-owners are ignored. On release the plot goes back to
   `ShowUnclaimed`.
 - Drop values are set by the server from the dropper's `Config.Droppers`

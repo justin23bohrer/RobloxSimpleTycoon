@@ -49,33 +49,66 @@ next, more expensive dropper's button has appeared, so they save up for it.
 
 ## Purchase
 
-There are four droppers (`Config.Droppers`), each with its own buy button:
+Everything is unlocked **one step at a time**, in this chain:
 
-| Dropper   | Cost (cookies) | Value per drop (cookies) |
-| --------- | -------------- | ------------------------ |
-| Dropper 1 | FREE           | 10                       |
-| Dropper 2 | 300            | 25                       |
-| Dropper 3 | 1000           | 60                       |
-| Dropper 4 | 3000           | 150                      |
+**Dropper 1 → 2 → 3 → 4 → Build Walls → Build Stairs → 2nd Floor → Dropper 5 → 6 → 7 → 8**
 
-- The owner buys a dropper by stepping on its red button. The label shows the
-  name with the price under it in yellow, e.g. "Dropper 2 / 🍪 300", or
-  "Dropper 1 / FREE!" (text comes
-  from `Config`; a `Cost` of 0 is free).
-- Droppers unlock **in order**: only the next dropper's button is shown, and
-  the server refuses to sell a dropper before the one before it is bought.
+Each step's button appears only after the step before it is bought, and the
+server refuses to sell anything out of order (`After` in `Config`).
+
+| Step | Button | Cost (cookies) | Value per drop (cookies) |
+| ---- | ------ | -------------- | ------------------------ |
+| Dropper 1 | red `BuyButton1` | FREE | 10 |
+| Dropper 2 | red `BuyButton2` | 300 | 25 |
+| Dropper 3 | red `BuyButton3` | 1000 | 60 |
+| Dropper 4 | red `BuyButton4` | 3000 | 150 |
+| Walls | orange `BuildButton1` | 5000 | — |
+| Stairs | orange `BuildButton2` | 8000 | — |
+| 2nd Floor | orange `BuildButton3` | 15000 | — |
+| Dropper 5 (2nd floor) | red `BuyButton5` | 20000 | 300 |
+| Dropper 6 (2nd floor) | red `BuyButton6` | 35000 | 450 |
+| Dropper 7 (2nd floor) | red `BuyButton7` | 60000 | 700 |
+| Dropper 8 (2nd floor) | red `BuyButton8` | 100000 | 1000 |
+
+- The owner buys something by stepping on its button. The label shows the
+  name with the price under it in yellow, e.g. "Dropper 2 / 🍪 300",
+  "Build Walls / 🍪 5000", or "Dropper 1 / FREE!" (text comes from
+  `Config`; a `Cost` of 0 is free).
 - The player must have enough cookies (the free dropper needs none).
 - The purchase is decided on the server.
-- Each dropper can only be bought once per plot. A bought button disappears
-  (pad, ring, label, and its yellow spot). All buttons are hidden again when
-  the plot is released.
+- Each step can only be bought once per plot. A bought button disappears
+  (pad, ring, label, and a dropper's yellow spot). Everything is hidden again
+  when the plot is released.
+
+## Building (walls, stairs, 2nd floor)
+
+The right side of the first floor is the **build area**: three orange build
+buttons appear there one at a time after Dropper 4.
+
+- **Walls:** gingerbread-brown walls, 15 studs high, around the edge of the
+  plot, with a 16-stud doorway in the middle of the front wall.
+- **Stairs:** 16 cream steps along the right wall, climbing from the front
+  (z −20) to the back (z −52), ending level with the top of the walls.
+- **2nd Floor:** a floor on top of the walls (the roof) with a hole where the
+  stairs come up, a railing around the edge and around the stair hole, and a
+  **second conveyor** on the **same (left) side** as the first one, directly
+  above it, moving the same way (front → back) into a second collector.
+  Droppers 5–8 sit above it, with their red buttons just right of it, like
+  floor 1.
+- Cookies that reach the 2nd-floor collector go into the **same** stored
+  cookies and cookie jar as floor 1; the owner collects them all on the
+  Collect pad downstairs.
+- Built parts are hidden (invisible, can't be touched or walked on) until
+  bought.
 
 ## Droppers
 
 - Each bought dropper drops one physical **cookie** worth its value every
   **2 seconds** (`Config.DropInterval`, shared by all droppers). A cookie is
   a flat golden-brown disc with chocolate chips (built from plain parts).
-- Cookies travel along the plot's one conveyor to the one collector.
+- Droppers 1–4 drop onto the first-floor conveyor, droppers 5–8 onto the
+  second-floor one. Each conveyor carries cookies to its own collector, and
+  runs while any of its droppers runs.
 
 ## Testing: unlimited cookies (Studio only)
 
@@ -113,19 +146,28 @@ earlier 100 × 100) and the ground is 280 × 280 of green grass
 (`Material = Grass`, color `86,166,64`). Seen from the spawn, looking at the
 plot ("left" is −X, "back" is −Z):
 
+First floor (walls shown with `█`; they appear once built):
+
 ```
-                 BACK (z = -76)    [ cash tank ]
-   Collector ■                      ( Collect )
-           ║
-           ║  ▣ spot 4   ( Buy 4 )
-  Conveyor ║  ▣ spot 3   ( Buy 3 )        (right side kept free for
-  (moves   ║  ▣ spot 2   ( Buy 2 )         walls + stairs to a 2nd floor)
-  to back) ║  ▣ spot 1   ( Buy 1 )
-           ║
-                  ( Claim )                       [ Owner sign ]
+   ██████████████████ BACK (z = -76)  [ cash tank ] ██████████████
+   █ Collector ■                      ( Collect )                █
+   █         ║                                         stairs    █
+   █         ║  ▣ spot 4   ( Buy 4 )                    top  ▲   █
+   █ Conveyor║  ▣ spot 3   ( Buy 3 )   ( Build 3 )          ▲   █
+   █ (moves  ║  ▣ spot 2   ( Buy 2 )   ( Build 2 )          ▲   █
+   █ to back)║  ▣ spot 1   ( Buy 1 )   ( Build 1 )          ▲   █
+   █         ║                                       bottom ▲   █
+   █                ( Claim )                       [ Owner sign ]█
+   ███████████████   doorway   ███████████████████████████████████
                  FRONT (z = -10)
                       ( Spawn )
 ```
+
+Second floor (on the roof, top at y = 18): the same left-side layout,
+directly above floor 1 — `Conveyor2` with `DropperSpot5`–`8` over it, red
+`BuyButton5`–`8` just right of it, `Collector2` at the back-left — plus the
+railed hole where the stairs arrive (back-right) and a railing around the
+edge.
 
 | Part | Position (center) |
 | ---- | ----------------- |
@@ -137,10 +179,18 @@ plot ("left" is −X, "back" is −Z):
 | `CollectPad` | (0, 2.2, −68), centered on the back wall; `CashTank` right behind it |
 | `ClaimPad` | (0, 2.2, −15), front center |
 | `OwnerSign` | (23, 5, −12), front-right corner |
+| `BuildButton1`–`3` | x 16, y 2.2, z −26 / −34 / −42 (right side of floor 1) |
+| `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8); 1 thick, y 2..17 |
+| `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
+| `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `Rail*` 3-high railings on the edge and `HoleRailSide`/`HoleRailFront` around the hole |
+| `Conveyor2` | (−28, 18.5, −42), 4 × 1 × 48, above `Conveyor` |
+| `Collector2` | (−28, 18.5, −69), above `Collector` |
+| `DropperSpot5`–`8` | x −28, y 24, z −22 / −30 / −38 / −46 |
+| `BuyButton5`–`8` | x −20, y 18.2, z matching their spot |
 
-The conveyor pushes drops toward the `Collector` (DropperService works the
-direction out from their positions), so moving those two parts is enough to
-reroute it.
+Each conveyor pushes drops toward its collector (`Conveyor` → `Collector`,
+`Conveyor2` → `Collector2`; DropperService works the direction out from
+their positions), so moving those parts is enough to reroute one.
 
 The spots players step on are flat round pads with a darker ring underneath
 as an outline:
@@ -150,10 +200,12 @@ as an outline:
 | `Base`             | 66 × 66 plot floor, in front of the spawn. Always visible. |
 | `ClaimPad`         | Round blue pad with a dark blue ring at the front of the plot, label "CLAIM TYCOON!". Shown only while the plot is unclaimed. |
 | `OwnerSign`        | Shows the owner's name.                              |
-| `BuyButton1`–`4`   | Round red pads with dark red rings, in a line just right of the conveyor, each next to its dropper spot. Buy droppers 1–4. |
-| `DropperSpot1`–`4` | Transparent yellow blocks above the conveyor where each dropper goes. |
-| `Conveyor`         | Dark strip that carries drops.                       |
-| `Collector`        | Green block at the end of the conveyor.              |
+| `BuyButton1`–`8`   | Round red pads with dark red rings, in a line just right of their floor's conveyor, each next to its dropper spot. Buy droppers 1–8 (5–8 on the 2nd floor). |
+| `DropperSpot1`–`8` | Transparent yellow blocks above the conveyor where each dropper goes. |
+| `BuildButton1`–`3` | Round orange pads (`255,140,0`, ring `140,70,0`, sign panel orange) on the right side of floor 1. Build the walls, stairs, and 2nd floor. |
+| `Walls`, `Stairs`, `SecondFloor` | Models that appear when built. Walls and railings gingerbread `196,128,72`, steps cream `245,225,190`, 2nd floor `200,200,200` like `Base`. |
+| `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). |
+| `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
 | `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime. |
 | `SpawnLocation`    | Round blue pad with a dark blue ring, in `Map` (not the plot). Where players appear. |

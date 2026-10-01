@@ -66,6 +66,24 @@ Record the date and result when you run a case.
 | U6 | Walk across the spots where the hidden buttons 2–4 are, before unlocking them. | Nothing happens; no cash removed. | |
 | U7 | Can't buy twice: after buying Dropper 3, walk over where its button was, repeatedly (with cash ≥ 1000). | No cash removed; still one dropper at spot 3; the button stays hidden. | |
 
+## Building and the 2nd floor
+
+Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quickly.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| BF1 | Claim; look at the right side of the plot. Buy Droppers 1–3. | No orange build button, no walls, stairs, or 2nd floor. You can walk straight off the plot on every side. | |
+| BF2 | Buy Dropper 4. | One orange "Build Walls / 🍪 5000" button appears on the right side (x ≈ 16). No other new button. | |
+| BF3 | Before buying the walls, in **Server** view make `BuildButton2` visible and touchable (`Transparency = 0`, `CanTouch = true`) and step on it with ≥ 8000 cookies. | Nothing is built; no cookies spent (Stairs needs Walls first). | |
+| BF4 | Buy the walls. | Cookies −5000. Gingerbread walls appear around the plot with a doorway in the middle of the front; the Build Walls button disappears; "Build Stairs / 🍪 8000" appears. You can walk in and out through the doorway only. The owner sign, conveyor, droppers, collect pad, and cookie jar still work inside. | |
+| BF5 | Buy the stairs. | Cookies −8000. 16 cream steps appear along the right wall; "2nd Floor / 🍪 15000" appears. Walk up them: each step is climbable without jumping. The top reaches the top of the walls, and nothing is there yet (no floor). | |
+| BF6 | Buy the 2nd floor. | Cookies −15000. A floor appears on top of the walls with a railing around the edge and around the stair hole. Walk up the stairs onto it. On the **left** side, directly above the first conveyor, is a second conveyor (not moving yet) and a green collector at its back end. "Dropper 5 / 🍪 20000" and its yellow spot appear next to it. Nothing on floor 1 is blocked or hidden by the new floor. | |
+| BF7 | Buy Dropper 5. | A dropper appears at spot 5; cookies fall onto the 2nd-floor conveyor, which moves front → back (same as floor 1) into Collector2. Each arrival adds a small cookie to the cookie jar **downstairs**. Dropper 6's button appears. The floor-1 conveyor keeps running. | |
+| BF8 | Go down and step on the Collect pad. | You get the cookies from both floors (e.g. with only Droppers 1 and 5 running: +10 per floor-1 cookie and +300 per floor-2 cookie). | |
+| BF9 | Buy Droppers 6, 7, 8. | Each costs its price; each appears above Conveyor2; after Dropper 8 no buy buttons remain. | |
+| BF10 | Try to fall: walk along every edge of the 2nd floor and around the stair hole. | Railings stop you everywhere except at the top of the stairs. | |
+| BF11 | Leave (or 2-player L1) after building the 2nd floor. | Walls, stairs, 2nd floor, both conveyors' droppers, and all buttons disappear; both conveyors stop; the plot looks like T1 again. The next owner starts from Dropper 1 with nothing built. | |
+
 ## Economy
 
 | ID | Test | Expected | Status |

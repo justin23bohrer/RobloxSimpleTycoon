@@ -4,7 +4,9 @@
 --
 -- * Start(plot, dropperId) places a plain part named dropperId at the plot's
 --   DropperSpotN (N = the dropper's position in Config.Droppers), sets the
---   conveyor moving toward the plot's Collector,
+--   dropper's conveyor (its Config Conveyor, e.g. "Conveyor" or "Conveyor2")
+--   moving toward that conveyor's collector (CollectorFor: "Collector",
+--   "Collector2"),
 --   and every Config.DropInterval seconds creates a "Drop" part worth that
 --   dropper's Config DropValue in the plot's "Drops" folder. A drop looks like
 --   a chocolate chip cookie: a flat disc with a few welded chip parts that
@@ -18,7 +20,8 @@
 --   drop can only be claimed once, and only by its own plot.
 -- * Stop(plot, dropperId) stops one dropper; its drops already on the conveyor
 --   keep going. StopAll(plot) stops every dropper on the plot and removes the
---   drops and the conveyor movement. The conveyor moves while any dropper runs.
+--   drops and the conveyor movement. A conveyor moves while any of its
+--   droppers runs.
 --   Both are safe to call if nothing is running.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -49,18 +52,36 @@ local DROP_GAP = 0.1 -- studs between the dropper's bottom and a new drop
 type PlotRun = {
 	Drops: Folder,
 	Droppers: { [string]: BasePart }, -- dropperId -> placed Dropper part
+	ConveyorOf: { [string]: string }, -- dropperId -> name of its conveyor
 }
 
 local runningByPlot: { [Model]: PlotRun } = {}
 local dropValues: { [BasePart]: number } = {}
 local dropPlots: { [BasePart]: Model } = {}
 
+-- The collector at the end of a conveyor: "Conveyor" -> "Collector",
+-- "Conveyor2" -> "Collector2".
+function DropperService.CollectorFor(conveyorName: string): string
+	return (string.gsub(conveyorName, "^Conveyor", "Collector"))
+end
 
--- The conveyor carries drops toward the plot's Collector, whichever way the
--- map lays it out: flat (no Y) unit direction from the conveyor's center to
--- the Collector's center.
+-- Every collector name the droppers in Config use, without repeats.
+function DropperService.CollectorNames(): { string }
+	local names = {}
+	for _, entry in Config.Droppers do
+		local name = DropperService.CollectorFor(entry.Conveyor)
+		if not table.find(names, name) then
+			table.insert(names, name)
+		end
+	end
+	return names
+end
+
+-- A conveyor carries drops toward its collector, whichever way the map lays
+-- it out: flat (no Y) unit direction from the conveyor's center to the
+-- collector's center.
 local function conveyorDirection(plot: Model, conveyor: BasePart): Vector3
-	local collector = plot:FindFirstChild("Collector")
+	local collector = plot:FindFirstChild(DropperService.CollectorFor(conveyor.Name))
 	if not collector or not collector:IsA("BasePart") then
 		return Vector3.xAxis
 	end
@@ -69,13 +90,23 @@ local function conveyorDirection(plot: Model, conveyor: BasePart): Vector3
 	return if flat.Magnitude > 0 then flat.Unit else Vector3.xAxis
 end
 
-local function setConveyorMoving(plot: Model, moving: boolean)
-	local conveyor = plot:FindFirstChild("Conveyor")
+local function setConveyorMoving(plot: Model, conveyorName: string, moving: boolean)
+	local conveyor = plot:FindFirstChild(conveyorName)
 	if conveyor and conveyor:IsA("BasePart") then
 		conveyor.AssemblyLinearVelocity = if moving
 			then conveyorDirection(plot, conveyor) * Config.ConveyorSpeed
 			else Vector3.zero
 	end
+end
+
+-- True if any dropper still running on the plot drops onto this conveyor.
+local function usesConveyor(run: PlotRun, conveyorName: string): boolean
+	for _, name in run.ConveyorOf do
+		if name == conveyorName then
+			return true
+		end
+	end
+	return false
 end
 
 local function forgetDrop(drop: BasePart)
@@ -164,8 +195,8 @@ function DropperService.Start(plot: Model, dropperId: string)
 	end
 
 	local spot = plot:FindFirstChild(`DropperSpot{index}`) :: BasePart?
-	if not spot or not plot:FindFirstChild("Conveyor") then
-		warn(`DropperService: {plot.Name} is missing DropperSpot{index} or Conveyor`)
+	if not spot or not plot:FindFirstChild(entry.Conveyor) then
+		warn(`DropperService: {plot.Name} is missing DropperSpot{index} or {entry.Conveyor}`)
 		return
 	end
 
@@ -173,7 +204,7 @@ function DropperService.Start(plot: Model, dropperId: string)
 		local drops = Instance.new("Folder")
 		drops.Name = "Drops"
 		drops.Parent = plot
-		run = { Drops = drops, Droppers = {} }
+		run = { Drops = drops, Droppers = {}, ConveyorOf = {} }
 		runningByPlot[plot] = run
 	end
 	local plotRun = run :: PlotRun
@@ -186,8 +217,9 @@ function DropperService.Start(plot: Model, dropperId: string)
 	dropper.Anchored = true
 	dropper.Parent = plot
 	plotRun.Droppers[dropperId] = dropper
+	plotRun.ConveyorOf[dropperId] = entry.Conveyor
 
-	setConveyorMoving(plot, true)
+	setConveyorMoving(plot, entry.Conveyor, true)
 
 	local value = entry.DropValue
 	task.spawn(function()
@@ -219,8 +251,9 @@ function DropperService.StopAll(plot: Model)
 	for _, dropper in run.Droppers do
 		dropper:Destroy()
 	end
-
-	setConveyorMoving(plot, false)
+	for _, conveyorName in run.ConveyorOf do
+		setConveyorMoving(plot, conveyorName, false)
+	end
 end
 
 -- Stops one dropper on a plot. Drops it already made stay on the conveyor.
@@ -233,9 +266,15 @@ function DropperService.Stop(plot: Model, dropperId: string)
 	end
 	run.Droppers[dropperId] = nil
 	dropper:Destroy()
+	local conveyorName = run.ConveyorOf[dropperId]
+	run.ConveyorOf[dropperId] = nil
 
 	if next(run.Droppers) == nil then
+		-- StopAll no longer knows this conveyor, so stop it here first.
+		setConveyorMoving(plot, conveyorName, false)
 		DropperService.StopAll(plot)
+	elseif not usesConveyor(run, conveyorName) then
+		setConveyorMoving(plot, conveyorName, false) -- none of its droppers left
 	end
 end
 

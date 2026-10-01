@@ -1,6 +1,8 @@
 -- CollectorService (server only)
--- Handles each plot's Collector and CollectPad:
---   1. A drop touching plot.Collector adds its value to that plot's stored
+-- Handles each plot's collectors and CollectPad:
+--   1. A drop touching one of the plot's collectors (Collector on the first
+--      floor, Collector2 on the second; see DropperService.CollectorNames)
+--      adds its value to that plot's single stored
 --      (uncollected) cash. DropperService.ClaimDrop validates and destroys it.
 --   2. The plot's owner touching plot.CollectPad moves the stored cash into
 --      their cash via EconomyService.AddCash.
@@ -57,7 +59,7 @@ local function onCollectPadTouched(plot: Model, hit: BasePart)
 	CollectorDisplay.Clear(plot, true)
 end
 
--- Connects the Collector and CollectPad touch handlers for a plot. Called once
+-- Connects the collector and CollectPad touch handlers for a plot. Called once
 -- per plot at server start.
 function CollectorService.SetupPlot(plot: Model)
 	if storedCashByPlot[plot] ~= nil then
@@ -66,9 +68,14 @@ function CollectorService.SetupPlot(plot: Model)
 	storedCashByPlot[plot] = 0
 	CollectorDisplay.Setup(plot)
 
-	plot.Collector.Touched:Connect(function(hit)
-		onCollectorTouched(plot, hit)
-	end)
+	for _, name in DropperService.CollectorNames() do
+		local collector = plot:FindFirstChild(name)
+		if collector and collector:IsA("BasePart") then
+			collector.Touched:Connect(function(hit)
+				onCollectorTouched(plot, hit)
+			end)
+		end
+	end
 	plot.CollectPad.Touched:Connect(function(hit)
 		onCollectPadTouched(plot, hit)
 	end)
