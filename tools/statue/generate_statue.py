@@ -342,10 +342,58 @@ for side, (x, z) in (("Front", (0, -18)), ("Back", (0, 18)), ("Left", (-18, 0)),
     ring["properties"]["CanQuery"] = False
     pad["children"] = [ring, sign("FEED CALEB!")]
 
+# Podium leaderboards: "CALEB'S TOP FEEDERS" boards at the pedestal's four
+# corners, each facing outward along a diagonal, so one is readable from any
+# direction and none sits near a FeedPad (those are on the axes). They stand
+# on the ground BOARD_DIST studs out along the diagonal, past the pedestal's
+# corner (18.4) and far outside Caleb even at Config.CalebMaxScale (1.6x
+# about the pedestal top: his widest point is his left elbow, ~19 studs out
+# but ~30 studs up). Each corner is a Model "Leaderboard<corner>" whose
+# "Board" part carries the SurfaceGui that CalebLeaderboard.client.luau
+# builds on its Front face (the -Z face, which points outward). All of it is
+# in the "Podium" folder, which Caleb's scaling and hiding never touch.
+BOARD_DIST = 21.0
+BOARD_SIZE = (14.0, 12.0, 0.8)  # 40 px/stud on the client -> 560 x 480 px
+BOARD_BOTTOM = 1.2
+BOARD_COLOR = (214, 160, 90)  # cookie dough (mostly covered by the panel)
+POST_COLOR = (92, 56, 30)  # chocolate
+COOKIE = (214, 160, 90)
+CHIP = (70, 40, 22)
+podium = []
+
+for corner, (sx, sz) in (("NE", (1, 1)), ("NW", (-1, 1)), ("SW", (-1, -1)), ("SE", (1, -1))):
+    out = unit((sx, 0, sz))
+    right = unit(cross(out, (0, 1, 0)))
+    rot = facing(out)
+    w, h, t = BOARD_SIZE
+    cy = BOARD_BOTTOM + h / 2
+    center = add(scale(out, BOARD_DIST), (0, cy, 0))
+    behind = scale(out, -(t / 2 + 0.3))  # just behind the board, toward Caleb
+
+    pieces = []
+    part("Board", BOARD_SIZE, center, BOARD_COLOR, rot=rot, into=pieces)
+    part("GoldTrim", (w + 1.0, h + 1.0, 0.6), add(center, behind), GOLD, rot=rot, material="Neon", into=pieces)
+    for name, side in (("PostLeft", -1), ("PostRight", 1)):
+        post_h = BOARD_BOTTOM + h + 0.5
+        pos = add(add(scale(right, side * (w / 2 - 1.5)), scale(out, BOARD_DIST - t / 2 - 0.9)), (0, post_h / 2, 0))
+        part(name, (1.0, post_h, 1.0), pos, POST_COLOR, rot=rot, into=pieces)
+
+    # A big chocolate chip cookie on top, facing outward.
+    cookie_d = 4.6
+    cookie_c = add(scale(out, BOARD_DIST - 0.2), (0, BOARD_BOTTOM + h + 0.5 + cookie_d / 2 - 0.4, 0))
+    cookie_rot = rows_from_columns(out, (0, 1, 0), cross(out, (0, 1, 0)))  # cylinder's round face points outward
+    part("Cookie", (0.8, cookie_d, cookie_d), cookie_c, COOKIE, shape="Cylinder", rot=cookie_rot, into=pieces)
+    for i, (cx, cyy) in enumerate([(-0.9, 0.9), (0.8, 1.0), (0.1, 0.0), (-1.1, -0.7), (1.0, -0.8), (-0.1, -1.5)]):
+        chip = add(add(cookie_c, scale(out, 0.4)), add(scale(right, cx), (0, cyy, 0)))
+        ball(f"Chip{i + 1}", 0.7, chip, CHIP, collide=False, into=pieces)
+
+    podium.append({"name": f"Leaderboard{corner}", "className": "Model", "children": pieces})
+
 model = {
     "className": "Model",
     "children": parts
     + [{"name": "FeedPads", "className": "Folder", "children": pads}]
+    + [{"name": "Podium", "className": "Folder", "children": podium}]
     + [
         {
             "name": "CartoonOutline",

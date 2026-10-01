@@ -33,7 +33,8 @@ src/
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
 │       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
-│       └── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       └── CalebLeaderboard.client.luau → LocalScript: "CALEB'S TOP FEEDERS" boards on the podium
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -141,6 +142,7 @@ changes cash, ownership, or purchases, and never talks to the server.
 | `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cookies`, shows it as `1,250` (comma separators) next to a cookie icon, and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a cookie icon drawn from round `Frame`s). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
 | `StarterPlayerScripts/FeedPrompt.client.luau` + `FeedPromptUI.luau` | When the local character stands on one of the statue's `FeedPads` (checked every frame against the pads loaded right now, so it works with content streaming; not `Touched` on pads found at start), shows a cartoony pop-up (same style as the cookie counter): "How many cookies do you want to feed Caleb?", progress `eaten / max` with a bar, an amount box (digits only), quick buttons 10 / 100 / 1K (each click **adds** that amount) / ALL (sets everything you can feed), Cancel and FEED!. The bar (fill + preview inside an `Inner` frame inset 4 px so they never touch the outline) is exact (eaten / `StatueMaxCookies`, with a thin minimum sliver above 0) plus a lighter preview of eaten + typed amount (red if unaffordable), and the text shows the exact %. FEED! invokes `Remotes.FeedStatue` with the amount and shows the server's answer. Closes on Cancel, right after a successful feed (with a `SendNotification` "Caleb ate N cookies!"), or when the player walks away; won't reopen until they step off the pad. Decides nothing. `FeedPromptUI.ProgressBar(parent, position, size)` builds that bar (track, fill, preview) and is reused by `StatueBar`. |
 | `StarterPlayerScripts/StatueBar.client.luau` | A `BillboardGui` (in PlayerGui, `AlwaysOnTop`, pixel-sized `Config.StatueBarSize`, `MaxDistance = Config.StatueBarMaxDistance`) above Caleb's head that every player sees: a yellow rounded panel with "Caleb: 12,345 / 1,000,000 🍪" (or "Caleb is FULL! 1,000,000 🍪") over the same cookie bar as the feed pop-up (`FeedPromptUI.ProgressBar`, fill only, same thin minimum sliver). Reads the statue's replicated `CookiesEaten` attribute at start (late joiners) and on `GetAttributeChangedSignal`, tweens the fill and pops the panel. Adorned to an `Attachment` in `Workspace.Terrain` placed `Config.StatueBarHeight` studs above the top of the `Head` (re-placed whenever the Head streams in or changes), so it stays visible when the statue's parts stream out. No remotes; decides nothing. |
+| `StarterPlayerScripts/CalebLeaderboard.client.luau` | Builds one `SurfaceGui` (in PlayerGui, `Face = Front`, 40 px/stud, `LightInfluence = 0`) per `Board` part in the statue's `Podium/Leaderboard<corner>` models, once, and re-adorns it when the board streams back in. Shows "CALEB'S TOP FEEDERS", up to `Config.CalebLeaderboardSize` rows from the statue's `CalebTopFeeders` JSON (decoded in `pcall`; bad data = empty), gold/silver/bronze badges for the top 3, the local player's row highlighted, "Be the first to feed Caleb!" when empty, "FINAL RESULTS" in `TrophyClaim`, and `CookiesEaten / CalebMaxCookies` (fallback `CalebEvent.MaxCookies()`). Refreshes on those attributes and `CalebState`. Names are plain text (`RichText = false`, fixed size, truncated). No remotes; decides nothing. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
@@ -314,7 +316,7 @@ type TrophyRecord = {
 ```
 
 Statue children: Caleb's body parts, `Pedestal*` parts, `FeedPads` (folder),
-and `Podium` (folder: leaderboard board and other podium decoration).
+and `Podium` (folder: the four `Leaderboard<corner>` models, each with a `Board` part that carries the client SurfaceGui, plus other podium decoration).
 Scaling, hiding, and client animation touch **only Caleb's body parts**.
 
 ### Who does presentation

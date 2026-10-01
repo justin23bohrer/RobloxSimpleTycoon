@@ -64,7 +64,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
 - [ ] Cookie rain (client, pooled).
 - [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
-- [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
+- [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
 - [ ] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01).
 - [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.
 - [ ] Celebration music (ask the user for a track).
