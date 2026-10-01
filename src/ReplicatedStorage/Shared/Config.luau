@@ -113,6 +113,17 @@ local Config = {
 	-- per client, and the radius (studs, around the statue) they fall in.
 	CookieRainMaxCookies = 120,
 	CookieRainRadius = 150,
+	-- New cookies per second (fewer if CookieRainMaxCookies are all in use),
+	-- fall speed (studs/s), height above the landing spot they start at
+	-- (studs), and spin (radians/s); each cookie varies these a little.
+	CookieRainPerSecond = 25,
+	CookieRainFallSpeed = 30,
+	CookieRainHeight = 80,
+	CookieRainSpinSpeed = 3,
+	-- Share (0..1) of cookies aimed within NearPlayerRadius studs of the local
+	-- player, so everyone sees plenty around them; the rest fall anywhere.
+	CookieRainNearPlayerShare = 0.6,
+	CookieRainNearPlayerRadius = 45,
 	-- Sound effects (client only). Each is a Roblox audio asset id string
 	-- ("rbxassetid://123..."). Empty = that sound is skipped. See
 	-- tools/audio/ for the original effects to upload. Music comes later.
