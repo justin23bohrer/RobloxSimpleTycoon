@@ -89,10 +89,13 @@ local function isValidPlot(plot: Instance): boolean
 	return true
 end
 
+-- The sign has the same text on both faces (toward the spawn and into the
+-- plot), so update every TextLabel on it.
 local function setOwnerSign(plot: Model, text: string)
-	local label = plot.OwnerSign:FindFirstChild("TextLabel", true)
-	if label and label:IsA("TextLabel") then
-		label.Text = text
+	for _, label in plot.OwnerSign:GetDescendants() do
+		if label:IsA("TextLabel") then
+			label.Text = text
+		end
 	end
 end
 
@@ -106,7 +109,7 @@ local function resetPlot(plot: Model)
 	DropperService.StopAll(plot)
 	CollectorService.ResetPlot(plot)
 	plot:SetAttribute("OwnerUserId", nil)
-	setOwnerSign(plot, "Unclaimed")
+	setOwnerSign(plot, "UNCLAIMED")
 	PlotStages.ShowUnclaimed(plot)
 end
 

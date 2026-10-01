@@ -9,7 +9,8 @@ src/
 ├── ReplicatedStorage/          → ReplicatedStorage (server + client can read)
 │   ├── Shared/
 │   │   └── Config.luau         → ModuleScript: all tunable numbers
-│   └── Remotes/                → Folder: RemoteEvents (none needed yet)
+│   └── Remotes/                → Folder: remotes
+│       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
 │   ├── ServerMain.server.luau  → Script: entry point, starts services
 │   └── Services/
@@ -22,10 +23,14 @@ src/
 │       ├── Purchases.luau      → read-only catalog of droppers + builds (ids, buttons, unlock order)
 │       ├── DropperService.luau
 │       ├── CollectorService.luau
-│       └── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
+│       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
+│       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
+│       └── StatueShape.luau    → helper for StatueService (makes the statue fatter)
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
-│       └── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
+│       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
+│       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
+│       └── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -90,6 +95,8 @@ reach the server.
 | `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects every purchase button's touch to a callback with the purchase id, sets RichText labels from `Config` ("Dropper N" or the build's `Name`, over a yellow "🍪 Cost" / "FREE!"), resets colors (droppers red, builds orange), and hides/shows each button (a dropper's together with its `DropperSpotN`) by purchase id (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places a part named after the id at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; each dropper drops onto its Config `Conveyor` (`Conveyor` or `Conveyor2`), and a conveyor moves while any of its droppers runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. `CollectorFor(conveyorName)` names a conveyor's collector (`Conveyor2` → `Collector2`); `CollectorNames()` lists every collector the droppers use. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`, `CollectorFor`, `CollectorNames`) |
 | `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
+| `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, and room left under `StatueMaxCookies`; spends with `EconomyService.TrySpend` (only what Caleb still has room for); adds to the session total, mirrors it to the statue's `CookiesEaten` attribute, and calls `StatueShape.Apply`. Pad signs say "CALEB IS FULL!" at the max. Total is per server session (no saving). | Implemented (`Start`, `OnPlayerRemoving`) |
+| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. Fatness = log(1+eaten)/log(1+max). | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -107,6 +114,7 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
+`StatueService` → `EconomyService`, `StatueShape`; nothing requires `StatueService` except `ServerMain`.
 
 ## Client
 
@@ -116,6 +124,7 @@ changes cash, ownership, or purchases, and never talks to the server.
 | Script | What it does |
 | ------ | ------------ |
 | `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cookies`, shows it as `1,250` (comma separators) next to a cookie icon, and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a cookie icon drawn from round `Frame`s). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
+| `StarterPlayerScripts/FeedPrompt.client.luau` + `FeedPromptUI.luau` | When the local character touches one of the statue's `FeedPads`, shows a cartoony pop-up (same style as the cookie counter): "How many cookies do you want to feed Caleb?", progress `eaten / max` with a bar, an amount box (digits only), quick buttons 10 / 100 / 1K / ALL, Cancel and FEED!. FEED! invokes `Remotes.FeedStatue` with the amount and shows the server's answer. Closes on Cancel, after a successful feed, or when the player walks away; won't reopen until they step off the pad. Decides nothing. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
@@ -131,7 +140,8 @@ read everything in ReplicatedStorage.
 
 `Config.luau` holds every tunable value (`StartingCash`, `Droppers`, `Builds`,
 `DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`, `DropLifetime`,
-`DevUnlimitedCash`, `DevStartingCash`). It is frozen (including each
+`DevUnlimitedCash`, `DevStartingCash`, `StatueName`, `StatueMaxCookies`,
+`StatueFeedRange`, `StatueFeedCooldown`). It is frozen (including each
 `Droppers` and `Builds` entry), so code cannot change it at runtime.
 
 `Droppers` is a list of `{ Id, Cost, DropValue, After, Conveyor }`. Entry N
@@ -148,7 +158,15 @@ warns if it does not.
 
 ## Remotes
 
-`ReplicatedStorage/Remotes` exists but is empty: the MVP needs **no** remotes.
+| Remote | Type | Direction | Handled by | Arguments (all untrusted) | Returns |
+| ------ | ---- | --------- | ---------- | ------------------------- | ------- |
+| `FeedStatue` | RemoteFunction | client → server (`InvokeServer`) | `StatueService` | `amount`: cookies to feed | `(true, cookiesEaten)` or `(false, reason)` |
+
+`FeedStatue` exists because typing an amount in a UI is something the server
+cannot see. The server re-checks everything (type, whole number, ≥ 1,
+player within `StatueFeedRange` of a feed pad, cooldown, can afford it,
+room left). It is a client → server RemoteFunction, which is safe: the
+server's handler never yields on the client.
 
 - **Use a server-side function call** when server code talks to server code,
   or when the server can observe the action itself (e.g. `Touched` on a
