@@ -79,13 +79,19 @@ BOOK_COLORS = [
     (230, 230, 220), (150, 80, 160), (60, 150, 100), (200, 50, 80), (40, 40, 50),
 ]
 
+# How much bigger the bed and the desk setup (desk, monitors, chair, ...) are
+# than "normal" cartoon size, so they fill the big room: across the floor
+# (x and z) and in height (y). Each is grown around its back-wall corner.
+BED_GROW = (1.4, 1.15)
+DESK_GROW = (1.35, 1.15)
+
 # Buy buttons: (index in Config.Builds, model name, x, z). Keep these in the
 # same order as Config.Builds entries 5-9.
 BUTTONS = [
-    (5, "Bed", -3, -55),
-    (6, "GamingDesk", 11, -57),
+    (5, "Bed", -3, -50),
+    (6, "GamingDesk", 13, -56),
     (7, "ShelvesTV", 8, -21),
-    (8, "MiniFridge", 27.5, -63),
+    (8, "MiniFridge", 27.75, -61),
     (9, "KitchenCounter", -8, -21),
 ]
 MANAGED = {name for _, name, _, _ in BUTTONS} | {f"BuildButton{i}" for i, _, _, _ in BUTTONS}
@@ -157,6 +163,21 @@ class Item:
         """A cylinder `length` long (along `rot`'s X, upright by default)."""
         self.part(name, (length, d, d), pos, color, material, shape="Cylinder", rot=rot, **kw)
 
+    def grow(self, anchor, flat, up):
+        """Makes every part so far bigger around `anchor`: `flat` times wider
+        and deeper (x, z), `up` times taller (y). Rotated parts grow along
+        their own axes by the matching amount."""
+        k = (flat, up, flat)
+        for node in self.parts:
+            props = node["properties"]
+            cf = props["CFrame"]["CFrame"]
+            cf["position"] = [r(a + (p - a) * ki) for p, a, ki in zip(cf["position"], anchor, k)]
+            rot = cf["orientation"]
+            props["Size"] = [
+                r(props["Size"][j] * math.sqrt(sum((k[i] * rot[i][j]) ** 2 for i in range(3))))
+                for j in range(3)
+            ]
+
     def model(self):
         return {"name": self.name, "className": "Model", "children": self.parts}
 
@@ -181,6 +202,7 @@ def bed():
     it.part("BlanketSide", (0.5, 2.0, 7.0), (x + width / 2 + 0.2, F + 2.8, foot - 3.5), BLANKET, "Fabric", collide=False)
     it.part("Throw", (5.0, 0.8, 3.4), (x + 0.8, F + 4.1, foot - 6.5), THROW, "Fabric", rot=rot_y(22), collide=False)
     it.part("ThrowLump", (2.6, 0.7, 2.0), (x - 1.6, F + 4.0, foot - 4.0), THROW, "Fabric", rot=rot_y(-30), collide=False)
+    it.grow((x, F, head), *BED_GROW)
     return it.model()
 
 
@@ -244,8 +266,10 @@ def gaming_desk():
         it.part(f"ChairLeg{i + 1}", (0.3, 0.25, 1.8), (cx + dx, F + 0.55, cz + dz), CHARCOAL, rot=rot_y(a), collide=False)
         it.ball(f"ChairWheel{i + 1}", 0.45, (cx + dx * 2, F + 0.22, cz + dz * 2), BLACK, collide=False)
 
-    # Backpack on the floor between the desk and the bed.
-    bx, bz = 3.2, BACK + 8.0
+    it.grow((x0, F, BACK), *DESK_GROW)
+
+    # Backpack on the floor next to the chair (not grown).
+    bx, bz = 7.5, BACK + 10.8
     it.part("Backpack", (1.8, 2.4, 1.1), (bx, F + 1.2, bz), BLACK, "Fabric", rot=rot_y(-15))
     it.part("BackpackPocket", (1.4, 1.0, 0.4), (bx + 0.2, F + 0.8, bz + 0.65), CHARCOAL, "Fabric", rot=rot_y(-15), collide=False)
     it.part("BackpackTop", (1.6, 0.4, 1.0), (bx, F + 2.5, bz), BLACK, "Fabric", rot=rot_y(-15), collide=False)
@@ -397,7 +421,7 @@ def mini_fridge():
         it.ball(f"BoosterTip{side}", 0.4, (x + dx, core_bottom + 3.4, rz), WHITE, collide=False)
 
     # Foam roller lying on the floor.
-    it.cyl("FoamRoller", 2.2, 0.9, (x - 6.0, F + 0.45, BACK + 1.3), (70, 74, 80), rot=IDENTITY)
+    it.cyl("FoamRoller", 2.2, 0.9, (x - 3.0, F + 0.45, z + 4.4), (70, 74, 80), rot=IDENTITY)
     return it.model()
 
 
