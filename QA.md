@@ -81,6 +81,25 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD20 | Open the pop-up; pick a small amount (10), a medium one (100,000), and feed until the bar is full. Check up close and on a phone (Device emulator). | The cookie-colored fill and the lighter preview always stay inside the white track with a thin white gap; they never touch or cover the dark outline, and the rounded ends stay clean. | |
 | FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
 
+## Caleb growth and animations
+
+Tip: set `DevCalebFastCycle = true` in Studio (goal 1,000 cookies; Full 3 s,
+Celebration 20 s, TrophyClaim 30 s) and `DevUnlimitedCash = true`. Set both
+back before committing. Feed amounts below are for the 1,000 goal.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CG1 | Press Play; look at Caleb (0 fed). | Normal size, thin, feet on the pedestal; nothing floating or sunk into the pedestal. | |
+| CG2 | Feed up to 250, 500, 750, 900, 990 total, looking at him from the same spot after each. | Every step is visibly bigger than the last (fatter first, then clearly taller/wider); feet always stay on the pedestal top; belly, cheeks, chin, chain, arms, and hair stay attached at every size. Each change is a bouncy grow. | |
+| CG3 | Feed the last 10 (to 1,000). | A visible final jump to max size (1.6×). Then the Full animation starts. | |
+| CG4 | Watch the Full state. | He waddles, leans back with arms out, belly bounces, puffs a white cloud from his mouth with a head jolt, settles. Looks funny, nothing detaches or flies off. | |
+| CG5 | Watch Celebration. | He dances the whole time: sway + hop per beat, arms alternate waving, head bobs, belly jiggles, a full spin every ~8 s. Only Caleb moves: pedestal, feed pads, podium stay put. No errors in Output. | |
+| CG6 | Wait for TrophyClaim. | Caleb's body is gone (invisible, can walk through where he was); the pedestal, the 4 feed pads, and the podium are still there. The cartoon outline doesn't draw a ghost of him. | |
+| CG7 | Wait for the reset (back to Normal). | Caleb is back, at his smallest, thin, in his normal pose, feet on the pedestal; not stuck in a dance pose. | |
+| CG8 | 2 players: Player 2 joins in the middle of Celebration. | Player 2 sees him dancing right away, at the same moment of the dance as Player 1 (spins line up). When it ends both see him stop in the normal pose. | |
+| CG9 | During Celebration, walk far away (until the statue streams out) and come back; also reset your character mid-dance. | He is dancing again when you come back; no part stays offset or frozen; one dance only (no double speed). | |
+| CG10 | Performance: in Normal and TrophyClaim, check the MicroProfiler / Script Performance for `CalebAnimator`. | No per-frame work outside Full/Celebration. | |
+
 ## Statue progress bar
 
 | ID | Test | Expected | Status |
@@ -153,6 +172,41 @@ Set `DevCalebFastCycle = true` (Studio only) to run the event quickly
 | EV12 | Join during Full. | The big text and confetti show; no flash or camera shake. | |
 | EV13 | Reset your character during Celebration / TrophyClaim. | Banners stay (no duplicates); no errors. | |
 | EV14 | Phone (Device emulator) during each state. | Banners readable, inside the screen, not covering the cookie counter. No errors in Output. | |
+
+## Caleb leaderboard (podium)
+
+Needs the Core agent's `CalebCycle` publishing `CalebTopFeeders`. Tip: `DevCalebFastCycle = true` + `DevUnlimitedCash = true` in Studio for the end-of-cycle cases (set back before committing).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| LB1 | Press Play; walk all the way around the statue, and look from each spawn. | Four boards at the pedestal's corners, each facing out diagonally, with gold trim, chocolate posts, and a chip cookie on top. From any side at least one board is readable from ~40 studs. They don't block any of the 4 feed pads (all 4 still open the pop-up). Text is not darkened by lighting/night. | |
+| LB2 | Before anyone feeds. | Title "CALEB'S TOP FEEDERS", subtitle "Cookies fed this round", "Be the first to feed Caleb!", total "🍪 0 / 1,000,000". | |
+| LB3 | Feed 10 cookies. | Within ~1 s your row appears: badge 1 (gold), your name, "10 🍪"; your row is green with a thick green outline; total "🍪 10 / 1,000,000". | |
+| LB4 | 2–3 players feed different amounts (e.g. Test > 3 Clients). | Rows are best first with commas (e.g. "248,321 🍪"); badges 1/2/3 are gold/silver/bronze, 4+ brown. Each client sees only its OWN row highlighted. | |
+| LB5 | Late joiner: feed, then a second player joins. | The new player's boards show the current list and total right away. | |
+| LB6 | Player with a long display name (or temporarily make the server send a 40-character name / one containing `<b>` tags). | The name ends in "…" inside its row; it never overlaps the cookie count or leaves the board; tags show as plain text. | |
+| LB7 | Feed until Caleb is full (fast cycle) and wait for TrophyClaim. Also check Caleb at max size. | At max size Caleb never touches a board. During TrophyClaim the subtitle says "FINAL RESULTS" (red) and the list stays. | |
+| LB8 | Wait for the reset to Normal. | List cleared ("Be the first to feed Caleb!"), total "🍪 0 / …", subtitle back to "Cookies fed this round". | |
+| LB9 | Walk far away (to a plot) and back; reset character. | Boards still show the list (re-attach after streaming); no duplicate boards; no errors in Output. | |
+
+## Caleb sounds
+
+Needs the WAVs uploaded and their ids in `Config.CalebSounds` (see
+`tools/audio/README.md`), except CS1. Use `Config.DevCalebFastCycle = true`
+(Studio only) to get through the event quickly.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CS0 | Run `python3 tools/audio/generate_sfx.py`. | Six WAVs in `tools/audio/out/` (16-bit, 44.1 kHz, mono), all under 300 KB. Re-running gives identical files. | |
+| CS1 | All `CalebSounds` ids empty; Play; run a full fast cycle. | Silent. Output has at most one `[CalebAudio] no sound id ...` line and no errors or warnings. | |
+| CS2 | Feed Caleb a few times quickly. | A quiet rising "bloop" per feed, never more than about 3 per second; the other game sounds are unchanged. | |
+| CS3 | Feed until the goal. | The "boing/burp/fanfare" plays once when he is Full. | |
+| CS4 | Wait for the Celebration. | Party horn + arpeggio + splash once, then a quiet sparkle loop with no audible click at the loop point. | |
+| CS5 | Wait for the Celebration to end (TrophyClaim starts). | The loop fades out and stops; the descending chime plays once. Nothing keeps playing. In Explorer, `SoundService.CalebAudio.CookieRain.IsPlaying` is false. | |
+| CS6 | Claim your trophy (2 players: only Player 1 claims). | Player 1 hears the "ta-da"; Player 2 does not. | |
+| CS7 | 2 players: Player 2 joins mid-Celebration. | Player 2 hears only the loop (no Full/CelebrationStart); it stops at the end like CS5. | |
+| CS8 | Player 2 joins during TrophyClaim, or after already claiming (rejoin). | No sounds play on join. | |
+| CS9 | Reset character during the Celebration; let the cycle run twice. | Still exactly one `SoundService.CalebAudio` folder; sounds play again in the next cycle; no duplicates. | |
 
 ## Purchase
 

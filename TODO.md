@@ -60,11 +60,12 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 
 - [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
 - [x] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id. (code done; Studio test pending: QA CE1–CE10)
-- [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
+- [x] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim (`StatueShape`, `CalebAnimator.client`). (code done; Studio test pending: QA CG1–CG10; `SetHidden` is called by StatueService on CalebCycle.StateChanged)
 - [x] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed. (code done; Studio test pending: QA EV1–EV14)
 - [x] Cookie rain (client, pooled): `CookieRain.client` + `CookieRainLook`. Visual only, not collectable. (code done; Studio test pending: QA CR1–CR10)
-- [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
-- [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
+- [x] Sound effects: `tools/audio/generate_sfx.py` + `CalebAudio.client` (original, synthesized).
+- [ ] Upload `tools/audio/out/*.wav` to Roblox and paste the ids into `Config.CalebSounds` (user; steps in `tools/audio/README.md`).
+- [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [x] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [ ] Celebration music (ask the user for a track).
