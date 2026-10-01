@@ -22,10 +22,11 @@ local MAX_TANK_CUBES = 60 -- tank looks full past this; stops adding cookies
 local CUBE_SIZE = Vector3.new(0.3, 0.9, 0.9) -- a Cylinder: X is the cookie's thickness
 local CUBE_COLOR = Color3.fromRGB(214, 160, 90) -- same dough color as the drops
 local GOLD = Color3.fromRGB(255, 215, 60)
--- Where new cubes appear, relative to the TankLid's center: just under the
--- lid, anywhere across the tank's inside (6 studs wide, 2.4 deep) with room
--- so a cube never starts inside the glass. The lid also covers the front
--- glass, so the inside is centered 0.2 studs behind the lid's center.
+-- Where new cubes appear, in the TankLid's own space (so it works on plots
+-- turned any way): just under the lid, anywhere across the tank's inside
+-- (6 studs wide along the lid's X, 2.4 deep along its Z) with room so a cube
+-- never starts inside the glass. The lid also covers the front glass, so the
+-- inside is centered 0.2 studs behind the lid's center.
 local CUBE_SPAWN_OFFSET = Vector3.new(0, -1.1, -0.2)
 local CUBE_SPREAD_X = 2.2
 local CUBE_SPREAD_Z = 0.4
@@ -152,7 +153,8 @@ function CollectorDisplay.AddCube(plot: Model)
 	cube.Material = Enum.Material.SmoothPlastic
 	cube.CanTouch = false -- never reaches the Collector or any Touched handler
 	cube.CanQuery = false
-	cube.CFrame = CFrame.new(lid.Position + offset)
+	cube.CFrame = lid.CFrame
+		* CFrame.new(offset)
 		* CFrame.Angles(0, math.random() * math.pi, math.pi / 2 + (math.random() - 0.5)) -- roughly flat, tilted; tumbles onto the pile
 	cube.Parent = cubes
 	cube:SetNetworkOwner(nil)

@@ -28,8 +28,16 @@ next, more expensive dropper's button has appeared, so they save up for it.
 
 ## Tycoon
 
-- There is **1** plot (`Config.NumberOfTycoonPlots`), directly in front of
-  the spawn. We build one tycoon at a time.
+- There are **4** plots (`Config.NumberOfTycoonPlots`), so up to 4 people
+  can each run a tycoon on the same server. They sit around the statue at
+  the same distance (each plot's center is 87 studs from the statue's
+  center), turned so every house's front doorway and Claim pad face the
+  statue. Plot1 is in front of the statue (−Z), Plot2 to its −X side,
+  Plot3 behind it (+Z), Plot4 to its +X side.
+- Each plot has its own spawn pad between it and the statue (44 studs from
+  the statue's center). Players appear at a random one of the four.
+- Plots 2–4 and spawns 2–4 are exact turned copies of Plot1 and the first
+  spawn, made by `tools/plots/generate_plots.py`. Only Plot1 is edited.
 - Players are **not** given a plot on join. A free plot shows only its floor
   and a round blue **Claim Tycoon** pad. The first player to step on it owns
   the plot. A player can own only one plot.
@@ -160,10 +168,13 @@ The stored amount is **not** shown as text. Instead:
 
 ## Plot layout (prototype)
 
-Plain parts only, no theme. The plot floor is **66 × 66 studs** (2/3 of the
-earlier 100 × 100) and the ground is 280 × 280 of green grass
-(`Material = Grass`, color `86,166,64`). Seen from the spawn, looking at the
-plot ("left" is −X, "back" is −Z):
+Plain parts only, no theme. Each plot floor is **66 × 66 studs** (2/3 of the
+earlier 100 × 100). The ground is 300 × 300 of green grass (`Material =
+Grass`, color `86,166,64`), centered on the statue at (0, 0.5, 44) so all
+four plots sit on it. The map and positions below are for **Plot1**; Plots
+2–4 are the same, turned 90°, 180°, and 270° around the statue's center
+(0, 44). Seen from Plot1's spawn, looking at the plot ("left" is −X, "back"
+is −Z):
 
 First floor (walls shown with `█`; they appear once built):
 
@@ -227,7 +238,7 @@ as an outline:
 | `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
 | `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime. |
-| `SpawnLocation`    | Round blue pad with a dark blue ring, in `Map` (not the plot). Where players appear. |
+| `SpawnLocation`, `SpawnLocation2`–`4` | Round blue pads with dark blue rings, in `Map` (not the plots), one between each plot and the statue. Where players appear (a random one). `SpawnLocation2`–`4` are generated. |
 | `Statue`           | In `Map` (not the plot), behind the spawn at z ≈ 44, facing it: turn around after spawning to see it. See below. |
 
 ### Statue (Caleb)
