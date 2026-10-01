@@ -877,7 +877,159 @@
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth"
-      }
+      },
+      "children": [
+        {
+          "name": "RailLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              48
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -30.2,
+                  3.5,
+                  -42
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              48
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -25.8,
+                  3.5,
+                  -42
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.8,
+              3,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -28,
+                  3.5,
+                  -17.8
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
     },
     {
       "name": "Collector",
@@ -925,7 +1077,159 @@
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth"
-      }
+      },
+      "children": [
+        {
+          "name": "RailLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              6.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -31.2,
+                  3.5,
+                  -69.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              6.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -24.8,
+                  3.5,
+                  -69.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6.8,
+              3,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -28,
+                  3.5,
+                  -72.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
     },
     {
       "name": "CollectPad",
@@ -14611,30 +14915,414 @@
           "className": "Model",
           "children": [
             {
-              "name": "RoofFront",
+              "name": "RoofFront1A",
               "className": "WedgePart",
               "properties": {
                 "Size": [
-                  68,
-                  14,
-                  34
+                  0.6,
+                  37.62,
+                  24.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.5,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0,
+                        -1
+                      ],
+                      [
+                        0.91707,
+                        0.398726,
+                        0
+                      ],
+                      [
+                        0.398726,
+                        -0.91707,
+                        0
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofFront1B",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  37.62,
+                  44.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -12.25,
+                      38.5,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0,
+                        1
+                      ],
+                      [
+                        -0.91707,
+                        0.398726,
+                        0
+                      ],
+                      [
+                        -0.398726,
+                        -0.91707,
+                        0
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofFront2A",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  12.912,
+                  15.273
                 ],
                 "CFrame": {
                   "CFrame": {
                     "position": [
                       0,
-                      38,
-                      -26
+                      46,
+                      -43
                     ],
                     "orientation": [
                       [
-                        -1,
                         0,
+                        -0.645602,
+                        -0.763674
+                      ],
+                      [
+                        0.91707,
+                        0.304497,
+                        -0.257418
+                      ],
+                      [
+                        0.398726,
+                        -0.700343,
+                        0.592062
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofFront2B",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  12.912,
+                  42.997
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -22.25,
+                      38.5,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        -0.645602,
+                        0.763674
+                      ],
+                      [
+                        -0.91707,
+                        0.304497,
+                        0.257418
+                      ],
+                      [
+                        -0.398726,
+                        -0.700343,
+                        -0.592062
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofBack1A",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  37.62,
+                  24.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -22.25,
+                      38.5,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0,
+                        1
+                      ],
+                      [
+                        0.91707,
+                        0.398726,
                         0
                       ],
                       [
+                        -0.398726,
+                        0.91707,
+                        0
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofBack1B",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  37.62,
+                  44.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      12.25,
+                      38.5,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
                         0,
-                        1,
+                        0,
+                        -1
+                      ],
+                      [
+                        -0.91707,
+                        0.398726,
+                        0
+                      ],
+                      [
+                        0.398726,
+                        0.91707,
+                        0
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofBack2A",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  12.912,
+                  15.273
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      0,
+                      46,
+                      -43
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0.645602,
+                        0.763674
+                      ],
+                      [
+                        0.91707,
+                        0.304497,
+                        -0.257418
+                      ],
+                      [
+                        -0.398726,
+                        0.700343,
+                        -0.592062
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofBack2B",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  12.912,
+                  42.997
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.5,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0.645602,
+                        -0.763674
+                      ],
+                      [
+                        -0.91707,
+                        0.304497,
+                        0.257418
+                      ],
+                      [
+                        0.398726,
+                        0.700343,
+                        0.592062
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofLeftA",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  28.727,
+                  34.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -22.25,
+                      38.5,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        -0.522154,
+                        0.852851,
+                        0
+                      ],
+                      [
+                        0.852851,
+                        0.522154,
                         0
                       ],
                       [
@@ -14659,30 +15347,30 @@
               }
             },
             {
-              "name": "RoofBack",
+              "name": "RoofLeftB",
               "className": "WedgePart",
               "properties": {
                 "Size": [
-                  68,
-                  14,
-                  34
+                  0.6,
+                  28.727,
+                  34.5
                 ],
                 "CFrame": {
                   "CFrame": {
                     "position": [
-                      0,
-                      38,
-                      -60
+                      -22.25,
+                      38.5,
+                      -60.25
                     ],
                     "orientation": [
                       [
-                        1,
-                        0,
+                        0.522154,
+                        0.852851,
                         0
                       ],
                       [
-                        0,
-                        1,
+                        -0.852851,
+                        0.522154,
                         0
                       ],
                       [
@@ -14707,19 +15395,370 @@
               }
             },
             {
-              "name": "Ridge",
+              "name": "RoofRightA",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  28.727,
+                  34.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.5,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
+                        0.522154,
+                        -0.852851,
+                        0
+                      ],
+                      [
+                        0.852851,
+                        0.522154,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RoofRightB",
+              "className": "WedgePart",
+              "properties": {
+                "Size": [
+                  0.6,
+                  28.727,
+                  34.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.5,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        -0.522154,
+                        -0.852851,
+                        0
+                      ],
+                      [
+                        -0.852851,
+                        0.522154,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        -1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    96,
+                    100,
+                    104
+                  ]
+                },
+                "Anchored": true,
+                "Material": "Slate",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth"
+              }
+            },
+            {
+              "name": "RidgeCap",
               "className": "Part",
               "properties": {
                 "Size": [
-                  68.4,
-                  0.8,
-                  1.4
+                  1,
+                  1,
+                  20
                 ],
                 "CFrame": {
                   "CFrame": {
                     "position": [
                       0,
-                      45.1,
+                      46.3,
+                      -43
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        0,
+                        1
+                      ],
+                      [
+                        0,
+                        1,
+                        0
+                      ],
+                      [
+                        -1,
+                        0,
+                        0
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    78,
+                    82,
+                    86
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "HipFrontLeftCap",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.8,
+                  0.8,
+                  44.894
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -22.25,
+                      38.8,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        -0.815327,
+                        -0.193454,
+                        0.545726
+                      ],
+                      [
+                        0,
+                        0.942531,
+                        0.334118
+                      ],
+                      [
+                        -0.579,
+                        0.272415,
+                        -0.768471
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    78,
+                    82,
+                    86
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "HipFrontRightCap",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.8,
+                  0.8,
+                  44.894
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.8,
+                      -25.75
+                    ],
+                    "orientation": [
+                      [
+                        -0.815327,
+                        0.193454,
+                        -0.545726
+                      ],
+                      [
+                        0,
+                        0.942531,
+                        0.334118
+                      ],
+                      [
+                        0.579,
+                        0.272415,
+                        -0.768471
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    78,
+                    82,
+                    86
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "HipBackLeftCap",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.8,
+                  0.8,
+                  44.894
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -22.25,
+                      38.8,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
+                        0.815327,
+                        -0.193454,
+                        0.545726
+                      ],
+                      [
+                        0,
+                        0.942531,
+                        0.334118
+                      ],
+                      [
+                        -0.579,
+                        -0.272415,
+                        0.768471
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    78,
+                    82,
+                    86
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "HipBackRightCap",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.8,
+                  0.8,
+                  44.894
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      22.25,
+                      38.8,
+                      -60.25
+                    ],
+                    "orientation": [
+                      [
+                        0.815327,
+                        0.193454,
+                        -0.545726
+                      ],
+                      [
+                        0,
+                        0.942531,
+                        0.334118
+                      ],
+                      [
+                        0.579,
+                        -0.272415,
+                        0.768471
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    78,
+                    82,
+                    86
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "Soffit",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  69,
+                  0.4,
+                  69
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      0,
+                      30.8,
                       -43
                     ],
                     "orientation": [
@@ -14743,18 +15782,15 @@
                 },
                 "Color": {
                   "Color3uint8": [
-                    78,
-                    82,
-                    86
+                    228,
+                    228,
+                    224
                   ]
                 },
                 "Anchored": true,
                 "Material": "SmoothPlastic",
                 "TopSurface": "Smooth",
-                "BottomSurface": "Smooth",
-                "CanCollide": false,
-                "CanTouch": false,
-                "CanQuery": false
+                "BottomSurface": "Smooth"
               }
             },
             {
@@ -14762,16 +15798,16 @@
               "className": "Part",
               "properties": {
                 "Size": [
-                  68.2,
-                  0.8,
-                  0.4
+                  69.6,
+                  0.9,
+                  0.3
                 ],
                 "CFrame": {
                   "CFrame": {
                     "position": [
                       0,
-                      31.2,
-                      -8.9
+                      30.9,
+                      -8.35
                     ],
                     "orientation": [
                       [
@@ -14813,16 +15849,118 @@
               "className": "Part",
               "properties": {
                 "Size": [
-                  68.2,
-                  0.8,
-                  0.4
+                  69.6,
+                  0.9,
+                  0.3
                 ],
                 "CFrame": {
                   "CFrame": {
                     "position": [
                       0,
-                      31.2,
-                      -77.1
+                      30.9,
+                      -77.65
+                    ],
+                    "orientation": [
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        1,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    122,
+                    126,
+                    130
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "FasciaLeft",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.3,
+                  0.9,
+                  69
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -34.65,
+                      30.9,
+                      -43
+                    ],
+                    "orientation": [
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        1,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    122,
+                    126,
+                    130
+                  ]
+                },
+                "Anchored": true,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "CanCollide": false,
+                "CanTouch": false,
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "FasciaRight",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.3,
+                  0.9,
+                  69
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      34.65,
+                      30.9,
+                      -43
                     ],
                     "orientation": [
                       [
@@ -14868,16 +16006,16 @@
                   "className": "WedgePart",
                   "properties": {
                     "Size": [
-                      18.429,
-                      8,
-                      9
+                      21.5,
+                      10,
+                      10
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
-                          -4.5,
-                          35,
-                          -19.214
+                          -5,
+                          36,
+                          -20.75
                         ],
                         "orientation": [
                           [
@@ -14916,16 +16054,16 @@
                   "className": "WedgePart",
                   "properties": {
                     "Size": [
-                      18.429,
-                      8,
-                      9
+                      21.5,
+                      10,
+                      10
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
-                          4.5,
-                          35,
-                          -19.214
+                          5,
+                          36,
+                          -20.75
                         ],
                         "orientation": [
                           [
@@ -14965,14 +16103,14 @@
                   "properties": {
                     "Size": [
                       1,
-                      7.289,
-                      8.2
+                      9.2,
+                      9.2
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
-                          -4.1,
-                          34.644,
+                          -4.6,
+                          35.6,
                           -9.5
                         ],
                         "orientation": [
@@ -15013,14 +16151,14 @@
                   "properties": {
                     "Size": [
                       1,
-                      7.289,
-                      8.2
+                      9.2,
+                      9.2
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
-                          4.1,
-                          34.644,
+                          4.6,
+                          35.6,
                           -9.5
                         ],
                         "orientation": [
@@ -15056,19 +16194,172 @@
                   }
                 },
                 {
-                  "name": "GableVent",
+                  "name": "GableRakeLeft",
                   "className": "Part",
                   "properties": {
                     "Size": [
-                      0.3,
-                      2.2,
-                      2.2
+                      0.6,
+                      0.6,
+                      14.566
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          -5.15,
+                          36.15,
+                          -9.1
+                        ],
+                        "orientation": [
+                          [
+                            0,
+                            -0.707107,
+                            0.707107
+                          ],
+                          [
+                            0,
+                            0.707107,
+                            0.707107
+                          ],
+                          [
+                            -1,
+                            0,
+                            0
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        122,
+                        126,
+                        130
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "SmoothPlastic",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth",
+                    "CanCollide": false,
+                    "CanTouch": false,
+                    "CanQuery": false
+                  }
+                },
+                {
+                  "name": "GableRakeRight",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      0.6,
+                      0.6,
+                      14.566
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          5.15,
+                          36.15,
+                          -9.1
+                        ],
+                        "orientation": [
+                          [
+                            0,
+                            0.707107,
+                            -0.707107
+                          ],
+                          [
+                            0,
+                            0.707107,
+                            0.707107
+                          ],
+                          [
+                            1,
+                            0,
+                            0
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        122,
+                        126,
+                        130
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "SmoothPlastic",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth",
+                    "CanCollide": false,
+                    "CanTouch": false,
+                    "CanQuery": false
+                  }
+                },
+                {
+                  "name": "GableRidgeCap",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      0.8,
+                      0.8,
+                      21.5
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
                           0,
-                          34,
+                          41.2,
+                          -20.75
+                        ],
+                        "orientation": [
+                          [
+                            -1,
+                            0,
+                            0
+                          ],
+                          [
+                            0,
+                            1,
+                            0
+                          ],
+                          [
+                            0,
+                            0,
+                            -1
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        78,
+                        82,
+                        86
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "SmoothPlastic",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth",
+                    "CanCollide": false,
+                    "CanTouch": false,
+                    "CanQuery": false
+                  }
+                },
+                {
+                  "name": "GableVent",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      0.3,
+                      2.6,
+                      2.6
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          0,
+                          35,
                           -8.85
                         ],
                         "orientation": [
@@ -15113,14 +16404,14 @@
                   "properties": {
                     "Size": [
                       0.3,
-                      1.6,
-                      1.6
+                      2,
+                      2
                     ],
                     "CFrame": {
                       "CFrame": {
                         "position": [
                           0,
-                          34,
+                          35,
                           -8.75
                         ],
                         "orientation": [
@@ -15154,6 +16445,162 @@
                     "TopSurface": "Smooth",
                     "BottomSurface": "Smooth",
                     "Shape": "Cylinder",
+                    "CanCollide": false,
+                    "CanTouch": false,
+                    "CanQuery": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Chimney",
+              "className": "Model",
+              "children": [
+                {
+                  "name": "ChimneyStack",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      4,
+                      19,
+                      4
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          17,
+                          40.5,
+                          -60
+                        ],
+                        "orientation": [
+                          [
+                            1,
+                            0,
+                            0
+                          ],
+                          [
+                            0,
+                            1,
+                            0
+                          ],
+                          [
+                            0,
+                            0,
+                            1
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        238,
+                        235,
+                        228
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "Brick",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth"
+                  }
+                },
+                {
+                  "name": "ChimneyCap",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      4.8,
+                      0.6,
+                      4.8
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          17,
+                          50.3,
+                          -60
+                        ],
+                        "orientation": [
+                          [
+                            1,
+                            0,
+                            0
+                          ],
+                          [
+                            0,
+                            1,
+                            0
+                          ],
+                          [
+                            0,
+                            0,
+                            1
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        122,
+                        126,
+                        130
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "SmoothPlastic",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth",
+                    "CanCollide": false,
+                    "CanTouch": false,
+                    "CanQuery": false
+                  }
+                },
+                {
+                  "name": "ChimneyHole",
+                  "className": "Part",
+                  "properties": {
+                    "Size": [
+                      3,
+                      0.1,
+                      3
+                    ],
+                    "CFrame": {
+                      "CFrame": {
+                        "position": [
+                          17,
+                          50.62,
+                          -60
+                        ],
+                        "orientation": [
+                          [
+                            1,
+                            0,
+                            0
+                          ],
+                          [
+                            0,
+                            1,
+                            0
+                          ],
+                          [
+                            0,
+                            0,
+                            1
+                          ]
+                        ]
+                      }
+                    },
+                    "Color": {
+                      "Color3uint8": [
+                        44,
+                        50,
+                        58
+                      ]
+                    },
+                    "Anchored": true,
+                    "Material": "SmoothPlastic",
+                    "TopSurface": "Smooth",
+                    "BottomSurface": "Smooth",
                     "CanCollide": false,
                     "CanTouch": false,
                     "CanQuery": false
@@ -15211,7 +16658,159 @@
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth"
-      }
+      },
+      "children": [
+        {
+          "name": "RailLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              48
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -30.2,
+                  19.5,
+                  -42
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              48
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -25.8,
+                  19.5,
+                  -42
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.8,
+              3,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -28,
+                  19.5,
+                  -17.8
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
     },
     {
       "name": "Collector2",
@@ -15259,7 +16858,159 @@
         "Material": "SmoothPlastic",
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth"
-      }
+      },
+      "children": [
+        {
+          "name": "RailLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              6.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -31.2,
+                  19.5,
+                  -69.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              3,
+              6.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -24.8,
+                  19.5,
+                  -69.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6.8,
+              3,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -28,
+                  19.5,
+                  -72.2
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                163,
+                162,
+                165
+              ]
+            },
+            "Anchored": true,
+            "Material": "Metal",
+            "CanTouch": false,
+            "CanQuery": false,
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
     },
     {
       "name": "DropperSpot5",

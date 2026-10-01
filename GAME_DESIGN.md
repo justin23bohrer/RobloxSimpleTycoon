@@ -96,8 +96,10 @@ buttons appear there one at a time after Dropper 4.
   come up (railed), the **second story of the house** (more off-white brick
   walls with gray corner posts and windows: two plain ones, an arched one
   above the doorway, and a wide one on the front), and a **gray shingle
-  roof** (a gable roof with a small pointed front gable and round vent above
-  the arched window). Under the roof there is a
+  roof**: a hip roof that slopes down on all four sides to eaves overhanging
+  the walls, with a ridge on top, darker ridge and hip caps, a soffit and
+  fascia under the eaves, a pointed brick front gable with gray rake trim
+  and a round vent above the arched window, and a brick chimney at the back. Under the roof there is a
   **second conveyor** on the **same (left) side** as the first one, directly
   above it, moving the same way (front → back) into a second collector.
   Droppers 5–8 sit above it, with their red buttons just right of it, like
@@ -109,6 +111,13 @@ buttons appear there one at a time after Dropper 4.
   bought.
 
 ## Droppers
+
+A bought dropper looks like an **upside-down red party cup** (red with
+darker ridges, a rolled lip, and a white inside you can see from below);
+cookies fall out of its open end onto the conveyor. Both conveyors and
+their collectors have gray metal **guard rails** (2 studs above the belt)
+on the sides, a stop at the front end of each conveyor, and a stop behind
+each collector, so cookies can't fall off.
 
 - Each bought dropper drops one physical **cookie** worth its value every
   **2 seconds** (`Config.DropInterval`, shared by all droppers). A cookie is
@@ -192,7 +201,7 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `BuildButton1`–`3` | x 16, y 2.2, z −26 / −34 / −42 (right side of floor 1) |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
-| `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (`RoofFront`/`RoofBack` wedges from y 31 to the ridge at y 45, 1-stud overhang, `Ridge`, `Fascia*`, and the `FrontGable`). **Generated** by `tools/house/generate_house.py`. |
+| `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
 | `Conveyor2` | (−28, 18.5, −42), 4 × 1 × 48, above `Conveyor` |
 | `Collector2` | (−28, 18.5, −69), above `Collector` |
 | `DropperSpot5`–`8` | x −28, y 24, z −22 / −30 / −38 / −46 |
@@ -214,7 +223,7 @@ as an outline:
 | `DropperSpot1`–`8` | Transparent yellow blocks above the conveyor where each dropper goes. |
 | `BuildButton1`–`3` | Round orange pads (`255,140,0`, ring `140,70,0`, sign panel orange) on the right side of floor 1. Build the walls, stairs, and 2nd floor. |
 | `Walls`, `Stairs`, `SecondFloor` | Models that appear when built. House walls off-white `Brick` `238,235,228`; trim, window frames, and hole railings gray `122,126,130`; window glass `44,50,58`; roof `Slate` `96,100,104`; steps cream `245,225,190`; 2nd floor `200,200,200` like `Base`. Trim and windows are looks only (`CanCollide`/`CanTouch`/`CanQuery` off). |
-| `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). |
+| `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). Each has `RailLeft`/`RailRight`/`RailFront` children: gray `Metal` guard rails, 0.4 thick, from the floor to 2 studs above the belt (`CanTouch`/`CanQuery` off). The collectors have `RailLeft`/`RailRight`/`RailBack`. |
 | `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
 | `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime. |

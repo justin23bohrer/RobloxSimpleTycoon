@@ -2,8 +2,9 @@
 -- Runs droppers: creates physical drops on an interval and moves them along
 -- the plot's conveyor toward its Collector.
 --
--- * Start(plot, dropperId) places a plain part named dropperId at the plot's
---   DropperSpotN (N = the dropper's position in Config.Droppers), sets the
+-- * Start(plot, dropperId) places an upside-down red cup (DropperCup) named
+--   dropperId at the plot's DropperSpotN (N = the dropper's position in
+--   Config.Droppers); drops fall out of the cup's open end. It sets the
 --   dropper's conveyor (its Config Conveyor, e.g. "Conveyor" or "Conveyor2")
 --   moving toward that conveyor's collector (CollectorFor: "Collector",
 --   "Collector2"),
@@ -27,6 +28,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local DropperCup = require(script.Parent.DropperCup)
 
 local DropperService = {}
 
@@ -46,12 +48,11 @@ local CHIP_SPOTS = {
 	Vector2.new(0.05, -0.35),
 	Vector2.new(-0.35, -0.15),
 }
-local DROPPER_COLOR = Color3.fromRGB(120, 120, 120)
-local DROP_GAP = 0.1 -- studs between the dropper's bottom and a new drop
+local DROP_GAP = 0.1 -- studs between the cup's rim and a new drop
 
 type PlotRun = {
 	Drops: Folder,
-	Droppers: { [string]: BasePart }, -- dropperId -> placed Dropper part
+	Droppers: { [string]: Model }, -- dropperId -> placed dropper cup
 	ConveyorOf: { [string]: string }, -- dropperId -> name of its conveyor
 }
 
@@ -138,8 +139,9 @@ local function addChips(drop: BasePart)
 	end
 end
 
-local function spawnDrop(plot: Model, run: PlotRun, dropper: BasePart, value: number)
-	local offsetY = dropper.Size.Y / 2 + COOKIE_THICKNESS / 2 + DROP_GAP
+-- rim: the center of the cup's open end (see DropperCup.Build).
+local function spawnDrop(plot: Model, run: PlotRun, rim: CFrame, value: number)
+	local offsetY = COOKIE_THICKNESS / 2 + DROP_GAP
 
 	local drop = Instance.new("Part")
 	drop.Name = "Drop"
@@ -148,7 +150,7 @@ local function spawnDrop(plot: Model, run: PlotRun, dropper: BasePart, value: nu
 	drop.Color = DROP_COLOR
 	drop.Material = Enum.Material.SmoothPlastic
 	drop.Anchored = false
-	drop.CFrame = dropper.CFrame * CFrame.new(0, -offsetY, 0) * FLAT
+	drop.CFrame = rim * CFrame.new(0, -offsetY, 0) * FLAT
 	addChips(drop)
 
 	dropValues[drop] = value
@@ -209,12 +211,7 @@ function DropperService.Start(plot: Model, dropperId: string)
 	end
 	local plotRun = run :: PlotRun
 
-	local dropper = Instance.new("Part")
-	dropper.Name = dropperId -- "Dropper1", "Dropper2", ...
-	dropper.Size = spot.Size
-	dropper.CFrame = spot.CFrame
-	dropper.Color = DROPPER_COLOR
-	dropper.Anchored = true
+	local dropper, rim = DropperCup.Build(spot, dropperId) -- named "Dropper1", "Dropper2", ...
 	dropper.Parent = plot
 	plotRun.Droppers[dropperId] = dropper
 	plotRun.ConveyorOf[dropperId] = entry.Conveyor
@@ -229,7 +226,7 @@ function DropperService.Start(plot: Model, dropperId: string)
 			if runningByPlot[plot] ~= plotRun or plotRun.Droppers[dropperId] ~= dropper then
 				return
 			end
-			spawnDrop(plot, plotRun, dropper, value)
+			spawnDrop(plot, plotRun, rim, value)
 		end
 	end)
 end
