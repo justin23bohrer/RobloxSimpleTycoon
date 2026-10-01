@@ -20,6 +20,7 @@ local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
+local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
 local FeedPromptUI = require(script.Parent.FeedPromptUI)
 
@@ -32,7 +33,6 @@ local padFolder = statue:WaitForChild("FeedPads")
 local cookies = player:WaitForChild("leaderstats"):WaitForChild("Cookies") :: IntValue
 
 local NAME = Config.StatueName
-local MAX = Config.StatueMaxCookies
 local CLOSE_DISTANCE = Config.StatueFeedRange + 2 -- walk this far from the pad and it closes
 local OPEN_DISTANCE = 3.5 -- pads are 6 studs wide: standing anywhere on one opens it
 local LEAVE_DISTANCE = 4 -- after closing, step this far off before it opens again
@@ -62,8 +62,20 @@ local function formatNumber(amount: number): string
 end
 
 local function eaten(): number
-	local value = statue:GetAttribute("CookiesEaten")
+	local value = statue:GetAttribute(CalebEvent.Attr.CookiesEaten)
 	return if typeof(value) == "number" then value else 0
+end
+
+-- This cycle's goal, published by the server (CalebCycle), or the contract
+-- default before it is set (also covers Config.DevCalebFastCycle).
+local function maxCookies(): number
+	local value = statue:GetAttribute(CalebEvent.Attr.MaxCookies)
+	return if typeof(value) == "number" and value > 0 then value else CalebEvent.MaxCookies()
+end
+
+-- Caleb only eats in the Normal state (the server enforces this too).
+local function isFull(): boolean
+	return CalebEvent.GetState(statue) ~= CalebEvent.State.Normal or eaten() >= maxCookies()
 end
 
 local function showMessage(text: string, isError: boolean)
@@ -75,9 +87,9 @@ local function typedAmount(): number
 	return tonumber(ui.AmountBox.Text) or 0
 end
 
--- Fills the bar to exactly cookies / MAX of its width.
+-- Fills the bar to exactly cookies / goal of its width.
 local function setBar(bar: Frame, cookieCount: number)
-	local fraction = math.clamp(cookieCount / MAX, 0, 1)
+	local fraction = math.clamp(cookieCount / maxCookies(), 0, 1)
 	if cookieCount > 0 then
 		fraction = math.max(fraction, MIN_VISIBLE_BAR)
 	end
@@ -86,27 +98,29 @@ end
 
 -- "0.13%"
 local function percent(cookieCount: number): string
-	local value = math.clamp(cookieCount / MAX, 0, 1) * 100
+	local value = math.clamp(cookieCount / maxCookies(), 0, 1) * 100
 	return if value >= 10 then string.format("%.1f%%", value) else string.format("%.2f%%", value)
 end
 
 -- Updates the text and the bar. The bar is exact: cookies eaten out of
--- MAX (the full bar). A lighter "preview" part shows exactly where it will be
+-- the goal (the full bar). A lighter "preview" part shows exactly where it will be
 -- after feeding the amount in the box (red if you can't afford it).
 local function refresh()
 	local total = eaten()
 	local typed = typedAmount()
-	local pending = math.min(typed, math.max(MAX - total, 0))
+	local max = maxCookies()
+	local full = isFull()
+	local pending = if full then 0 else math.min(typed, math.max(max - total, 0))
 
-	if total >= MAX then
+	if full then
 		ui.Title.Text = `{NAME} is FULL!`
-		ui.Progress.Text = `He ate all {formatNumber(MAX)} cookies!`
+		ui.Progress.Text = `He ate all {formatNumber(max)} cookies!`
 	else
 		ui.Title.Text = `How many cookies do you want to feed {NAME}?`
 		local suffix = if pending > 0
 			then `  +{formatNumber(pending)} = {percent(total + pending)}`
 			else `  ({percent(total)})`
-		ui.Progress.Text = `{NAME} has eaten {formatNumber(total)} / {formatNumber(MAX)}{suffix}`
+		ui.Progress.Text = `{NAME} has eaten {formatNumber(total)} / {formatNumber(max)}{suffix}`
 	end
 
 	setBar(ui.ProgressFill, total)
@@ -239,7 +253,7 @@ for text, quickButton in ui.QuickButtons do
 	quickButton.Activated:Connect(function()
 		local amount
 		if text == "ALL" then
-			amount = math.min(cookies.Value, math.max(MAX - eaten(), 0))
+			amount = math.min(cookies.Value, if isFull() then 0 else math.max(maxCookies() - eaten(), 0))
 		else
 			amount = math.min(typedAmount() + QUICK_AMOUNTS[text], MAX_AMOUNT)
 		end
@@ -256,5 +270,7 @@ ui.AmountBox.FocusLost:Connect(function(enterPressed)
 end)
 
 -- Keep the numbers live while it's open (other players feed Caleb too).
-statue:GetAttributeChangedSignal("CookiesEaten"):Connect(refresh)
+statue:GetAttributeChangedSignal(CalebEvent.Attr.CookiesEaten):Connect(refresh)
+statue:GetAttributeChangedSignal(CalebEvent.Attr.MaxCookies):Connect(refresh)
+statue:GetAttributeChangedSignal(CalebEvent.Attr.State):Connect(refresh)
 cookies.Changed:Connect(refresh)
