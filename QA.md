@@ -81,6 +81,25 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD20 | Open the pop-up; pick a small amount (10), a medium one (100,000), and feed until the bar is full. Check up close and on a phone (Device emulator). | The cookie-colored fill and the lighter preview always stay inside the white track with a thin white gap; they never touch or cover the dark outline, and the rounded ends stay clean. | |
 | FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
 
+## Caleb growth and animations
+
+Tip: set `DevCalebFastCycle = true` in Studio (goal 1,000 cookies; Full 3 s,
+Celebration 20 s, TrophyClaim 30 s) and `DevUnlimitedCash = true`. Set both
+back before committing. Feed amounts below are for the 1,000 goal.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CG1 | Press Play; look at Caleb (0 fed). | Normal size, thin, feet on the pedestal; nothing floating or sunk into the pedestal. | |
+| CG2 | Feed up to 250, 500, 750, 900, 990 total, looking at him from the same spot after each. | Every step is visibly bigger than the last (fatter first, then clearly taller/wider); feet always stay on the pedestal top; belly, cheeks, chin, chain, arms, and hair stay attached at every size. Each change is a bouncy grow. | |
+| CG3 | Feed the last 10 (to 1,000). | A visible final jump to max size (1.6×). Then the Full animation starts. | |
+| CG4 | Watch the Full state. | He waddles, leans back with arms out, belly bounces, puffs a white cloud from his mouth with a head jolt, settles. Looks funny, nothing detaches or flies off. | |
+| CG5 | Watch Celebration. | He dances the whole time: sway + hop per beat, arms alternate waving, head bobs, belly jiggles, a full spin every ~8 s. Only Caleb moves: pedestal, feed pads, podium stay put. No errors in Output. | |
+| CG6 | Wait for TrophyClaim. | Caleb's body is gone (invisible, can walk through where he was); the pedestal, the 4 feed pads, and the podium are still there. The cartoon outline doesn't draw a ghost of him. | |
+| CG7 | Wait for the reset (back to Normal). | Caleb is back, at his smallest, thin, in his normal pose, feet on the pedestal; not stuck in a dance pose. | |
+| CG8 | 2 players: Player 2 joins in the middle of Celebration. | Player 2 sees him dancing right away, at the same moment of the dance as Player 1 (spins line up). When it ends both see him stop in the normal pose. | |
+| CG9 | During Celebration, walk far away (until the statue streams out) and come back; also reset your character mid-dance. | He is dancing again when you come back; no part stays offset or frozen; one dance only (no double speed). | |
+| CG10 | Performance: in Normal and TrophyClaim, check the MicroProfiler / Script Performance for `CalebAnimator`. | No per-frame work outside Full/Celebration. | |
+
 ## Statue progress bar
 
 | ID | Test | Expected | Status |
