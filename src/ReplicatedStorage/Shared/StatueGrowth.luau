@@ -2,8 +2,8 @@
 -- How fat the statue is for a number of cookies eaten, from 0 (thin) to 1
 -- (maximum, at Config.StatueMaxCookies).
 --
--- StatueService uses it to shape the statue, and the feed pop-up uses it for
--- its progress bar, so the bar always matches what players see on the statue.
+-- StatueService uses it to shape the statue. (The feed pop-up's progress bar
+-- does not: it shows the exact cookies eaten out of the max.)
 -- It is a pure function: it reads Config and decides nothing.
 --
 -- Growth follows log(eaten) so small feeds still show: 100 cookies is about

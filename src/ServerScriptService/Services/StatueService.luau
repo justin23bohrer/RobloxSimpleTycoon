@@ -13,8 +13,8 @@
 --   clients can show it. Caleb stops eating at Config.StatueMaxCookies; a
 --   bigger feed only spends what he still has room for.
 -- * The more he has eaten, the fatter he gets (StatueShape). How fat comes
---   from Shared/StatueGrowth (log scale), which the feed pop-up's progress
---   bar also uses, so the bar matches the statue.
+--   from Shared/StatueGrowth (log scale). The feed pop-up's progress bar is
+--   exact (cookies eaten / max) instead.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
