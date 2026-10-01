@@ -44,6 +44,15 @@ Record the date and result when you run a case.
 | LY3 | Buy Dropper 1, then 2–4 (Server cash 4300). | Each button appears just right of the conveyor next to its yellow spot. Drops land on the conveyor and ride it **toward the back** into the collector (none fall off the sides); stored cash rises. | |
 | LY4 | Collect at the back wall. | The tank fills with cubes as drops arrive at the collector; stepping on the Collect pad pays out as before. | |
 
+## Statue
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| ST1 | Press Play; after spawning, turn the camera around (away from the plot). | A giant cartoon statue (~2 stories) on a stone pedestal stands behind the spawn, facing you, on the grass. | |
+| ST2 | Look at the statue's face and outfit. | Big round head, shaggy dark-brown hair with fringe over the forehead and ears, big white eyes with tiny pupils, brows, small nose, wide grin with white teeth; dark navy long-sleeve shirt, gold chain, one hand on the hip; gray pants, white sneakers. A black cartoon outline around the whole statue. Nothing is floating or misaligned. | |
+| ST3 | Walk into and jump on the statue/pedestal. | It's solid and doesn't move; nothing happens to cash or the plot. No errors in Output. | |
+| ST4 | Walk around near the statue and look at it from the plot. | No noticeable lag. | |
+
 ## Purchase
 
 | ID | Test | Expected | Status |
