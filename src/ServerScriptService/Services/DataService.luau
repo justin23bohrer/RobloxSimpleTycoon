@@ -165,8 +165,8 @@ local function load(player: Player): (DataSchema.PlayerData?, string?)
 					return nil
 				end
 				outcome, loaded, reason = "ok", data, nil
-				return toStored(data, SERVER_ID)
-			end, { player.UserId })
+				return toStored(data, SERVER_ID), { player.UserId }
+			end)
 		end)
 		if not ok then
 			return nil, err
@@ -204,8 +204,8 @@ local function saveNow(player: Player, session: Session, release: boolean)
 				return nil -- another server has newer data; never overwrite it
 			end
 			outcome = "ok"
-			return toStored(session.Data :: DataSchema.PlayerData, if release then nil else SERVER_ID)
-		end, { player.UserId })
+			return toStored(session.Data :: DataSchema.PlayerData, if release then nil else SERVER_ID), { player.UserId }
+		end)
 	end)
 
 	if ok and outcome == "ok" then

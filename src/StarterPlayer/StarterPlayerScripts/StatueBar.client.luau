@@ -21,7 +21,7 @@ local Workspace = game:GetService("Workspace")
 
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
-local FeedPromptUI = require(script.Parent.FeedPromptUI)
+local FeedPromptUI = require(script.Parent:WaitForChild("FeedPromptUI"))
 
 local player = Players.LocalPlayer
 local statue = Workspace:WaitForChild("Map"):WaitForChild("Statue")

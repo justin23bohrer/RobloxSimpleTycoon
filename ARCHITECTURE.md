@@ -190,6 +190,12 @@ triggering, which the server validates).
 
 | `StarterPlayerScripts/TrophyPrompt.client.luau` | Watches `Workspace.Map` for `CalebClaimTrophy` (and its descendants, for streaming) and sets its `ProximityPrompt.Enabled` **locally** to whether this player is eligible (`CalebFed > 0` and not `CalebTrophyClaimed`), updating on those attributes; the server re-checks every claim. On `CalebTrophyNotice` changes, shows a `StarterGui:SetCore("SendNotification")` with the result: the variant's name + rarity (saved, or "couldn't be saved"), "already have this round's trophy", or "only players who fed Caleb this round". No remotes. |
 
+**Client requires:** LocalScripts in `StarterPlayerScripts` start running
+while the folder is still being copied into the player, so a sibling
+ModuleScript may not exist yet. Always require siblings with
+`require(script.Parent:WaitForChild("Name"))`, never `script.Parent.Name`
+(that raced and broke CalebAnimator, CookieRain, and CalebEventUI on join).
+
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
 that are purely visual stay in the script; gameplay numbers stay in `Config`.
