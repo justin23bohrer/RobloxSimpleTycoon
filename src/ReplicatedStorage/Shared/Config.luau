@@ -92,6 +92,52 @@ local Config = {
 	StatueBarSize = Vector2.new(300, 80),
 	StatueBarMaxDistance = 500,
 
+	-- Caleb Full Event (see Shared/CalebEvent.luau and ARCHITECTURE.md).
+	-- When the shared total reaches StatueMaxCookies: Full (his "I'm full"
+	-- animation) -> Celebration (dance, cookie rain) -> TrophyClaim (Caleb
+	-- hidden, contributors claim a trophy) -> reset to 0 and a new cycle.
+	CalebFullSeconds = 5,
+	CalebCelebrationSeconds = 115, -- 0:05 -> 2:00
+	CalebTrophyClaimSeconds = 300, -- 2:00 -> 7:00
+	-- Caleb's overall size: MinScale at 0 cookies, MaxScale at the goal,
+	-- smooth in between (on top of the existing fatness). Scaled around the
+	-- top of the pedestal, so his feet stay on it. Seconds = growth tween.
+	CalebMinScale = 1,
+	CalebMaxScale = 1.6,
+	CalebGrowSeconds = 1.2,
+	-- Podium "CALEB'S TOP FEEDERS" board: how many rows, and the fewest
+	-- seconds between leaderboard updates (feeds in between are batched).
+	CalebLeaderboardSize = 10,
+	CalebLeaderboardInterval = 1,
+	-- Cookie rain (client only, visual): most falling cookies alive at once
+	-- per client, and the radius (studs, around the statue) they fall in.
+	CookieRainMaxCookies = 120,
+	CookieRainRadius = 150,
+	-- Sound effects (client only). Each is a Roblox audio asset id string
+	-- ("rbxassetid://123..."). Empty = that sound is skipped. See
+	-- tools/audio/ for the original effects to upload. Music comes later.
+	CalebSounds = table.freeze({
+		Full = "",
+		CelebrationStart = "",
+		Grow = "",
+		CookieRain = "",
+		TrophyClaim = "",
+		EventEnd = "",
+	}),
+
+	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
+	DataStoreName = "SimpleTycoon_v1",
+	-- Seconds between autosaves of each player's data.
+	DataAutosaveSeconds = 120,
+	-- Trophy Case (a build in every house): how many trophies it shows.
+	TrophyCaseSlots = 5,
+
+	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
+	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 20 s, TrophyClaim
+	-- 30 s (see CalebEvent.Duration). Keep this false in commits.
+	DevCalebFastCycle = false,
+	DevCalebFastMaxCookies = 1_000,
+
 	-- TESTING ONLY. When true, players start with DevStartingCash instead of
 	-- StartingCash, but only inside Roblox Studio (RunService:IsStudio()). It
 	-- never applies in a published game. Keep this false in commits.
