@@ -84,9 +84,9 @@ local function onNotice()
 	local name = if typeof(notice.Variant) == "string" then TrophyVariants.Get(notice.Variant).DisplayName else "Caleb Trophy"
 	local rarity = if typeof(notice.Variant) == "string" then TrophyVariants.Get(notice.Variant).Rarity else ""
 	if notice.Kind == "Saved" then
-		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! Show it off in your house's Trophy Case.`)
+		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! Equipped trophies in a built Trophy Case give their powers.`)
 	elseif notice.Kind == "Unsaved" then
-		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! It couldn't be saved, so it's only in your Trophy Case until you leave this server.`)
+		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! It couldn't be saved, so you only have it until you leave this server.`)
 	elseif notice.Kind == "AlreadyOwned" then
 		notify("Caleb Trophy", "You already have this round's trophy.")
 	elseif notice.Kind == "NotEligible" then
