@@ -85,12 +85,19 @@ server refuses to sell anything out of order (`After` in `Config`).
 The right side of the first floor is the **build area**: three orange build
 buttons appear there one at a time after Dropper 4.
 
-- **Walls:** gingerbread-brown walls, 15 studs high, around the edge of the
-  plot, with a 16-stud doorway in the middle of the front wall.
+- **Walls:** the first floor of a two-story house: off-white brick walls,
+  15 studs high, around the edge of the plot, with gray trim (corner posts,
+  a base strip, a band along the top) and dark windows with gray frames,
+  grilles, and sills. The front has a gray-framed, garage-style doorway
+  (16 wide, 11 high) in the middle.
 - **Stairs:** 16 cream steps along the right wall, climbing from the front
   (z −20) to the back (z −52), ending level with the top of the walls.
-- **2nd Floor:** a floor on top of the walls (the roof) with a hole where the
-  stairs come up, a railing around the edge and around the stair hole, and a
+- **2nd Floor:** a floor on top of the walls with a hole where the stairs
+  come up (railed), the **second story of the house** (more off-white brick
+  walls with gray corner posts and windows: two plain ones, an arched one
+  above the doorway, and a wide one on the front), and a **gray shingle
+  roof** (a gable roof with a small pointed front gable and round vent above
+  the arched window). Under the roof there is a
   **second conveyor** on the **same (left) side** as the first one, directly
   above it, moving the same way (front → back) into a second collector.
   Droppers 5–8 sit above it, with their red buttons just right of it, like
@@ -166,11 +173,11 @@ First floor (walls shown with `█`; they appear once built):
                       ( Spawn )
 ```
 
-Second floor (on the roof, top at y = 18): the same left-side layout,
-directly above floor 1 — `Conveyor2` with `DropperSpot5`–`8` over it, red
-`BuyButton5`–`8` just right of it, `Collector2` at the back-left — plus the
-railed hole where the stairs arrive (back-right) and a railing around the
-edge.
+Second floor (floor at y = 18, walls up to y = 31, roof ridge at y = 45):
+the same left-side layout, directly above floor 1 — `Conveyor2` with
+`DropperSpot5`–`8` over it, red `BuyButton5`–`8` just right of it,
+`Collector2` at the back-left — plus the railed hole where the stairs arrive
+(back-right).
 
 | Part | Position (center) |
 | ---- | ----------------- |
@@ -183,9 +190,9 @@ edge.
 | `ClaimPad` | (0, 2.2, −15), front center |
 | `OwnerSign` | (23, 5, −12), front-right corner |
 | `BuildButton1`–`3` | x 16, y 2.2, z −26 / −34 / −42 (right side of floor 1) |
-| `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8); 1 thick, y 2..17 |
+| `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
-| `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `Rail*` 3-high railings on the edge and `HoleRailSide`/`HoleRailFront` around the hole |
+| `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (`RoofFront`/`RoofBack` wedges from y 31 to the ridge at y 45, 1-stud overhang, `Ridge`, `Fascia*`, and the `FrontGable`). **Generated** by `tools/house/generate_house.py`. |
 | `Conveyor2` | (−28, 18.5, −42), 4 × 1 × 48, above `Conveyor` |
 | `Collector2` | (−28, 18.5, −69), above `Collector` |
 | `DropperSpot5`–`8` | x −28, y 24, z −22 / −30 / −38 / −46 |
@@ -206,7 +213,7 @@ as an outline:
 | `BuyButton1`–`8`   | Round red pads with dark red rings, in a line just right of their floor's conveyor, each next to its dropper spot. Buy droppers 1–8 (5–8 on the 2nd floor). |
 | `DropperSpot1`–`8` | Transparent yellow blocks above the conveyor where each dropper goes. |
 | `BuildButton1`–`3` | Round orange pads (`255,140,0`, ring `140,70,0`, sign panel orange) on the right side of floor 1. Build the walls, stairs, and 2nd floor. |
-| `Walls`, `Stairs`, `SecondFloor` | Models that appear when built. Walls and railings gingerbread `196,128,72`, steps cream `245,225,190`, 2nd floor `200,200,200` like `Base`. |
+| `Walls`, `Stairs`, `SecondFloor` | Models that appear when built. House walls off-white `Brick` `238,235,228`; trim, window frames, and hole railings gray `122,126,130`; window glass `44,50,58`; roof `Slate` `96,100,104`; steps cream `245,225,190`; 2nd floor `200,200,200` like `Base`. Trim and windows are looks only (`CanCollide`/`CanTouch`/`CanQuery` off). |
 | `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). |
 | `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
