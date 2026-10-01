@@ -8,6 +8,8 @@
 --   builds, see Purchases). Each one unlocks only after the purchase named in
 --   its Config After field: Dropper1-4 -> Walls -> Stairs -> SecondFloor ->
 --   Dropper5-8.
+-- * Restores a player's saved purchases (DataService) when they claim a plot,
+--   in unlock order, without charging cookies, and records new purchases.
 -- * Tells PlotStages what to show: only the ClaimPad while unclaimed, then the
 --   collect area and the first buy button, then the next button(s) and any
 --   built parts after each purchase.
@@ -23,6 +25,7 @@ local Workspace = game:GetService("Workspace")
 local Config = require(ReplicatedStorage.Shared.Config)
 local BuyButtons = require(script.Parent.BuyButtons)
 local CollectorService = require(script.Parent.CollectorService)
+local DataService = require(script.Parent.DataService)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 local PlotStages = require(script.Parent.PlotStages)
@@ -40,6 +43,8 @@ export type Tycoon = {
 	-- Add new upgrades as new ids; the service that runs the upgrade keeps its
 	-- own runtime state keyed by plot.
 	Purchased: { [string]: boolean },
+	-- True while saved purchases are being restored; buying waits for it.
+	Restoring: boolean,
 }
 
 -- Parts every plot model must contain (see src/Workspace/Map/Plots), plus
@@ -179,11 +184,13 @@ function TycoonService.TryClaimPlot(player: Player, plot: Model): boolean
 		Plot = plot,
 		Owner = player,
 		Purchased = {},
+		Restoring = true,
 	}
 	ownerByPlot[plot] = player
 	plot:SetAttribute("OwnerUserId", player.UserId)
 	setOwnerSign(plot, `{player.DisplayName}'s Tycoon`)
 	PlotStages.ShowClaimed(plot)
+	task.spawn(TycoonService.RestorePurchases, player)
 	return true
 end
 
@@ -216,6 +223,50 @@ function TycoonService.HasPurchased(player: Player, purchaseId: string): boolean
 	return tycoon ~= nil and tycoon.Purchased[purchaseId] == true
 end
 
+-- Marks a purchase as bought on the tycoon's plot: shows what it builds and
+-- unlocks, and starts a dropper. Charges nothing; callers decide that.
+local function applyPurchase(tycoon: Tycoon, purchase: Purchases.Purchase)
+	tycoon.Purchased[purchase.Id] = true
+	PlotStages.ShowAfterPurchase(tycoon.Plot, purchase.Id)
+	if purchase.Kind == "Dropper" then
+		DropperService.Start(tycoon.Plot, purchase.Id)
+	end
+end
+
+-- Rebuilds the player's saved house on the plot they just claimed (called by
+-- TryClaimPlot). Waits for DataService to load, then applies each saved
+-- purchase in unlock order (walking the After chain from the first buttons),
+-- so every purchase's After is in place before it. Free: no cookies spent.
+-- Saved ids that are no longer purchases, or whose After was not saved, are
+-- skipped. If the data did not load, the plot just starts fresh.
+function TycoonService.RestorePurchases(player: Player)
+	local tycoon = tycoonsByPlayer[player]
+	if not tycoon or not tycoon.Restoring then
+		return
+	end
+	local loaded = DataService.WaitForData(player)
+	if tycoonsByPlayer[player] ~= tycoon then
+		return -- left (plot already reset) while loading
+	end
+
+	if loaded then
+		local saved = DataService.GetPurchases(player)
+		local queue = table.clone(Purchases.UnlockedBy(nil))
+		local i = 1
+		while i <= #queue do
+			local purchase = queue[i]
+			i += 1
+			if saved[purchase.Id] and not tycoon.Purchased[purchase.Id] then
+				applyPurchase(tycoon, purchase)
+				for _, unlocked in Purchases.UnlockedBy(purchase.Id) do
+					table.insert(queue, unlocked)
+				end
+			end
+		end
+	end
+	tycoon.Restoring = false
+end
+
 -- Buys one purchase (a Config.Droppers or Config.Builds Id) for the player's
 -- own plot. Returns true on success. Called when the owner touches its button.
 -- A purchase can only be bought after the one named in its After field; the
@@ -225,6 +276,9 @@ function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 	local tycoon = tycoonsByPlayer[player]
 	if not tycoon or typeof(purchaseId) ~= "string" then
 		return false -- player has no plot, or a bad id
+	end
+	if tycoon.Restoring then
+		return false -- saved house not restored yet; never charge for owned items
 	end
 	local purchase = Purchases.Get(purchaseId)
 	if not purchase then
@@ -242,11 +296,8 @@ function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 		return false -- cannot afford it; cash unchanged
 	end
 
-	tycoon.Purchased[purchaseId] = true
-	PlotStages.ShowAfterPurchase(tycoon.Plot, purchaseId)
-	if purchase.Kind == "Dropper" then
-		DropperService.Start(tycoon.Plot, purchaseId)
-	end
+	applyPurchase(tycoon, purchase)
+	DataService.SetPurchased(player, purchaseId)
 	return true
 end
 

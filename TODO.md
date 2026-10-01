@@ -65,7 +65,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [ ] Cookie rain (client, pooled).
 - [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
 - [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
-- [ ] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01).
+- [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.
 - [ ] Celebration music (ask the user for a track).
 

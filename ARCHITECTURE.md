@@ -16,6 +16,8 @@ src/
 │   ├── ServerMain.server.luau  → Script: entry point, starts services
 │   └── Services/
 │       ├── PlayerDataService.luau
+│       ├── DataService.luau    → saving: house purchases + trophies (DataStore)
+│       ├── DataSchema.luau     → helper for DataService (saved shape, cleaning, migration)
 │       ├── EconomyService.luau
 │       ├── TycoonService.luau
 │       ├── PlotStages.luau     → helper for TycoonService (what a plot shows at each stage)
@@ -94,15 +96,20 @@ reach the server.
 `ServerMain.server.luau` is the only server Script. It calls
 `TycoonService.Start()`, then routes join/leave in a fixed order:
 
-- Join: `PlayerDataService.OnPlayerAdded` (no plot yet; plots are claimed on
-  the `ClaimPad`, see TycoonService)
-- Leave: `TycoonService.OnPlayerRemoving` → `PlayerDataService.OnPlayerRemoving`
+- Join: `PlayerDataService.OnPlayerAdded` → `DataService.OnPlayerAdded`
+  (starts loading in the background; no plot yet; plots are claimed on the
+  `ClaimPad`, see TycoonService)
+- Leave: `TycoonService.OnPlayerRemoving` → `StatueService.OnPlayerRemoving`
+  → `PlayerDataService.OnPlayerRemoving` → `DataService.OnPlayerRemoving`
+  (saves and releases in the background; never yields)
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
+| `DataService` | Saves/loads each player's house purchases and Caleb trophies (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
+| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids and bad/duplicate trophies; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`). Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
 | `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds`: `Get(id)`, `All()`, `UnlockedBy(id?)`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
@@ -123,7 +130,8 @@ center; `ConveyorN` pairs with `CollectorN`), so the map can lay a conveyor
 out in any horizontal direction. Layout and positions are in `GAME_DESIGN.md` → Plot layout.
 
 Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purchases`, `DropperService`,
-`CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
+`CollectorService`, `EconomyService`, `DataService`. `DataService` → `DataSchema`, `Purchases`, `Config`
+(never `TycoonService`). `DataSchema` → `Purchases`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
 `BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
 `CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
@@ -205,6 +213,7 @@ type Tycoon = {
 	Plot: Model,                     -- Workspace.Map.Plots.PlotN
 	Owner: Player,
 	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper2 = true, Purchased.Walls = true
+	Restoring: boolean,               -- true until the saved house is restored; TryPurchase refuses meanwhile
 }
 ```
 
@@ -217,9 +226,73 @@ type Tycoon = {
 - **Active systems:** a purchase activates a system by calling its service
   (`DropperService.Start(plot, dropperId)`). Each system service keeps its own runtime
   state keyed by plot and must clean up in its stop/reset function.
-- **Lifetime:** data lasts for the session. On leave, systems stop, the plot
-  is released and reset. Respawning does not touch any of it (cash lives on
-  the Player, not the character).
+- **Lifetime:** the Tycoon lasts for the session. On leave, systems stop, the
+  plot is released and reset. Respawning does not touch any of it (cash lives
+  on the Player, not the character). The *purchase ids* are also saved by
+  `DataService` and restored on the next claim (see Persistence).
+
+## Persistence (DataService)
+
+Approved by the user 2026-10-01: the **house** (purchase ids) and **Caleb
+trophies** are saved. **Cookies are not saved** (every session starts at
+`StartingCash`).
+
+Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
+
+```lua
+{
+	Version = 1,                       -- DataSchema.CURRENT_VERSION
+	Purchases = { [purchaseId] = true },
+	Trophies = { TrophyRecord },       -- oldest first, one per EventId
+	SessionJobId = "<JobId>" | nil,    -- session lock (DataService only)
+	SessionTime = os.time(),           -- last write by the lock holder
+}
+```
+
+- **Loading** (on join, background): one `UpdateAsync` reads, cleans
+  (`DataSchema.FromStored`), and takes the session lock. Unknown purchase
+  ids and bad/duplicate trophy records are dropped; older `Version`s are
+  migrated step by step. A value that is not a table, or has a **newer**
+  `Version` than the server knows, is refused (not overwritten).
+- **Load failure** (all retries failed, refused data, Studio without API
+  access): the player is **not loaded** for the session: `IsLoaded` is
+  false, `GetPurchases`/`GetTrophies` return `{}`, `SetPurchased` is
+  ignored, `AddTrophy` returns false, and **nothing is ever written** for
+  them. A `warn` says so; gameplay works, unsaved.
+- **Retries:** every DataStore call is tried up to 5 times, waiting 1, 2, 4,
+  8 s.
+- **Session lock (chosen over a plain "last saved" stamp):** the record
+  holds the id of the server that has it open (`game.JobId`; a random id in
+  Studio). Every save is an `UpdateAsync` that writes only if the record
+  still carries this server's id, so a server that lost the lock can never
+  overwrite newer data. Leaving clears the id. A joining server that finds
+  another server's fresh lock (a fast server hop while the old server is
+  still saving) cancels, waits 5 s, and retries; after ~30 s it takes the
+  lock over (the old server's later saves are then refused). A lock older
+  than 30 min (crashed server) is taken over at once. Autosave rewrites
+  unchanged data every 10 min only to keep the lock fresh. A player who
+  rejoins the **same** server waits for their previous leave save first.
+  Why: a time stamp alone can't tell which server's data is newer when two
+  servers' clocks and write times interleave; a lock with a compare on
+  every write can.
+- **Saving:** `UpdateAsync` on leave (and release the lock), every
+  `Config.DataAutosaveSeconds` for players whose data changed, right after
+  `AddTrophy`, and in `game:BindToClose` (everyone in parallel; waits for
+  all loads/saves, at most 25 s). One write per player at a time.
+- **Studio without API access:** DataStore calls error; DataService detects
+  it, warns once ("Enable Studio Access to API Services to test saving"),
+  and runs everyone unsaved.
+- **Restoring the house:** `TycoonService.TryClaimPlot` spawns
+  `RestorePurchases(player)`: it waits for `DataService.WaitForData`, then
+  walks the unlock chain from the first buttons (`Purchases.UnlockedBy`)
+  and applies every saved purchase whose `After` is already applied, the
+  same way as a purchase (`PlotStages.ShowAfterPurchase` + `DropperService.Start`)
+  but without spending. Saved ids that no longer exist, or whose `After`
+  wasn't saved, are skipped. Until it finishes, `TryPurchase` refuses, so a
+  player is never charged for something they own.
+- **Trophies:** DataService only stores and returns them
+  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`); TrophyService (wave 2)
+  shows and awards them.
 
 ## Economy model
 
@@ -243,7 +316,9 @@ type Tycoon = {
   `TrySpend(entry.Cost)` succeeds (skipped when `Cost` is 0) → marks
   `Purchased[purchaseId]`, calls `PlotStages.ShowAfterPurchase` (hide that
   button, show a build's parts, show the next button), and for a dropper
-  calls `DropperService.Start(plot, purchaseId)`.
+  calls `DropperService.Start(plot, purchaseId)`, then records it with
+  `DataService.SetPurchased`. While the saved house is being restored after a
+  claim (`Restoring`), `TryPurchase` refuses.
   Touches from non-owners are ignored. On release the plot goes back to
   `ShowUnclaimed`.
 - Drop values are set by the server from the dropper's `Config.Droppers`
