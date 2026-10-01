@@ -7,6 +7,11 @@
 -- player is at a pad, and that they can afford it, then spends the cookies.
 -- This script only opens/closes the pop-up and shows the server's answer.
 -- The UI itself is built by FeedPromptUI.
+--
+-- It opens by checking every frame whether the character is standing on any
+-- pad that currently exists, not with Touched on the pads found at start.
+-- With content streaming on, the pads load after this script runs (and can
+-- unload/reload), so pads hooked up once at start never opened anything.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -29,6 +34,8 @@ local cookies = player:WaitForChild("leaderstats"):WaitForChild("Cookies") :: In
 local NAME = Config.StatueName
 local MAX = Config.StatueMaxCookies
 local CLOSE_DISTANCE = Config.StatueFeedRange + 2 -- walk this far from the pad and it closes
+local OPEN_DISTANCE = 3.5 -- pads are 6 studs wide: standing anywhere on one opens it
+local LEAVE_DISTANCE = 4 -- after closing, step this far off before it opens again
 local ERROR_COLOR = Color3.fromRGB(255, 120, 120)
 local OK_COLOR = Color3.fromRGB(255, 255, 255)
 local PREVIEW_COLOR = ui.ProgressPreview.BackgroundColor3
@@ -156,35 +163,41 @@ local function feed()
 	refresh()
 end
 
--- Opening on touch -----------------------------------------------------------
+-- Opening when standing on a pad ---------------------------------------------
 
-local function connectPad(pad: Instance)
-	if not pad:IsA("BasePart") then
-		return
+-- The pad the character is standing on right now, or nil. Only looks at pads
+-- that are loaded on this client at this moment (see the note at the top).
+local function padUnderPlayer(): BasePart?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if not root or not root:IsA("BasePart") then
+		return nil
 	end
-	pad.Touched:Connect(function(hit)
-		local character = player.Character
-		if ui.Gui.Enabled or not character or not hit:IsDescendantOf(character) then
-			return
+	for _, pad in padFolder:GetChildren() do
+		if pad:IsA("BasePart") then
+			local height = root.Position.Y - pad.Position.Y -- about 3 when standing on it
+			if distanceTo(pad) <= OPEN_DISTANCE and height > -1 and height < 6 then
+				return pad
+			end
 		end
-		if mustLeavePad == pad then
-			return -- just closed it here; step off first
-		end
-		open(pad)
-	end)
+	end
+	return nil
 end
 
-for _, pad in padFolder:GetChildren() do
-	connectPad(pad)
-end
-
--- Close when walking away; allow re-opening once off the pad.
 RunService.Heartbeat:Connect(function()
-	if currentPad and distanceTo(currentPad) > CLOSE_DISTANCE then
+	-- Close when walking away (or if the pad unloaded); allow re-opening once off the pad.
+	if currentPad and (not currentPad.Parent or distanceTo(currentPad) > CLOSE_DISTANCE) then
 		close()
 	end
-	if mustLeavePad and distanceTo(mustLeavePad) > 4 then
+	if mustLeavePad and (not mustLeavePad.Parent or distanceTo(mustLeavePad) > LEAVE_DISTANCE) then
 		mustLeavePad = nil
+	end
+
+	if not ui.Gui.Enabled then
+		local pad = padUnderPlayer()
+		if pad and pad ~= mustLeavePad then
+			open(pad)
+		end
 	end
 end)
 

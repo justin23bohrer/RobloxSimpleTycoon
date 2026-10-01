@@ -77,6 +77,7 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD15 | With Caleb at 0, click **10** once. | A lighter section appears in the bar, about 1/6 of the way (same curve as the statue). Each extra click grows it; clearing the box makes it slide back. | |
 | FD16 | Pick more than you have (e.g. 1K with 50 cookies). | The preview section turns red. FEED! still says "You don't have that many cookies!" from the server. | |
 | FD17 | Feed 100 cookies to a fresh Caleb. | The bar's filled part slides to about 1/3, the same amount Caleb visibly grew; feeding 10,000 total brings it to about 2/3. | |
+| FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
 
 ## Purchase
 
