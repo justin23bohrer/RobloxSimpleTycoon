@@ -14,6 +14,7 @@ local PANEL_COLOR = Color3.fromRGB(255, 214, 64) -- same yellow as the cookie co
 local OUTLINE_COLOR = Color3.fromRGB(40, 28, 20)
 local TEXT_COLOR = Color3.fromRGB(255, 255, 255)
 local COOKIE_COLOR = Color3.fromRGB(214, 160, 90)
+local PREVIEW_COLOR = Color3.fromRGB(255, 232, 180) -- lighter cookie: "after this feed"
 local FEED_COLOR = Color3.fromRGB(70, 200, 80)
 local CANCEL_COLOR = Color3.fromRGB(235, 70, 70)
 local QUICK_COLOR = Color3.fromRGB(255, 150, 40)
@@ -24,7 +25,8 @@ export type Parts = {
 	Scale: UIScale,
 	Title: TextLabel,
 	Progress: TextLabel,
-	ProgressFill: Frame,
+	ProgressFill: Frame, -- how fat Caleb is now
+	ProgressPreview: Frame, -- how fat he'd be after feeding the amount in the box
 	Have: TextLabel,
 	AmountBox: TextBox,
 	QuickButtons: { [string]: TextButton }, -- "10", "100", "1K", "ALL"
@@ -126,11 +128,22 @@ function FeedPromptUI.Build(parent: Instance): Parts
 	corner(track, UDim.new(0.5, 0))
 	stroke(track, 3, Enum.ApplyStrokeMode.Border)
 
+	-- Drawn under the fill, so only the part past the current fill shows.
+	local preview = Instance.new("Frame")
+	preview.Name = "Preview"
+	preview.Size = UDim2.fromScale(0, 1)
+	preview.BackgroundColor3 = PREVIEW_COLOR
+	preview.BorderSizePixel = 0
+	preview.ZIndex = 1
+	preview.Parent = track
+	corner(preview, UDim.new(0.5, 0))
+
 	local fill = Instance.new("Frame")
 	fill.Name = "Fill"
 	fill.Size = UDim2.fromScale(0, 1)
 	fill.BackgroundColor3 = COOKIE_COLOR
 	fill.BorderSizePixel = 0
+	fill.ZIndex = 2
 	fill.Parent = track
 	corner(fill, UDim.new(0.5, 0))
 
@@ -177,6 +190,7 @@ function FeedPromptUI.Build(parent: Instance): Parts
 		Title = title,
 		Progress = progress,
 		ProgressFill = fill,
+		ProgressPreview = preview,
 		Have = have,
 		AmountBox = box,
 		QuickButtons = quick,

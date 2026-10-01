@@ -12,14 +12,15 @@
 --   saving yet). It is mirrored into the statue's "CookiesEaten" attribute so
 --   clients can show it. Caleb stops eating at Config.StatueMaxCookies; a
 --   bigger feed only spends what he still has room for.
--- * The more he has eaten, the fatter he gets (StatueShape). Fatness grows
---   with log(eaten) so small feeds still show: 100 cookies is about 1/3 of
---   the way, 10,000 about 2/3, 1,000,000 is the maximum.
+-- * The more he has eaten, the fatter he gets (StatueShape). How fat comes
+--   from Shared/StatueGrowth (log scale), which the feed pop-up's progress
+--   bar also uses, so the bar matches the statue.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local StatueGrowth = require(ReplicatedStorage.Shared.StatueGrowth)
 local EconomyService = require(script.Parent.EconomyService)
 local StatueShape = require(script.Parent.StatueShape)
 
@@ -31,10 +32,6 @@ local statue: Model? = nil
 local pads: { BasePart } = {}
 local eaten = 0
 local lastFeed: { [Player]: number } = {}
-
-local function fatness(cookies: number): number
-	return math.clamp(math.log(1 + cookies) / math.log(1 + Config.StatueMaxCookies), 0, 1)
-end
 
 local function isNearPad(player: Player): boolean
 	local character = player.Character
@@ -89,7 +86,7 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 
 	eaten += cookies
 	statue:SetAttribute("CookiesEaten", eaten)
-	StatueShape.Apply(fatness(eaten), GROW_SECONDS)
+	StatueShape.Apply(StatueGrowth.Fatness(eaten), GROW_SECONDS)
 	if eaten >= Config.StatueMaxCookies then
 		setPadLabels(`{string.upper(Config.StatueName)} IS FULL!`)
 	end
