@@ -21344,14 +21344,14 @@
           "className": "Part",
           "properties": {
             "Size": [
-              22.68,
+              20.25,
               0.575,
               5.4
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  20.41,
+                  18.25,
                   21.622,
                   -72.05
                 ],
@@ -21386,106 +21386,6 @@
             "Material": "Wood",
             "TopSurface": "Smooth",
             "BottomSurface": "Smooth"
-          }
-        },
-        {
-          "name": "ReturnTop",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              5.4,
-              0.575,
-              11.34
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  29.05,
-                  21.622,
-                  -63.68
-                ],
-                "orientation": [
-                  [
-                    1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                34,
-                34,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "Wood",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth"
-          }
-        },
-        {
-          "name": "CornerTrim",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              5.4,
-              0.138,
-              0.162
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  29.05,
-                  21.933,
-                  -69.35
-                ],
-                "orientation": [
-                  [
-                    1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                58,
-                58,
-                66
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "SmoothPlastic",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false
           }
         },
         {
@@ -21500,7 +21400,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  9.407,
+                  8.462,
                   19.668,
                   -72.05
                 ],
@@ -21538,69 +21438,20 @@
           }
         },
         {
-          "name": "ReturnEnd",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              5.4,
-              3.335,
-              0.675
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  29.05,
-                  19.668,
-                  -58.347
-                ],
-                "orientation": [
-                  [
-                    1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                34,
-                34,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "Wood",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth"
-          }
-        },
-        {
-          "name": "InnerLeg",
+          "name": "SideRight",
           "className": "Part",
           "properties": {
             "Size": [
               0.675,
               3.335,
-              0.675
+              5.4
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  26.688,
+                  28.038,
                   19.668,
-                  -69.688
+                  -72.05
                 ],
                 "orientation": [
                   [
@@ -21640,67 +21491,16 @@
           "className": "Part",
           "properties": {
             "Size": [
-              16.605,
+              18.9,
               2.07,
               0.405
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  17.71,
+                  18.25,
                   20.53,
                   -74.345
-                ],
-                "orientation": [
-                  [
-                    1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                58,
-                58,
-                66
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "Wood",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false
-          }
-        },
-        {
-          "name": "ReturnPanel",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              0.405,
-              2.07,
-              16.065
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  31.345,
-                  20.53,
-                  -66.38
                 ],
                 "orientation": [
                   [
@@ -21749,7 +21549,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  12.782,
+                  11.837,
                   21.996,
                   -72.86
                 ],
@@ -21800,7 +21600,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  12.782,
+                  11.837,
                   22.6,
                   -72.995
                 ],
@@ -21851,7 +21651,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  12.782,
+                  11.837,
                   24.497,
                   -73.13
                 ],
@@ -21902,7 +21702,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  12.782,
+                  11.837,
                   24.497,
                   -72.9
                 ],
@@ -21953,7 +21753,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  11.365,
+                  10.42,
                   24.497,
                   -72.86
                 ],
@@ -22005,7 +21805,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   21.996,
                   -72.86
                 ],
@@ -22056,7 +21856,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   22.6,
                   -72.995
                 ],
@@ -22107,7 +21907,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   24.497,
                   -73.13
                 ],
@@ -22158,7 +21958,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   24.497,
                   -72.9
                 ],
@@ -22209,7 +22009,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  17.305,
+                  16.36,
                   24.497,
                   -72.86
                 ],
@@ -22261,7 +22061,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  25.337,
+                  23.043,
                   21.996,
                   -72.86
                 ],
@@ -22312,7 +22112,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  25.337,
+                  23.043,
                   22.6,
                   -72.995
                 ],
@@ -22363,7 +22163,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  25.337,
+                  23.043,
                   25.475,
                   -73.13
                 ],
@@ -22414,7 +22214,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  25.337,
+                  23.043,
                   25.475,
                   -72.9
                 ],
@@ -22465,7 +22265,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  24.494,
+                  22.199,
                   25.475,
                   -72.86
                 ],
@@ -22517,7 +22317,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   26.188,
                   -73.13
                 ],
@@ -22568,7 +22368,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.723,
+                  17.777,
                   26.188,
                   -72.792
                 ],
@@ -22620,7 +22420,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   22.054,
                   -70.7
                 ],
@@ -22671,7 +22471,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   22.255,
                   -70.7
                 ],
@@ -22722,7 +22522,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  19.262,
+                  18.318,
                   22.054,
                   -70.7
                 ],
@@ -22773,7 +22573,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  10.487,
+                  9.677,
                   22.428,
                   -70.7
                 ],
@@ -22825,9 +22625,9 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.05,
+                  22.098,
                   22.14,
-                  -65.975
+                  -70.7
                 ],
                 "orientation": [
                   [
@@ -22876,9 +22676,9 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.05,
+                  22.098,
                   22.428,
-                  -66.11
+                  -70.835
                 ],
                 "orientation": [
                   [
@@ -22927,9 +22727,9 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  28.51,
+                  21.557,
                   22.428,
-                  -65.705
+                  -70.43
                 ],
                 "orientation": [
                   [
@@ -22979,9 +22779,9 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.59,
+                  22.637,
                   22.428,
-                  -65.705
+                  -70.43
                 ],
                 "orientation": [
                   [
@@ -23031,15 +22831,15 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.05,
+                  25.607,
                   22.772,
-                  -62.195
+                  -71.78
                 ],
                 "orientation": [
                   [
+                    1,
                     0,
-                    0,
-                    1
+                    0
                   ],
                   [
                     0,
@@ -23047,9 +22847,9 @@
                     0
                   ],
                   [
-                    -1,
                     0,
-                    0
+                    0,
+                    1
                   ]
                 ]
               }
@@ -23083,15 +22883,15 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.05,
+                  27.498,
                   22.772,
-                  -60.305
+                  -71.78
                 ],
                 "orientation": [
                   [
+                    1,
                     0,
-                    0,
-                    1
+                    0
                   ],
                   [
                     0,
@@ -23099,9 +22899,9 @@
                     0
                   ],
                   [
-                    -1,
                     0,
-                    0
+                    0,
+                    1
                   ]
                 ]
               }
@@ -23128,16 +22928,16 @@
           "className": "Part",
           "properties": {
             "Size": [
-              0.608,
+              2.43,
               0.345,
-              2.43
+              0.608
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  29.05,
+                  26.552,
                   23.692,
-                  -61.25
+                  -71.78
                 ],
                 "orientation": [
                   [
@@ -23186,7 +22986,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   20.76,
                   -66.38
                 ],
@@ -23235,7 +23035,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   23.29,
                   -64.49
                 ],
@@ -23284,7 +23084,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  13.593,
+                  12.648,
                   21.91,
                   -66.11
                 ],
@@ -23335,7 +23135,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  13.593,
+                  12.648,
                   21.335,
                   -65.57
                 ],
@@ -23386,7 +23186,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  17.913,
+                  16.968,
                   21.91,
                   -66.11
                 ],
@@ -23437,7 +23237,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  17.913,
+                  16.968,
                   21.335,
                   -65.57
                 ],
@@ -23488,7 +23288,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   19.495,
                   -66.38
                 ],
@@ -23538,7 +23338,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   18.633,
                   -65.165
                 ],
@@ -23589,7 +23389,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.752,
+                  14.807,
                   18.253,
                   -63.95
                 ],
@@ -23641,7 +23441,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  16.908,
+                  15.963,
                   18.633,
                   -66.005
                 ],
@@ -23692,7 +23492,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  18.064,
+                  17.119,
                   18.253,
                   -65.629
                 ],
@@ -23744,7 +23544,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  16.467,
+                  15.522,
                   18.633,
                   -67.363
                 ],
@@ -23795,7 +23595,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  17.181,
+                  16.236,
                   18.253,
                   -68.346
                 ],
@@ -23847,7 +23647,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  15.038,
+                  14.093,
                   18.633,
                   -67.363
                 ],
@@ -23898,7 +23698,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  14.324,
+                  13.379,
                   18.253,
                   -68.346
                 ],
@@ -23950,7 +23750,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  14.597,
+                  13.652,
                   18.633,
                   -66.005
                 ],
@@ -24001,7 +23801,7 @@
             "CFrame": {
               "CFrame": {
                 "position": [
-                  13.441,
+                  12.496,
                   18.253,
                   -65.629
                 ],
