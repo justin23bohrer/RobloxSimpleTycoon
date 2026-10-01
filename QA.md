@@ -21,7 +21,7 @@ Record the date and result when you run a case.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| P1 | Player joins. | Player spawns on the center spawn; no errors in Output. | |
+| P1 | Player joins. | Player spawns on the grass at one of the four spawn areas; no errors in Output. | |
 | P2 | Check the player list (with `DevUnlimitedCash = false`). | The column is named **Cookies** and shows **100**. | |
 
 ## Tycoon (claiming and unlocking)
@@ -29,7 +29,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | T1 | Player joins; look at the plot. | Only the floor and a round blue pad with a "CLAIM TYCOON!" sign show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
-| T2 | Look at the map (fly around in Studio). | Four 66 × 66 plots around the statue, all the same distance from it, each with its Claim pad and front doorway facing the statue, and a blue spawn pad between each plot and the statue. All on grass; nothing overlaps. Output shows no `NumberOfTycoonPlots` warning. | |
+| T2 | Look at the map (fly around in Studio). | Four 66 × 66 plots around the statue, all the same distance from it, each with its Claim pad and front doorway facing the statue, and an (invisible) spawn area between each plot and the statue; no blue spawn discs anywhere. All on grass; nothing overlaps. Output shows no `NumberOfTycoonPlots` warning. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays. | |
 | T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 / FREE!", with yellow spot 1 above the conveyor. | |
 | T5 | Stepping on your own Collect pad right after claiming. | Nothing happens (nothing stored). | |
@@ -157,7 +157,7 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| V1 | Look at the spawn and Claim pad; then claim and look at the Buy button and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
+| V1 | Look at the Claim pad; then claim and look at the Buy button and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
 | CT1 | Look behind the Collect pad. | Purple wall with a gold frame, pink "COOKIE JAR" sign readable from the pad side, glass tank on an orange stand. The wall doesn't block walking onto the pad. | |
 | CT2 | Look above the pad. | A gold ▼ arrow bounces up and down, always. | |
 | CT3 | Buy Dropper 1; watch a drop reach the collector. | One small cookie falls into the jar per drop; pad starts sparkling and glowing. | |
@@ -189,8 +189,15 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | M4 | Both players step on the Claim pad at the same moment. | Exactly one of them owns the plot; the other has none. | |
 | M5 | Four players (Test > Clients and Servers, 4 players). Each claims a different plot. | Each player owns exactly one plot; each sign shows its owner's name. A player who already owns a plot can't claim a second one. | |
 | M6 | With 4 players, each buys Dropper 1 and collects. | Each plot's cup drops cookies onto its own conveyor, into its own collector and cookie jar; collecting pays only that plot's owner. Cookies on the turned plots (2–4) ride toward their own back-left collector and land inside their jar (not stuck in the glass). | |
-| M7 | Join several times. | You appear at one of the four spawn pads (it varies). | |
+| M7 | Join several times. | You appear at one of the four spawn areas (it varies). | |
 | M8 | Player on Plot3 leaves. | Only Plot3 resets to its Claim pad; the other three keep running. | |
+
+## Spawns
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| SP1 | Test > Clients and Servers with 4 players (rejoin a few times if needed so all four spawns get used). | Every player appears standing on the grass between a plot and the statue, in front of that plot's doorway: at Plot1 (0, 0), Plot2 (−44, 44), Plot3 (0, 88), Plot4 (44, 44). Nobody falls through the ground, sinks into it, or gets stuck. | |
+| SP2 | Fly around each of the four spawn spots in Studio (Play and Run mode). | Nothing blue and no disc, ring, decal, or outline is visible at any spawn; it's just grass. In Explorer, `Map` has `SpawnLocation`–`SpawnLocation4` and none has a `SpawnLocationRing` child. | |
 
 ## Respawn
 
