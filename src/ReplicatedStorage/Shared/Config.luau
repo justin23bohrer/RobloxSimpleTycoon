@@ -115,8 +115,8 @@ local Config = {
 	-- animation) -> Celebration (dance, cookie rain) -> TrophyClaim (Caleb
 	-- hidden, contributors claim a trophy) -> reset to 0 and a new cycle.
 	CalebFullSeconds = 5,
-	CalebCelebrationSeconds = 115, -- 0:05 -> 2:00
-	CalebTrophyClaimSeconds = 300, -- 2:00 -> 7:00
+	CalebCelebrationSeconds = 60, -- 0:05 -> 1:05
+	CalebTrophyClaimSeconds = 120, -- 1:05 -> 3:05
 	-- Caleb's overall size: MinScale at 0 cookies, MaxScale at the goal,
 	-- smooth in between (on top of the existing fatness). Scaled around the
 	-- top of the pedestal, so his feet stay on it. Seconds = growth tween.
