@@ -8,18 +8,21 @@
 --   the player must be standing near a feed pad, must not be spamming, and
 --   must be able to afford it. Cookies are spent only through
 --   EconomyService.TrySpend.
--- * Total cookies eaten is shared by all players for this server session (no
---   saving yet). It is mirrored into the statue's "CookiesEaten" attribute so
---   clients can show it. Caleb stops eating at CalebEvent.MaxCookies(); a
---   bigger feed only spends what he still has room for.
--- * The more he has eaten, the fatter and bigger he gets: StatueShape.Apply
---   with progress = eaten / CalebEvent.MaxCookies().
+-- * CalebCycle owns the shared total, contributions, and the Caleb Full
+--   Event state. Feeding is refused unless CalebCycle.CanFeed() (Normal, room
+--   left). A bigger feed only spends what Caleb still has room for (up to
+--   CalebEvent.MaxCookies()); after the spend, CalebCycle.AddCookies records
+--   it (and starts the event at the goal).
+-- * Caleb's size follows progress = eaten / goal (StatueShape.Apply). He is
+--   hidden during TrophyClaim and shrinks back on reset. Pad signs say
+--   "FEED CALEB!" in Normal and "CALEB IS FULL!" otherwise.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
-local Config = require(ReplicatedStorage.Shared.Config)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
+local Config = require(ReplicatedStorage.Shared.Config)
+local CalebCycle = require(script.Parent.CalebCycle)
 local EconomyService = require(script.Parent.EconomyService)
 local StatueShape = require(script.Parent.StatueShape)
 
@@ -27,7 +30,6 @@ local StatueService = {}
 
 local statue: Model? = nil
 local pads: { BasePart } = {}
-local eaten = 0
 local lastFeed: { [Player]: number } = {}
 
 local function isNearPad(player: Player): boolean
@@ -44,6 +46,20 @@ local function isNearPad(player: Player): boolean
 		end
 	end
 	return false
+end
+
+-- CalebCycle keeps CookiesEaten up to date (set synchronously in AddCookies).
+local function eatenNow(): number
+	local eaten = statue and statue:GetAttribute(CalebEvent.Attr.CookiesEaten)
+	return if typeof(eaten) == "number" then eaten else 0
+end
+
+local function feedText(): string
+	return `FEED {string.upper(Config.StatueName)}!`
+end
+
+local function fullText(): string
+	return `{string.upper(Config.StatueName)} IS FULL!`
 end
 
 local function setPadLabels(text: string)
@@ -72,7 +88,13 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 		return false, "Stand on a feed pad first."
 	end
 
-	local room = CalebEvent.MaxCookies() - eaten
+	-- Nothing below yields, so no other feed can run between the room check,
+	-- the spend, and AddCookies: two feeds at once can't pass the goal.
+	if not CalebCycle.CanFeed() then
+		return false, `{Config.StatueName} is FULL!`
+	end
+	local max = CalebEvent.MaxCookies()
+	local room = max - eatenNow()
 	if room <= 0 then
 		return false, `{Config.StatueName} is FULL!`
 	end
@@ -81,21 +103,33 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 		return false, "You don't have that many cookies!"
 	end
 
-	eaten += cookies
-	statue:SetAttribute("CookiesEaten", eaten)
-	StatueShape.Apply(eaten / CalebEvent.MaxCookies(), Config.CalebGrowSeconds)
-	if eaten >= CalebEvent.MaxCookies() then
-		setPadLabels(`{string.upper(Config.StatueName)} IS FULL!`)
-	end
+	CalebCycle.AddCookies(player, cookies)
+	StatueShape.Apply(eatenNow() / max, Config.CalebGrowSeconds)
 	return true, cookies
 end
 
--- Called once by ServerMain.
-function StatueService.Start()
+local function onStateChanged(state: string)
+	setPadLabels(if state == CalebEvent.State.Normal then feedText() else fullText())
+	if state == CalebEvent.State.TrophyClaim then
+		if StatueShape.SetHidden then
+			StatueShape.SetHidden(true)
+		end
+	elseif state == CalebEvent.State.Normal then
+		-- A new cycle: Caleb comes back at his smallest size.
+		if StatueShape.SetHidden then
+			StatueShape.SetHidden(false)
+		end
+		StatueShape.Apply(0, Config.CalebGrowSeconds)
+	end
+end
+
+-- Called once by ServerMain. Returns the statue (for CalebCycle.Start), or
+-- nil if the map has none.
+function StatueService.Start(): Model?
 	local found = Workspace:WaitForChild("Map"):FindFirstChild("Statue")
 	if not found or not found:IsA("Model") then
 		warn("StatueService: Workspace.Map.Statue is missing; feeding is off")
-		return
+		return nil
 	end
 	statue = found
 
@@ -113,11 +147,12 @@ function StatueService.Start()
 
 	StatueShape.Setup(found)
 	StatueShape.Apply(0, 0)
-	found:SetAttribute("CookiesEaten", 0)
-	setPadLabels(`FEED {string.upper(Config.StatueName)}!`)
+	setPadLabels(feedText())
+	CalebCycle.StateChanged:Connect(onStateChanged)
 
 	local remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("FeedStatue") :: RemoteFunction
 	remote.OnServerInvoke = onFeed
+	return found
 end
 
 -- Called by ServerMain when a player leaves.
