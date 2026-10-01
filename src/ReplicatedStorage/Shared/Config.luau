@@ -223,9 +223,10 @@ local Config = {
 	DataStoreName = "SimpleTycoon_v1",
 	-- Seconds between autosaves of each player's data.
 	DataAutosaveSeconds = 120,
-	-- Trophy Case (a build in every house): how many trophies it shows (the
-	-- newest ones), and the size of each trophy in it (1 = about 3.5 studs tall).
-	TrophyCaseSlots = 5,
+	-- Trophy Case (a build in every house): how many TrophySlotN parts it has
+	-- (two rows of 5; only the first TrophyActiveSlots are used for now). Keep
+	-- equal to SLOTS in tools/trophycase/generate_trophy_case.py.
+	TrophyCaseSlots = 10,
 	-- Trophy powers (TrophyPowers / PowerService). How many trophies a player
 	-- can have equipped (displayed in their Trophy Case) at once; only those
 	-- give powers, and only while the TrophyCase build is bought.
@@ -255,6 +256,8 @@ local Config = {
 	TrophyLuckyCookieMultiplier = 5,
 	-- Fewest seconds between two equip/unequip requests from one player.
 	TrophyEquipCooldown = 0.25,
+	-- Size of each trophy in the Trophy Case (1 = about 3.8 studs tall with a
+	-- hat; each shelf row is 4.9 studs tall, so keep this at 1.2 or less).
 	TrophyCaseScale = 1.2,
 	-- The big claim trophy on Caleb's pedestal during TrophyClaim
 	-- (TrophyService): its size, and its "Claim Caleb Trophy" prompt (studs

@@ -95,7 +95,7 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Contract: `Shared/TrophyPowers`, `Remotes/TrophyEquip`, Config (`TrophyActiveSlots`, `TrophyRarityChances`, `TrophyStatCaps`, ...) (lead).
 - [ ] Definitions: 6 rarities, Description/Powers/PowerText, new trophies, `RollReward`, looks.
 - [ ] Inventory: saved InstanceIds + Equipped (Version 2), equip remote, reward roll at claim, display rules.
-- [ ] Powers: `PowerService`, drop/collect/movement hooks, double jump.
+- [x] Powers: `PowerService`, drop/collect/movement hooks, double jump. (code done; Studio test pending: QA PW1–PW12)
 - [x] Inventory UI: `TrophyInventory.client` + `TrophyInventoryUI` / `TrophyInventoryIcon` / `TrophyInventoryData` (needs Studio QA: TI1–TI14).
-- [ ] Big Trophy Case + nameplates.
+- [x] Big Trophy Case + nameplates: `tools/trophycase/generate_trophy_case.py` (~25 × 14.6 case, 10 slots, sign, warm lights), `TrophyCaseDisplay` slot order + nameplates, `TrophyCaseSlots = 10`. (code done; Studio test pending: QA TR9, TR16–TR18)
 
