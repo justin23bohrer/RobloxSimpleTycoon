@@ -19,6 +19,7 @@ local FEED_COLOR = Color3.fromRGB(70, 200, 80)
 local CANCEL_COLOR = Color3.fromRGB(235, 70, 70)
 local QUICK_COLOR = Color3.fromRGB(255, 150, 40)
 local FONT = Enum.Font.FredokaOne
+local BAR_INSET = 4 -- px of white between the progress outline and the fill
 
 export type Parts = {
 	Gui: ScreenGui,
@@ -123,10 +124,21 @@ function FeedPromptUI.Build(parent: Instance): Parts
 	track.Position = UDim2.fromScale(0.06, 0.36)
 	track.Size = UDim2.fromScale(0.88, 0.07)
 	track.BackgroundColor3 = TEXT_COLOR
-	track.ClipsDescendants = true
 	track.Parent = panel
 	corner(track, UDim.new(0.5, 0))
 	stroke(track, 3, Enum.ApplyStrokeMode.Border)
+
+	-- The fill and preview live in this inner area, inset BAR_INSET px from
+	-- the track on every side, so they always sit inside the outline with a
+	-- small white gap. (ClipsDescendants only clips to a rectangle, not to
+	-- rounded corners, so a full-height fill used to poke into the outline.)
+	local inner = Instance.new("Frame")
+	inner.Name = "Inner"
+	inner.AnchorPoint = Vector2.new(0.5, 0.5)
+	inner.Position = UDim2.fromScale(0.5, 0.5)
+	inner.Size = UDim2.new(1, -BAR_INSET * 2, 1, -BAR_INSET * 2)
+	inner.BackgroundTransparency = 1
+	inner.Parent = track
 
 	-- Drawn under the fill, so only the part past the current fill shows.
 	local preview = Instance.new("Frame")
@@ -135,7 +147,7 @@ function FeedPromptUI.Build(parent: Instance): Parts
 	preview.BackgroundColor3 = PREVIEW_COLOR
 	preview.BorderSizePixel = 0
 	preview.ZIndex = 1
-	preview.Parent = track
+	preview.Parent = inner
 	corner(preview, UDim.new(0.5, 0))
 
 	local fill = Instance.new("Frame")
@@ -144,7 +156,7 @@ function FeedPromptUI.Build(parent: Instance): Parts
 	fill.BackgroundColor3 = COOKIE_COLOR
 	fill.BorderSizePixel = 0
 	fill.ZIndex = 2
-	fill.Parent = track
+	fill.Parent = inner
 	corner(fill, UDim.new(0.5, 0))
 
 	local box = Instance.new("TextBox")
