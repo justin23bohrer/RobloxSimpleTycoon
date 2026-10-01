@@ -71,6 +71,37 @@ local function setPadLabels(text: string)
 	end
 end
 
+-- Map colors of each pad's parts (the pad, its ring) and sign panels, saved
+-- at Start so a disabled pad goes back exactly as it was built.
+local padPartColors: { [BasePart]: Color3 } = {}
+local padSignColors: { [Frame]: Color3 } = {}
+
+local function rememberPadColors()
+	for _, pad in pads do
+		padPartColors[pad] = pad.Color
+		for _, item in pad:GetDescendants() do
+			if item:IsA("BasePart") then
+				padPartColors[item] = item.Color
+			elseif item:IsA("Frame") and item.Name == "Panel" then
+				padSignColors[item] = item.BackgroundColor3
+			end
+		end
+	end
+end
+
+-- Gray pads while Caleb isn't eating; map colors when he is. Looks only:
+-- the feed itself is refused by CalebCycle.CanFeed, and the client won't
+-- open the pop-up.
+local function setPadsEnabled(enabled: boolean)
+	for part, color in padPartColors do
+		local off = if table.find(pads, part) then Config.StatueFeedPadOffColor else Config.StatueFeedPadOffRingColor
+		part.Color = if enabled then color else off
+	end
+	for panel, color in padSignColors do
+		panel.BackgroundColor3 = if enabled then color else Config.StatueFeedPadOffSignColor
+	end
+end
+
 -- Handles one feed request. Returns (true, cookiesEaten) or (false, reason).
 -- Every argument is untrusted.
 local function onFeed(player: Player, amount: any): (boolean, number | string)
@@ -109,7 +140,9 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 end
 
 local function onStateChanged(state: string)
-	setPadLabels(if state == CalebEvent.State.Normal then feedText() else fullText())
+	local eating = state == CalebEvent.State.Normal
+	setPadLabels(if eating then feedText() else fullText())
+	setPadsEnabled(eating)
 	if state == CalebEvent.State.TrophyClaim then
 		if StatueShape.SetHidden then
 			StatueShape.SetHidden(true)
@@ -148,6 +181,7 @@ function StatueService.Start(): Model?
 	StatueShape.Setup(found)
 	StatueShape.Apply(0, 0)
 	setPadLabels(feedText())
+	rememberPadColors()
 	CalebCycle.StateChanged:Connect(onStateChanged)
 
 	local remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("FeedStatue") :: RemoteFunction

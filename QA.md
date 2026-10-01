@@ -130,6 +130,15 @@ Tip: set `DevCalebFastCycle = true` (and `DevUnlimitedCash = true`) in Studio fo
 | CE9 | After the reset (back to Normal). | New `CalebCycleId`; `CookiesEaten = 0`; `CalebTopFeeders = []` right away; everyone's `CalebFed = 0` and `CalebTrophyClaimed = false`; Caleb visible at his smallest size; pads say "FEED CALEB!"; feeding works again and the next goal starts a new event. | |
 | CE10 | Fast cycle off (normal). | Goal 1,000,000; Full 5 s, Celebration 115 s, TrophyClaim 300 s. `DevCalebFastCycle` has no effect in a published game. | |
 
+## Feed pads while Caleb is full, and glare
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| FP1 | Reach the goal, then walk onto any feed pad during Full, Celebration, and TrophyClaim. | No feed pop-up opens. The pads, rings, and their signs are gray and say "CALEB IS FULL!". | |
+| FP2 | Stand on a pad with the pop-up open while someone else feeds the last cookies. | The pop-up closes by itself. | |
+| FP3 | After the reset (Normal). | Pads are back to their orange colors, sign says "FEED CALEB!", the pop-up opens again. | |
+| GL1 | Look at the podium, leaderboards, and Caleb's chain, in Normal and during COOKIE PARTY (day and night). | Gold trim is plain gold, not glowing; nothing is blinding. The party glow is soft. | |
+
 ## Cookie rain (Caleb Full Event)
 
 Needs the Caleb cycle (`CalebCycle`) merged. Set `Config.DevCalebFastCycle = true`

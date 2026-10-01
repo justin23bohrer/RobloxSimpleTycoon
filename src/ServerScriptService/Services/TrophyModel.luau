@@ -109,7 +109,7 @@ function TrophyModel.Build(variantId: string, scale: number?, label: string?): M
 	-- Plinth with a gold trim and nameplate.
 	local base = variant.Base
 	make("Plinth", Vector3.new(1.7, 0.5, 1.7), CFrame.new(0, 0.25, 0), base.Color, base.Material)
-	make("PlinthTrim", Vector3.new(1.78, 0.08, 1.78), CFrame.new(0, 0.5, 0), GOLD, Enum.Material.Neon)
+	make("PlinthTrim", Vector3.new(1.78, 0.08, 1.78), CFrame.new(0, 0.5, 0), GOLD, Enum.Material.SmoothPlastic)
 	local plate = make("Nameplate", Vector3.new(1.3, 0.34, 0.04), CFrame.new(0, 0.26, -0.87), GOLD)
 	local rarity = TrophyVariants.Rarities[variant.Rarity] or TrophyVariants.Rarities.Common
 	addNameplate(plate, label or variant.DisplayName, rarity.Color)

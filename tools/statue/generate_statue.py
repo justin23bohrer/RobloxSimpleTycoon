@@ -166,7 +166,7 @@ def on_head(x, y, extra=0.0):
 # Pedestal ------------------------------------------------------------------
 part("PedestalBase", (26, 2, 26), (0, 1, 0), STONE)
 part("PedestalTop", (21, 3, 21), (0, 3.5, 0), STONE_TOP)
-part("PedestalTrim", (21.6, 0.6, 21.6), (0, 5.2, 0), GOLD, material="Neon")
+part("PedestalTrim", (21.6, 0.6, 21.6), (0, 5.2, 0), GOLD)
 
 FLOOR = 5.5  # top of the pedestal
 
@@ -188,8 +188,8 @@ for i in range(13):
     t = i / 12 * 2 - 1  # -1 .. 1
     x = t * 2.2
     y = TORSO_TOP - 0.6 - (1 - t * t) * 1.8
-    ball(f"ChainBead{i + 1}", 0.45, (x, y, -2.85), GOLD, material="Neon", collide=False)
-part("ChainPendant", (0.5, 0.9, 0.3), (0, TORSO_TOP - 2.9, -2.9), GOLD, material="Neon", collide=False)
+    ball(f"ChainBead{i + 1}", 0.45, (x, y, -2.85), GOLD, collide=False)
+part("ChainPendant", (0.5, 0.9, 0.3), (0, TORSO_TOP - 2.9, -2.9), GOLD, collide=False)
 
 # Belly: hidden inside the torso until Caleb is fed (StatueShape grows it).
 ball("Belly", 5.0, (0, TORSO_BOTTOM + 3.0, 0), SHIRT)
@@ -372,7 +372,7 @@ for corner, (sx, sz) in (("NE", (1, 1)), ("NW", (-1, 1)), ("SW", (-1, -1)), ("SE
 
     pieces = []
     part("Board", BOARD_SIZE, center, BOARD_COLOR, rot=rot, into=pieces)
-    part("GoldTrim", (w + 1.0, h + 1.0, 0.6), add(center, behind), GOLD, rot=rot, material="Neon", into=pieces)
+    part("GoldTrim", (w + 1.0, h + 1.0, 0.6), add(center, behind), GOLD, rot=rot, into=pieces)
     for name, side in (("PostLeft", -1), ("PostRight", 1)):
         post_h = BOARD_BOTTOM + h + 0.5
         pos = add(add(scale(right, side * (w / 2 - 1.5)), scale(out, BOARD_DIST - t / 2 - 0.9)), (0, post_h / 2, 0))
