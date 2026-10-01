@@ -11,14 +11,15 @@ other, shelves + TV along the front wall, desk and bed at the back):
 
   Bed             black headboard and frame, gray sheets, white + gray
                   pillows, a rumpled gray blanket
-  GamingDesk      black L-shaped desk, 3 monitors (one standing up), webcam,
+  GamingDesk      black L-shaped corner desk (back wall + right wall),
+                  3 monitors (one standing up in the corner), webcam,
                   white/blue keyboard, mouse, controller, headphones, a cup,
                   black office chair, backpack on the floor
   ShelvesTV       dark cube bookshelf full of books with the Barad-dur LEGO
                   tower and a lime-green drill on top; cube TV stand with
                   board games and white bins, a TV, PS5, mushroom lamp, remote
   MiniFridge      black mini fridge with the orange LEGO moon rocket on top,
-                  and a foam roller on the floor
+                  and a foam roller on the floor (left of the bed)
   KitchenCounter  granite counter with a tile backsplash, the Ninja ice cream
                   maker, the Ninja blender, and a cast iron skillet
 
@@ -89,9 +90,9 @@ DESK_GROW = (1.35, 1.15)
 # same order as Config.Builds entries 5-9.
 BUTTONS = [
     (5, "Bed", -3, -50),
-    (6, "GamingDesk", 13, -56),
+    (6, "GamingDesk", 15.5, -55),
     (7, "ShelvesTV", 8, -21),
-    (8, "MiniFridge", 27.75, -61),
+    (8, "MiniFridge", -13.5, -63),
     (9, "KitchenCounter", -8, -21),
 ]
 MANAGED = {name for _, name, _, _ in BUTTONS} | {f"BuildButton{i}" for i, _, _, _ in BUTTONS}
@@ -221,39 +222,48 @@ def monitor(it, name, x, z, width, height, screen_color, top):
 
 
 def gaming_desk():
+    """An L-shaped corner desk like the photo: the main top runs along the
+    back wall to the back-right corner, and the return runs along the right
+    wall toward the front, with the standing-up monitor in the corner.
+    Designed at normal cartoon size around the corner, then grown."""
     it = Item("GamingDesk")
     top = F + 3.4
-    x0, x1 = 5.0, 19.0  # main top along the back wall
-    depth = 4.0
+    x1 = RIGHT  # the corner
+    x0 = x1 - 16.8  # left end of the main top
+    depth = 4.0  # main top, out from the back wall
+    ret_w, ret_len = 4.0, 12.4  # return: width out from the right wall, length out from the back wall
+    rx = x1 - ret_w / 2
     it.part("DeskTop", (x1 - x0, 0.5, depth), ((x0 + x1) / 2, top - 0.25, BACK + depth / 2), BLACK, "Wood")
-    it.part("ReturnTop", (4.0, 0.5, 8.0), (x1 - 2.0, top - 0.25, BACK + depth + 4.0), BLACK, "Wood")
+    it.part("ReturnTop", (ret_w, 0.5, ret_len - depth), (rx, top - 0.25, BACK + (depth + ret_len) / 2), BLACK, "Wood")
+    it.part("CornerTrim", (ret_w, 0.12, 0.12), (rx, top + 0.02, BACK + depth), CHARCOAL, collide=False)
     it.part("SideLeft", (0.5, 2.9, depth), (x0 + 0.25, F + 1.45, BACK + depth / 2), BLACK, "Wood")
-    it.part("SideRight", (0.5, 2.9, depth + 8.0), (x1 - 0.25, F + 1.45, BACK + (depth + 8.0) / 2), BLACK, "Wood")
-    it.part("ReturnEnd", (3.5, 2.9, 0.5), (x1 - 2.25, F + 1.45, BACK + depth + 7.75), BLACK, "Wood")
-    it.part("BackPanel", (x1 - x0 - 1.0, 1.8, 0.3), ((x0 + x1) / 2, F + 2.2, BACK + 0.3), CHARCOAL, "Wood", collide=False)
+    it.part("ReturnEnd", (ret_w, 2.9, 0.5), (rx, F + 1.45, BACK + ret_len - 0.25), BLACK, "Wood")
+    it.part("InnerLeg", (0.5, 2.9, 0.5), (x1 - ret_w + 0.25, F + 1.45, BACK + depth - 0.25), BLACK, "Wood")
+    it.part("BackPanel", (x1 - x0 - ret_w - 0.5, 1.8, 0.3), ((x0 + x1 - ret_w) / 2, F + 2.2, BACK + 0.3), CHARCOAL, "Wood", collide=False)
+    it.part("ReturnPanel", (0.3, 1.8, ret_len - 0.5), (x1 - 0.3, F + 2.2, BACK + ret_len / 2), CHARCOAL, "Wood", collide=False)
 
     z = BACK + 1.4
-    monitor(it, "Monitor1", 8.6, z, 4.2, 2.5, SCREEN_BLUE, top)
-    m2_top = monitor(it, "Monitor2", 13.0, z, 4.2, 2.5, SCREEN_GREEN, top)
-    monitor(it, "Monitor3", 17.0, z, 2.5, 4.2, SCREEN_PURPLE, top)  # standing up
-    it.part("Webcam", (0.9, 0.45, 0.5), (13.0, m2_top + 0.22, z - 0.2), BLACK, collide=False)
-    it.ball("WebcamLens", 0.3, (13.0, m2_top + 0.22, z + 0.05), (60, 60, 70), collide=False)
+    monitor(it, "Monitor1", 17.7, z, 4.2, 2.5, SCREEN_BLUE, top)
+    m2_top = monitor(it, "Monitor2", 22.1, z, 4.2, 2.5, SCREEN_GREEN, top)
+    monitor(it, "Monitor3", 27.0, z, 2.5, 4.2, SCREEN_PURPLE, top)  # standing up, in the corner
+    it.part("Webcam", (0.9, 0.45, 0.5), (22.1, m2_top + 0.22, z - 0.2), BLACK, collide=False)
+    it.ball("WebcamLens", 0.3, (22.1, m2_top + 0.22, z + 0.05), (60, 60, 70), collide=False)
 
-    it.part("Keyboard", (3.4, 0.25, 1.2), (11.0, top + 0.125, BACK + 3.0), WHITE, collide=False)
-    it.part("Keycaps", (3.0, 0.12, 0.8), (11.0, top + 0.3, BACK + 3.0), KEYS, collide=False)
-    it.part("Mouse", (0.5, 0.25, 0.8), (13.6, top + 0.125, BACK + 3.0), BLACK, collide=False)
-    it.part("Controller", (1.4, 0.4, 0.9), (17.0, top + 0.2, BACK + 8.0), WHITE, collide=False)
-    it.part("ControllerTouchpad", (0.6, 0.1, 0.4), (17.0, top + 0.45, BACK + 7.9), BLACK, collide=False)
+    it.part("Keyboard", (3.4, 0.25, 1.2), (19.9, top + 0.125, BACK + 3.0), WHITE, collide=False)
+    it.part("Keycaps", (3.0, 0.12, 0.8), (19.9, top + 0.3, BACK + 3.0), KEYS, collide=False)
+    it.part("Mouse", (0.5, 0.25, 0.8), (22.5, top + 0.125, BACK + 3.0), BLACK, collide=False)
+    it.cyl("Cup", 0.9, 0.7, (16.0, top + 0.45, BACK + 3.0), WHITE, collide=False)
+    # On the return: the controller and the headphones (cups facing sideways).
+    it.part("Controller", (1.4, 0.4, 0.9), (rx, top + 0.2, BACK + 6.5), WHITE, collide=False)
+    it.part("ControllerTouchpad", (0.6, 0.1, 0.4), (rx, top + 0.45, BACK + 6.4), BLACK, collide=False)
     for side, dx in (("Left", -0.4), ("Right", 0.4)):
-        it.ball(f"ControllerStick{side}", 0.3, (17.0 + dx, top + 0.45, BACK + 8.2), BLACK, collide=False)
-    # Headphones standing on the desk, cups facing sideways.
-    for side, dx in (("Left", -0.7), ("Right", 0.7)):
-        it.cyl(f"Headphone{side}", 0.45, 1.1, (6.4 + dx, top + 0.75, BACK + 2.4), BLACK, rot=IDENTITY, collide=False)
-    it.part("HeadphoneBand", (1.8, 0.3, 0.45), (6.4, top + 1.55, BACK + 2.4), BLACK, collide=False)
-    it.cyl("Cup", 0.9, 0.7, (7.6, top + 0.45, BACK + 3.4), WHITE, collide=False)
+        it.ball(f"ControllerStick{side}", 0.3, (rx + dx, top + 0.45, BACK + 6.7), BLACK, collide=False)
+    for side, dz in (("Left", -0.7), ("Right", 0.7)):
+        it.cyl(f"Headphone{side}", 0.45, 1.1, (rx, top + 0.75, BACK + 10.0 + dz), BLACK, rot=ALONG_Z, collide=False)
+    it.part("HeadphoneBand", (0.45, 0.3, 1.8), (rx, top + 1.55, BACK + 10.0), BLACK, collide=False)
 
-    # Office chair (black leather) facing the desk.
-    cx, cz = 11.0, BACK + 6.2
+    # Office chair (black leather) facing the main desk.
+    cx, cz = 19.9, BACK + 6.2
     it.part("ChairSeat", (3.0, 0.6, 3.0), (cx, F + 2.4, cz), BLACK, "Leather")
     it.part("ChairBack", (3.0, 3.6, 0.7), (cx, F + 4.6, cz + 1.4), BLACK, "Leather", rot=rot_x(-8))
     for side, dx in (("Left", -1.6), ("Right", 1.6)):
@@ -266,10 +276,10 @@ def gaming_desk():
         it.part(f"ChairLeg{i + 1}", (0.3, 0.25, 1.8), (cx + dx, F + 0.55, cz + dz), CHARCOAL, rot=rot_y(a), collide=False)
         it.ball(f"ChairWheel{i + 1}", 0.45, (cx + dx * 2, F + 0.22, cz + dz * 2), BLACK, collide=False)
 
-    it.grow((x0, F, BACK), *DESK_GROW)
+    it.grow((x1, F, BACK), *DESK_GROW)
 
-    # Backpack on the floor next to the chair (not grown).
-    bx, bz = 7.5, BACK + 10.8
+    # Backpack on the floor between the bed and the desk (not grown).
+    bx, bz = 6.3, BACK + 8.5
     it.part("Backpack", (1.8, 2.4, 1.1), (bx, F + 1.2, bz), BLACK, "Fabric", rot=rot_y(-15))
     it.part("BackpackPocket", (1.4, 1.0, 0.4), (bx + 0.2, F + 0.8, bz + 0.65), CHARCOAL, "Fabric", rot=rot_y(-15), collide=False)
     it.part("BackpackTop", (1.6, 0.4, 1.0), (bx, F + 2.5, bz), BLACK, "Fabric", rot=rot_y(-15), collide=False)
@@ -396,7 +406,7 @@ def shelves_tv():
 def mini_fridge():
     it = Item("MiniFridge")
     w, h, d = 3.4, 4.6, 3.2
-    x, z = RIGHT - 0.4 - w / 2, BACK + 0.3 + d / 2
+    x, z = -13.5, BACK + 0.3 + d / 2  # against the back wall, left of the bed
     front = z + d / 2
     it.part("Body", (w, h, d), (x, F + h / 2, z), BLACK)
     it.part("Door", (w - 0.1, h - 0.3, 0.1), (x, F + h / 2, front + 0.05), (44, 44, 50), collide=False)
@@ -421,7 +431,7 @@ def mini_fridge():
         it.ball(f"BoosterTip{side}", 0.4, (x + dx, core_bottom + 3.4, rz), WHITE, collide=False)
 
     # Foam roller lying on the floor.
-    it.cyl("FoamRoller", 2.2, 0.9, (x - 3.0, F + 0.45, z + 4.4), (70, 74, 80), rot=IDENTITY)
+    it.cyl("FoamRoller", 2.2, 0.9, (x - 5.0, F + 0.45, z), (70, 74, 80), rot=IDENTITY)
     return it.model()
 
 
