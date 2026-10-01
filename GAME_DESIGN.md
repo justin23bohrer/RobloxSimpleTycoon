@@ -108,6 +108,10 @@ The stored amount is **not** shown as text. Instead:
 
 ## Plot layout (prototype)
 
+The ground around the plot (`Map.Ground`, 140 × 140 studs) is green grass
+(`Material = Grass`, color `86,166,64`). The plot's own gray `Base` floor sits
+on top of it and is unchanged.
+
 Plain parts only, no theme. The spots players step on are flat round pads
 with a darker ring underneath as an outline:
 
