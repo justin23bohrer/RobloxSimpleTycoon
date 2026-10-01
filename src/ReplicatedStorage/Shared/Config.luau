@@ -105,6 +105,45 @@ local Config = {
 	CalebMinScale = 1,
 	CalebMaxScale = 1.6,
 	CalebGrowSeconds = 1.2,
+	-- Growth curves (StatueShape, progress = cookies / goal, 0..1):
+	--   fatness = log(1 + progress * FatnessCurve) / log(1 + FatnessCurve)
+	--     (front-loaded: the first feeds show; bigger = more front-loaded)
+	--   scale = MinScale + (MaxScale - MinScale - FinalPopScale) * progress ^ ScaleCurve
+	--     below the goal, and exactly MaxScale at the goal (a last visible pop).
+	CalebFatnessCurve = 100_000,
+	CalebScaleCurve = 2,
+	CalebFinalPopScale = 0.1,
+	-- Caleb's animations (CalebAnimator.client, client only, looks only).
+	-- Degrees are angles; Height/Bounce/Jiggle are studs.
+	-- Full: "I'm completely full" over CalebEvent.Duration("Full") seconds:
+	-- a waddle that dies down, leaning back with arms out, belly bouncing,
+	-- then a puff (burp) at PuffAt (0..1 of the way through) and his head
+	-- jolts back.
+	CalebFullAnim = table.freeze({
+		WobbleDegrees = 7,
+		WobblesPerSecond = 2.5,
+		LeanBackDegrees = 12,
+		ArmsOutDegrees = 40,
+		BellyBounce = 1.6,
+		BellyBouncesPerSecond = 2,
+		PuffAt = 0.55,
+		HeadJoltDegrees = 14,
+		PuffParticles = 30,
+	}),
+	-- Celebration: a dance loop. One sway to a side and one hop per beat,
+	-- arms take turns waving, head bobs, belly jiggles, and a full spin every
+	-- SpinEverySeconds (lasting SpinSeconds).
+	CalebDance = table.freeze({
+		BeatSeconds = 0.55,
+		SwayDegrees = 9,
+		HopHeight = 1.5,
+		ArmDegrees = 75,
+		ArmWiggleDegrees = 12,
+		HeadBobDegrees = 7,
+		BellyJiggle = 0.8,
+		SpinEverySeconds = 8,
+		SpinSeconds = 1.2,
+	}),
 	-- Podium "CALEB'S TOP FEEDERS" board: how many rows, and the fewest
 	-- seconds between leaderboard updates (feeds in between are batched).
 	CalebLeaderboardSize = 10,
@@ -113,6 +152,17 @@ local Config = {
 	-- per client, and the radius (studs, around the statue) they fall in.
 	CookieRainMaxCookies = 120,
 	CookieRainRadius = 150,
+	-- New cookies per second (fewer if CookieRainMaxCookies are all in use),
+	-- fall speed (studs/s), height above the landing spot they start at
+	-- (studs), and spin (radians/s); each cookie varies these a little.
+	CookieRainPerSecond = 25,
+	CookieRainFallSpeed = 30,
+	CookieRainHeight = 80,
+	CookieRainSpinSpeed = 3,
+	-- Share (0..1) of cookies aimed within NearPlayerRadius studs of the local
+	-- player, so everyone sees plenty around them; the rest fall anywhere.
+	CookieRainNearPlayerShare = 0.6,
+	CookieRainNearPlayerRadius = 45,
 	-- Sound effects (client only). Each is a Roblox audio asset id string
 	-- ("rbxassetid://123..."). Empty = that sound is skipped. See
 	-- tools/audio/ for the original effects to upload. Music comes later.
@@ -124,6 +174,20 @@ local Config = {
 		TrophyClaim = "",
 		EventEnd = "",
 	}),
+	-- Event UI + screen effects (client only, CalebEventUI.client.luau).
+	-- TickSeconds: how often the countdowns refresh. ConfettiCount: pooled
+	-- UI confetti pieces per burst (capped at 100). Shake: camera shake
+	-- strength (studs) and length when Caleb gets full. ClosedMessage: how
+	-- long "TROPHY CLAIM CLOSED" stays. Party*: Celebration lighting
+	-- (ColorCorrection saturation, Bloom intensity, fade in/out seconds).
+	CalebUITickSeconds = 0.25,
+	CalebConfettiCount = 60,
+	CalebShakeStuds = 0.6,
+	CalebShakeSeconds = 0.5,
+	CalebClosedMessageSeconds = 4,
+	CalebPartySaturation = 0.25,
+	CalebPartyBloom = 0.4,
+	CalebPartyFadeSeconds = 1.5,
 	-- Volume (0..1) of each sound above (CalebAudio.client). CookieRain loops
 	-- for the whole Celebration, so keep it quiet; Grow plays on every feed.
 	CalebSoundVolumes = table.freeze({

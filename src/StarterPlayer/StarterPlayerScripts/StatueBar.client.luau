@@ -1,10 +1,14 @@
 -- StatueBar (client only)
 -- A cartoony progress bar floating above Caleb's head that everyone can see:
 -- "Caleb: 12,345 / 1,000,000 🍪" over the same cookie bar as the feed pop-up
--- (FeedPromptUI.ProgressBar), and "Caleb is FULL!" at the max.
+-- (FeedPromptUI.ProgressBar), and "Caleb is FULL!" at the max. During the
+-- Caleb Full Event the text follows the event state (FULL / COOKIE PARTY /
+-- resting); the big screen messages are CalebEventUI's job.
 --
--- Display only: reads the statue's replicated CookiesEaten attribute (set by
--- StatueService). It never changes anything and never talks to the server.
+-- Display only: reads the statue's replicated CookiesEaten, CalebMaxCookies
+-- and CalebState attributes (set by the server; names in
+-- Shared/CalebEvent.luau). It never changes anything and never talks to the
+-- server.
 --
 -- The BillboardGui is adorned to an Attachment in Terrain placed above the
 -- Head, not to the Head itself: with content streaming the statue's parts can
@@ -15,6 +19,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
+local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
 local FeedPromptUI = require(script.Parent.FeedPromptUI)
 
@@ -22,7 +27,7 @@ local player = Players.LocalPlayer
 local statue = Workspace:WaitForChild("Map"):WaitForChild("Statue")
 
 local NAME = Config.StatueName
-local MAX = Config.StatueMaxCookies
+local State = CalebEvent.State
 
 -- Look (presentation only, same as CashDisplay / FeedPromptUI)
 local PANEL_COLOR = Color3.fromRGB(255, 214, 64)
@@ -46,8 +51,14 @@ local function formatNumber(amount: number): string
 end
 
 local function eaten(): number
-	local value = statue:GetAttribute("CookiesEaten")
+	local value = statue:GetAttribute(CalebEvent.Attr.CookiesEaten)
 	return if typeof(value) == "number" then value else 0
+end
+
+-- The goal published by the server, or the contract default before it is set.
+local function maxCookies(): number
+	local value = statue:GetAttribute(CalebEvent.Attr.MaxCookies)
+	return if typeof(value) == "number" and value > 0 then value else CalebEvent.MaxCookies()
 end
 
 local function addStroke(parent: GuiObject, thickness: number, mode: Enum.ApplyStrokeMode)
@@ -156,13 +167,19 @@ end
 
 local function refresh()
 	local total = eaten()
-	if total >= MAX then
-		label.Text = `{NAME} is FULL! {formatNumber(MAX)} 🍪`
+	local max = maxCookies()
+	local state = CalebEvent.GetState(statue)
+	if state == State.Celebration then
+		label.Text = "🎉 COOKIE PARTY! 🎉"
+	elseif state == State.TrophyClaim then
+		label.Text = `{NAME} is resting... 💤`
+	elseif state == State.Full or total >= max then
+		label.Text = `{NAME} is FULL! {formatNumber(max)} 🍪`
 	else
-		label.Text = `{NAME}: {formatNumber(total)} / {formatNumber(MAX)} 🍪`
+		label.Text = `{NAME}: {formatNumber(total)} / {formatNumber(max)} 🍪`
 	end
 
-	local fraction = math.clamp(total / MAX, 0, 1)
+	local fraction = math.clamp(total / max, 0, 1)
 	if total > 0 then
 		fraction = math.max(fraction, MIN_VISIBLE_BAR)
 	end
@@ -171,7 +188,12 @@ end
 
 -- A late joiner gets the current value from the replicated attribute here.
 refresh()
-statue:GetAttributeChangedSignal("CookiesEaten"):Connect(function()
+statue:GetAttributeChangedSignal(CalebEvent.Attr.CookiesEaten):Connect(function()
+	refresh()
+	pop()
+end)
+statue:GetAttributeChangedSignal(CalebEvent.Attr.MaxCookies):Connect(refresh)
+statue:GetAttributeChangedSignal(CalebEvent.Attr.State):Connect(function()
 	refresh()
 	pop()
 end)

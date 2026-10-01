@@ -9,13 +9,16 @@ src/
 ├── ReplicatedStorage/          → ReplicatedStorage (server + client can read)
 │   ├── Shared/
 │   │   ├── Config.luau         → ModuleScript: all tunable numbers
-│   │   └── StatueGrowth.luau   → statue fatness curve (used by StatueService)
+│   │   ├── CalebEvent.luau     → Caleb Full Event contract (state names, attributes, timing)
+│   │   └── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
 │   └── Remotes/                → Folder: remotes
 │       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
 │   ├── ServerMain.server.luau  → Script: entry point, starts services
 │   └── Services/
 │       ├── PlayerDataService.luau
+│       ├── DataService.luau    → saving: house purchases + trophies (DataStore)
+│       ├── DataSchema.luau     → helper for DataService (saved shape, cleaning, migration)
 │       ├── EconomyService.luau
 │       ├── TycoonService.luau
 │       ├── PlotStages.luau     → helper for TycoonService (what a plot shows at each stage)
@@ -27,13 +30,22 @@ src/
 │       ├── CollectorService.luau
 │       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 │       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
-│       └── StatueShape.luau    → helper for StatueService (makes the statue fatter)
+│       ├── CalebCycle.luau     → Caleb Full Event state machine (total, contributions, trophy eligibility)
+│       └── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
 │       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
 │       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       ├── CookieRain.client.luau  → LocalScript: cookie rain during Caleb's Celebration (visual only)
+│       ├── CookieRainLook.luau     → ModuleScript: builds a rain cookie + the landing puff
+│       ├── CalebEventUI.client.luau → LocalScript: Caleb Full Event screen messages + countdowns
+│       ├── CalebEventUIBuild.luau  → ModuleScript: builds the event ScreenGui once
+│       ├── CalebEventFX.luau       → ModuleScript: event screen effects (slam, flash, confetti, shake, party lighting)
+│       ├── CalebAnimator.client.luau → LocalScript: Caleb's "I'm full" animation + dance (from CalebState)
+│       ├── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
+│       ├── CalebLeaderboard.client.luau → LocalScript: "CALEB'S TOP FEEDERS" boards on the podium
 │       └── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
@@ -101,15 +113,20 @@ reach the server.
 `ServerMain.server.luau` is the only server Script. It calls
 `TycoonService.Start()`, then routes join/leave in a fixed order:
 
-- Join: `PlayerDataService.OnPlayerAdded` (no plot yet; plots are claimed on
-  the `ClaimPad`, see TycoonService)
-- Leave: `TycoonService.OnPlayerRemoving` → `PlayerDataService.OnPlayerRemoving`
+- Join: `PlayerDataService.OnPlayerAdded` → `DataService.OnPlayerAdded`
+  (starts loading in the background; no plot yet; plots are claimed on the
+  `ClaimPad`, see TycoonService)
+- Leave: `TycoonService.OnPlayerRemoving` → `StatueService.OnPlayerRemoving`
+  → `PlayerDataService.OnPlayerRemoving` → `DataService.OnPlayerRemoving`
+  (saves and releases in the background; never yields)
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
+| `DataService` | Saves/loads each player's house purchases and Caleb trophies (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
+| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids and bad/duplicate trophies; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`). Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
 | `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds`: `Get(id)`, `All()`, `UnlockedBy(id?)`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
@@ -117,8 +134,9 @@ reach the server.
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places an upside-down red cup (a Model named after the id, built by `DropperCup`) at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; each dropper drops onto its Config `Conveyor` (`Conveyor` or `Conveyor2`), and a conveyor moves while any of its droppers runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. `CollectorFor(conveyorName)` names a conveyor's collector (`Conveyor2` → `Collector2`); `CollectorNames()` lists every collector the droppers use. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`, `CollectorFor`, `CollectorNames`) |
 | `DropperCup` (helper) | Used only by `DropperService`; presentation only. `Build(spot, name)` returns a Model that fills the spot's box (stacked red cylinders narrowing toward the top, two darker ridges, a rolled lip, a white inside disc) and the CFrame of the center of its open rim, where drops start. Parts are anchored with `CanTouch`/`CanQuery` off. | Implemented |
 | `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Never shows the amount as text. | Implemented (`SetupPlot`, `ResetPlot`) |
-| `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, and room left under `StatueMaxCookies`; spends with `EconomyService.TrySpend` (only what Caleb still has room for); adds to the session total, mirrors it to the statue's `CookiesEaten` attribute, and calls `StatueShape.Apply`. Pad signs say "CALEB IS FULL!" at the max. Total is per server session (no saving). | Implemented (`Start`, `OnPlayerRemoving`) |
-| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. Fatness comes from `Shared/StatueGrowth` (log(1+eaten)/log(1+max)). | Implemented |
+| `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, `CalebCycle.CanFeed()` (Normal only), and room left under `CalebEvent.MaxCookies()`; spends with `EconomyService.TrySpend` (only what Caleb still has room for), then `CalebCycle.AddCookies` (which owns the total and `CookiesEaten`), and calls `StatueShape.Apply(eaten / goal, Config.CalebGrowSeconds)`. On `CalebCycle.StateChanged`: pad signs "FEED CALEB!" in Normal, "CALEB IS FULL!" otherwise; `StatueShape.SetHidden(true)` in TrophyClaim; `SetHidden(false)` + `Apply(0)` on reset. Total is per server session (no saving). | Implemented (`Start(): Model?`, `OnPlayerRemoving`) |
+| `CalebCycle` | Caleb Full Event state machine (see "Caleb Full Event (contract)"). Owns the shared total, contributions by UserId (+ display name), trophy claims, cycle id, and the timed states (`task.delay` timers guarded by cycle id + state). Publishes all statue/player attributes; `CalebTopFeeders` is throttled to `Config.CalebLeaderboardInterval` (batched, last value always published, immediate on reset). | Implemented |
+| `StatueShape` (helper) | Presentation only. `Setup(statue)` remembers every body part's map position/size (body = `Shared/CalebBody`: not `Pedestal*`, `FeedPads`, `Podium`) and the pedestal top. `Apply(progress 0..1, seconds)` (progress = cookies / goal) tweens, from the original map values: fatness (Torso/Belt wider and deeper, arms/legs out and thicker, the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin` grow out, chain stays on the belly) with fatness = log(1 + p·`CalebFatnessCurve`)/log(1 + `CalebFatnessCurve`) (front-loaded), then scales every body part about the pedestal top by `CalebMinScale` → `CalebMaxScale` (p^`CalebScaleCurve`, plus a last `CalebFinalPopScale` jump at exactly the goal). `SetHidden(hidden)` hides/shows the body with `PlotVisibility`. | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -130,13 +148,15 @@ center; `ConveyorN` pairs with `CollectorN`), so the map can lay a conveyor
 out in any horizontal direction. Layout and positions are in `GAME_DESIGN.md` → Plot layout.
 
 Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purchases`, `DropperService`,
-`CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
+`CollectorService`, `EconomyService`, `DataService`. `DataService` → `DataSchema`, `Purchases`, `Config`
+(never `TycoonService`). `DataSchema` → `Purchases`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
 `BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
 `CollectorService` → `CollectorDisplay`, `DropperService` (`ClaimDrop`) and `EconomyService`. `EconomyService` →
 `PlayerDataService`. `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
-`StatueService` → `EconomyService`, `StatueShape`; nothing requires `StatueService` except `ServerMain`.
+`CalebCycle` → `CalebEvent`, `Config` only (it changes no cash); `ServerMain` starts it with the statue `StatueService.Start()` returns.
+`StatueService` → `EconomyService`, `StatueShape`, `CalebCycle`; `StatueShape` → `PlotVisibility`, `Shared/CalebBody`; nothing requires `StatueService` except `ServerMain`.
 
 ## Client
 
@@ -147,7 +167,10 @@ changes cash, ownership, or purchases, and never talks to the server.
 | ------ | ------------ |
 | `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cookies`, shows it as `1,250` (comma separators) next to a cookie icon, and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a cookie icon drawn from round `Frame`s). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
 | `StarterPlayerScripts/FeedPrompt.client.luau` + `FeedPromptUI.luau` | When the local character stands on one of the statue's `FeedPads` (checked every frame against the pads loaded right now, so it works with content streaming; not `Touched` on pads found at start), shows a cartoony pop-up (same style as the cookie counter): "How many cookies do you want to feed Caleb?", progress `eaten / max` with a bar, an amount box (digits only), quick buttons 10 / 100 / 1K (each click **adds** that amount) / ALL (sets everything you can feed), Cancel and FEED!. The bar (fill + preview inside an `Inner` frame inset 4 px so they never touch the outline) is exact (eaten / `StatueMaxCookies`, with a thin minimum sliver above 0) plus a lighter preview of eaten + typed amount (red if unaffordable), and the text shows the exact %. FEED! invokes `Remotes.FeedStatue` with the amount and shows the server's answer. Closes on Cancel, right after a successful feed (with a `SendNotification` "Caleb ate N cookies!"), or when the player walks away; won't reopen until they step off the pad. Decides nothing. `FeedPromptUI.ProgressBar(parent, position, size)` builds that bar (track, fill, preview) and is reused by `StatueBar`. |
-| `StarterPlayerScripts/StatueBar.client.luau` | A `BillboardGui` (in PlayerGui, `AlwaysOnTop`, pixel-sized `Config.StatueBarSize`, `MaxDistance = Config.StatueBarMaxDistance`) above Caleb's head that every player sees: a yellow rounded panel with "Caleb: 12,345 / 1,000,000 🍪" (or "Caleb is FULL! 1,000,000 🍪") over the same cookie bar as the feed pop-up (`FeedPromptUI.ProgressBar`, fill only, same thin minimum sliver). Reads the statue's replicated `CookiesEaten` attribute at start (late joiners) and on `GetAttributeChangedSignal`, tweens the fill and pops the panel. Adorned to an `Attachment` in `Workspace.Terrain` placed `Config.StatueBarHeight` studs above the top of the `Head` (re-placed whenever the Head streams in or changes), so it stays visible when the statue's parts stream out. No remotes; decides nothing. |
+| `StarterPlayerScripts/CookieRain.client.luau` + `CookieRainLook.luau` | Cookie rain while the statue's `CalebState` is `Celebration` (`CalebEvent.GetState`; checked at start for mid-event joiners and on the attribute's changed signal). Visual only: no remotes, no rewards, nothing on the server. Creates a client-local `Workspace.CookieRain` folder (never replicated) and a `CookieRainPuff` attachment in `Terrain`. Cookies come from a pool that grows up to `Config.CookieRainMaxCookies` and is reused (each cookie = 1 disc + 5 chip parts, all anchored, `CanCollide`/`CanTouch`/`CanQuery` off, built by `CookieRainLook.Build`). One `Heartbeat` connection (only while cookies exist) spawns `CookieRainPerSecond`, picks spots in `CookieRainRadius` around the statue (`CookieRainNearPlayerShare` of them within `CookieRainNearPlayerRadius` of the local player), finds the landing height with a downward raycast per cookie (skipping invisible parts such as spawn areas), and moves every part with one `Workspace:BulkMoveTo`. Landing: hop, `ParticleEmitter:Emit` puff, fade. When the state leaves Celebration it stops spawning, lets the falling cookies finish, then disconnects and destroys the folder, pool, and puff. |
+| `StarterPlayerScripts/StatueBar.client.luau` | A `BillboardGui` (in PlayerGui, `AlwaysOnTop`, pixel-sized `Config.StatueBarSize`, `MaxDistance = Config.StatueBarMaxDistance`) above Caleb's head that every player sees: a yellow rounded panel with "Caleb: 12,345 / 1,000,000 🍪" (or "Caleb is FULL! 1,000,000 🍪") over the same cookie bar as the feed pop-up (`FeedPromptUI.ProgressBar`, fill only, same thin minimum sliver). Reads the statue's replicated `CookiesEaten` attribute at start (late joiners) and on `GetAttributeChangedSignal`, tweens the fill and pops the panel. Adorned to an `Attachment` in `Workspace.Terrain` placed `Config.StatueBarHeight` studs above the top of the `Head` (re-placed whenever the Head streams in or changes), so it stays visible when the statue's parts stream out. No remotes; decides nothing. During the Caleb Full Event it also reads `CalebMaxCookies` (falls back to `CalebEvent.MaxCookies()`) and `CalebState`: the text becomes "Caleb is FULL!" (Full), "🎉 COOKIE PARTY! 🎉" (Celebration), "Caleb is resting... 💤" (TrophyClaim). |
+| `StarterPlayerScripts/CalebEventUI.client.luau` + `CalebEventUIBuild.luau` + `CalebEventFX.luau` | The Caleb Full Event's screen UI. `CalebEventUIBuild.Build` makes one `CalebEventUI` ScreenGui (`ResetOnSpawn = false`, `IgnoreGuiInset`, `DisplayOrder` 5) with everything hidden: a white `Flash`, a pool of `Config.CalebConfettiCount` confetti frames, the big `FullText`, the pink `PartyBanner`, the gold `TrophyBanner`, and a purple one-line `Pill`. The client script reads the statue's `CalebState` at start (mid-event join) and on change and switches panels: Full → text slam + confetti (+ flash and a `Humanoid.CameraOffset` shake, restored after, unless just joined); Celebration → "COOKIE PARTY!" + m:ss and party lighting (`CalebPartyColor` ColorCorrection + `CalebPartyBloom` in Lighting, created once, tweened in, tweened out and disabled after); TrophyClaim → trophy banner if the local player's `CalebFed > 0` and not `CalebTrophyClaimed`, "Trophy claimed! 🏆" if claimed, else "CALEB IS RESTING — new round soon" + countdown; TrophyClaim → Normal shows "TROPHY CLAIM CLOSED" for `Config.CalebClosedMessageSeconds`. Countdowns use `CalebEvent.TimeLeft` every `Config.CalebUITickSeconds`. No remotes; decides nothing. |
+| `StarterPlayerScripts/CalebLeaderboard.client.luau` | Builds one `SurfaceGui` (in PlayerGui, `Face = Front`, 40 px/stud, `LightInfluence = 0`) per `Board` part in the statue's `Podium/Leaderboard<corner>` models, once, and re-adorns it when the board streams back in. Shows "CALEB'S TOP FEEDERS", up to `Config.CalebLeaderboardSize` rows from the statue's `CalebTopFeeders` JSON (decoded in `pcall`; bad data = empty), gold/silver/bronze badges for the top 3, the local player's row highlighted, "Be the first to feed Caleb!" when empty, "FINAL RESULTS" in `TrophyClaim`, and `CookiesEaten / CalebMaxCookies` (fallback `CalebEvent.MaxCookies()`). Refreshes on those attributes and `CalebState`. Names are plain text (`RichText = false`, fixed size, truncated). No remotes; decides nothing. |
 | `StarterPlayerScripts/CalebAudio.client.luau` | Caleb Full Event sound effects (no music). Creates one `Sound` per non-empty `Config.CalebSounds` id, once, in a `SoundService.CalebAudio` folder (volumes from `Config.CalebSoundVolumes`), and reuses them. Driven only by attributes: `CalebState` → `Full` plays Full; → `Celebration` plays CelebrationStart and starts the looping CookieRain; leaving `Celebration` fades the loop out (0.8 s, then `Stop`) and plays EventEnd; `CookiesEaten` going up in `Normal` plays Grow (at most every `Config.CalebGrowSoundInterval` s); the local player's `CalebTrophyClaimed` turning true plays TrophyClaim. A late joiner hears no old one-shots; only the loop starts if it is mid-Celebration. Empty ids are skipped (one info print in Studio). Touches no other sounds. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
@@ -166,6 +189,10 @@ read everything in ReplicatedStorage.
 `DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`, `DropLifetime`,
 `DevUnlimitedCash`, `DevStartingCash`, `StatueName`, `StatueMaxCookies`,
 `StatueFeedRange`, `StatueFeedCooldown`, `StatueBarHeight`, `StatueBarSize`,
+`StatueBarMaxDistance`, and the `Caleb*` / `CookieRain*` event settings,
+including the event UI's `CalebUITickSeconds`, `CalebConfettiCount`,
+`CalebShakeStuds`, `CalebShakeSeconds`, `CalebClosedMessageSeconds`,
+`CalebPartySaturation`, `CalebPartyBloom`, `CalebPartyFadeSeconds`). It is frozen (including each
 `StatueBarMaxDistance`, and the Caleb Full Event settings, including
 `CalebSounds`, `CalebSoundVolumes`, `CalebGrowSoundInterval`). It is frozen (including each
 `Droppers` and `Builds` entry), so code cannot change it at runtime.
@@ -214,6 +241,7 @@ type Tycoon = {
 	Plot: Model,                     -- Workspace.Map.Plots.PlotN
 	Owner: Player,
 	Purchased: { [string]: boolean }, -- e.g. Purchased.Dropper2 = true, Purchased.Walls = true
+	Restoring: boolean,               -- true until the saved house is restored; TryPurchase refuses meanwhile
 }
 ```
 
@@ -226,9 +254,73 @@ type Tycoon = {
 - **Active systems:** a purchase activates a system by calling its service
   (`DropperService.Start(plot, dropperId)`). Each system service keeps its own runtime
   state keyed by plot and must clean up in its stop/reset function.
-- **Lifetime:** data lasts for the session. On leave, systems stop, the plot
-  is released and reset. Respawning does not touch any of it (cash lives on
-  the Player, not the character).
+- **Lifetime:** the Tycoon lasts for the session. On leave, systems stop, the
+  plot is released and reset. Respawning does not touch any of it (cash lives
+  on the Player, not the character). The *purchase ids* are also saved by
+  `DataService` and restored on the next claim (see Persistence).
+
+## Persistence (DataService)
+
+Approved by the user 2026-10-01: the **house** (purchase ids) and **Caleb
+trophies** are saved. **Cookies are not saved** (every session starts at
+`StartingCash`).
+
+Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
+
+```lua
+{
+	Version = 1,                       -- DataSchema.CURRENT_VERSION
+	Purchases = { [purchaseId] = true },
+	Trophies = { TrophyRecord },       -- oldest first, one per EventId
+	SessionJobId = "<JobId>" | nil,    -- session lock (DataService only)
+	SessionTime = os.time(),           -- last write by the lock holder
+}
+```
+
+- **Loading** (on join, background): one `UpdateAsync` reads, cleans
+  (`DataSchema.FromStored`), and takes the session lock. Unknown purchase
+  ids and bad/duplicate trophy records are dropped; older `Version`s are
+  migrated step by step. A value that is not a table, or has a **newer**
+  `Version` than the server knows, is refused (not overwritten).
+- **Load failure** (all retries failed, refused data, Studio without API
+  access): the player is **not loaded** for the session: `IsLoaded` is
+  false, `GetPurchases`/`GetTrophies` return `{}`, `SetPurchased` is
+  ignored, `AddTrophy` returns false, and **nothing is ever written** for
+  them. A `warn` says so; gameplay works, unsaved.
+- **Retries:** every DataStore call is tried up to 5 times, waiting 1, 2, 4,
+  8 s.
+- **Session lock (chosen over a plain "last saved" stamp):** the record
+  holds the id of the server that has it open (`game.JobId`; a random id in
+  Studio). Every save is an `UpdateAsync` that writes only if the record
+  still carries this server's id, so a server that lost the lock can never
+  overwrite newer data. Leaving clears the id. A joining server that finds
+  another server's fresh lock (a fast server hop while the old server is
+  still saving) cancels, waits 5 s, and retries; after ~30 s it takes the
+  lock over (the old server's later saves are then refused). A lock older
+  than 30 min (crashed server) is taken over at once. Autosave rewrites
+  unchanged data every 10 min only to keep the lock fresh. A player who
+  rejoins the **same** server waits for their previous leave save first.
+  Why: a time stamp alone can't tell which server's data is newer when two
+  servers' clocks and write times interleave; a lock with a compare on
+  every write can.
+- **Saving:** `UpdateAsync` on leave (and release the lock), every
+  `Config.DataAutosaveSeconds` for players whose data changed, right after
+  `AddTrophy`, and in `game:BindToClose` (everyone in parallel; waits for
+  all loads/saves, at most 25 s). One write per player at a time.
+- **Studio without API access:** DataStore calls error; DataService detects
+  it, warns once ("Enable Studio Access to API Services to test saving"),
+  and runs everyone unsaved.
+- **Restoring the house:** `TycoonService.TryClaimPlot` spawns
+  `RestorePurchases(player)`: it waits for `DataService.WaitForData`, then
+  walks the unlock chain from the first buttons (`Purchases.UnlockedBy`)
+  and applies every saved purchase whose `After` is already applied, the
+  same way as a purchase (`PlotStages.ShowAfterPurchase` + `DropperService.Start`)
+  but without spending. Saved ids that no longer exist, or whose `After`
+  wasn't saved, are skipped. Until it finishes, `TryPurchase` refuses, so a
+  player is never charged for something they own.
+- **Trophies:** DataService only stores and returns them
+  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`); TrophyService (wave 2)
+  shows and awards them.
 
 ## Economy model
 
@@ -252,7 +344,9 @@ type Tycoon = {
   `TrySpend(entry.Cost)` succeeds (skipped when `Cost` is 0) → marks
   `Purchased[purchaseId]`, calls `PlotStages.ShowAfterPurchase` (hide that
   button, show a build's parts, show the next button), and for a dropper
-  calls `DropperService.Start(plot, purchaseId)`.
+  calls `DropperService.Start(plot, purchaseId)`, then records it with
+  `DataService.SetPurchased`. While the saved house is being restored after a
+  claim (`Restoring`), `TryPurchase` refuses.
   Touches from non-owners are ignored. On release the plot goes back to
   `ShowUnclaimed`.
 - Drop values are set by the server from the dropper's `Config.Droppers`
@@ -323,7 +417,7 @@ type TrophyRecord = {
 ```
 
 Statue children: Caleb's body parts, `Pedestal*` parts, `FeedPads` (folder),
-and `Podium` (folder: leaderboard board and other podium decoration).
+and `Podium` (folder: the four `Leaderboard<corner>` models, each with a `Board` part that carries the client SurfaceGui, plus other podium decoration).
 Scaling, hiding, and client animation touch **only Caleb's body parts**.
 
 ### Who does presentation

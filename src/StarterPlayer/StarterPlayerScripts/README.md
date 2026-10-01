@@ -10,6 +10,8 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   server; the server decides and spends.
 - `StatueBar.client.luau` — progress bar above Caleb's head ("Caleb: N /
   1,000,000 🍪"), reusing `FeedPromptUI.ProgressBar`. Display only.
+- `CookieRain.client.luau` + `CookieRainLook.luau` (ModuleScript) — cookie
+  rain during Caleb's Celebration. Client-only visuals, pooled; no rewards.
 - `CalebAudio.client.luau` — Caleb Full Event sound effects, driven only by
   the statue's / player's attributes (`Config.CalebSounds`).
 
