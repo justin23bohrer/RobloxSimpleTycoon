@@ -23,7 +23,7 @@ local CUBE_SIZE = Vector3.new(0.3, 0.9, 0.9) -- a Cylinder: X is the cookie's th
 local CUBE_COLOR = Color3.fromRGB(214, 160, 90) -- same dough color as the drops
 local GOLD = Color3.fromRGB(255, 215, 60)
 -- Where new cubes appear, relative to the TankLid's center: just under the
--- lid, anywhere across the tank's inside (x 14..20, z -29..-26.6) with room
+-- lid, anywhere across the tank's inside (6 studs wide, 2.4 deep) with room
 -- so a cube never starts inside the glass. The lid also covers the front
 -- glass, so the inside is centered 0.2 studs behind the lid's center.
 local CUBE_SPAWN_OFFSET = Vector3.new(0, -1.1, -0.2)

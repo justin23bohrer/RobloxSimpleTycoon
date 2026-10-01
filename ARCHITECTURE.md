@@ -88,6 +88,11 @@ reach the server.
 `CollectorService` is deliberately not named `CollectionService`, which is a
 built-in Roblox service.
 
+Conveyor direction: `DropperService` moves the conveyor toward the plot's
+`Collector` (flat unit vector from the `Conveyor`'s center to the
+`Collector`'s center), so the map can lay the conveyor out in any horizontal
+direction. Layout and positions are in `GAME_DESIGN.md` → Plot layout.
+
 Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `DropperService`,
 `CollectorService`, `EconomyService`. `PlotStages` → `BuyButtons`, `PlotVisibility`.
 `BuyButtons` → `PlotVisibility`.

@@ -4,7 +4,7 @@
 --
 -- * Start(plot, dropperId) places a plain part named dropperId at the plot's
 --   DropperSpotN (N = the dropper's position in Config.Droppers), sets the
---   conveyor moving toward +X (plots are unrotated; the Collector is at +X),
+--   conveyor moving toward the plot's Collector,
 --   and every Config.DropInterval seconds creates a "Drop" part worth that
 --   dropper's Config DropValue in the plot's "Drops" folder. A drop looks like
 --   a chocolate chip cookie: a flat disc with a few welded chip parts that
@@ -56,10 +56,25 @@ local dropValues: { [BasePart]: number } = {}
 local dropPlots: { [BasePart]: Model } = {}
 
 
+-- The conveyor carries drops toward the plot's Collector, whichever way the
+-- map lays it out: flat (no Y) unit direction from the conveyor's center to
+-- the Collector's center.
+local function conveyorDirection(plot: Model, conveyor: BasePart): Vector3
+	local collector = plot:FindFirstChild("Collector")
+	if not collector or not collector:IsA("BasePart") then
+		return Vector3.xAxis
+	end
+	local offset = collector.Position - conveyor.Position
+	local flat = Vector3.new(offset.X, 0, offset.Z)
+	return if flat.Magnitude > 0 then flat.Unit else Vector3.xAxis
+end
+
 local function setConveyorMoving(plot: Model, moving: boolean)
 	local conveyor = plot:FindFirstChild("Conveyor")
 	if conveyor and conveyor:IsA("BasePart") then
-		conveyor.AssemblyLinearVelocity = if moving then Vector3.new(Config.ConveyorSpeed, 0, 0) else Vector3.zero
+		conveyor.AssemblyLinearVelocity = if moving
+			then conveyorDirection(plot, conveyor) * Config.ConveyorSpeed
+			else Vector3.zero
 	end
 end
 
