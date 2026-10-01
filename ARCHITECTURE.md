@@ -468,6 +468,73 @@ message, countdowns, trophy prompt text, screen VFX), `CookieRain.client`,
 existing `StatueBar.client`. No new RemoteEvents for the event: state is
 attributes; the trophy claim uses a server `ProximityPrompt`.
 
+## Trophy Collection + Powers (contract)
+
+Approved by the user 2026-10-01. Built by several agents in parallel: **this
+section is the contract**; names are fixed (change only with the lead's OK).
+User decisions: no Magnet Caleb; Big Brain = Collect pad bonus; trophy claim
+stays 2 minutes; the Trophy Case stays a purchase and **a trophy's power only
+works while it is displayed in a built Trophy Case**.
+
+### Data (DataService / DataSchema, Version 2)
+
+```lua
+type TrophyRecord = {
+	InstanceId: string, -- unique per earned trophy (HttpService:GenerateGUID(false)), never reused
+	Variant: string,    -- definition id in Shared/TrophyVariants (never renamed)
+	EventId: string,    -- the CalebCycleId it was earned in ("" for none)
+	EarnedAt: number,   -- os.time()
+}
+PlayerData.Equipped: { string } -- InstanceIds in display order, unique, owned, at most Config.TrophyActiveSlots
+```
+
+Version 1 → 2 migration: every old record gets a new InstanceId; Equipped =
+the newest `TrophyActiveSlots` records (what the old case showed).
+
+### Shared modules
+
+| Module | Owner | Contract |
+| ------ | ----- | -------- |
+| `Shared/TrophyVariants` | Definitions | Every definition: `Id`, `DisplayName`, `Rarity`, `Description`, `Powers: {[TrophyPowers.Stat]: number}`, `PowerText` (short line, e.g. "2x COOKIE PRODUCTION"), `Weight`, and the existing look fields. `Rarities` = Common, Uncommon, Rare, Epic, Legendary, Mythic, each `{ Order, Color, ... }` (the ONLY place rarity presentation lives). `Get(id)` (never nil), `RollReward(ownedVariantIds): string` (rarity by `Config.TrophyRarityChances`, then a definition of that rarity, preferring unowned; server calls it), `CollectableCount(): number` (definitions with Weight > 0). |
+| `Shared/TrophyPowers` | Lead (names) / Powers (logic) | `Stat` names and the stacking rule (see the file). Powers agent may add a pure `Compute(variantIds): {[Stat]: number}` here. |
+
+### Server modules
+
+| Module | Owner | API |
+| ------ | ----- | --- |
+| `DataService` | Inventory | existing API, plus `AddTrophy` assigns `InstanceId` when missing; `GetEquipped(player): {string}`; `SetEquipped(player, ids): (boolean, string?)` (validates: loaded, every id owned, no repeats, ≤ `TrophyActiveSlots`); `EquippedChanged: RBXScriptSignal (player)` |
+| `TrophyService` | Inventory | claim uses `TrophyVariants.RollReward`; handles the `TrophyEquip` remote; publishes the `TrophyInventory` attribute; decides what is displayed (equipped records, only if the case is built) and calls `TrophyCaseDisplay.Show(plot, case, recordsInSlotOrder)` and `PowerService.SetDisplayed(player, variantIds)` (empty when the case isn't built or the plot is released). Session-only (unsaved) trophies keep working as today. |
+| `PowerService` | Powers | `SetDisplayed(player, variantIds)`, `Get(player, stat): number` (the capped total bonus, 0 if none), `OnPlayerAdded/OnPlayerRemoving`. Applies WalkSpeed / JumpHeight to the character (and on respawn), publishes `TrophyStats` + `CanDoubleJump`. Requires only Shared modules (no TycoonService: avoids a require cycle). Event-driven, no loops. |
+| `DropperService` / `CollectorService` | Powers | read `PowerService.Get(owner, …)` for the plot owner: drop value × (1 + CookieMultiplier), interval ÷ (1 + DropperSpeed), ExtraCookieChance, LuckyCookieChance, collect × (1 + CollectBonus). |
+| `TrophyCaseDisplay` | Case | `Show(plot, case, records)` shows `records` in slot order (slot 1 = first), with a nameplate per trophy (name, rarity color from `TrophyVariants.Rarities`); `Clear(plot)`. |
+| `TrophyModel` / `TrophyAccessories` | Definitions | looks for every definition. |
+
+### Remote
+
+| Remote | Type | Args (untrusted) | Returns |
+| ------ | ---- | ---------------- | ------- |
+| `TrophyEquip` | RemoteFunction | `action: "Equip" \| "Unequip"`, `instanceId: string` | `(true)` or `(false, reason)` |
+
+Server checks: types, rate limit (`Config.TrophyEquipCooldown`), data loaded,
+the instance is the caller's, equip limit. Ownership is never taken from the
+client.
+
+### Player attributes (server-written, read-only for clients)
+
+| Attribute | Type | Meaning |
+| --------- | ---- | ------- |
+| `TrophyInventory` | string | JSON `{ Owned = [{InstanceId, Variant, EventId, EarnedAt}], Equipped = [InstanceId], CaseBuilt = bool, Max = TrophyActiveSlots, Saved = bool }` |
+| `TrophyStats` | string | JSON `{[Stat] = total}` of active powers |
+| `CanDoubleJump` | boolean | Rocket Caleb's double jump is active |
+
+### Client
+
+`TrophyInventory.client` (+ UI builder module): "MY CALEB TROPHIES N / M"
+button + panel, trophy details (name, rarity, PowerText, Description),
+EQUIP / UNEQUIP via `TrophyEquip`, "ACTIVE TROPHIES: n / 5", and a note when
+the Trophy Case isn't built. `DoubleJump.client`: second jump when
+`CanDoubleJump` is true.
+
 ## Adding a feature (for future agents)
 
 1. Confirm the feature is approved (in `GAME_DESIGN.md` / `TODO.md`).
