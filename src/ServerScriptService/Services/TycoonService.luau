@@ -4,10 +4,13 @@
 -- * Finds the plots in Workspace.Map.Plots at startup.
 -- * A player claims a free plot by stepping on its ClaimPad (one plot each).
 -- * Releases the plot (and stops its systems) when the player leaves.
--- * Is the single place that decides purchases for a tycoon. Droppers unlock
---   in Config.Droppers order: only the next one can be bought.
+-- * Is the single place that decides purchases for a tycoon (droppers and
+--   builds, see Purchases). Each one unlocks only after the purchase named in
+--   its Config After field: Dropper1-4 -> Walls -> Stairs -> SecondFloor ->
+--   Dropper5-8.
 -- * Tells PlotStages what to show: only the ClaimPad while unclaimed, then the
---   collect area and the first buy button, then one more button per purchase.
+--   collect area and the first buy button, then the next button(s) and any
+--   built parts after each purchase.
 --
 -- Public ownership marker: each plot Model has an "OwnerUserId" attribute set
 -- by this service (nil when unclaimed). Other services and the client may read
@@ -23,6 +26,7 @@ local CollectorService = require(script.Parent.CollectorService)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 local PlotStages = require(script.Parent.PlotStages)
+local Purchases = require(script.Parent.Purchases)
 
 local TycoonService = {}
 
@@ -32,14 +36,15 @@ export type Tycoon = {
 	Plot: Model,
 	Owner: Player,
 	-- Purchase id -> true once bought. Ids are Config.Droppers[N].Id
-	-- ("Dropper1", "Dropper2", ...).
+	-- ("Dropper1", ...) and Config.Builds[N].Id ("Walls", "Stairs", ...).
 	-- Add new upgrades as new ids; the service that runs the upgrade keeps its
 	-- own runtime state keyed by plot.
 	Purchased: { [string]: boolean },
 }
 
--- Parts every plot model must contain (see src/Workspace/Map/Plots), plus a
--- DropperSpotN and BuyButtonN for each entry in Config.Droppers.
+-- Parts every plot model must contain (see src/Workspace/Map/Plots), plus
+-- every purchase's button, each dropper's DropperSpotN, conveyor, and
+-- collector, and each build's Parts.
 local REQUIRED_PARTS = {
 	"Base",
 	"ClaimPad",
@@ -48,9 +53,17 @@ local REQUIRED_PARTS = {
 	"Collector",
 	"CollectPad",
 }
-for index in Config.Droppers do
-	table.insert(REQUIRED_PARTS, `DropperSpot{index}`)
-	table.insert(REQUIRED_PARTS, BuyButtons.PartName(index))
+for _, purchase in Purchases.All() do
+	table.insert(REQUIRED_PARTS, purchase.ButtonName)
+	if purchase.Kind == "Dropper" then
+		table.insert(REQUIRED_PARTS, `DropperSpot{purchase.Index}`)
+		table.insert(REQUIRED_PARTS, purchase.Entry.Conveyor)
+		table.insert(REQUIRED_PARTS, DropperService.CollectorFor(purchase.Entry.Conveyor))
+	else
+		for _, name in purchase.Entry.Parts do
+			table.insert(REQUIRED_PARTS, name)
+		end
+	end
 end
 
 -- Seconds a player must wait between buy-button touches. Touched fires many
@@ -107,7 +120,7 @@ local function onClaimPadTouched(plot: Model, hit: BasePart)
 	end
 end
 
-local function onBuyButtonTouched(plot: Model, hit: BasePart, dropperId: string)
+local function onBuyButtonTouched(plot: Model, hit: BasePart, purchaseId: string)
 	local player = getPlayerFromHit(hit)
 	if not player or ownerByPlot[plot] ~= player then
 		return -- not a player, or not this plot's owner
@@ -119,7 +132,7 @@ local function onBuyButtonTouched(plot: Model, hit: BasePart, dropperId: string)
 	end
 	lastBuyTouch[player] = now
 
-	TycoonService.TryPurchaseDropper(player, dropperId)
+	TycoonService.TryPurchase(player, purchaseId)
 end
 
 -- Called once by ServerMain before any players are handled.
@@ -145,8 +158,8 @@ function TycoonService.Start()
 		plot.ClaimPad.Touched:Connect(function(hit)
 			onClaimPadTouched(plot, hit)
 		end)
-		BuyButtons.Connect(plot, function(hit, dropperId)
-			onBuyButtonTouched(plot, hit, dropperId)
+		BuyButtons.Connect(plot, function(hit, purchaseId)
+			onBuyButtonTouched(plot, hit, purchaseId)
 		end)
 	end
 end
@@ -203,33 +216,37 @@ function TycoonService.HasPurchased(player: Player, purchaseId: string): boolean
 	return tycoon ~= nil and tycoon.Purchased[purchaseId] == true
 end
 
--- Buys one dropper (a Config.Droppers Id) for the player's own plot.
--- Returns true on success. Called when the owner touches a BuyButtonN.
--- Droppers must be bought in Config.Droppers order; the price comes only from
--- Config. A Cost of 0 is free (nothing is spent).
-function TycoonService.TryPurchaseDropper(player: Player, dropperId: string): boolean
+-- Buys one purchase (a Config.Droppers or Config.Builds Id) for the player's
+-- own plot. Returns true on success. Called when the owner touches its button.
+-- A purchase can only be bought after the one named in its After field; the
+-- price comes only from Config. A Cost of 0 is free (nothing is spent).
+-- Buying a dropper starts it; buying a build shows its parts (PlotStages).
+function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 	local tycoon = tycoonsByPlayer[player]
-	if not tycoon or typeof(dropperId) ~= "string" then
+	if not tycoon or typeof(purchaseId) ~= "string" then
 		return false -- player has no plot, or a bad id
 	end
-	local dropper, index = DropperService.GetConfig(dropperId)
-	if not dropper or not index then
-		return false -- not a real dropper id
+	local purchase = Purchases.Get(purchaseId)
+	if not purchase then
+		return false -- not a real purchase id
 	end
-	if tycoon.Purchased[dropperId] then
+	if tycoon.Purchased[purchaseId] then
 		return false -- already bought; never charge twice
 	end
-	local previous = Config.Droppers[index - 1]
-	if previous and not tycoon.Purchased[previous.Id] then
+	local after = purchase.Entry.After
+	if after ~= nil and not tycoon.Purchased[after] then
 		return false -- not unlocked yet; buy the one before it first
 	end
-	if dropper.Cost > 0 and not EconomyService.TrySpend(player, dropper.Cost) then
+	local cost = purchase.Entry.Cost
+	if cost > 0 and not EconomyService.TrySpend(player, cost) then
 		return false -- cannot afford it; cash unchanged
 	end
 
-	tycoon.Purchased[dropperId] = true
-	PlotStages.ShowAfterPurchase(tycoon.Plot, index)
-	DropperService.Start(tycoon.Plot, dropperId)
+	tycoon.Purchased[purchaseId] = true
+	PlotStages.ShowAfterPurchase(tycoon.Plot, purchaseId)
+	if purchase.Kind == "Dropper" then
+		DropperService.Start(tycoon.Plot, purchaseId)
+	end
 	return true
 end
 

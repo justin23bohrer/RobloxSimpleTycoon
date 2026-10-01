@@ -2581,6 +2581,3503 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Walls",
+      "className": "Model",
+      "children": [
+        {
+          "name": "WallLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1,
+              15,
+              66
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -32.5,
+                  9.5,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "WallRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1,
+              15,
+              66
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  32.5,
+                  9.5,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "WallBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              64,
+              15,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  9.5,
+                  -75.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "WallFrontLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              24,
+              15,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -20,
+                  9.5,
+                  -10.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "WallFrontRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              24,
+              15,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  20,
+                  9.5,
+                  -10.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stairs",
+      "className": "Model",
+      "children": [
+        {
+          "name": "Step1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              1,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  2.5,
+                  -21
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              2,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  3.0,
+                  -23
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              3,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  3.5,
+                  -25
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              4,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  4.0,
+                  -27
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step5",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              5,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  4.5,
+                  -29
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step6",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              6,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  5.0,
+                  -31
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step7",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              7,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  5.5,
+                  -33
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step8",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              8,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  6.0,
+                  -35
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step9",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              9,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  6.5,
+                  -37
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step10",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              10,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  7.0,
+                  -39
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step11",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              11,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  7.5,
+                  -41
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step12",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              12,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  8.0,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step13",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              13,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  8.5,
+                  -45
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step14",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              14,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  9.0,
+                  -47
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step15",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              15,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  9.5,
+                  -49
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Step16",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              16,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  10.0,
+                  -51
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                245,
+                225,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SecondFloor",
+      "className": "Model",
+      "children": [
+        {
+          "name": "FloorMain",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              59,
+              1,
+              66
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -3.5,
+                  17.5,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                200,
+                200
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "FloorBackRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              7,
+              1,
+              24
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29.5,
+                  17.5,
+                  -64
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                200,
+                200
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "FloorFrontRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              7,
+              1,
+              10
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29.5,
+                  17.5,
+                  -15
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                200,
+                200
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "FloorRightEdge",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1,
+              1,
+              32
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  32.5,
+                  17.5,
+                  -36
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                200,
+                200
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1,
+              3,
+              66
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -32.5,
+                  19.5,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1,
+              3,
+              66
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  32.5,
+                  19.5,
+                  -43
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              64,
+              3,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  19.5,
+                  -75.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RailFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              64,
+              3,
+              1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  19.5,
+                  -10.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "HoleRailSide",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.6,
+              3,
+              32
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  25.7,
+                  19.5,
+                  -36
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "HoleRailFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              6,
+              3,
+              0.6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  29,
+                  19.5,
+                  -19.7
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                196,
+                128,
+                72
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conveyor2",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          1,
+          48
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              18.5,
+              -42
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            40,
+            40,
+            40
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    },
+    {
+      "name": "Collector2",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          6,
+          1,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              18.5,
+              -69
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            75,
+            151,
+            75
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth"
+      }
+    },
+    {
+      "name": "DropperSpot5",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              24,
+              -22
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "BuyButton5",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -20,
+              18.2,
+              -22
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton5Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -20,
+                  18.099999999999998,
+                  -22
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 5",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DropperSpot6",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              24,
+              -30
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "BuyButton6",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -20,
+              18.2,
+              -30
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton6Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -20,
+                  18.099999999999998,
+                  -30
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 6",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DropperSpot7",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              24,
+              -38
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "BuyButton7",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -20,
+              18.2,
+              -38
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton7Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -20,
+                  18.099999999999998,
+                  -38
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 7",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DropperSpot8",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          4,
+          4,
+          4
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -28,
+              24,
+              -46
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            245,
+            205,
+            48
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "CanCollide": false,
+        "CanTouch": false,
+        "CanQuery": false,
+        "Transparency": 0.7
+      }
+    },
+    {
+      "name": "BuyButton8",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -20,
+              18.2,
+              -46
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            0,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuyButton8Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -20,
+                  18.099999999999998,
+                  -46
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                110,
+                0,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.235,
+                  0.235
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Dropper 8",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuildButton1",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              16,
+              2.2,
+              -26
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            140,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuildButton1Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  16,
+                  2.1,
+                  -26
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                140,
+                70,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.6,
+                  0.15
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Build Walls",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuildButton2",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              16,
+              2.2,
+              -34
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            140,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuildButton2Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  16,
+                  2.1,
+                  -34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                140,
+                70,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.6,
+                  0.15
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Build Stairs",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BuildButton3",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              16,
+              2.2,
+              -42
+            ],
+            "orientation": [
+              [
+                0,
+                -1,
+                0
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            140,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuildButton3Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  16,
+                  2.1,
+                  -42
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                140,
+                70,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.6,
+                  0.15
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "2nd Floor",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
