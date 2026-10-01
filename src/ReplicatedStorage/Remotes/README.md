@@ -3,7 +3,12 @@
 This folder syncs into Studio as `ReplicatedStorage.Remotes`. (Rojo ignores this
 README; it is documentation only.)
 
-It is intentionally empty. The current MVP needs **no** remotes:
+Remotes here:
+
+- `FeedStatue.model.json` (RemoteFunction): the feed pop-up asks the server
+  to feed the statue an amount of cookies. Handled by `StatueService`.
+
+Everything else needs no remote:
 
 - Buying and collecting happen when a character touches a part. The server
   receives `Touched` directly, so no client message is needed.

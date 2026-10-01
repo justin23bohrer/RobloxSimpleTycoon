@@ -39,6 +39,18 @@ local Config = {
 	-- Prevents lost drops from piling up forever.
 	DropLifetime = 30,
 
+	-- Feeding the statue (StatueService). Players spend cookies on the four
+	-- feed pads around the statue; the more Caleb has eaten (all players
+	-- together, this server session), the fatter he gets. He stops growing
+	-- and stops eating at StatueMaxCookies.
+	StatueName = "Caleb",
+	StatueMaxCookies = 1_000_000,
+	-- How close (studs, flat distance) a player must be to a feed pad's center
+	-- for the server to accept a feed.
+	StatueFeedRange = 12,
+	-- Seconds a player must wait between feeds (anti-spam).
+	StatueFeedCooldown = 0.5,
+
 	-- TESTING ONLY. When true, players start with DevStartingCash instead of
 	-- StartingCash, but only inside Roblox Studio (RunService:IsStudio()). It
 	-- never applies in a published game. Keep this false in commits.
