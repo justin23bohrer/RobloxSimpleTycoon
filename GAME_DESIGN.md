@@ -108,13 +108,13 @@ The stored amount is **not** shown as text. Instead:
 
 ## Plot layout (prototype)
 
-Plain parts only, no theme. The plot floor is **100 × 100 studs** (it was
-50 × 50) and the ground is 280 × 280 of green grass
+Plain parts only, no theme. The plot floor is **66 × 66 studs** (2/3 of the
+earlier 100 × 100) and the ground is 280 × 280 of green grass
 (`Material = Grass`, color `86,166,64`). Seen from the spawn, looking at the
 plot ("left" is −X, "back" is −Z):
 
 ```
-                 BACK (z = -110)   [ cash tank ]
+                 BACK (z = -76)    [ cash tank ]
    Collector ■                      ( Collect )
            ║
            ║  ▣ spot 4   ( Buy 4 )
@@ -129,14 +129,14 @@ plot ("left" is −X, "back" is −Z):
 
 | Part | Position (center) |
 | ---- | ----------------- |
-| `Base` | (0, 1.5, −60), 100 × 1 × 100 |
-| `Conveyor` | (−42, 2.5, −58), 4 × 1 × 76, runs front → back along the left side |
-| `DropperSpot1`–`4` | x −42, y 8, z −26 / −38 / −50 / −62 (above the conveyor) |
-| `BuyButton1`–`4` | x −32, z matching their spot (just right of the conveyor) |
-| `Collector` | (−42, 2.5, −99), back-left corner at the conveyor's end |
-| `CollectPad` | (0, 2.2, −102), centered on the back wall; `CashTank` right behind it |
+| `Base` | (0, 1.5, −43), 66 × 1 × 66 |
+| `Conveyor` | (−28, 2.5, −42), 4 × 1 × 48, runs front → back along the left side |
+| `DropperSpot1`–`4` | x −28, y 8, z −22 / −30 / −38 / −46 (above the conveyor) |
+| `BuyButton1`–`4` | x −20, z matching their spot (just right of the conveyor) |
+| `Collector` | (−28, 2.5, −69), back-left corner at the conveyor's end |
+| `CollectPad` | (0, 2.2, −68), centered on the back wall; `CashTank` right behind it |
 | `ClaimPad` | (0, 2.2, −15), front center |
-| `OwnerSign` | (35, 5, −12), front-right corner |
+| `OwnerSign` | (23, 5, −12), front-right corner |
 
 The conveyor pushes drops toward the `Collector` (DropperService works the
 direction out from their positions), so moving those two parts is enough to
@@ -147,7 +147,7 @@ as an outline:
 
 | Part               | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
-| `Base`             | 100 × 100 plot floor, in front of the spawn. Always visible. |
+| `Base`             | 66 × 66 plot floor, in front of the spawn. Always visible. |
 | `ClaimPad`         | Round blue pad with a dark blue ring at the front of the plot, label "CLAIM TYCOON!". Shown only while the plot is unclaimed. |
 | `OwnerSign`        | Shows the owner's name.                              |
 | `BuyButton1`–`4`   | Round red pads with dark red rings, in a line just right of the conveyor, each next to its dropper spot. Buy droppers 1–4. |
