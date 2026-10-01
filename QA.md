@@ -392,13 +392,66 @@ Services** ON (published place) except TR8. Watch Output (Server view).
 | TR6 | Player B joins after the goal (during Full/Celebration/TrophyClaim). | B never sees the prompt; claiming is refused. | |
 | TR7 | Let TrophyClaim end without claiming. | The podium trophy and prompt disappear at the reset; Caleb is back. Nothing can be claimed afterwards (a held prompt finishing exactly at the end is refused: no trophy). | |
 | TR8 | API access **OFF** (unsaved). Feed, claim. Build the Trophy Case. | Notification says you got <Name> and that it couldn't be saved. The trophy stands in your Trophy Case this session. Stop/Play: it's gone (it was never saved). One "saving is OFF" warning only. | |
-| TR9 | Trophy Case: claim a plot with Walls built, buy "Trophy Case / 🍪 7500" (button behind the Build 3 spot on the right side). | Cookies −7500. A wooden glass-front cabinet with a red velvet back and a "🏆 TROPHY CASE" sign appears against the back wall between the two windows; it doesn't block the conveyor, collector, cookie jar/Collect pad, stairs, or doorway. With trophies, they stand on the gold slots (newest in the middle), facing into the room, inside the glass. Without trophies: 5 empty gold slots. Before buying and after leaving: no case. | |
+| TR9 | Trophy Case: claim a plot with Walls built, buy "Trophy Case / 🍪 7500" (button behind the Build 3 spot on the right side). | Cookies −7500. A big dark-wood cabinet (about 25 wide, nearly up to the ceiling) with gold trim, a red velvet back, two shelf rows behind glass, and a red "MY CALEB TROPHIES" sign on top appears against the middle of the back wall (covering the middle back window from inside); it doesn't block the conveyor, collector, cookie jar/Collect pad, stairs, `BuildButton4` area, or doorway, and you can walk all around in front of it. Trophies stand on the bottom row (slot 1 in the middle, then left, right, far left, far right), facing into the room, inside the glass, none poking through the shelf above. Without trophies: empty shelves (no visible slots). Before buying and after leaving: no case and no light glow on the back wall. | |
 | TR10 | Restore after rejoin (API ON): with the case built and 1+ saved trophies, Stop, Play, claim any plot. | The house comes back with the Trophy Case and the same trophies in it (no charge). Same on Plot2–4 (case against that house's back wall, facing in). | |
 | TR11 | New trophy updates the case: with the case built, claim a trophy. | The new trophy appears in the middle slot right away; older ones move outward. | |
 | TR12 | Second cycle: after claiming, let the cycle reset, feed to the goal again, claim again. | New `CalebCycleId`; you get another trophy; it is one you don't own yet **of the rolled rarity** (a repeat only once you own every trophy of that rarity). Both are saved. | |
 | TR13 | 6 trophies (repeat TR12, or temporarily set the fast goal low). | The case shows the newest 5; the oldest isn't shown but is still in the save (`DataService.GetTrophies`). | |
 | TR14 | Variant look check: run several cycles (or in the command bar: `require(game.ServerScriptService.Services.TrophyModel).Build("GoldenCaleb", 3).Parent = workspace`, for each Id in `TrophyVariants.List` and an unknown Id like `"Nope"`). | Each looks like a mini cartoony Caleb (big round head, hair cap, big eyes, grin, belly) in its color, pose, accessories (crown, party hat, chef hat, sunglasses, cookie in hand, bow tie, and the TD2 looks), and effect (sparkles/glow/flame), with the plinth band in its rarity color. The unknown Id shows a gray "Mystery Caleb". Nothing collides or can be clicked. | |
 | TR15 | Server shutdown right after claiming (API ON): claim, then Stop within 2 s. | Next session the trophy is there (saved right after the claim, and in BindToClose). | |
+| TR16 | Trophy Case nameplates: case built, 1+ trophies shown. Walk up close, then back to the Collect pad, then 60+ studs away. | Each trophy has a small tilted gold-rimmed plaque in front of it with its name in its rarity color (Common white, Rare blue, ...) and, if the trophy has a power, the power line (e.g. "2x COOKIE PRODUCTION") in white; readable at night (not dimmed). Plaques disappear beyond ~60 studs. The plaque doesn't hide the trophy. | |
+| TR17 | Trophy Case lighting: case built, with and without trophies; day and night (`Lighting.ClockTime`). | With trophies shown: a soft warm light inside each row, no glare, no bright Neon. Before the case is bought, and after the plot is released: no light on the back wall. | |
+| TR18 | Slot order: with equipping (Inventory), equip 1, then 2, ... 5 trophies; unequip one. | Slot 1 (bottom-row middle) = first equipped, then left, right, far left, far right; unequipping rebuilds the row in the new order. (Before the Inventory change: TrophyService passes oldest first, so slot 1 = oldest.) Plot2–4: same, case against each house's back wall facing in. | |
+
+## Trophy powers
+
+Needs the Trophy Case built and trophies equipped (Inventory UI). For quick
+checks, in the Server command bar:
+`require(game.ServerScriptService.Services.PowerService).SetDisplayed(game.Players.<Name>, { "<VariantId>", ... })`
+(TrophyService resets it on the next equip change). Read `TrophyStats` /
+`CanDoubleJump` on the player in the Properties window.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PW1 | No trophies displayed. | `TrophyStats` = `[]` or `{}`, `CanDoubleJump` = false; drops worth exactly `DropValue`, one drop per `DropInterval`, payout = stored; normal WalkSpeed (16) / JumpHeight (7.2). | |
+| PW2 | CookieMultiplier: display a +1.0 cookie trophy. | Collected cookies per drop double (Dropper1: 20 instead of 10) from the next drop. | |
+| PW3 | DropperSpeed: display a DropperSpeed trophy. | Drops come out faster (+1.0 → one per 1 s instead of 2 s) from the next drop. | |
+| PW4 | ExtraCookieChance: display one (or set a high value temporarily in a test definition). | Sometimes two cookies fall at once (one just below the other); both are counted. Never three. | |
+| PW5 | LuckyCookieChance: display one. | Sometimes a **gold** cookie; it adds 5× the normal value. | |
+| PW6 | CollectBonus: display +0.5, collect 100 stored. | Cookies +150 (rounded down for odd amounts). | |
+| PW7 | WalkSpeed / JumpHeight: display them. | Visibly faster / higher right away; Humanoid `UseJumpPower` = false. Unequip → back to normal right away. | |
+| PW8 | DoubleJump: display Rocket Caleb. | `CanDoubleJump` = true; press jump, then again in the air → a second jump; only one per air time; landing resets. Holding jump does not fire both at once. Unequip → no air jump. | |
+| PW9 | Caps: display several trophies of one stat whose sum exceeds the cap. | `TrophyStats` shows the cap (e.g. CookieMultiplier 2 → 3× cookies), never more. Two copies of the same definition count once. | |
+| PW10 | Respawn (reset character) with speed/jump trophies. | Same boosted WalkSpeed / JumpHeight after respawn; not compounded (reset twice → same values). | |
+| PW11 | 2 players (Clients and Servers): only Player 1 has trophies. | Player 2's drops, payouts, speed, jump and `TrophyStats` are unaffected; Player 1's bonuses apply only on Player 1's plot. | |
+| PW12 | Unequip every trophy (or release the plot / leave). | All bonuses gone from the next drop; `TrophyStats` empty; movement normal. | |
+
+## Trophy inventory UI
+
+Needs the Inventory + Powers server work merged (the `TrophyInventory` and
+`TrophyStats` attributes and the `TrophyEquip` handler). To get trophies
+quickly use `DevCalebFastCycle = true` (see Caleb Trophies), or in the Server
+command bar set a test attribute, e.g.
+`game.Players.Player1:SetAttribute("TrophyInventory", '{"Owned":[{"InstanceId":"a","Variant":"GoldenCaleb","EventId":"1","EarnedAt":1}],"Equipped":[],"CaseBuilt":false,"Max":5,"Saved":true}')`
+(the server overwrites it on its next publish). Check on PC and with the
+Device emulator (a phone in landscape).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| TI1 | Join with no trophies. Look at the screen; click "🏆 TROPHIES". | A yellow "🏆 TROPHIES" button at the left middle, not over the cookie counter, chat, or the phone thumbstick. The panel opens with a small pop: "MY CALEB TROPHIES", "🏆 COLLECTION 0 / M" (M = collectable trophies), "ACTIVE TROPHIES: 0 / 5", "No trophies yet! Feed Caleb to earn one 🏆", "Tap a trophy to see its power!", "Active powers: none". | |
+| TI2 | Click the button again; open again and click the red X. | Each closes the panel; the button reopens it. Respawning (Esc → Reset) keeps the button (no duplicate GUI). | |
+| TI3 | Claim a trophy (TR2) with the panel open. | A tile appears right away (no reopening needed): icon in the trophy's colors (hat for crown/party/chef, ✨ for effects), rarity in its color, name, border in the rarity color. Collection goes to 1 / M. | |
+| TI4 | Tap the tile. | It turns yellow and pops. Details: icon, name, "⭐ RARITY" in the rarity color, the power in big text, the description in quotes, green EQUIP. | |
+| TI5 | EQUIP it. | The button shows "..." briefly, then "Equipped!" and red UNEQUIP; the tile gets a green "EQUIPPED" badge and moves to the front; "ACTIVE TROPHIES: 1 / 5". With the case built, the trophy appears in the Trophy Case and "Active powers" lists its power. | |
+| TI6 | UNEQUIP it. | "Unequipped.", EQUIP again, badge gone, active count back down, trophy leaves the case, its power leaves the list. | |
+| TI7 | Equip 5 trophies, select a 6th. | Grey "Case full (5/5)"; clicking it does nothing (no request). Unequip one → the 6th can be equipped. | |
+| TI8 | Spam-click EQUIP / UNEQUIP very fast. | Only one request at a time (button "..."); no errors; the final state matches the server (badge, count, case). If the server refuses (rate limit), its reason shows in red under the description. | |
+| TI9 | Trophy Case not built (or plot released). | Orange note "Build your Trophy Case at home to activate trophy powers!"; EQUIP still works; "Active powers: none". Build the case → the note disappears and powers appear without reopening the panel. | |
+| TI10 | API access OFF (unsaved, TR8). | "Saving is off this session" at the bottom right; everything else works. | |
+| TI11 | Many trophies: in the Server command bar publish a test `TrophyInventory` with 120 records (any variants). | The grid scrolls smoothly; every tile shows; no lag spike when it updates again; equipped first, then rarest, then newest. | |
+| TI12 | Bad data: set `TrophyInventory` to `"oops"`, then to `'{"Owned":[{"InstanceId":5}],"Equipped":["zzz"]}'`, and a record with Variant `"Nope"`. | No errors. Bad JSON / bad records = empty or skipped; unknown Equipped ids ignored; "Nope" shows as a grey "Mystery Caleb". | |
+| TI13 | Selected trophy disappears (publish a `TrophyInventory` without it). | Details go back to "Tap a trophy to see its power!"; no errors. | |
+| TI14 | Phone (Device emulator, e.g. iPhone landscape) and a big PC window. Open the panel while the feed pop-up is open, and during the Caleb event banners. | Panel fits the screen and stays readable (text scales, clamps); tiles are 3+ per row. The feed pop-up and event banners draw over the panel, not under it. | |
 
 ### Trophy definitions (rarities, powers, looks)
 

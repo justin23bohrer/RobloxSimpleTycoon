@@ -18,12 +18,19 @@
 --   never read from the touching part.
 -- * Payout only if plot:GetAttribute("OwnerUserId") == player.UserId.
 -- * Stored cash is set to 0 BEFORE paying out so a double touch cannot pay twice.
+-- * The owner's CollectBonus trophy power (PowerService) is added at payout:
+--   paid = floor(stored * (1 + CollectBonus)). If the payout fails, only the
+--   stored amount (without the bonus) goes back on the plot.
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 
 local CollectorDisplay = require(script.Parent.CollectorDisplay)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
+local PowerService = require(script.Parent.PowerService)
 
 local CollectorService = {}
 
@@ -50,7 +57,9 @@ local function onCollectPadTouched(plot: Model, hit: BasePart)
 	end
 
 	storedCashByPlot[plot] = 0
-	if not EconomyService.AddCash(player, amount) then
+	local bonus = PowerService.Get(player, TrophyPowers.Stat.CollectBonus)
+	local payout = math.floor(amount * (1 + bonus))
+	if not EconomyService.AddCash(player, payout) then
 		-- Payout failed (e.g. player data missing); keep the cash (and the
 		-- cubes in the tank) on the plot.
 		storedCashByPlot[plot] += amount

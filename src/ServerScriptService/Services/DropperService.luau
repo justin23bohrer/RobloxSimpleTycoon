@@ -15,6 +15,15 @@
 -- * Each drop's value and plot live only in server-side tables keyed by the
 --   part. Nothing is read from the part or the client, so a client cannot
 --   change a drop's value or move it to another plot.
+-- * Trophy powers (PowerService) of the plot's OWNER (OwnerUserId attribute;
+--   no owner in the server = no bonus) apply to every drop, read when the drop
+--   is made so equip changes apply from the next drop:
+--     value    = round(DropValue * (1 + CookieMultiplier)), and with
+--                LuckyCookieChance it is worth Config.TrophyLuckyCookieMultiplier
+--                times that (a "lucky" drop is gold-colored);
+--     extra    = with ExtraCookieChance one more drop (same value rules, never
+--                another extra) falls right under the first;
+--     interval = Config.DropInterval / (1 + DropperSpeed), read every cycle.
 -- * Drops are server-simulated (SetNetworkOwner(nil)) and destroyed after
 --   Config.DropLifetime seconds.
 -- * CollectorService calls ClaimDrop(drop, plot) to take a drop's value. A
@@ -25,10 +34,13 @@
 --   droppers runs.
 --   Both are safe to call if nothing is running.
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 local DropperCup = require(script.Parent.DropperCup)
+local PowerService = require(script.Parent.PowerService)
 
 local DropperService = {}
 
@@ -39,6 +51,7 @@ local COOKIE_THICKNESS = 0.4
 local DROP_SIZE = Vector3.new(COOKIE_THICKNESS, 1.4, 1.4)
 local FLAT = CFrame.Angles(0, 0, math.pi / 2)
 local DROP_COLOR = Color3.fromRGB(214, 160, 90) -- golden-brown dough
+local LUCKY_DROP_COLOR = Color3.fromRGB(255, 205, 40) -- gold: a lucky drop
 local CHIP_COLOR = Color3.fromRGB(70, 40, 20) -- chocolate
 local CHIP_SIZE = Vector3.new(0.3, 0.3, 0.3)
 -- Chip positions on the cookie's top face, in the disc's local Y/Z plane.
@@ -55,6 +68,9 @@ type PlotRun = {
 	Droppers: { [string]: Model }, -- dropperId -> placed dropper cup
 	ConveyorOf: { [string]: string }, -- dropperId -> name of its conveyor
 }
+
+local Stat = TrophyPowers.Stat
+local rng = Random.new()
 
 local runningByPlot: { [Model]: PlotRun } = {}
 local dropValues: { [BasePart]: number } = {}
@@ -139,15 +155,24 @@ local function addChips(drop: BasePart)
 	end
 end
 
--- rim: the center of the cup's open end (see DropperCup.Build).
-local function spawnDrop(plot: Model, run: PlotRun, rim: CFrame, value: number)
-	local offsetY = COOKIE_THICKNESS / 2 + DROP_GAP
+-- The plot owner's total bonus for a trophy stat (0 if the plot has no owner
+-- in this server).
+local function ownerPower(plot: Model, stat: string): number
+	local ownerUserId = plot:GetAttribute("OwnerUserId")
+	local owner = type(ownerUserId) == "number" and Players:GetPlayerByUserId(ownerUserId)
+	return if owner then PowerService.Get(owner, stat) else 0
+end
+
+-- rim: the center of the cup's open end (see DropperCup.Build). below: how
+-- many cookie heights under the usual spot (0, or 1 for an extra drop).
+local function spawnDrop(plot: Model, run: PlotRun, rim: CFrame, value: number, lucky: boolean, below: number)
+	local offsetY = COOKIE_THICKNESS / 2 + DROP_GAP + below * (COOKIE_THICKNESS + DROP_GAP)
 
 	local drop = Instance.new("Part")
 	drop.Name = "Drop"
 	drop.Shape = Enum.PartType.Cylinder
 	drop.Size = DROP_SIZE
-	drop.Color = DROP_COLOR
+	drop.Color = if lucky then LUCKY_DROP_COLOR else DROP_COLOR
 	drop.Material = Enum.Material.SmoothPlastic
 	drop.Anchored = false
 	drop.CFrame = rim * CFrame.new(0, -offsetY, 0) * FLAT
@@ -170,6 +195,27 @@ local function spawnDrop(plot: Model, run: PlotRun, rim: CFrame, value: number)
 			drop:Destroy()
 		end
 	end)
+end
+
+-- One drop's value with the owner's powers, and whether it rolled lucky.
+-- Server-side only; integers.
+local function dropValueFor(plot: Model, baseValue: number): (number, boolean)
+	local value = math.floor(baseValue * (1 + ownerPower(plot, Stat.CookieMultiplier)) + 0.5)
+	local lucky = rng:NextNumber() < ownerPower(plot, Stat.LuckyCookieChance)
+	if lucky then
+		value *= Config.TrophyLuckyCookieMultiplier
+	end
+	return value, lucky
+end
+
+-- Makes one dropper cycle's drops: one, plus maybe one extra (never more).
+local function produce(plot: Model, run: PlotRun, rim: CFrame, baseValue: number)
+	local value, lucky = dropValueFor(plot, baseValue)
+	spawnDrop(plot, run, rim, value, lucky, 0)
+	if rng:NextNumber() < ownerPower(plot, Stat.ExtraCookieChance) then
+		local extraValue, extraLucky = dropValueFor(plot, baseValue)
+		spawnDrop(plot, run, rim, extraValue, extraLucky, 1)
+	end
 end
 
 -- Returns a dropper's Config.Droppers entry and its position in the list, or
@@ -221,12 +267,13 @@ function DropperService.Start(plot: Model, dropperId: string)
 	local value = entry.DropValue
 	task.spawn(function()
 		while true do
-			task.wait(Config.DropInterval)
+			-- Read every cycle so a DropperSpeed change applies from the next drop.
+			task.wait(Config.DropInterval / (1 + ownerPower(plot, Stat.DropperSpeed)))
 			-- Stop/StopAll (or a stop then Start) replaces these entries; end this loop.
 			if runningByPlot[plot] ~= plotRun or plotRun.Droppers[dropperId] ~= dropper then
 				return
 			end
-			spawnDrop(plot, plotRun, rim, value)
+			produce(plot, plotRun, rim, value)
 		end
 	end)
 end
