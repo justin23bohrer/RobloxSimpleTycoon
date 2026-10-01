@@ -400,6 +400,30 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
   podium stay). After the reset he is back, small, in his normal pose.
 - Only Caleb's body moves; the pedestal, feed pads, and podium never do.
 
+### Podium: "CALEB'S TOP FEEDERS"
+
+- Four leaderboard boards stand on the grass at the pedestal's four
+  **corners**, each facing outward along a diagonal (21 studs from the
+  statue's center), so one is readable from any direction and none is near
+  a feed pad (those are on the sides). Each board is cookie-themed: a gold
+  neon trim frame, two chocolate posts, and a big chocolate chip cookie on
+  top. They stay clear of Caleb even at his biggest
+  (`Config.CalebMaxScale`). Generated in the statue's `Podium` folder
+  (`Leaderboard<corner>` models) by `tools/statue/generate_statue.py`.
+- Each board shows **"CALEB'S TOP FEEDERS"**, then up to
+  `Config.CalebLeaderboardSize` rows like "1  Justin   248,321 🍪" (best
+  first, commas), and the shared total "🍪 N / 1,000,000" at the bottom.
+  The top 3 have gold / silver / bronze rank badges; **your own row** is
+  green with a thick green outline. Empty list: "Be the first to feed
+  Caleb!". Long names end in "…" instead of overflowing.
+- It counts cookies **fed to Caleb** this round (tracked by the server), not
+  cookies produced. During the trophy claim it says **"FINAL RESULTS"** above
+  the list (the server keeps the list until the reset, which clears it).
+- Same look as the rest of the game (yellow rounded panel, thick dark
+  outline, FredokaOne, not affected by lighting), readable from ~40 studs.
+  Display only (`CalebLeaderboard.client.luau` reads the statue's
+  `CalebTopFeeders` attribute). Names are plain text, never markup.
+
 ### Pad style (copy this for new pads)
 
 | Piece | Setting |

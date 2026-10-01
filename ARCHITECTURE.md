@@ -9,8 +9,8 @@ src/
 ├── ReplicatedStorage/          → ReplicatedStorage (server + client can read)
 │   ├── Shared/
 │   │   ├── Config.luau         → ModuleScript: all tunable numbers
-│   │   └── CalebEvent.luau     → Caleb Full Event contract (state names, attributes, timing)
-│   │   ├── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
+│   │   ├── CalebEvent.luau     → Caleb Full Event contract (state names, attributes, timing)
+│   │   └── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
 │   └── Remotes/                → Folder: remotes
 │       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
@@ -39,12 +39,13 @@ src/
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
 │       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
 │       ├── CookieRain.client.luau  → LocalScript: cookie rain during Caleb's Celebration (visual only)
-│       └── CookieRainLook.luau     → ModuleScript: builds a rain cookie + the landing puff
+│       ├── CookieRainLook.luau     → ModuleScript: builds a rain cookie + the landing puff
 │       ├── CalebEventUI.client.luau → LocalScript: Caleb Full Event screen messages + countdowns
 │       ├── CalebEventUIBuild.luau  → ModuleScript: builds the event ScreenGui once
-│       └── CalebEventFX.luau       → ModuleScript: event screen effects (slam, flash, confetti, shake, party lighting)
+│       ├── CalebEventFX.luau       → ModuleScript: event screen effects (slam, flash, confetti, shake, party lighting)
 │       ├── CalebAnimator.client.luau → LocalScript: Caleb's "I'm full" animation + dance (from CalebState)
-│       └── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
+│       ├── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
+│       └── CalebLeaderboard.client.luau → LocalScript: "CALEB'S TOP FEEDERS" boards on the podium
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -163,6 +164,7 @@ changes cash, ownership, or purchases, and never talks to the server.
 | `StarterPlayerScripts/CookieRain.client.luau` + `CookieRainLook.luau` | Cookie rain while the statue's `CalebState` is `Celebration` (`CalebEvent.GetState`; checked at start for mid-event joiners and on the attribute's changed signal). Visual only: no remotes, no rewards, nothing on the server. Creates a client-local `Workspace.CookieRain` folder (never replicated) and a `CookieRainPuff` attachment in `Terrain`. Cookies come from a pool that grows up to `Config.CookieRainMaxCookies` and is reused (each cookie = 1 disc + 5 chip parts, all anchored, `CanCollide`/`CanTouch`/`CanQuery` off, built by `CookieRainLook.Build`). One `Heartbeat` connection (only while cookies exist) spawns `CookieRainPerSecond`, picks spots in `CookieRainRadius` around the statue (`CookieRainNearPlayerShare` of them within `CookieRainNearPlayerRadius` of the local player), finds the landing height with a downward raycast per cookie (skipping invisible parts such as spawn areas), and moves every part with one `Workspace:BulkMoveTo`. Landing: hop, `ParticleEmitter:Emit` puff, fade. When the state leaves Celebration it stops spawning, lets the falling cookies finish, then disconnects and destroys the folder, pool, and puff. |
 | `StarterPlayerScripts/StatueBar.client.luau` | A `BillboardGui` (in PlayerGui, `AlwaysOnTop`, pixel-sized `Config.StatueBarSize`, `MaxDistance = Config.StatueBarMaxDistance`) above Caleb's head that every player sees: a yellow rounded panel with "Caleb: 12,345 / 1,000,000 🍪" (or "Caleb is FULL! 1,000,000 🍪") over the same cookie bar as the feed pop-up (`FeedPromptUI.ProgressBar`, fill only, same thin minimum sliver). Reads the statue's replicated `CookiesEaten` attribute at start (late joiners) and on `GetAttributeChangedSignal`, tweens the fill and pops the panel. Adorned to an `Attachment` in `Workspace.Terrain` placed `Config.StatueBarHeight` studs above the top of the `Head` (re-placed whenever the Head streams in or changes), so it stays visible when the statue's parts stream out. No remotes; decides nothing. During the Caleb Full Event it also reads `CalebMaxCookies` (falls back to `CalebEvent.MaxCookies()`) and `CalebState`: the text becomes "Caleb is FULL!" (Full), "🎉 COOKIE PARTY! 🎉" (Celebration), "Caleb is resting... 💤" (TrophyClaim). |
 | `StarterPlayerScripts/CalebEventUI.client.luau` + `CalebEventUIBuild.luau` + `CalebEventFX.luau` | The Caleb Full Event's screen UI. `CalebEventUIBuild.Build` makes one `CalebEventUI` ScreenGui (`ResetOnSpawn = false`, `IgnoreGuiInset`, `DisplayOrder` 5) with everything hidden: a white `Flash`, a pool of `Config.CalebConfettiCount` confetti frames, the big `FullText`, the pink `PartyBanner`, the gold `TrophyBanner`, and a purple one-line `Pill`. The client script reads the statue's `CalebState` at start (mid-event join) and on change and switches panels: Full → text slam + confetti (+ flash and a `Humanoid.CameraOffset` shake, restored after, unless just joined); Celebration → "COOKIE PARTY!" + m:ss and party lighting (`CalebPartyColor` ColorCorrection + `CalebPartyBloom` in Lighting, created once, tweened in, tweened out and disabled after); TrophyClaim → trophy banner if the local player's `CalebFed > 0` and not `CalebTrophyClaimed`, "Trophy claimed! 🏆" if claimed, else "CALEB IS RESTING — new round soon" + countdown; TrophyClaim → Normal shows "TROPHY CLAIM CLOSED" for `Config.CalebClosedMessageSeconds`. Countdowns use `CalebEvent.TimeLeft` every `Config.CalebUITickSeconds`. No remotes; decides nothing. |
+| `StarterPlayerScripts/CalebLeaderboard.client.luau` | Builds one `SurfaceGui` (in PlayerGui, `Face = Front`, 40 px/stud, `LightInfluence = 0`) per `Board` part in the statue's `Podium/Leaderboard<corner>` models, once, and re-adorns it when the board streams back in. Shows "CALEB'S TOP FEEDERS", up to `Config.CalebLeaderboardSize` rows from the statue's `CalebTopFeeders` JSON (decoded in `pcall`; bad data = empty), gold/silver/bronze badges for the top 3, the local player's row highlighted, "Be the first to feed Caleb!" when empty, "FINAL RESULTS" in `TrophyClaim`, and `CookiesEaten / CalebMaxCookies` (fallback `CalebEvent.MaxCookies()`). Refreshes on those attributes and `CalebState`. Names are plain text (`RichText = false`, fixed size, truncated). No remotes; decides nothing. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
@@ -406,7 +408,7 @@ type TrophyRecord = {
 ```
 
 Statue children: Caleb's body parts, `Pedestal*` parts, `FeedPads` (folder),
-and `Podium` (folder: leaderboard board and other podium decoration).
+and `Podium` (folder: the four `Leaderboard<corner>` models, each with a `Board` part that carries the client SurfaceGui, plus other podium decoration).
 Scaling, hiding, and client animation touch **only Caleb's body parts**.
 
 ### Who does presentation
