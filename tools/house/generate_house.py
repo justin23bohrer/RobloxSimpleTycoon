@@ -6,7 +6,7 @@ Run from the repo root:   python3 tools/house/generate_house.py
 The tycoon building looks like a two-story suburban house: off-white brick
 walls, gray trim (corner posts, a band between the floors, door frame,
 fascia), dark windows with gray frames and grilles (an arched one above the
-doorway), and a gray shingle gable roof.
+doorway), and a gray shingle hip roof with a front gable and a chimney.
 
 Only the children of two plot models are rewritten; everything else in the
 plot file is left exactly as it is:
@@ -34,7 +34,8 @@ TRIM = [122, 126, 130]  # gray outlining
 GLASS = [44, 50, 58]  # dark window glass
 ROOF = [96, 100, 104]  # gray shingles
 ROOF_MATERIAL = "Slate"
-RIDGE = [78, 82, 86]
+RIDGE = [78, 82, 86]  # ridge and hip caps
+SOFFIT = [228, 228, 224]
 FLOOR = [200, 200, 200]
 
 # The plot (see GAME_DESIGN.md -> Plot layout). Walls are 1 thick; their
@@ -48,16 +49,95 @@ FLOOR2_Y = 18  # top of the 2nd floor slab
 WALL2_TOP = 31  # top of the second-story walls = bottom of the roof
 DOOR_HALF = 8  # the front doorway is x -8..8
 DOOR_TOP = 13  # doorway height (a brick header fills 13..17)
-ROOF_HEIGHT = 14
-ROOF_OVERHANG = 1
+ROOF_HEIGHT = 15  # eaves (y 31) to ridge (y 46)
+ROOF_OVERHANG = 1.5  # eaves stick out this far past the walls
+RIDGE_HALF = 10  # the ridge runs x -10..10; the roof slopes down on all four sides
+ROOF_THICKNESS = 0.6
 
 IDENTITY = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-TURN_180 = [[-1, 0, 0], [0, 1, 0], [0, 0, -1]]
 
 
 def r(x):
     x = round(x, 3)
     return int(x) if x == int(x) else x
+
+
+# --- Small vector helpers -------------------------------------------------
+
+def add(a, b):
+    return tuple(x + y for x, y in zip(a, b))
+
+
+def sub(a, b):
+    return tuple(x - y for x, y in zip(a, b))
+
+
+def scale(a, s):
+    return tuple(x * s for x in a)
+
+
+def dot(a, b):
+    return sum(x * y for x, y in zip(a, b))
+
+
+def cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def unit(a):
+    length = dot(a, a) ** 0.5
+    return scale(a, 1 / length)
+
+
+def up(p, dy):
+    return (p[0], p[1] + dy, p[2])
+
+
+def columns(x, y, z):
+    """Rotation matrix (rows) whose local X/Y/Z axes point along x, y, z."""
+    return [[rot6(x[i]), rot6(y[i]), rot6(z[i])] for i in range(3)]
+
+
+def rot6(v):
+    v = round(v, 6)
+    return int(v) if v == int(v) else v
+
+
+def triangle(name, a, b, c, thickness, color, material):
+    """Fills the flat triangle a-b-c with two WedgeParts (the usual Roblox
+    way to draw any triangle). A WedgePart's slope runs from its tall back
+    edge (+Z) down to its front (-Z); its width (X) is the thickness here."""
+    ab, ac, bc = sub(b, a), sub(c, a), sub(c, b)
+    abd, acd, bcd = dot(ab, ab), dot(ac, ac), dot(bc, bc)
+    # Put the longest side between b and c.
+    if abd > acd and abd > bcd:
+        a, c = c, a
+    elif acd > bcd and acd > abd:
+        a, b = b, a
+    ab, ac, bc = sub(b, a), sub(c, a), sub(c, b)
+    right = unit(cross(ac, ab))
+    upv = unit(cross(bc, right))
+    back = unit(bc)
+    height = abs(dot(ab, upv))
+    parts = []
+    for i, (corner, length, rot) in enumerate((
+        (b, abs(dot(ab, back)), columns(right, upv, back)),
+        (c, abs(dot(ac, back)), columns(scale(right, -1), upv, scale(back, -1))),
+    ), 1):
+        if length > 0.01:
+            center = scale(add(a, corner), 0.5)
+            parts.append(part(f"{name}{'AB'[i - 1]}", (thickness, height, length), center, color, material, "WedgePart", rot))
+    return parts
+
+
+def line_part(name, a, b, thickness, color):
+    """A square beam from a to b (used for ridge/hip caps and trim boards)."""
+    direction = sub(b, a)
+    z = unit(direction)
+    x = unit(cross((0, 1, 0), z)) if abs(z[1]) < 0.999 else (1, 0, 0)
+    y = cross(z, x)
+    length = dot(direction, direction) ** 0.5
+    return part(name, (thickness, thickness, length), scale(add(a, b), 0.5), color, rot=columns(x, y, z), decor=True)
 
 
 def part(name, size, pos, color, material="SmoothPlastic", class_name="Part", rot=None, shape=None, decor=False):
@@ -230,39 +310,60 @@ def walls():
 
 
 def roof():
-    depth = (Z_FRONT - Z_BACK) / 2 + ROOF_OVERHANG
-    width = 2 * X_OUT + 2 * ROOF_OVERHANG
-    ridge_z = (Z_FRONT + Z_BACK) / 2
-    y = WALL2_TOP + ROOF_HEIGHT / 2
-    # A WedgePart's slope faces its front (-Z) with the tall side at +Z. The
-    # back half keeps that; the front half is turned around to face the street.
-    return model("Roof", [
-        part("RoofFront", (width, ROOF_HEIGHT, depth), (0, y, ridge_z + depth / 2), ROOF, ROOF_MATERIAL, "WedgePart", TURN_180),
-        part("RoofBack", (width, ROOF_HEIGHT, depth), (0, y, ridge_z - depth / 2), ROOF, ROOF_MATERIAL, "WedgePart"),
-        part("Ridge", (width + 0.4, 0.8, 1.4), (0, WALL2_TOP + ROOF_HEIGHT + 0.1, ridge_z), RIDGE, decor=True),
-        trim("FasciaFront", (width + 0.2, 0.8, 0.4), (0, WALL2_TOP + 0.2, Z_FRONT + ROOF_OVERHANG + 0.1)),
-        trim("FasciaBack", (width + 0.2, 0.8, 0.4), (0, WALL2_TOP + 0.2, Z_BACK - ROOF_OVERHANG - 0.1)),
-        front_gable(),
-    ])
+    """A hip roof: it slopes down on all four sides to eaves that overhang
+    the walls, with a short ridge along X, a pointed front gable over the
+    arched window, gray ridge/hip caps, fascia boards and a soffit under the
+    eaves, and a brick chimney at the back."""
+    o = ROOF_OVERHANG
+    y0, y1 = WALL2_TOP, WALL2_TOP + ROOF_HEIGHT
+    xl, xr = -X_OUT - o, X_OUT + o
+    zf, zb = Z_FRONT + o, Z_BACK - o
+    mid_z = (Z_FRONT + Z_BACK) / 2
+    fl, fr, bl, br = (xl, y0, zf), (xr, y0, zf), (xl, y0, zb), (xr, y0, zb)
+    rl, rr = (-RIDGE_HALF, y1, mid_z), (RIDGE_HALF, y1, mid_z)
+
+    faces = []
+    for name, a, b, c in (
+        ("Front1", fl, fr, rr), ("Front2", fl, rr, rl),
+        ("Back1", br, bl, rl), ("Back2", br, rl, rr),
+        ("Left", bl, fl, rl), ("Right", fr, br, rr),
+    ):
+        faces += triangle(f"Roof{name}", a, b, c, ROOF_THICKNESS, ROOF, ROOF_MATERIAL)
+
+    lift = ROOF_THICKNESS / 2  # caps sit on top of the roof faces
+    caps = [line_part("RidgeCap", up(rl, lift), up(rr, lift), 1.0, RIDGE)]
+    for name, a, b in (("HipFrontLeft", fl, rl), ("HipFrontRight", fr, rr), ("HipBackLeft", bl, rl), ("HipBackRight", br, rr)):
+        caps.append(line_part(f"{name}Cap", up(a, lift), up(b, lift), 0.8, RIDGE))
+
+    width, depth = xr - xl, zf - zb
+    edge = [
+        # Soffit: the flat underside of the overhang (also the 2nd floor's ceiling).
+        part("Soffit", (width, 0.4, depth), (0, y0 - 0.2, mid_z), SOFFIT),
+        trim("FasciaFront", (width + 0.6, 0.9, 0.3), (0, y0 - 0.1, zf + 0.15)),
+        trim("FasciaBack", (width + 0.6, 0.9, 0.3), (0, y0 - 0.1, zb - 0.15)),
+        trim("FasciaLeft", (0.3, 0.9, depth), (xl - 0.15, y0 - 0.1, mid_z)),
+        trim("FasciaRight", (0.3, 0.9, depth), (xr + 0.15, y0 - 0.1, mid_z)),
+    ]
+    return model("Roof", faces + caps + edge + [front_gable(), chimney()])
 
 
 # Wedges turned so their slope faces -X / +X (their length runs along Z).
 SLOPE_LEFT = [[0, 0, 1], [0, 1, 0], [-1, 0, 0]]
 SLOPE_RIGHT = [[0, 0, -1], [0, 1, 0], [1, 0, 0]]
-GABLE_HALF = 9  # the front gable spans x -9..9, over the arched window
-GABLE_HEIGHT = 8
+GABLE_HALF = 10  # the front gable spans x -10..10, over the arched window
+GABLE_HEIGHT = 10
 
 
 def front_gable():
-    """A small pointed roof facing the street, with a brick triangle and a
-    round vent, poking out of the main roof's front slope.
+    """A pointed roof facing the street, with a brick triangle and a round
+    vent, poking out of the main roof's front slope.
 
     Wedges are solid, so the gable roof's front end is a gray triangle; the
     brick triangle sits 1 stud in front of it, a little smaller, so the
-    roof's edges outline it in gray."""
+    roof's edges outline it in gray. Gray rake boards trim its two slopes."""
     # Reaches back until the main roof is as tall as the gable.
-    depth_main = (Z_FRONT - Z_BACK) / 2 + ROOF_OVERHANG
-    back_z = Z_FRONT + ROOF_OVERHANG - depth_main * GABLE_HEIGHT / ROOF_HEIGHT
+    run = (Z_FRONT - Z_BACK) / 2 + ROOF_OVERHANG
+    back_z = Z_FRONT + ROOF_OVERHANG - run * GABLE_HEIGHT / ROOF_HEIGHT
     front_z = Z_FRONT
     length = front_z - back_z
     mid_z = (front_z + back_z) / 2
@@ -271,13 +372,29 @@ def front_gable():
     inset = 0.8  # the brick triangle sits under the gable's roof edges
     tri_half, tri_h = half - inset, GABLE_HEIGHT - inset * GABLE_HEIGHT / half
     tri_y = WALL2_TOP + tri_h / 2
+    peak = (0, WALL2_TOP + GABLE_HEIGHT + 0.3, Z_FRONT + 0.9)
+    vent_y = WALL2_TOP + GABLE_HEIGHT * 0.4
     return model("FrontGable", [
         part("GableRoofLeft", (length, GABLE_HEIGHT, half), (-half / 2, y, mid_z), ROOF, ROOF_MATERIAL, "WedgePart", SLOPE_LEFT),
         part("GableRoofRight", (length, GABLE_HEIGHT, half), (half / 2, y, mid_z), ROOF, ROOF_MATERIAL, "WedgePart", SLOPE_RIGHT),
         part("GableBrickLeft", (1, tri_h, tri_half), (-tri_half / 2, tri_y, Z_FRONT + 0.5), BRICK, BRICK_MATERIAL, "WedgePart", SLOPE_LEFT),
         part("GableBrickRight", (1, tri_h, tri_half), (tri_half / 2, tri_y, Z_FRONT + 0.5), BRICK, BRICK_MATERIAL, "WedgePart", SLOPE_RIGHT),
-        part("GableVent", (0.3, 2.2, 2.2), (0, WALL2_TOP + 3, Z_FRONT + 1.15), TRIM, rot=cylinder_rot("front"), shape="Cylinder", decor=True),
-        part("GableVentHole", (0.3, 1.6, 1.6), (0, WALL2_TOP + 3, Z_FRONT + 1.25), GLASS, rot=cylinder_rot("front"), shape="Cylinder", decor=True),
+        line_part("GableRakeLeft", (-half - 0.3, WALL2_TOP, Z_FRONT + 0.9), peak, 0.6, TRIM),
+        line_part("GableRakeRight", (half + 0.3, WALL2_TOP, Z_FRONT + 0.9), peak, 0.6, TRIM),
+        line_part("GableRidgeCap", (0, WALL2_TOP + GABLE_HEIGHT + 0.2, Z_FRONT), (0, WALL2_TOP + GABLE_HEIGHT + 0.2, back_z), 0.8, RIDGE),
+        part("GableVent", (0.3, 2.6, 2.6), (0, vent_y, Z_FRONT + 1.15), TRIM, rot=cylinder_rot("front"), shape="Cylinder", decor=True),
+        part("GableVentHole", (0.3, 2, 2), (0, vent_y, Z_FRONT + 1.25), GLASS, rot=cylinder_rot("front"), shape="Cylinder", decor=True),
+    ])
+
+
+def chimney():
+    """A brick chimney coming up through the back slope, with a gray cap."""
+    x, z, size = 17, -60, 4
+    bottom, top = WALL2_TOP, WALL2_TOP + ROOF_HEIGHT + 4
+    return model("Chimney", [
+        brick("ChimneyStack", (size, top - bottom, size), (x, (bottom + top) / 2, z)),
+        trim("ChimneyCap", (size + 0.8, 0.6, size + 0.8), (x, top + 0.3, z)),
+        part("ChimneyHole", (size - 1, 0.1, size - 1), (x, top + 0.62, z), GLASS, decor=True),
     ])
 
 
