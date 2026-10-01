@@ -5,16 +5,21 @@
 local Players = game:GetService("Players")
 
 local Services = script.Parent.Services
+local CalebCycle = require(Services.CalebCycle)
 local PlayerDataService = require(Services.PlayerDataService)
 local StatueService = require(Services.StatueService)
 local TycoonService = require(Services.TycoonService)
 
 TycoonService.Start()
-StatueService.Start()
+local statue = StatueService.Start()
+if statue then
+	CalebCycle.Start(statue)
+end
 
 -- Players get a plot by stepping on a ClaimPad (TycoonService), not on join.
 local function onPlayerAdded(player: Player)
 	PlayerDataService.OnPlayerAdded(player)
+	CalebCycle.OnPlayerAdded(player)
 end
 
 local function onPlayerRemoving(player: Player)
