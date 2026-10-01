@@ -60,6 +60,15 @@ local Config = {
 		-- Shows the owner's Caleb Trophies (TrophyService). Its model holds
 		-- TrophySlot1..TrophySlotN (N = TrophyCaseSlots).
 		table.freeze({ Id = "TrophyCase", Name = "Trophy Case", Cost = 7500, After = "Walls", Parts = table.freeze({ "TrophyCase" }) }),
+		-- Second-floor furniture (tools/furniture/generate_furniture.py). All
+		-- unlock with the 2nd Floor, together with Dropper 5, so they can be
+		-- bought in any order alongside the second-floor droppers. Names are
+		-- RichText on the button sign: no "&" or "<".
+		table.freeze({ Id = "Bed", Name = "Bed", Cost = 12000, After = "SecondFloor", Parts = table.freeze({ "Bed" }) }),
+		table.freeze({ Id = "GamingDesk", Name = "Gaming Desk", Cost = 25000, After = "SecondFloor", Parts = table.freeze({ "GamingDesk" }) }),
+		table.freeze({ Id = "ShelvesTV", Name = "Shelves + TV", Cost = 18000, After = "SecondFloor", Parts = table.freeze({ "ShelvesTV" }) }),
+		table.freeze({ Id = "MiniFridge", Name = "Mini Fridge", Cost = 8000, After = "SecondFloor", Parts = table.freeze({ "MiniFridge" }) }),
+		table.freeze({ Id = "Kitchen", Name = "Ninja Kitchen", Cost = 10000, After = "SecondFloor", Parts = table.freeze({ "KitchenCounter" }) }),
 	}),
 
 	-- Seconds between drops (shared by all droppers).
