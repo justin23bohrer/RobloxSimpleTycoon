@@ -7,7 +7,8 @@
 -- * Is the single place that decides purchases for a tycoon (droppers and
 --   builds, see Purchases). Each one unlocks only after the purchase named in
 --   its Config After field: Dropper1-4 -> Walls -> Stairs -> SecondFloor ->
---   Dropper5-8.
+--   Dropper5-8 (and Walls -> TrophyCase). PurchaseApplied fires for every
+--   purchase applied to a plot (bought or restored).
 -- * Restores a player's saved purchases (DataService) when they claim a plot,
 --   in unlock order, without charging cookies, and records new purchases.
 -- * Tells PlotStages what to show: only the ClaimPad while unclaimed, then the
@@ -80,6 +81,11 @@ local plots: { Model } = {} -- valid plots, sorted by PlotId
 local tycoonsByPlayer: { [Player]: Tycoon } = {}
 local ownerByPlot: { [Model]: Player } = {}
 local lastBuyTouch: { [Player]: number } = {}
+
+local purchaseApplied = Instance.new("BindableEvent")
+-- Fires (player, plot, purchaseId) each time a purchase is applied to a plot:
+-- when it is bought and when a saved one is restored after a claim.
+TycoonService.PurchaseApplied = purchaseApplied.Event
 
 local function isValidPlot(plot: Instance): boolean
 	if not plot:IsA("Model") or typeof(plot:GetAttribute("PlotId")) ~= "number" then
@@ -231,6 +237,7 @@ local function applyPurchase(tycoon: Tycoon, purchase: Purchases.Purchase)
 	if purchase.Kind == "Dropper" then
 		DropperService.Start(tycoon.Plot, purchase.Id)
 	end
+	purchaseApplied:Fire(tycoon.Owner, tycoon.Plot, purchase.Id)
 end
 
 -- Rebuilds the player's saved house on the plot they just claimed (called by

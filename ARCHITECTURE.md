@@ -10,7 +10,8 @@ src/
 │   ├── Shared/
 │   │   ├── Config.luau         → ModuleScript: all tunable numbers
 │   │   ├── CalebEvent.luau     → Caleb Full Event contract (state names, attributes, timing)
-│   │   └── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
+│   │   ├── CalebBody.luau      → which statue parts are Caleb's body (not pedestal/FeedPads/Podium)
+│   │   └── TrophyVariants.luau → every Caleb Trophy look (data) + PickVariant
 │   └── Remotes/                → Folder: remotes
 │       └── FeedStatue.model.json → RemoteFunction: client asks to feed the statue
 ├── ServerScriptService/        → ServerScriptService (server only)
@@ -31,7 +32,11 @@ src/
 │       ├── CollectorDisplay.luau → helper for CollectorService (cash tank + pad effects)
 │       ├── StatueService.luau  → feeding the statue (validates, spends cookies)
 │       ├── CalebCycle.luau     → Caleb Full Event state machine (total, contributions, trophy eligibility)
-│       └── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
+│       ├── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
+│       ├── TrophyService.luau  → Caleb Trophy claim on the podium + Trophy Case display
+│       ├── TrophyModel.luau    → helper for TrophyService (builds a trophy Model from a variant)
+│       ├── TrophyCaseDisplay.luau → helper for TrophyService (puts trophies on a Trophy Case's slots)
+│       └── TrophyAccessories.luau → helper for TrophyModel (hats, glasses, cookie, bow tie)
 ├── StarterPlayer/
 │   └── StarterPlayerScripts/   → client LocalScripts
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
@@ -46,7 +51,8 @@ src/
 │       ├── CalebAnimator.client.luau → LocalScript: Caleb's "I'm full" animation + dance (from CalebState)
 │       ├── CalebPoses.luau         → ModuleScript: the pose math for CalebAnimator
 │       ├── CalebLeaderboard.client.luau → LocalScript: "CALEB'S TOP FEEDERS" boards on the podium
-│       └── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects
+│       ├── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects
+│       └── TrophyPrompt.client.luau → LocalScript: hides the trophy claim prompt for non-eligible players; claim messages
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -111,7 +117,8 @@ reach the server.
 ## Services (server only)
 
 `ServerMain.server.luau` is the only server Script. It calls
-`TycoonService.Start()`, then routes join/leave in a fixed order:
+`TycoonService.Start()`, `StatueService.Start()`, `CalebCycle.Start(statue)`,
+`TrophyService.Start(statue)`, then routes join/leave in a fixed order:
 
 - Join: `PlayerDataService.OnPlayerAdded` → `DataService.OnPlayerAdded`
   (starts loading in the background; no plot yet; plots are claimed on the
@@ -126,7 +133,7 @@ reach the server.
 | `DataService` | Saves/loads each player's house purchases and Caleb trophies (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
 | `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids and bad/duplicate trophies; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
-| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. | Implemented (claiming + ordered purchases) |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
 | `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds`: `Get(id)`, `All()`, `UnlockedBy(id?)`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
@@ -137,6 +144,11 @@ reach the server.
 | `StatueService` | Feeding the statue (Caleb). Handles the `FeedStatue` RemoteFunction: validates the amount (whole number ≥ 1), that the player stands within `StatueFeedRange` of a `FeedPad`, a per-player `StatueFeedCooldown`, `CalebCycle.CanFeed()` (Normal only), and room left under `CalebEvent.MaxCookies()`; spends with `EconomyService.TrySpend` (only what Caleb still has room for), then `CalebCycle.AddCookies` (which owns the total and `CookiesEaten`), and calls `StatueShape.Apply(eaten / goal, Config.CalebGrowSeconds)`. On `CalebCycle.StateChanged`: pad signs "FEED CALEB!" in Normal, "CALEB IS FULL!" otherwise; `StatueShape.SetHidden(true)` in TrophyClaim; `SetHidden(false)` + `Apply(0)` on reset. Total is per server session (no saving). | Implemented (`Start(): Model?`, `OnPlayerRemoving`) |
 | `CalebCycle` | Caleb Full Event state machine (see "Caleb Full Event (contract)"). Owns the shared total, contributions by UserId (+ display name), trophy claims, cycle id, and the timed states (`task.delay` timers guarded by cycle id + state). Publishes all statue/player attributes; `CalebTopFeeders` is throttled to `Config.CalebLeaderboardInterval` (batched, last value always published, immediate on reset). | Implemented |
 | `StatueShape` (helper) | Presentation only. `Setup(statue)` remembers every body part's map position/size (body = `Shared/CalebBody`: not `Pedestal*`, `FeedPads`, `Podium`) and the pedestal top. `Apply(progress 0..1, seconds)` (progress = cookies / goal) tweens, from the original map values: fatness (Torso/Belt wider and deeper, arms/legs out and thicker, the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin` grow out, chain stays on the belly) with fatness = log(1 + p·`CalebFatnessCurve`)/log(1 + `CalebFatnessCurve`) (front-loaded), then scales every body part about the pedestal top by `CalebMinScale` → `CalebMaxScale` (p^`CalebScaleCurve`, plus a last `CalebFinalPopScale` jump at exactly the goal). `SetHidden(hidden)` hides/shows the body with `PlotVisibility`. | Implemented |
+| `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. `StatueService` passes progress = eaten / goal (linear). | Implemented |
+| `TrophyService` | Caleb Trophies. On `CalebCycle.StateChanged` → `TrophyClaim` puts a big golden trophy (`Workspace.Map.CalebClaimTrophy`, `Config.TrophyPodiumScale`) on top of the highest `Pedestal*` part with a server `ProximityPrompt` "Claim Caleb Trophy"; any other state (and `Start`) removes it. `Triggered`: `CalebCycle.IsEligible` → (waits only if the player's data is still loading, then re-checks) → `TrophyVariants.PickVariant(owned)` → `DataService.AddTrophy` (or, if data is not loaded, a session-only list by UserId kept until the server closes) → `CalebCycle.MarkTrophyClaimed`, with no yield between the last check and the mark. Reports the result in the `CalebTrophyNotice` player attribute. Shows the owner's newest `Config.TrophyCaseSlots` trophies (saved + session) on the Trophy Case's `TrophySlotN` parts via `TrophyCaseDisplay`, on `TycoonService.PurchaseApplied("TrophyCase")` and `DataService.TrophiesChanged`; clears it when the plot's `OwnerUserId` goes away. | Implemented (`Start(statue?)`) |
+| `TrophyModel` (helper) | Used only by `TrophyService`; presentation only. `Build(variantId, scale?, label?)` returns an anchored, non-colliding Model (pivot = bottom center of the plinth, facing -Z): plinth + gold trim + "CALEB TROPHY" nameplate (variant name in its rarity color, or `label`), a mini Caleb in the statue's style in the variant's color/material and pose (arm angles per pose), accessories, and effect (`Sparkles` on the head or a `PointLight` glow). Unknown variant ids use `TrophyVariants.Fallback`. | Implemented |
+| `TrophyCaseDisplay` (helper) | Used only by `TrophyService`; presentation only. `Show(plot, case, records)` builds the newest `Config.TrophyCaseSlots` records (oldest-first list) with `TrophyModel` (`Config.TrophyCaseScale`) and stands them on `TrophySlot1..N` (slot 1 = newest) in a runtime `CaseTrophies` folder in the plot (outside the `TrophyCase` model, so `PlotVisibility` never tracks them); `Clear(plot)` destroys that folder. | Implemented |
+| `TrophyAccessories` (helper) | Used only by `TrophyModel`: `Add(make, names, anchors)` builds `Crown`, `PartyHat`, `ChefHat`, `Sunglasses`, `Cookie` (right hand), `BowTie`; unknown names are skipped. | Implemented |
 | `CollectorDisplay` (helper) | Used only by `CollectorService`: presentation only, never reads or changes cash. `Setup(plot)` adds the pad's sparkles, glow, and bouncing arrow; `AddCube(plot)` drops a small cookie (`TankCookie`) into the plot's `CashTank` (max 60) and turns sparkles/glow on; `Clear(plot, celebrate)` empties the tank and, on payout, bursts sparkles. Built on the server so all players see it. | Implemented |
 
 `CollectorService` is deliberately not named `CollectionService`, which is a
@@ -157,11 +169,14 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
 `CalebCycle` → `CalebEvent`, `Config` only (it changes no cash); `ServerMain` starts it with the statue `StatueService.Start()` returns.
 `StatueService` → `EconomyService`, `StatueShape`, `CalebCycle`; `StatueShape` → `PlotVisibility`, `Shared/CalebBody`; nothing requires `StatueService` except `ServerMain`.
+`TrophyService` → `CalebCycle`, `DataService`, `TycoonService` (read-only: `GetTycoon`, `HasPurchased`, `PurchaseApplied`), `TrophyCaseDisplay`, `TrophyModel`, `TrophyVariants`; nothing requires `TrophyService` except `ServerMain`. `TrophyCaseDisplay` → `TrophyModel`, `Config`. `TrophyModel` → `TrophyAccessories`, `TrophyVariants`.
 
 ## Client
 
 Client code is presentation only. It reads replicated state and never
-changes cash, ownership, or purchases, and never talks to the server.
+changes cash, ownership, or purchases, and never talks to the server
+(except the `FeedStatue` remote and Roblox's own `ProximityPrompt`
+triggering, which the server validates).
 
 | Script | What it does |
 | ------ | ------------ |
@@ -173,14 +188,18 @@ changes cash, ownership, or purchases, and never talks to the server.
 | `StarterPlayerScripts/CalebLeaderboard.client.luau` | Builds one `SurfaceGui` (in PlayerGui, `Face = Front`, 40 px/stud, `LightInfluence = 0`) per `Board` part in the statue's `Podium/Leaderboard<corner>` models, once, and re-adorns it when the board streams back in. Shows "CALEB'S TOP FEEDERS", up to `Config.CalebLeaderboardSize` rows from the statue's `CalebTopFeeders` JSON (decoded in `pcall`; bad data = empty), gold/silver/bronze badges for the top 3, the local player's row highlighted, "Be the first to feed Caleb!" when empty, "FINAL RESULTS" in `TrophyClaim`, and `CookiesEaten / CalebMaxCookies` (fallback `CalebEvent.MaxCookies()`). Refreshes on those attributes and `CalebState`. Names are plain text (`RichText = false`, fixed size, truncated). No remotes; decides nothing. |
 | `StarterPlayerScripts/CalebAudio.client.luau` | Caleb Full Event sound effects (no music). Creates one `Sound` per non-empty `Config.CalebSounds` id, once, in a `SoundService.CalebAudio` folder (volumes from `Config.CalebSoundVolumes`), and reuses them. Driven only by attributes: `CalebState` → `Full` plays Full; → `Celebration` plays CelebrationStart and starts the looping CookieRain; leaving `Celebration` fades the loop out (0.8 s, then `Stop`) and plays EventEnd; `CookiesEaten` going up in `Normal` plays Grow (at most every `Config.CalebGrowSoundInterval` s); the local player's `CalebTrophyClaimed` turning true plays TrophyClaim. A late joiner hears no old one-shots; only the loop starts if it is mid-Celebration. Empty ids are skipped (one info print in Studio). Touches no other sounds. |
 
+| `StarterPlayerScripts/TrophyPrompt.client.luau` | Watches `Workspace.Map` for `CalebClaimTrophy` (and its descendants, for streaming) and sets its `ProximityPrompt.Enabled` **locally** to whether this player is eligible (`CalebFed > 0` and not `CalebTrophyClaimed`), updating on those attributes; the server re-checks every claim. On `CalebTrophyNotice` changes, shows a `StarterGui:SetCore("SendNotification")` with the result: the variant's name + rarity (saved, or "couldn't be saved"), "already have this round's trophy", or "only players who fed Caleb this round". No remotes. |
+
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
 that are purely visual stay in the script; gameplay numbers stay in `Config`.
 
 ## Shared modules
 
-`ReplicatedStorage/Shared` holds modules both sides can require. Right now
-that is only `Config`. Never put secrets or server-only logic here: clients can
+`ReplicatedStorage/Shared` holds modules both sides can require: `Config`,
+`CalebEvent` (event contract), and `TrophyVariants` (trophy looks: data,
+`Get(id)` with a fallback for unknown ids, `PickVariant(ownedIds)` weighted
+random preferring unowned variants). Never put secrets or server-only logic here: clients can
 read everything in ReplicatedStorage.
 
 ## Configuration
@@ -195,6 +214,9 @@ including the event UI's `CalebUITickSeconds`, `CalebConfettiCount`,
 `CalebPartySaturation`, `CalebPartyBloom`, `CalebPartyFadeSeconds`). It is frozen (including each
 `StatueBarMaxDistance`, and the Caleb Full Event settings, including
 `CalebSounds`, `CalebSoundVolumes`, `CalebGrowSoundInterval`). It is frozen (including each
+`CalebPartySaturation`, `CalebPartyBloom`, `CalebPartyFadeSeconds`, and the
+trophy settings `TrophyCaseSlots`, `TrophyCaseScale`, `TrophyPodiumScale`,
+`TrophyClaimPromptDistance`, `TrophyClaimHoldSeconds`). It is frozen (including each
 `Droppers` and `Builds` entry), so code cannot change it at runtime.
 
 `Droppers` is a list of `{ Id, Cost, DropValue, After, Conveyor }`. Entry N
@@ -250,7 +272,7 @@ type Tycoon = {
   (read-only for everyone else).
 - **Purchased upgrades:** `Purchased` is a set of purchase ids: the
   `Config.Droppers` ids (`"Dropper1"` … `"Dropper8"`) and `Config.Builds` ids
-  (`"Walls"`, `"Stairs"`, `"SecondFloor"`).
+  (`"Walls"`, `"Stairs"`, `"SecondFloor"`, `"TrophyCase"`).
 - **Active systems:** a purchase activates a system by calling its service
   (`DropperService.Start(plot, dropperId)`). Each system service keeps its own runtime
   state keyed by plot and must clean up in its stop/reset function.
@@ -319,8 +341,11 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   wasn't saved, are skipped. Until it finishes, `TryPurchase` refuses, so a
   player is never charged for something they own.
 - **Trophies:** DataService only stores and returns them
-  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`); TrophyService (wave 2)
-  shows and awards them.
+  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`); TrophyService awards and
+  shows them. A trophy claimed while the player's data is **not loaded**
+  is kept only in TrophyService's session list (by UserId, until the server
+  closes) and is never written. The Trophy Case itself is a normal build
+  (purchase id `TrophyCase`), so it is saved and restored like the walls.
 
 ## Economy model
 
@@ -379,6 +404,7 @@ string literals.
 | `Workspace.Map.Statue` | `CalebTopFeeders` | string | JSON `[{UserId, Name, Cookies}]`, best first, ≤ `Config.CalebLeaderboardSize`, updated at most every `Config.CalebLeaderboardInterval` s |
 | each `Player` | `CalebFed` | number | cookies this player fed Caleb this cycle (restored if they rejoin the same server) |
 | each `Player` | `CalebTrophyClaimed` | boolean | claimed this cycle's trophy |
+| each `Player` | `CalebTrophyNotice` | string | JSON `{Id, Kind, Variant?}` set by TrophyService after a claim attempt (`Kind`: `Saved` / `Unsaved` / `AlreadyOwned` / `NotEligible`); `Id` changes every time. `TrophyPrompt.client` shows it. |
 
 A player is **eligible** for this cycle's trophy when `CalebFed > 0` and
 `CalebTrophyClaimed` is not true, during `TrophyClaim`. Players who join
@@ -406,7 +432,7 @@ and the total can never pass the goal.
 | `StatueService` | Core | unchanged `FeedStatue` remote; asks `CalebCycle.CanFeed()` and `CalebCycle.AddCookies` |
 | `StatueShape` | Statue look | `Setup(statue)`, `Apply(progress, seconds)` (progress 0..1 = cookies / goal; fatness + overall scale), `SetHidden(hidden)` (hide/show Caleb's body; never the pedestal, `FeedPads`, or `Podium`) |
 | `DataService` | Saving | `OnPlayerAdded(player)`, `OnPlayerRemoving(player)`, `IsLoaded(player): boolean`, `WaitForData(player): boolean`, `GetPurchases(player): {[string]: true}`, `SetPurchased(player, id)`, `GetTrophies(player): {TrophyRecord}`, `AddTrophy(player, record): boolean` (false if not loaded or `EventId` already owned), `TrophiesChanged: RBXScriptSignal` (fires `(player)`) |
-| `TrophyService` | Trophy (wave 2) | podium claim + Trophy Case display |
+| `TrophyService` | Trophy (wave 2) | `Start(statue?)`. Podium claim (`Workspace.Map.CalebClaimTrophy` + `ClaimPrompt` ProximityPrompt, only during `TrophyClaim`) + Trophy Case display. Uses `TycoonService.PurchaseApplied` (fires `(player, plot, purchaseId)` on buy and restore). |
 
 ```lua
 type TrophyRecord = {
@@ -425,7 +451,8 @@ Scaling, hiding, and client animation touch **only Caleb's body parts**.
 All presentation is client-side and driven only by the attributes above:
 `CalebAnimator.client` (full animation + dance), `CalebEventUI.client` (big
 message, countdowns, trophy prompt text, screen VFX), `CookieRain.client`,
-`CalebAudio.client`, `CalebLeaderboard.client` (podium board), and the
+`CalebAudio.client`, `CalebLeaderboard.client` (podium board),
+`TrophyPrompt.client` (claim prompt visibility + claim messages), and the
 existing `StatueBar.client`. No new RemoteEvents for the event: state is
 attributes; the trophy claim uses a server `ProximityPrompt`.
 

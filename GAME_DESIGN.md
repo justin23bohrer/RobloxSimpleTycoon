@@ -98,8 +98,9 @@ server refuses to sell anything out of order (`After` in `Config`).
 
 ## Building (walls, stairs, 2nd floor)
 
-The right side of the first floor is the **build area**: three orange build
-buttons appear there one at a time after Dropper 4.
+The right side of the first floor is the **build area**: orange build
+buttons appear there one at a time after Dropper 4 (Walls first; after the
+walls both Stairs and the Trophy Case are offered).
 
 - **Walls:** the first floor of a two-story house: off-white brick walls,
   15 studs high, around the edge of the plot, with gray trim (corner posts,
@@ -123,6 +124,12 @@ buttons appear there one at a time after Dropper 4.
 - Cookies that reach the 2nd-floor collector go into the **same** stored
   cookies and cookie jar as floor 1; the owner collects them all on the
   Collect pad downstairs.
+- **Trophy Case** (🍪 7,500, after the walls; button `BuildButton4` at the
+  back of the build area): a wooden cabinet with a glass front and a red
+  velvet back against the middle of the back wall (x 3.5..16.5), under a
+  red "🏆 TROPHY CASE" sign. It has **5 gold slots** in a row; the owner's
+  Caleb Trophies stand on them (see "Caleb Trophies" below). It is saved and
+  restored like the other builds.
 - Built parts are hidden (invisible, can't be touched or walked on) until
   bought.
 
@@ -188,9 +195,9 @@ First floor (walls shown with `█`; they appear once built):
 
 ```
    ██████████████████ BACK (z = -76) ████████████████████████████
-   █ Collector ■                                                 █
+   █ Collector ■            [=TROPHY CASE=]                      █
    █         ║                                         stairs    █
-   █         ║  ▣ spot 4   ( Buy 4 ) [cookie jar]       top  ▲   █
+   █         ║  ▣ spot 4   ( Buy 4 ) [cookie jar] ( Build 4 )▲   █
    █ Conveyor║  ▣ spot 3   ( Buy 3 ) ( Collect ) ( Build 3 ) ▲   █
    █ (moves  ║  ▣ spot 2   ( Buy 2 )             ( Build 2 ) ▲   █
    █ to back)║  ▣ spot 1   ( Buy 1 )             ( Build 1 ) ▲   █
@@ -217,7 +224,8 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `CollectPad` | (0, 2.2, −41), middle of floor 1, on the front side of the `CashTank` (jar wall's back at z −48.4); free-standing, so the jar's back faces the back of the room |
 | `ClaimPad` | (0, 2.2, −15), front center |
 | `OwnerSign` | (23, 5, −12), front-right corner |
-| `BuildButton1`–`3` | x 16, y 2.2, z −26 / −34 / −42 (right side of floor 1) |
+| `BuildButton1`–`4` | x 16, y 2.2, z −26 / −34 / −42 / −50 (right side of floor 1) |
+| `TrophyCase` (model) | Against the back wall, x 3.5..16.5, z −75..−71.4, y 2..10 (sign up to y 12): `CaseBase` (top y 4), `CaseBack`, `CaseSideLeft`/`Right`, `CaseTop`, glass `CaseGlass`, gold `CaseShelfTrim`/`CaseTopTrim`, `CaseSign`, and `TrophySlot1`–`5` (gold pads on the shelf at x 10 / 7.5 / 12.5 / 5 / 15, turned to face into the room; slot 1 in the middle). Between the back windows; clear of the conveyor, collector, cookie jar, stairs, and doorway. |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
 | `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
@@ -240,7 +248,7 @@ as an outline:
 | `OwnerSign`        | Gold-framed wall with a purple cartoony panel on both faces showing "<DisplayName>'s Tycoon" (hidden until claimed). |
 | `BuyButton1`–`8`   | Round red pads with dark red rings, in a line just right of their floor's conveyor, each next to its dropper spot. Buy droppers 1–8 (5–8 on the 2nd floor). |
 | `DropperSpot1`–`8` | Transparent yellow blocks above the conveyor where each dropper goes. |
-| `BuildButton1`–`3` | Round orange pads (`255,140,0`, ring `140,70,0`, sign panel orange) on the right side of floor 1. Build the walls, stairs, and 2nd floor. |
+| `BuildButton1`–`4` | Round orange pads (`255,140,0`, ring `140,70,0`, sign panel orange) on the right side of floor 1. Build the walls, stairs, 2nd floor, and Trophy Case. |
 | `Walls`, `Stairs`, `SecondFloor` | Models that appear when built. House walls off-white `Brick` `238,235,228`; trim, window frames, and hole railings gray `122,126,130`; window glass `44,50,58`; roof `Slate` `96,100,104`; steps cream `245,225,190`; 2nd floor `200,200,200` like `Base`. Trim and windows are looks only (`CanCollide`/`CanTouch`/`CanQuery` off). |
 | `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). Each has `RailLeft`/`RailRight`/`RailFront` children: gray `Metal` guard rails, 0.4 thick, from the floor to 2 studs above the belt (`CanTouch`/`CanQuery` off). The collectors have `RailLeft`/`RailRight`/`RailBack`. |
 | `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
@@ -340,6 +348,43 @@ feed pads can be touched). The JSON is generated by
 - During the Caleb Full Event the bar's text follows the event: **"Caleb is
   FULL!"**, then **"🎉 COOKIE PARTY! 🎉"**, then **"Caleb is resting...
   💤"** while trophies are claimed.
+
+### Caleb Trophies
+
+- During the **trophy claim** (5 minutes), a big golden Caleb trophy stands
+  on Caleb's pedestal (where he stood; he is hidden then) with a **"Claim
+  Caleb Trophy"** prompt (hold E / tap, from up to
+  `Config.TrophyClaimPromptDistance` studs). Only players who fed Caleb this
+  round and haven't claimed see the prompt; the server checks again on
+  every claim. One trophy per player per round; clicking twice never gives
+  two. When the claim period ends, the trophy and prompt disappear and no
+  more claims are accepted.
+- Each claim gives a **random variant** (`Shared/TrophyVariants.luau`):
+  12 to start, Common / Rare / Epic / Legendary, each with its own colors,
+  material, pose, accessories, and effect (e.g. Bronze Caleb, Party Caleb,
+  Chef Caleb, Cool Caleb, Ruby Caleb, Diamond Caleb, Neon Caleb, Golden
+  Caleb, Cookie King Caleb). Rarer ones have a smaller weight. A player
+  gets a variant they **don't own yet** whenever there is one left, so
+  every round's trophy is a new look until they have them all. Adding a
+  variant = adding one entry to that list.
+- A message tells the player what they got ("You got Golden Caleb
+  (Legendary)!"). Trophies are **saved** (DataService). If saving isn't
+  working for them (DataStore down, or Studio without API access) they still
+  get it for this server session, shown in their Trophy Case until they
+  leave the server, and the message says it couldn't be saved.
+- Each trophy is a small statue of Caleb on a plinth with a gold
+  "CALEB TROPHY" nameplate showing the variant's name in its rarity color.
+- The **Trophy Case** (a house build, see Building) shows the owner's
+  **newest 5** trophies (newest in the middle slot). With more than 5, the
+  older ones are kept (saved) but not shown; there is no picker in this
+  version. The case appears when built, when the saved house is restored on
+  claim, and updates right after a new trophy; it empties when the plot is
+  released.
+- Edge cases: leaving during the Celebration and rejoining (same server)
+  during the claim keeps your contribution, so you can still claim. Joining
+  after the goal: not eligible. Next round: new event id, so you can earn
+  another (different) trophy. Server shutdown: trophies were already saved
+  right after the claim (and again on close).
 
 ### Caleb Full Event: what players see on screen
 

@@ -9,6 +9,7 @@ local CalebCycle = require(Services.CalebCycle)
 local DataService = require(Services.DataService)
 local PlayerDataService = require(Services.PlayerDataService)
 local StatueService = require(Services.StatueService)
+local TrophyService = require(Services.TrophyService)
 local TycoonService = require(Services.TycoonService)
 
 TycoonService.Start()
@@ -16,6 +17,7 @@ local statue = StatueService.Start()
 if statue then
 	CalebCycle.Start(statue)
 end
+TrophyService.Start(statue) -- podium claim + Trophy Case display
 
 -- Players get a plot by stepping on a ClaimPad (TycoonService), not on join.
 local function onPlayerAdded(player: Player)

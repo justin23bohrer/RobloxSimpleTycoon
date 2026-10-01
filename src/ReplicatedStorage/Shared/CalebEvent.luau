@@ -43,6 +43,10 @@ CalebEvent.Attr = table.freeze({
 CalebEvent.PlayerAttr = table.freeze({
 	Fed = "CalebFed", -- number: cookies this player fed Caleb in the current cycle (restored on rejoin)
 	TrophyClaimed = "CalebTrophyClaimed", -- boolean: claimed this cycle's trophy
+	-- string: JSON { Id, Kind, Variant? } set by TrophyService after a claim
+	-- attempt (Kind "Saved" / "Unsaved" / "AlreadyOwned" / "NotEligible"); Id
+	-- changes every time so the client notices repeats. Client shows a message.
+	TrophyNotice = "CalebTrophyNotice",
 })
 
 -- Studio-only fast test cycle (Config.DevCalebFastCycle). Never applies in a

@@ -19008,6 +19008,1095 @@
           ]
         }
       ]
+    },
+    {
+      "name": "BuildButton4",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          0.4,
+          6,
+          6
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -94,
+              2.2,
+              28
+            ],
+            "orientation": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            255,
+            140,
+            0
+          ]
+        },
+        "Anchored": true,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Cylinder"
+      },
+      "children": [
+        {
+          "name": "BuildButton4Ring",
+          "className": "Part",
+          "properties": {
+            "Shape": "Cylinder",
+            "Size": [
+              0.2,
+              7.5,
+              7.5
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -94,
+                  2.1,
+                  28
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                140,
+                70,
+                0
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "CanQuery": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "Label",
+          "className": "BillboardGui",
+          "properties": {
+            "Size": {
+              "UDim2": [
+                [
+                  7,
+                  0
+                ],
+                [
+                  2.8,
+                  0
+                ]
+              ]
+            },
+            "StudsOffset": [
+              0,
+              3.6,
+              0
+            ],
+            "LightInfluence": 0
+          },
+          "children": [
+            {
+              "name": "Panel",
+              "className": "Frame",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                },
+                "BackgroundColor3": [
+                  1.0,
+                  0.6,
+                  0.15
+                ],
+                "BorderSizePixel": 0
+              },
+              "children": [
+                {
+                  "name": "UICorner",
+                  "className": "UICorner",
+                  "properties": {
+                    "CornerRadius": {
+                      "UDim": [
+                        0.35,
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "UIStroke",
+                  "className": "UIStroke",
+                  "properties": {
+                    "Color": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "Thickness": 4,
+                    "ApplyStrokeMode": "Border",
+                    "LineJoinMode": "Round"
+                  }
+                },
+                {
+                  "name": "TextLabel",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "Trophy Case",
+                    "RichText": true,
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.88,
+                          0
+                        ],
+                        [
+                          0.8,
+                          0
+                        ]
+                      ]
+                    }
+                  },
+                  "children": [
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 2.5,
+                        "ApplyStrokeMode": "Contextual",
+                        "LineJoinMode": "Round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TrophyCase",
+      "className": "Model",
+      "children": [
+        {
+          "name": "CaseBase",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13,
+              2,
+              3.6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  3,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                98,
+                58
+              ]
+            },
+            "Anchored": true,
+            "Material": "Wood",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "CaseBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13,
+              5.4,
+              0.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -118.8,
+                  6.7,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "CaseSideLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.5,
+              5.4,
+              3.6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  6.7,
+                  40.25
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                98,
+                58
+              ]
+            },
+            "Anchored": true,
+            "Material": "Wood",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "CaseSideRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.5,
+              5.4,
+              3.6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  6.7,
+                  27.75
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                98,
+                58
+              ]
+            },
+            "Anchored": true,
+            "Material": "Wood",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "CaseTop",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13.4,
+              0.6,
+              3.8
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  9.7,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                98,
+                58
+              ]
+            },
+            "Anchored": true,
+            "Material": "Wood",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "CaseShelfTrim",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13,
+              0.3,
+              0.2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -115.35,
+                  4.0,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "Material": "Neon",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "CaseTopTrim",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              13.4,
+              0.2,
+              0.2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -115.25,
+                  9.4,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "Material": "Neon",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "CaseGlass",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              12,
+              5.4,
+              0.2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -115.6,
+                  6.7,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                180,
+                230,
+                255
+              ]
+            },
+            "Anchored": true,
+            "Material": "Glass",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Transparency": 0.6,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TrophySlot1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2.1,
+              0.2,
+              2.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  4.1,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                160,
+                60
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TrophySlot2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2.1,
+              0.2,
+              2.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  4.1,
+                  36.5
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                160,
+                60
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TrophySlot3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2.1,
+              0.2,
+              2.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  4.1,
+                  31.5
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                160,
+                60
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TrophySlot4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2.1,
+              0.2,
+              2.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  4.1,
+                  39
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                160,
+                60
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "TrophySlot5",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2.1,
+              0.2,
+              2.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -117.2,
+                  4.1,
+                  29
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    -1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                200,
+                160,
+                60
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "CaseSign",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              7,
+              1.6,
+              0.3
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -118.8,
+                  11.2,
+                  34
+                ],
+                "orientation": [
+                  [
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "SignGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 50,
+                "LightInfluence": 0
+              },
+              "children": [
+                {
+                  "name": "Panel",
+                  "className": "Frame",
+                  "properties": {
+                    "AnchorPoint": [
+                      0.5,
+                      0.5
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.5,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.94,
+                          0
+                        ],
+                        [
+                          0.84,
+                          0
+                        ]
+                      ]
+                    },
+                    "BackgroundColor3": [
+                      0.85,
+                      0.2,
+                      0.25
+                    ],
+                    "BorderSizePixel": 0
+                  },
+                  "children": [
+                    {
+                      "name": "UICorner",
+                      "className": "UICorner",
+                      "properties": {
+                        "CornerRadius": {
+                          "UDim": [
+                            0.35,
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 6,
+                        "ApplyStrokeMode": "Border",
+                        "LineJoinMode": "Round"
+                      }
+                    },
+                    {
+                      "name": "TextLabel",
+                      "className": "TextLabel",
+                      "properties": {
+                        "Text": "🏆 TROPHY CASE",
+                        "Font": "FredokaOne",
+                        "TextScaled": true,
+                        "TextColor3": [
+                          1,
+                          1,
+                          1
+                        ],
+                        "TextStrokeTransparency": 1,
+                        "BackgroundTransparency": 1,
+                        "AnchorPoint": [
+                          0.5,
+                          0.5
+                        ],
+                        "Position": {
+                          "UDim2": [
+                            [
+                              0.5,
+                              0
+                            ],
+                            [
+                              0.5,
+                              0
+                            ]
+                          ]
+                        },
+                        "Size": {
+                          "UDim2": [
+                            [
+                              0.86,
+                              0
+                            ],
+                            [
+                              0.7,
+                              0
+                            ]
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "name": "UIStroke",
+                          "className": "UIStroke",
+                          "properties": {
+                            "Color": [
+                              0.157,
+                              0.11,
+                              0.078
+                            ],
+                            "Thickness": 3.5,
+                            "ApplyStrokeMode": "Contextual",
+                            "LineJoinMode": "Round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

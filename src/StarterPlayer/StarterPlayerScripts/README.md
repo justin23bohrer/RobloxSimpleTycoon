@@ -14,6 +14,9 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   rain during Caleb's Celebration. Client-only visuals, pooled; no rewards.
 - `CalebAudio.client.luau` — Caleb Full Event sound effects, driven only by
   the statue's / player's attributes (`Config.CalebSounds`).
+- `TrophyPrompt.client.luau` — hides the podium "Claim Caleb Trophy" prompt
+  for players who can't claim, and shows the claim result message. The
+  server decides every claim.
 
 Client code may handle input, visual effects, and presentation. It must never
 be trusted for cash, ownership, purchases, drops, or collection.
