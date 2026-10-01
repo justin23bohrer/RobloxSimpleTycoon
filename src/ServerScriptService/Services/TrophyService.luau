@@ -1,28 +1,33 @@
 -- TrophyService (server only)
--- Caleb Trophies: the claim on Caleb's podium, and showing each player's
--- trophies in the Trophy Case build of their house.
+-- Caleb Trophies: the claim on Caleb's podium, equipping, and what each
+-- player's Trophy Case shows (and so which trophy powers are active).
 --
 -- * Claim: while CalebCycle's state is TrophyClaim, a big golden trophy
 --   (Workspace.Map.CalebClaimTrophy) stands where Caleb stood, with a server
 --   ProximityPrompt "Claim Caleb Trophy". In any other state it is removed.
 --   On Triggered the server checks CalebCycle.IsEligible (fed this cycle,
---   not claimed yet, state is TrophyClaim), picks a variant
---   (TrophyVariants.PickVariant, preferring ones the player doesn't own),
---   saves it with DataService.AddTrophy, then CalebCycle.MarkTrophyClaimed.
---   The check, the save, and the mark run without yielding in between, so
---   double triggers can never give two trophies. AddTrophy also refuses a
---   second trophy for the same EventId (cycle id).
+--   not claimed yet, state is TrophyClaim), rolls the reward on the server
+--   (TrophyVariants.RollReward: rarity by Config.TrophyRarityChances,
+--   preferring trophies the player doesn't own), saves it with
+--   DataService.AddTrophy, then CalebCycle.MarkTrophyClaimed. The check, the
+--   save, and the mark run without yielding in between, so double triggers
+--   can never give two trophies. AddTrophy also refuses a second trophy for
+--   the same EventId (cycle id).
 -- * If the player's data is not loaded (DataStore down, or Studio without
---   API access), the trophy is kept in a session-only list here instead
---   (by UserId, until this server closes) and still shown in their case.
--- * The player is told the result through the CalebTrophyNotice player
---   attribute (TrophyPrompt.client shows a notification). No remotes.
--- * Trophy Case: when the owner's TrophyCase is built or restored
---   (TycoonService.PurchaseApplied), or they get a trophy
---   (DataService.TrophiesChanged), their newest Config.TrophyCaseSlots
---   trophies are placed on TrophySlot1.. (slot 1 = newest) by
---   TrophyCaseDisplay. Cleared when the plot is released (its OwnerUserId
---   attribute goes away).
+--   API access), the trophy is kept session-only by TrophyInventory (by
+--   UserId, until this server closes) and can still be equipped.
+-- * A new trophy is equipped automatically when an active slot is free.
+-- * Equipping: the TrophyEquip remote (TrophyInventory.HandleRequest checks
+--   type, cooldown, loading, ownership, and the active slot limit).
+-- * The player is told the claim result through the CalebTrophyNotice
+--   player attribute (TrophyPrompt.client shows a notification).
+-- * Display rule: a trophy's power only works while it is displayed, and
+--   only equipped trophies in a BUILT Trophy Case are displayed. On every
+--   change (join/load, trophy added, equip change, case built/restored, plot
+--   claimed/released) refresh() shows the equipped trophies in slot order
+--   (TrophyCaseDisplay.Show) or clears the case, tells PowerService which
+--   variants are displayed (none without a built case), and republishes the
+--   TrophyInventory player attribute. Refreshes are batched per frame.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -34,13 +39,13 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyVariants = require(ReplicatedStorage.Shared.TrophyVariants)
 local CalebCycle = require(script.Parent.CalebCycle)
 local DataService = require(script.Parent.DataService)
+local PowerService = require(script.Parent.PowerService)
 local TrophyCaseDisplay = require(script.Parent.TrophyCaseDisplay)
+local TrophyInventory = require(script.Parent.TrophyInventory)
 local TrophyModel = require(script.Parent.TrophyModel)
 local TycoonService = require(script.Parent.TycoonService)
 
 local TrophyService = {}
-
-type TrophyRecord = DataService.TrophyRecord
 
 local CASE_ID = "TrophyCase" -- the Config.Builds Id (and plot model name)
 local CLAIM_NAME = "CalebClaimTrophy"
@@ -48,8 +53,9 @@ local CLAIM_LOOK = "GoldenCaleb"
 
 local statue: Instance? = nil
 local claimTrophy: Model? = nil
-local sessionTrophies: { [number]: { TrophyRecord } } = {} -- unsaved claims, by UserId
 local claiming: { [number]: true } = {} -- waiting for their data to load
+local pending: { [Player]: true } = {} -- refresh scheduled this frame
+local leaving: { [Player]: true } = setmetatable({}, { __mode = "k" }) :: any
 local noticeId = 0
 
 local function notify(player: Player, kind: string, variantId: string?)
@@ -58,33 +64,43 @@ local function notify(player: Player, kind: string, variantId: string?)
 	player:SetAttribute(CalebEvent.PlayerAttr.TrophyNotice, HttpService:JSONEncode(notice))
 end
 
--- Saved + session-only trophies, oldest first.
-local function allTrophies(player: Player): { TrophyRecord }
-	local list = DataService.GetTrophies(player)
-	for _, record in sessionTrophies[player.UserId] or {} do
-		table.insert(list, record)
-	end
-	table.sort(list, function(a, b)
-		if a.EarnedAt ~= b.EarnedAt then
-			return a.EarnedAt < b.EarnedAt
-		end
-		return a.EventId < b.EventId
-	end)
-	return list
-end
-
--- Rebuilds the trophies in the player's Trophy Case (if it is built).
-local function refreshCase(player: Player)
-	local tycoon = TycoonService.GetTycoon(player)
-	if not tycoon then
+-- Shows the player's equipped trophies in their case if it is built (else
+-- clears it), sets their active powers to exactly what is displayed, and
+-- republishes their TrophyInventory attribute.
+local function refresh(player: Player)
+	pending[player] = nil -- done now; a scheduled refresh is not needed
+	if leaving[player] or player.Parent ~= Players then
 		return
 	end
-	local case = tycoon.Plot:FindFirstChild(CASE_ID)
-	if case and TycoonService.HasPurchased(player, CASE_ID) then
-		TrophyCaseDisplay.Show(tycoon.Plot, case, allTrophies(player))
-	else
+	local tycoon = TycoonService.GetTycoon(player)
+	local case = tycoon and tycoon.Plot:FindFirstChild(CASE_ID)
+	local caseBuilt = tycoon ~= nil and case ~= nil and TycoonService.HasPurchased(player, CASE_ID)
+	local displayed = if caseBuilt then TrophyInventory.GetEquippedRecords(player) else {}
+	if tycoon and caseBuilt then
+		TrophyCaseDisplay.Show(tycoon.Plot, case :: Instance, displayed)
+	elseif tycoon then
 		TrophyCaseDisplay.Clear(tycoon.Plot)
 	end
+	local variantIds = {}
+	for _, record in displayed do
+		table.insert(variantIds, record.Variant)
+	end
+	PowerService.SetDisplayed(player, variantIds)
+	TrophyInventory.Publish(player, caseBuilt)
+end
+
+-- Several changes in one frame (e.g. a trophy added and auto-equipped)
+-- rebuild the case only once.
+local function scheduleRefresh(player: Player)
+	if pending[player] then
+		return
+	end
+	pending[player] = true
+	task.defer(function()
+		if pending[player] then
+			refresh(player)
+		end
+	end)
 end
 
 local function onClaimTriggered(player: Player)
@@ -112,29 +128,21 @@ local function onClaimTriggered(player: Player)
 
 	-- Nothing below yields: check, record, and mark happen together.
 	local owned = {}
-	for _, record in allTrophies(player) do
+	for _, record in TrophyInventory.GetOwned(player) do
 		table.insert(owned, record.Variant)
 	end
-	local record: TrophyRecord = {
-		Variant = TrophyVariants.PickVariant(owned),
-		EventId = CalebCycle.GetCycleId(),
-		EarnedAt = os.time(),
-	}
+	local record = TrophyInventory.NewRecord(TrophyVariants.RollReward(owned), CalebCycle.GetCycleId())
 	local kind
 	if DataService.IsLoaded(player) then
 		-- False only if they already have this cycle's trophy saved.
 		kind = if DataService.AddTrophy(player, record) then "Saved" else "AlreadyOwned"
 	else
-		local list = sessionTrophies[userId] or {}
-		sessionTrophies[userId] = list
-		table.insert(list, record)
+		TrophyInventory.AddSessionTrophy(player, record)
 		kind = "Unsaved"
 	end
 	CalebCycle.MarkTrophyClaimed(userId)
 	notify(player, kind, if kind == "AlreadyOwned" then nil else record.Variant)
-	if kind == "Unsaved" then
-		refreshCase(player) -- saved ones refresh through TrophiesChanged
-	end
+	scheduleRefresh(player)
 end
 
 -- Top center of Caleb's pedestal (the highest Pedestal* part).
@@ -203,12 +211,42 @@ function TrophyService.Start(statueModel: Instance?)
 	CalebCycle.StateChanged:Connect(onStateChanged)
 	onStateChanged(CalebCycle.GetState())
 
+	local remotes = ReplicatedStorage:WaitForChild("Remotes")
+	local equipRemote = remotes:WaitForChild("TrophyEquip") :: RemoteFunction
+	equipRemote.OnServerInvoke = function(player: Player, action: any, instanceId: any)
+		local ok, reason = TrophyInventory.HandleRequest(player, action, instanceId)
+		if ok then
+			scheduleRefresh(player) -- also batches with EquippedChanged
+		end
+		return ok, reason
+	end
+
 	TycoonService.PurchaseApplied:Connect(function(player: Player, _plot: Model, purchaseId: string)
 		if purchaseId == CASE_ID then
-			refreshCase(player)
+			scheduleRefresh(player)
 		end
 	end)
-	DataService.TrophiesChanged:Connect(refreshCase)
+	DataService.TrophiesChanged:Connect(scheduleRefresh)
+	DataService.EquippedChanged:Connect(scheduleRefresh)
+
+	-- Join: publish at once (nothing owned yet), again once their data loaded.
+	local function onPlayerAdded(player: Player)
+		scheduleRefresh(player)
+		task.spawn(function()
+			DataService.WaitForData(player)
+			scheduleRefresh(player)
+		end)
+	end
+	Players.PlayerAdded:Connect(onPlayerAdded)
+	for _, player in Players:GetPlayers() do
+		onPlayerAdded(player)
+	end
+	Players.PlayerRemoving:Connect(function(player: Player)
+		leaving[player] = true
+		pending[player] = nil
+		TrophyInventory.OnPlayerRemoving(player)
+		PowerService.SetDisplayed(player, {})
+	end)
 
 	local plots = Workspace:WaitForChild("Map"):WaitForChild("Plots")
 	for _, plot in plots:GetChildren() do
@@ -218,9 +256,19 @@ function TrophyService.Start(statueModel: Instance?)
 				warn(`TrophyService: {plot.Name}.{CASE_ID} is missing TrophySlot{slot}`)
 			end
 		end
+		local ownerUserId = plot:GetAttribute("OwnerUserId")
 		plot:GetAttributeChangedSignal("OwnerUserId"):Connect(function()
-			if plot:GetAttribute("OwnerUserId") == nil then
+			local previous = ownerUserId
+			ownerUserId = plot:GetAttribute("OwnerUserId")
+			if ownerUserId == nil then
 				TrophyCaseDisplay.Clear(plot) -- released
+			end
+			-- Claimed or released: the owner's case (and powers) changed.
+			for _, userId in { previous, ownerUserId } do
+				local player = typeof(userId) == "number" and Players:GetPlayerByUserId(userId)
+				if player then
+					scheduleRefresh(player)
+				end
 			end
 		end)
 	end

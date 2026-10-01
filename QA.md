@@ -396,6 +396,32 @@ Services** ON (published place) except TR8. Watch Output (Server view).
 | TR10 | Restore after rejoin (API ON): with the case built and 1+ saved trophies, Stop, Play, claim any plot. | The house comes back with the Trophy Case and the same trophies in it (no charge). Same on Plot2–4 (case against that house's back wall, facing in). | |
 | TR11 | New trophy updates the case: with the case built, claim a trophy. | The new trophy appears in the middle slot right away; older ones move outward. | |
 | TR12 | Second cycle: after claiming, let the cycle reset, feed to the goal again, claim again. | New `CalebCycleId`; you get another trophy with a **different** variant from the ones you own (until you own all 12). Both are saved. | |
-| TR13 | 6 trophies (repeat TR12, or temporarily set the fast goal low). | The case shows the newest 5; the oldest isn't shown but is still in the save (`DataService.GetTrophies`). | |
+| TR13 | 6 trophies (repeat TR12, or temporarily set the fast goal low). | The first 5 were equipped automatically and stand in the case; the 6th is owned (in `TrophyInventory` `Owned`) but **not** equipped or shown until you unequip one (TI3). | |
 | TR14 | Variant look check: run several cycles (or in the command bar: `require(game.ServerScriptService.Services.TrophyModel).Build("GoldenCaleb", 3).Parent = workspace`, for each Id in `TrophyVariants.List` and an unknown Id like `"Nope"`). | Each looks like a mini cartoony Caleb (big round head, hair cap, big eyes, grin, belly) in its color, pose, accessories (crown, party hat, chef hat, sunglasses, cookie in hand, bow tie), and effect (sparkles/glow). The unknown Id shows a gray "Mystery Caleb". Nothing collides or can be clicked. | |
 | TR15 | Server shutdown right after claiming (API ON): claim, then Stop within 2 s. | Next session the trophy is there (saved right after the claim, and in BindToClose). | |
+
+## Trophy inventory + equipping
+
+Same setup as Caleb Trophies (fast cycle, API access ON unless noted). Read
+the server-written player attribute `TrophyInventory` (JSON: `Owned`,
+`Equipped`, `CaseBuilt`, `Max`, `Saved`) in the Properties window of your
+Player (Client or Server view). Until the Inventory UI exists, equip from the
+**client** command bar (Test > Clients and Servers, Player 1 window):
+`print(game.ReplicatedStorage.Remotes.TrophyEquip:InvokeServer("Equip", "<InstanceId>"))`
+(copy an InstanceId from `Owned`).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| TI1 | Join (no trophies yet). | `TrophyInventory` appears right away with `Owned = []`, `Equipped = []`, `Max = 5`, `CaseBuilt = false`; `Saved` becomes true once your data loads (false with API access off). | |
+| TI2 | Claim a trophy with fewer than 5 equipped. | It is in `Owned` and auto-equipped (last in `Equipped`). With the case built it appears in the case at once; without the case it is not shown and gives no power (`TrophyStats` empty). | |
+| TI3 | Unequip then equip: `InvokeServer("Unequip", id)`, wait 1 s, `InvokeServer("Equip", id)`. | Each prints `true`. The trophy leaves / returns to the case; `Equipped` updates; repeating an action that is already done also returns `true` and changes nothing. | |
+| TI4 | Limit: with 5 equipped, equip a 6th owned trophy. | `false  All 5 active slots are full. Unequip a trophy first.` Nothing changes. | |
+| TI5 | Unowned / fake id: `InvokeServer("Equip", "not-a-real-id")`, `InvokeServer("Equip", <Player 2's InstanceId>)`, `InvokeServer("Equip", 123)`, `InvokeServer("Equip", string.rep("a", 500))`, `InvokeServer("Dance", id)`. | Every one returns `false` with a friendly reason ("isn't in your collection" / "Unknown action."); no change to either player; no server errors. | |
+| TI6 | Spam: `for i = 1, 20 do print(game.ReplicatedStorage.Remotes.TrophyEquip:InvokeServer("Unequip", id)) end` | Most calls return `false  Slow down a little!` (cooldown `TrophyEquipCooldown` = 0.25 s); no errors, no lag. | |
+| TI7 | Rejoin restores equipped: equip a specific set (e.g. unequip slot 1), Stop, Play, claim a plot. | `Equipped` is the same list in the same order; with the case built the same trophies are in the case, same slots. | |
+| TI8 | Migration of an old save: in a published test place with a Version 1 save (made before this change, or written via the command bar: `game:GetService("DataStoreService"):GetDataStore("SimpleTycoon_v1"):SetAsync("Player_<UserId>", {Version = 1, Purchases = {}, Trophies = {{Variant = "GoldenCaleb", EventId = "a", EarnedAt = 1}, ...6 more}})` while not in the game), join. | No warnings. Every trophy is kept with a new `InstanceId`; `Equipped` = the newest 5, newest first. Rejoin: the same InstanceIds (written at load). | |
+| TI9 | Case not built: own trophies, plot claimed but no Trophy Case. Then buy it. | Before: `CaseBuilt = false`, nothing displayed, no powers. After buying: `CaseBuilt = true`, equipped trophies appear, powers on. | |
+| TI10 | Release: leave with the case built (2 players: watch from Player 2). | The case and its trophies are removed with the plot; no errors. Player 1's powers stop (they're gone). | |
+| TI11 | Unsaved (API access OFF): claim, then unequip/equip it. | Notification says it couldn't be saved; `Saved = false`; the trophy is auto-equipped and can be unequipped/equipped this session. Leave + rejoin the same server: still owned and equipped. New server: gone. | |
+| TI12 | Exploit: from the client, set your own `TrophyInventory` attribute or call `InvokeServer` with another player's id. | Client-side attribute changes affect only your own view; the server's state, the case, and powers don't change. | |
+

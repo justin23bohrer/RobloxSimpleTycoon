@@ -1,6 +1,6 @@
 -- DataService (server only)
--- Saves and loads each player's house purchases and Caleb trophies with a
--- DataStore (Config.DataStoreName, key "Player_<UserId>"). Cookies are NOT
+-- Saves and loads each player's house purchases, Caleb trophies, and which
+-- trophies are equipped with a DataStore (Config.DataStoreName, key "Player_<UserId>"). Cookies are NOT
 -- saved: every session still starts at Config.StartingCash.
 --
 -- The shape of the saved data and how bad data is cleaned is in DataSchema.
@@ -68,8 +68,12 @@ local savingDisabled = false
 
 local loadFinished = Instance.new("BindableEvent")
 local trophiesChanged = Instance.new("BindableEvent")
+local equippedChanged = Instance.new("BindableEvent")
 -- Fires (player) after AddTrophy adds a trophy.
 DataService.TrophiesChanged = trophiesChanged.Event
+-- Fires (player) after the equipped list changes (SetEquipped, or AddTrophy
+-- auto-equipping a new trophy).
+DataService.EquippedChanged = equippedChanged.Event
 
 local function disableSaving(message: string)
 	if savingDisabled then
@@ -296,6 +300,12 @@ function DataService.OnPlayerRemoving(player: Player)
 	end)
 end
 
+-- True while the player's data is still loading (just joined).
+function DataService.IsLoading(player: Player): boolean
+	local session = sessions[player]
+	return session ~= nil and session.Status == "Loading"
+end
+
 -- True once the player's data loaded and is being saved.
 function DataService.IsLoaded(player: Player): boolean
 	return getLoaded(player) ~= nil
@@ -345,23 +355,91 @@ function DataService.GetTrophies(player: Player): { TrophyRecord }
 end
 
 -- Adds a trophy and saves right away. False if the data is not loaded, the
--- record is invalid, or the player already has a trophy for that EventId.
+-- record is invalid, or it is an event trophy (EventId ~= "") and the player
+-- already has one for that EventId. A missing InstanceId (or one the player
+-- already owns) is replaced by a new one. If an active slot is free
+-- (fewer than Config.TrophyActiveSlots equipped), the new trophy is equipped
+-- too, so a first trophy shows up in the Trophy Case right away.
 function DataService.AddTrophy(player: Player, record: TrophyRecord): boolean
 	local session = getLoaded(player)
 	local clean = DataSchema.CleanTrophy(record)
 	if not session or not clean then
 		return false
 	end
-	local trophies = (session.Data :: DataSchema.PlayerData).Trophies
-	for _, owned in trophies do
-		if owned.EventId == clean.EventId then
+	local data = session.Data :: DataSchema.PlayerData
+	for _, owned in data.Trophies do
+		if clean.EventId ~= "" and owned.EventId == clean.EventId then
 			return false
 		end
+		if owned.InstanceId == clean.InstanceId then
+			clean.InstanceId = DataSchema.NewInstanceId()
+		end
 	end
-	table.insert(trophies, clean)
+	table.insert(data.Trophies, clean)
+	local autoEquipped = #data.Equipped < Config.TrophyActiveSlots
+	if autoEquipped then
+		table.insert(data.Equipped, clean.InstanceId)
+	end
 	session.Dirty = true
 	trophiesChanged:Fire(player)
+	if autoEquipped then
+		equippedChanged:Fire(player)
+	end
 	task.spawn(save, player, session, false)
+	return true
+end
+
+-- A copy of the equipped InstanceIds in display order ({} if not loaded).
+function DataService.GetEquipped(player: Player): { string }
+	local session = getLoaded(player)
+	return if session then table.clone((session.Data :: DataSchema.PlayerData).Equipped) else {}
+end
+
+-- Replaces the equipped list. Every id must be a trophy the player owns,
+-- with no repeats and at most Config.TrophyActiveSlots. Returns (true) or
+-- (false, reason); nothing changes on false. Saved with the next autosave.
+function DataService.SetEquipped(player: Player, ids: { string }): (boolean, string?)
+	local session = getLoaded(player)
+	if not session then
+		return false, "data not loaded"
+	end
+	if typeof(ids) ~= "table" then
+		return false, "not a list"
+	end
+	local count = 0
+	for _ in ids do
+		count += 1
+	end
+	if count ~= #ids then
+		return false, "not a list"
+	end
+	if count > Config.TrophyActiveSlots then
+		return false, "too many equipped"
+	end
+	local data = session.Data :: DataSchema.PlayerData
+	local owned = {}
+	for _, record in data.Trophies do
+		owned[record.InstanceId] = true
+	end
+	local seen = {}
+	for _, id in ids do
+		if typeof(id) ~= "string" or not owned[id] then
+			return false, "not owned"
+		end
+		if seen[id] then
+			return false, "equipped twice"
+		end
+		seen[id] = true
+	end
+	local same = #ids == #data.Equipped
+	for i, id in ids do
+		same = same and data.Equipped[i] == id
+	end
+	if not same then
+		data.Equipped = table.clone(ids)
+		session.Dirty = true
+		equippedChanged:Fire(player)
+	end
 	return true
 end
 

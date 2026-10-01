@@ -34,6 +34,7 @@ src/
 │       ├── CalebCycle.luau     → Caleb Full Event state machine (total, contributions, trophy eligibility)
 │       ├── StatueShape.luau    → helper: Caleb's fatness + overall scale, and hiding him
 │       ├── TrophyService.luau  → Caleb Trophy claim on the podium + Trophy Case display
+│       ├── TrophyInventory.luau → helper for TrophyService (owned/equipped, TrophyEquip rules, TrophyInventory attribute)
 │       ├── TrophyModel.luau    → helper for TrophyService (builds a trophy Model from a variant)
 │       ├── TrophyCaseDisplay.luau → helper for TrophyService (puts trophies on a Trophy Case's slots)
 │       └── TrophyAccessories.luau → helper for TrophyModel (hats, glasses, cookie, bow tie)
@@ -136,8 +137,8 @@ reach the server.
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
-| `DataService` | Saves/loads each player's house purchases and Caleb trophies (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
-| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids and bad/duplicate trophies; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`. | Implemented |
+| `DataService` | Saves/loads each player's house purchases, Caleb trophies, and equipped trophy ids (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
+| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
@@ -151,7 +152,8 @@ reach the server.
 | `CalebCycle` | Caleb Full Event state machine (see "Caleb Full Event (contract)"). Owns the shared total, contributions by UserId (+ display name), trophy claims, cycle id, and the timed states (`task.delay` timers guarded by cycle id + state). Publishes all statue/player attributes; `CalebTopFeeders` is throttled to `Config.CalebLeaderboardInterval` (batched, last value always published, immediate on reset). | Implemented |
 | `StatueShape` (helper) | Presentation only. `Setup(statue)` remembers every body part's map position/size (body = `Shared/CalebBody`: not `Pedestal*`, `FeedPads`, `Podium`) and the pedestal top. `Apply(progress 0..1, seconds)` (progress = cookies / goal) tweens, from the original map values: fatness (Torso/Belt wider and deeper, arms/legs out and thicker, the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin` grow out, chain stays on the belly) with fatness = log(1 + p·`CalebFatnessCurve`)/log(1 + `CalebFatnessCurve`) (front-loaded), then scales every body part about the pedestal top by `CalebMinScale` → `CalebMaxScale` (p^`CalebScaleCurve`, plus a last `CalebFinalPopScale` jump at exactly the goal). `SetHidden(hidden)` hides/shows the body with `PlotVisibility`. | Implemented |
 | `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. `StatueService` passes progress = eaten / goal (linear). | Implemented |
-| `TrophyService` | Caleb Trophies. On `CalebCycle.StateChanged` → `TrophyClaim` puts a big golden trophy (`Workspace.Map.CalebClaimTrophy`, `Config.TrophyPodiumScale`) on top of the highest `Pedestal*` part with a server `ProximityPrompt` "Claim Caleb Trophy"; any other state (and `Start`) removes it. `Triggered`: `CalebCycle.IsEligible` → (waits only if the player's data is still loading, then re-checks) → `TrophyVariants.PickVariant(owned)` → `DataService.AddTrophy` (or, if data is not loaded, a session-only list by UserId kept until the server closes) → `CalebCycle.MarkTrophyClaimed`, with no yield between the last check and the mark. Reports the result in the `CalebTrophyNotice` player attribute. Shows the owner's newest `Config.TrophyCaseSlots` trophies (saved + session) on the Trophy Case's `TrophySlotN` parts via `TrophyCaseDisplay`, on `TycoonService.PurchaseApplied("TrophyCase")` and `DataService.TrophiesChanged`; clears it when the plot's `OwnerUserId` goes away. | Implemented (`Start(statue?)`) |
+| `TrophyService` | Caleb Trophies. On `CalebCycle.StateChanged` → `TrophyClaim` puts a big golden trophy (`Workspace.Map.CalebClaimTrophy`, `Config.TrophyPodiumScale`) on top of the highest `Pedestal*` part with a server `ProximityPrompt` "Claim Caleb Trophy"; any other state (and `Start`) removes it. `Triggered`: `CalebCycle.IsEligible` → (waits only if the player's data is still loading, then re-checks) → `TrophyVariants.RollReward(ownedVariantIds)` → `DataService.AddTrophy` (or, if data is not loaded, `TrophyInventory.AddSessionTrophy`: kept by UserId until the server closes) → `CalebCycle.MarkTrophyClaimed`, with no yield between the last check and the mark. Reports the result in the `CalebTrophyNotice` player attribute. Handles the `TrophyEquip` remote (rules in `TrophyInventory`). **Display rule:** only equipped trophies in a **built** Trophy Case are displayed, and only displayed trophies give powers. On join/load, trophy added, equip change, `PurchaseApplied("TrophyCase")` (buy or restore), and plot claimed/released (`OwnerUserId`), it calls `TrophyCaseDisplay.Show(plot, case, equippedRecordsInSlotOrder)` (or `Clear`), `PowerService.SetDisplayed(player, displayedVariantIds)` (empty without a built case, after release, and on leave), and republishes the `TrophyInventory` attribute; refreshes are batched per frame. | Implemented (`Start(statue?)`) |
+| `TrophyInventory` (helper) | Used only by `TrophyService`. Owned = saved (`DataService`) + session-only trophies; Equipped = saved list then equipped session-only ones (≤ `TrophyActiveSlots`). `NewRecord`, `GetOwned`, `GetEquipped`, `GetEquippedRecords`, `AddSessionTrophy` (auto-equips into a free slot), `SetEquippedState`, `HandleRequest(player, action, instanceId)` (the remote's checks), `Publish(player, caseBuilt)`, `OnPlayerRemoving`. | Implemented |
 | `TrophyModel` (helper) | Used only by `TrophyService`; presentation only. `Build(variantId, scale?, label?)` returns an anchored, non-colliding Model (pivot = bottom center of the plinth, facing -Z): plinth + gold trim + "CALEB TROPHY" nameplate (variant name in its rarity color, or `label`), a mini Caleb in the statue's style in the variant's color/material and pose (arm angles per pose), accessories, and effect (`Sparkles` on the head or a `PointLight` glow). Unknown variant ids use `TrophyVariants.Fallback`. | Implemented |
 | `TrophyCaseDisplay` (helper) | Used only by `TrophyService`; presentation only. `Show(plot, case, records)` builds the newest `Config.TrophyCaseSlots` records (oldest-first list) with `TrophyModel` (`Config.TrophyCaseScale`) and stands them on `TrophySlot1..N` (slot 1 = newest) in a runtime `CaseTrophies` folder in the plot (outside the `TrophyCase` model, so `PlotVisibility` never tracks them); `Clear(plot)` destroys that folder. | Implemented |
 | `TrophyAccessories` (helper) | Used only by `TrophyModel`: `Add(make, names, anchors)` builds `Crown`, `PartyHat`, `ChefHat`, `Sunglasses`, `Cookie` (right hand), `BowTie`; unknown names are skipped. | Implemented |
@@ -175,7 +177,7 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
 `CalebCycle` → `CalebEvent`, `Config` only (it changes no cash); `ServerMain` starts it with the statue `StatueService.Start()` returns.
 `StatueService` → `EconomyService`, `StatueShape`, `CalebCycle`; `StatueShape` → `PlotVisibility`, `Shared/CalebBody`; nothing requires `StatueService` except `ServerMain`.
-`TrophyService` → `CalebCycle`, `DataService`, `TycoonService` (read-only: `GetTycoon`, `HasPurchased`, `PurchaseApplied`), `TrophyCaseDisplay`, `TrophyModel`, `TrophyVariants`; nothing requires `TrophyService` except `ServerMain`. `TrophyCaseDisplay` → `TrophyModel`, `Config`. `TrophyModel` → `TrophyAccessories`, `TrophyVariants`.
+`TrophyService` → `CalebCycle`, `DataService`, `PowerService`, `TrophyInventory`, `TycoonService` (read-only: `GetTycoon`, `HasPurchased`, `PurchaseApplied`), `TrophyCaseDisplay`, `TrophyModel`, `TrophyVariants`; `TrophyInventory` → `DataService`, `DataSchema`, `Config`; nothing requires `TrophyService` except `ServerMain`. `TrophyCaseDisplay` → `TrophyModel`, `Config`. `TrophyModel` → `TrophyAccessories`, `TrophyVariants`.
 
 ## Client
 
@@ -248,6 +250,7 @@ warns if it does not.
 | Remote | Type | Direction | Handled by | Arguments (all untrusted) | Returns |
 | ------ | ---- | --------- | ---------- | ------------------------- | ------- |
 | `FeedStatue` | RemoteFunction | client → server (`InvokeServer`) | `StatueService` | `amount`: cookies to feed | `(true, cookiesEaten)` or `(false, reason)` |
+| `TrophyEquip` | RemoteFunction | client → server (`InvokeServer`) | `TrophyService` (`TrophyInventory.HandleRequest`) | `action`: `"Equip"`/`"Unequip"`, `instanceId`: string ≤ 64 | `(true)` or `(false, reason)` |
 
 `FeedStatue` exists because typing an amount in a UI is something the server
 cannot see. The server re-checks everything (type, whole number, ≥ 1,
@@ -303,9 +306,10 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 
 ```lua
 {
-	Version = 1,                       -- DataSchema.CURRENT_VERSION
+	Version = 2,                       -- DataSchema.CURRENT_VERSION
 	Purchases = { [purchaseId] = true },
-	Trophies = { TrophyRecord },       -- oldest first, one per EventId
+	Trophies = { TrophyRecord },       -- oldest first, one per non-empty EventId, unique InstanceId
+	Equipped = { InstanceId },         -- display order, owned, unique, <= Config.TrophyActiveSlots
 	SessionJobId = "<JobId>" | nil,    -- session lock (DataService only)
 	SessionTime = os.time(),           -- last write by the lock holder
 }
@@ -314,12 +318,24 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 - **Loading** (on join, background): one `UpdateAsync` reads, cleans
   (`DataSchema.FromStored`), and takes the session lock. Unknown purchase
   ids and bad/duplicate trophy records are dropped; older `Version`s are
-  migrated step by step. A value that is not a table, or has a **newer**
+  migrated step by step.
+- **Version 2 (trophy inventory):** 1 → 2 gives every trophy a new
+  `InstanceId` (a GUID) and sets `Equipped` to the newest
+  `TrophyActiveSlots` trophies, newest first (what the old case showed). The
+  load writes the migrated record at once, so the new ids stick. Cleaning
+  (every load): a record without a non-empty `Variant` string or with a bad
+  `EarnedAt` is dropped; a non-string `EventId` becomes `""`; a second
+  record with the same non-empty `EventId` is dropped; a missing, invalid,
+  or repeated `InstanceId` gets a new one (the trophy is kept). `Equipped`
+  keeps only owned string ids, each once, at most `TrophyActiveSlots`.
+  A Version 1 server refuses a Version 2 record (newer version), so during a
+  rollout a player who reaches an old server plays unsaved there. A value that is not a table, or has a **newer**
   `Version` than the server knows, is refused (not overwritten).
 - **Load failure** (all retries failed, refused data, Studio without API
   access): the player is **not loaded** for the session: `IsLoaded` is
-  false, `GetPurchases`/`GetTrophies` return `{}`, `SetPurchased` is
-  ignored, `AddTrophy` returns false, and **nothing is ever written** for
+  false, `GetPurchases`/`GetTrophies`/`GetEquipped` return `{}`,
+  `SetPurchased` is ignored, `AddTrophy` returns false, `SetEquipped`
+  returns `(false, "data not loaded")`, and **nothing is ever written** for
   them. A `warn` says so; gameplay works, unsaved.
 - **Retries:** every DataStore call is tried up to 5 times, waiting 1, 2, 4,
   8 s.
@@ -353,10 +369,17 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   wasn't saved, are skipped. Until it finishes, `TryPurchase` refuses, so a
   player is never charged for something they own.
 - **Trophies:** DataService only stores and returns them
-  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`); TrophyService awards and
-  shows them. A trophy claimed while the player's data is **not loaded**
-  is kept only in TrophyService's session list (by UserId, until the server
-  closes) and is never written. The Trophy Case itself is a normal build
+  (`GetTrophies`, `AddTrophy`, `TrophiesChanged`, `GetEquipped`,
+  `SetEquipped`, `EquippedChanged`, `IsLoading`); TrophyService awards,
+  equips, and shows them. `AddTrophy` assigns an `InstanceId` if missing
+  and **auto-equips** the new trophy when fewer than `TrophyActiveSlots`
+  are equipped (so a first trophy shows up in a built case at once);
+  `SetEquipped` validates loaded / owned / no repeats / limit, marks the
+  data dirty (saved by autosave or on leave), and fires `EquippedChanged`.
+  A trophy claimed while the player's data is **not loaded** is kept only
+  in `TrophyInventory`'s session list (by UserId, until the server closes),
+  is auto-equipped the same way, can be equipped/unequipped this session,
+  and is never written. The Trophy Case itself is a normal build
   (purchase id `TrophyCase`), so it is saved and restored like the walls.
 
 ## Economy model
@@ -502,7 +525,7 @@ the newest `TrophyActiveSlots` records (what the old case showed).
 
 | Module | Owner | API |
 | ------ | ----- | --- |
-| `DataService` | Inventory | existing API, plus `AddTrophy` assigns `InstanceId` when missing; `GetEquipped(player): {string}`; `SetEquipped(player, ids): (boolean, string?)` (validates: loaded, every id owned, no repeats, ≤ `TrophyActiveSlots`); `EquippedChanged: RBXScriptSignal (player)` |
+| `DataService` | Inventory | existing API, plus `AddTrophy` assigns `InstanceId` when missing; `GetEquipped(player): {string}`; `SetEquipped(player, ids): (boolean, string?)` (validates: loaded, every id owned, no repeats, ≤ `TrophyActiveSlots`); `EquippedChanged: RBXScriptSignal (player)`; `IsLoading(player): boolean`. `AddTrophy` auto-equips into a free active slot. |
 | `TrophyService` | Inventory | claim uses `TrophyVariants.RollReward`; handles the `TrophyEquip` remote; publishes the `TrophyInventory` attribute; decides what is displayed (equipped records, only if the case is built) and calls `TrophyCaseDisplay.Show(plot, case, recordsInSlotOrder)` and `PowerService.SetDisplayed(player, variantIds)` (empty when the case isn't built or the plot is released). Session-only (unsaved) trophies keep working as today. |
 | `PowerService` | Powers | `SetDisplayed(player, variantIds)`, `Get(player, stat): number` (the capped total bonus, 0 if none), `OnPlayerAdded/OnPlayerRemoving`. Applies WalkSpeed / JumpHeight to the character (and on respawn), publishes `TrophyStats` + `CanDoubleJump`. Requires only Shared modules (no TycoonService: avoids a require cycle). Event-driven, no loops. |
 | `DropperService` / `CollectorService` | Powers | read `PowerService.Get(owner, …)` for the plot owner: drop value × (1 + CookieMultiplier), interval ÷ (1 + DropperSpeed), ExtraCookieChance, LuckyCookieChance, collect × (1 + CollectBonus). |

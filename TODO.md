@@ -94,7 +94,7 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 
 - [x] Contract: `Shared/TrophyPowers`, `Remotes/TrophyEquip`, Config (`TrophyActiveSlots`, `TrophyRarityChances`, `TrophyStatCaps`, ...) (lead).
 - [ ] Definitions: 6 rarities, Description/Powers/PowerText, new trophies, `RollReward`, looks.
-- [ ] Inventory: saved InstanceIds + Equipped (Version 2), equip remote, reward roll at claim, display rules.
+- [x] Inventory: saved InstanceIds + Equipped (Version 2), equip remote, reward roll at claim, display rules. `DataSchema`, `DataService`, `TrophyService` (+ `TrophyInventory`). (code done; Studio test pending: QA TI1–TI12, TR13)
 - [ ] Powers: `PowerService`, drop/collect/movement hooks, double jump.
 - [ ] Inventory UI.
 - [ ] Big Trophy Case + nameplates.
