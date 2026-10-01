@@ -53,6 +53,26 @@ Record the date and result when you run a case.
 | ST3 | Walk into and jump on the statue/pedestal. | It's solid and doesn't move; nothing happens to cash or the plot. No errors in Output. | |
 | ST4 | Walk around near the statue and look at it from the plot. | No noticeable lag. | |
 
+## Feeding Caleb
+
+Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it back before committing).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| FD1 | Turn around at the spawn; walk around the statue. | Four round orange pads with "FEED CALEB!" signs: in front of, behind, and on both sides of the pedestal. | |
+| FD2 | Step on any feed pad. | The pop-up appears with a little bounce: yellow rounded panel, thick dark outline, FredokaOne text: "How many cookies do you want to feed Caleb?", "Caleb has eaten 0 / 1,000,000", empty bar, "You have N", amount box, 10 / 100 / 1K / ALL, Cancel, FEED!. | |
+| FD3 | Type `abc12x3` in the amount box. | Only digits stay: `123`. | |
+| FD4 | With 100 cookies, press 10 → FEED!. | Cookies 100 → 90 (counter pops). "Caleb ate 10 cookies! Yum!". Progress "10 / 1,000,000"; Caleb visibly gets a bit fatter (belly, cheeks, chin, wider body) with a bouncy grow. Pop-up closes after ~1.5 s. | |
+| FD5 | Feed more than you have (e.g. type 5000 with 90). | "You don't have that many cookies!"; cookies unchanged; Caleb unchanged. | |
+| FD6 | Press Cancel; then walk off and back onto the pad. | Cancel closes it. It doesn't reopen while you stand there, but reopens after stepping off and back on. | |
+| FD7 | Open the pop-up, then walk ~15 studs away. | It closes by itself. | |
+| FD8 | Press FEED! with the box empty. | "Type how many cookies first!"; nothing sent. | |
+| FD9 | With dev cash, feed 10,000 then 1,000,000. | At 10,000 he's about two thirds as fat as the max. The second feed spends only 990,000 (the room left); he's at max size; signs say "CALEB IS FULL!"; the pop-up says "Caleb is FULL!". Further feeds: "Caleb is FULL!", no cookies spent. | |
+| FD10 | 2 players: Player 1 feeds while Player 2 has the pop-up open. | Player 2's progress and bar update live; both see Caleb grow. | |
+| FD11 | Security (code review / Server view): the client can't feed from far away or feed fractions/negatives. | `StatueService` rejects non-whole, < 1, and players not within `StatueFeedRange` of a pad; only `EconomyService.TrySpend` takes cookies. | |
+| FD12 | Phone (Device emulator): open the pop-up. | Fits the screen, text readable, buttons tappable, keyboard opens for the amount box. | |
+| FD13 | Reset character with the pop-up open; leave and rejoin the server. | Pop-up closes when you walk/teleport away; nothing breaks. Caleb's size stays for the server session (resets only on a new server). | |
+
 ## Purchase
 
 | ID | Test | Expected | Status |

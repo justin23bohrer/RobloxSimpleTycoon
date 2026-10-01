@@ -7,6 +7,12 @@ The statue is made only of built-in Roblox parts (balls, blocks, cylinders)
 plus a Highlight for a black cartoon outline. Edit the numbers below and
 re-run this script instead of hand-editing the JSON (it is regenerated).
 
+The statue is Caleb. Players feed him cookies on the four FeedPads around the
+pedestal; StatueService (server) then grows the Belly, Cheeks, and Chin parts
+made here and widens his body (see StatueShape.luau). Those parts start
+hidden inside the body; their "not fed yet" positions below must match
+StatueShape's formulas at fatness 0.
+
 Look: a cartoon caricature (huge round head, big white eyes with tiny pupils,
 wide toothy grin) with a smooth bald-style face, shaggy dark-brown hair with
 messy bangs over the forehead and ears, a dark navy long-sleeve shirt, a thin
@@ -111,7 +117,7 @@ def r(x):
     return round(x, 3)
 
 
-def part(name, size, pos, color, shape=None, rot=None, material="SmoothPlastic", collide=True):
+def part(name, size, pos, color, shape=None, rot=None, material="SmoothPlastic", collide=True, touch=False, into=None):
     world = add(pos, STATUE_ORIGIN)
     props = {
         "Size": [r(s) for s in size],
@@ -123,7 +129,7 @@ def part(name, size, pos, color, shape=None, rot=None, material="SmoothPlastic",
         },
         "Color": {"Color3uint8": list(color)},
         "Anchored": True,
-        "CanTouch": False,
+        "CanTouch": touch,
         "Material": material,
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth",
@@ -133,7 +139,9 @@ def part(name, size, pos, color, shape=None, rot=None, material="SmoothPlastic",
         props["CanQuery"] = False
     if shape:
         props["Shape"] = shape
-    parts.append({"name": name, "className": "Part", "properties": props})
+    node = {"name": name, "className": "Part", "properties": props}
+    (parts if into is None else into).append(node)
+    return node
 
 
 def ball(name, diameter, pos, color, **kw):
@@ -183,6 +191,9 @@ for i in range(13):
     ball(f"ChainBead{i + 1}", 0.45, (x, y, -2.85), GOLD, material="Neon", collide=False)
 part("ChainPendant", (0.5, 0.9, 0.3), (0, TORSO_TOP - 2.9, -2.9), GOLD, material="Neon", collide=False)
 
+# Belly: hidden inside the torso until Caleb is fed (StatueShape grows it).
+ball("Belly", 5.0, (0, TORSO_BOTTOM + 3.0, 0), SHIRT)
+
 # Arms: right arm (+X, the statue's right) hangs down; left hand on the hip.
 SHOULDER_Y = TORSO_TOP - 1.2
 r_sh = (5.8, SHOULDER_Y, 0)
@@ -214,6 +225,11 @@ for side, x, px in (("Right", 1.85, 1.6), ("Left", -1.85, -1.4)):
 
 np_, _ = on_head(0, -0.9, -0.2)
 ball("Nose", 1.6, np_, SKIN)
+
+# Chubby cheeks and a double chin: hidden inside the head until Caleb is fed.
+for side, x in (("Right", 1), ("Left", -1)):
+    ball(f"{side}Cheek", 2.0, add(HEAD_CENTER, scale(unit((x * 5.0, -1.4, -3.4)), 4.6)), SKIN)
+ball("Chin", 3.0, add(HEAD_CENTER, scale(unit((0, -0.93, -0.37)), 4.0)), SKIN)
 
 # Wide grin: a curved mouth band with a row of teeth along its top edge.
 N = 11
@@ -262,9 +278,74 @@ for x, y, tilt, h in [(-3.9, 4.3, 18, 3.0), (-2.6, 3.9, 22, 3.6), (-1.1, 4.0, 26
     count += 1
     part(f"Hair{count}", (1.9, h, 1.0), p, HAIR, rot=facing(n, (math.sin(t), math.cos(t), 0)))
 
+# Feed pads: one on each side of the pedestal. Same pad style as the plot's
+# pads (round pad + darker ring + cartoony sign). Touching one opens the feed
+# prompt on that player's screen (FeedPrompt.client.luau); the server checks
+# the player is really near a pad before taking any cookies.
+PAD_COLOR = (255, 170, 40)
+PAD_RING = (150, 80, 10)
+SIGN_PANEL = [1.0, 0.549, 0.118]  # 255,140,30
+OUTLINE = [0.157, 0.11, 0.078]  # 40,28,20, same dark outline as the cash display
+PAD_ROT = [[0, -1, 0], [1, 0, 0], [0, 0, 1]]  # cylinder's round face points up
+pads = []
+
+
+def sign(text):
+    return {
+        "name": "Label",
+        "className": "BillboardGui",
+        "properties": {"Size": {"UDim2": [[8, 0], [1.9, 0]]}, "StudsOffset": [0, 3.2, 0], "LightInfluence": 0},
+        "children": [
+            {
+                "name": "Panel",
+                "className": "Frame",
+                "properties": {"Size": {"UDim2": [[1, 0], [1, 0]]}, "BackgroundColor3": SIGN_PANEL, "BorderSizePixel": 0},
+                "children": [
+                    {"name": "UICorner", "className": "UICorner", "properties": {"CornerRadius": {"UDim": [0.35, 0]}}},
+                    {
+                        "name": "UIStroke",
+                        "className": "UIStroke",
+                        "properties": {"Color": OUTLINE, "Thickness": 4, "ApplyStrokeMode": "Border", "LineJoinMode": "Round"},
+                    },
+                    {
+                        "name": "TextLabel",
+                        "className": "TextLabel",
+                        "properties": {
+                            "Text": text,
+                            "RichText": True,
+                            "Font": "FredokaOne",
+                            "TextScaled": True,
+                            "TextColor3": [1, 1, 1],
+                            "TextStrokeTransparency": 1,
+                            "BackgroundTransparency": 1,
+                            "AnchorPoint": [0.5, 0.5],
+                            "Position": {"UDim2": [[0.5, 0], [0.5, 0]]},
+                            "Size": {"UDim2": [[0.88, 0], [0.8, 0]]},
+                        },
+                        "children": [
+                            {
+                                "name": "UIStroke",
+                                "className": "UIStroke",
+                                "properties": {"Color": OUTLINE, "Thickness": 2.5, "ApplyStrokeMode": "Contextual", "LineJoinMode": "Round"},
+                            }
+                        ],
+                    },
+                ],
+            }
+        ],
+    }
+
+
+for side, (x, z) in (("Front", (0, -18)), ("Back", (0, 18)), ("Left", (-18, 0)), ("Right", (18, 0))):
+    pad = part(f"FeedPad{side}", (0.4, 6, 6), (x, 0.2, z), PAD_COLOR, shape="Cylinder", rot=PAD_ROT, touch=True, into=pads)
+    ring = part(f"FeedPad{side}Ring", (0.2, 7.5, 7.5), (x, 0.1, z), PAD_RING, shape="Cylinder", rot=PAD_ROT, into=[])
+    ring["properties"]["CanQuery"] = False
+    pad["children"] = [ring, sign("FEED CALEB!")]
+
 model = {
     "className": "Model",
     "children": parts
+    + [{"name": "FeedPads", "className": "Folder", "children": pads}]
     + [
         {
             "name": "CartoonOutline",

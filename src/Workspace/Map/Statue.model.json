@@ -1318,6 +1318,56 @@
       }
     },
     {
+      "name": "Belly",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          5.0,
+          5.0,
+          5.0
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              0.0,
+              20.0,
+              44.0
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            32,
+            36,
+            56
+          ]
+        },
+        "Anchored": true,
+        "CanTouch": false,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Ball"
+      }
+    },
+    {
       "name": "RightArm",
       "className": "Part",
       "properties": {
@@ -2077,6 +2127,156 @@
               0.0,
               33.628,
               37.761
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            236,
+            190,
+            156
+          ]
+        },
+        "Anchored": true,
+        "CanTouch": false,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Ball"
+      }
+    },
+    {
+      "name": "RightCheek",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          2.0,
+          2.0,
+          2.0
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              3.706,
+              33.462,
+              41.48
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            236,
+            190,
+            156
+          ]
+        },
+        "Anchored": true,
+        "CanTouch": false,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Ball"
+      }
+    },
+    {
+      "name": "LeftCheek",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          2.0,
+          2.0,
+          2.0
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              -3.706,
+              33.462,
+              41.48
+            ],
+            "orientation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        "Color": {
+          "Color3uint8": [
+            236,
+            190,
+            156
+          ]
+        },
+        "Anchored": true,
+        "CanTouch": false,
+        "Material": "SmoothPlastic",
+        "TopSurface": "Smooth",
+        "BottomSurface": "Smooth",
+        "Shape": "Ball"
+      }
+    },
+    {
+      "name": "Chin",
+      "className": "Part",
+      "properties": {
+        "Size": [
+          3.0,
+          3.0,
+          3.0
+        ],
+        "CFrame": {
+          "CFrame": {
+            "position": [
+              0.0,
+              30.783,
+              42.521
             ],
             "orientation": [
               [
@@ -4475,6 +4675,980 @@
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth"
       }
+    },
+    {
+      "name": "FeedPads",
+      "className": "Folder",
+      "children": [
+        {
+          "name": "FeedPadFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              6,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0.0,
+                  1.2,
+                  26.0
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                170,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Shape": "Cylinder"
+          },
+          "children": [
+            {
+              "name": "FeedPadFrontRing",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.2,
+                  7.5,
+                  7.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      0.0,
+                      1.1,
+                      26.0
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        -1,
+                        0
+                      ],
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    150,
+                    80,
+                    10
+                  ]
+                },
+                "Anchored": true,
+                "CanTouch": false,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "Shape": "Cylinder",
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "Label",
+              "className": "BillboardGui",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      8,
+                      0
+                    ],
+                    [
+                      1.9,
+                      0
+                    ]
+                  ]
+                },
+                "StudsOffset": [
+                  0,
+                  3.2,
+                  0
+                ],
+                "LightInfluence": 0
+              },
+              "children": [
+                {
+                  "name": "Panel",
+                  "className": "Frame",
+                  "properties": {
+                    "Size": {
+                      "UDim2": [
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ]
+                    },
+                    "BackgroundColor3": [
+                      1.0,
+                      0.549,
+                      0.118
+                    ],
+                    "BorderSizePixel": 0
+                  },
+                  "children": [
+                    {
+                      "name": "UICorner",
+                      "className": "UICorner",
+                      "properties": {
+                        "CornerRadius": {
+                          "UDim": [
+                            0.35,
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 4,
+                        "ApplyStrokeMode": "Border",
+                        "LineJoinMode": "Round"
+                      }
+                    },
+                    {
+                      "name": "TextLabel",
+                      "className": "TextLabel",
+                      "properties": {
+                        "Text": "FEED CALEB!",
+                        "RichText": true,
+                        "Font": "FredokaOne",
+                        "TextScaled": true,
+                        "TextColor3": [
+                          1,
+                          1,
+                          1
+                        ],
+                        "TextStrokeTransparency": 1,
+                        "BackgroundTransparency": 1,
+                        "AnchorPoint": [
+                          0.5,
+                          0.5
+                        ],
+                        "Position": {
+                          "UDim2": [
+                            [
+                              0.5,
+                              0
+                            ],
+                            [
+                              0.5,
+                              0
+                            ]
+                          ]
+                        },
+                        "Size": {
+                          "UDim2": [
+                            [
+                              0.88,
+                              0
+                            ],
+                            [
+                              0.8,
+                              0
+                            ]
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "name": "UIStroke",
+                          "className": "UIStroke",
+                          "properties": {
+                            "Color": [
+                              0.157,
+                              0.11,
+                              0.078
+                            ],
+                            "Thickness": 2.5,
+                            "ApplyStrokeMode": "Contextual",
+                            "LineJoinMode": "Round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FeedPadBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              6,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0.0,
+                  1.2,
+                  62.0
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                170,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Shape": "Cylinder"
+          },
+          "children": [
+            {
+              "name": "FeedPadBackRing",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.2,
+                  7.5,
+                  7.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      0.0,
+                      1.1,
+                      62.0
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        -1,
+                        0
+                      ],
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    150,
+                    80,
+                    10
+                  ]
+                },
+                "Anchored": true,
+                "CanTouch": false,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "Shape": "Cylinder",
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "Label",
+              "className": "BillboardGui",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      8,
+                      0
+                    ],
+                    [
+                      1.9,
+                      0
+                    ]
+                  ]
+                },
+                "StudsOffset": [
+                  0,
+                  3.2,
+                  0
+                ],
+                "LightInfluence": 0
+              },
+              "children": [
+                {
+                  "name": "Panel",
+                  "className": "Frame",
+                  "properties": {
+                    "Size": {
+                      "UDim2": [
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ]
+                    },
+                    "BackgroundColor3": [
+                      1.0,
+                      0.549,
+                      0.118
+                    ],
+                    "BorderSizePixel": 0
+                  },
+                  "children": [
+                    {
+                      "name": "UICorner",
+                      "className": "UICorner",
+                      "properties": {
+                        "CornerRadius": {
+                          "UDim": [
+                            0.35,
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 4,
+                        "ApplyStrokeMode": "Border",
+                        "LineJoinMode": "Round"
+                      }
+                    },
+                    {
+                      "name": "TextLabel",
+                      "className": "TextLabel",
+                      "properties": {
+                        "Text": "FEED CALEB!",
+                        "RichText": true,
+                        "Font": "FredokaOne",
+                        "TextScaled": true,
+                        "TextColor3": [
+                          1,
+                          1,
+                          1
+                        ],
+                        "TextStrokeTransparency": 1,
+                        "BackgroundTransparency": 1,
+                        "AnchorPoint": [
+                          0.5,
+                          0.5
+                        ],
+                        "Position": {
+                          "UDim2": [
+                            [
+                              0.5,
+                              0
+                            ],
+                            [
+                              0.5,
+                              0
+                            ]
+                          ]
+                        },
+                        "Size": {
+                          "UDim2": [
+                            [
+                              0.88,
+                              0
+                            ],
+                            [
+                              0.8,
+                              0
+                            ]
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "name": "UIStroke",
+                          "className": "UIStroke",
+                          "properties": {
+                            "Color": [
+                              0.157,
+                              0.11,
+                              0.078
+                            ],
+                            "Thickness": 2.5,
+                            "ApplyStrokeMode": "Contextual",
+                            "LineJoinMode": "Round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FeedPadLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              6,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -18.0,
+                  1.2,
+                  44.0
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                170,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Shape": "Cylinder"
+          },
+          "children": [
+            {
+              "name": "FeedPadLeftRing",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.2,
+                  7.5,
+                  7.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      -18.0,
+                      1.1,
+                      44.0
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        -1,
+                        0
+                      ],
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    150,
+                    80,
+                    10
+                  ]
+                },
+                "Anchored": true,
+                "CanTouch": false,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "Shape": "Cylinder",
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "Label",
+              "className": "BillboardGui",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      8,
+                      0
+                    ],
+                    [
+                      1.9,
+                      0
+                    ]
+                  ]
+                },
+                "StudsOffset": [
+                  0,
+                  3.2,
+                  0
+                ],
+                "LightInfluence": 0
+              },
+              "children": [
+                {
+                  "name": "Panel",
+                  "className": "Frame",
+                  "properties": {
+                    "Size": {
+                      "UDim2": [
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ]
+                    },
+                    "BackgroundColor3": [
+                      1.0,
+                      0.549,
+                      0.118
+                    ],
+                    "BorderSizePixel": 0
+                  },
+                  "children": [
+                    {
+                      "name": "UICorner",
+                      "className": "UICorner",
+                      "properties": {
+                        "CornerRadius": {
+                          "UDim": [
+                            0.35,
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 4,
+                        "ApplyStrokeMode": "Border",
+                        "LineJoinMode": "Round"
+                      }
+                    },
+                    {
+                      "name": "TextLabel",
+                      "className": "TextLabel",
+                      "properties": {
+                        "Text": "FEED CALEB!",
+                        "RichText": true,
+                        "Font": "FredokaOne",
+                        "TextScaled": true,
+                        "TextColor3": [
+                          1,
+                          1,
+                          1
+                        ],
+                        "TextStrokeTransparency": 1,
+                        "BackgroundTransparency": 1,
+                        "AnchorPoint": [
+                          0.5,
+                          0.5
+                        ],
+                        "Position": {
+                          "UDim2": [
+                            [
+                              0.5,
+                              0
+                            ],
+                            [
+                              0.5,
+                              0
+                            ]
+                          ]
+                        },
+                        "Size": {
+                          "UDim2": [
+                            [
+                              0.88,
+                              0
+                            ],
+                            [
+                              0.8,
+                              0
+                            ]
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "name": "UIStroke",
+                          "className": "UIStroke",
+                          "properties": {
+                            "Color": [
+                              0.157,
+                              0.11,
+                              0.078
+                            ],
+                            "Thickness": 2.5,
+                            "ApplyStrokeMode": "Contextual",
+                            "LineJoinMode": "Round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FeedPadRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.4,
+              6,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  18.0,
+                  1.2,
+                  44.0
+                ],
+                "orientation": [
+                  [
+                    0,
+                    -1,
+                    0
+                  ],
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                170,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "Shape": "Cylinder"
+          },
+          "children": [
+            {
+              "name": "FeedPadRightRing",
+              "className": "Part",
+              "properties": {
+                "Size": [
+                  0.2,
+                  7.5,
+                  7.5
+                ],
+                "CFrame": {
+                  "CFrame": {
+                    "position": [
+                      18.0,
+                      1.1,
+                      44.0
+                    ],
+                    "orientation": [
+                      [
+                        0,
+                        -1,
+                        0
+                      ],
+                      [
+                        1,
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        1
+                      ]
+                    ]
+                  }
+                },
+                "Color": {
+                  "Color3uint8": [
+                    150,
+                    80,
+                    10
+                  ]
+                },
+                "Anchored": true,
+                "CanTouch": false,
+                "Material": "SmoothPlastic",
+                "TopSurface": "Smooth",
+                "BottomSurface": "Smooth",
+                "Shape": "Cylinder",
+                "CanQuery": false
+              }
+            },
+            {
+              "name": "Label",
+              "className": "BillboardGui",
+              "properties": {
+                "Size": {
+                  "UDim2": [
+                    [
+                      8,
+                      0
+                    ],
+                    [
+                      1.9,
+                      0
+                    ]
+                  ]
+                },
+                "StudsOffset": [
+                  0,
+                  3.2,
+                  0
+                ],
+                "LightInfluence": 0
+              },
+              "children": [
+                {
+                  "name": "Panel",
+                  "className": "Frame",
+                  "properties": {
+                    "Size": {
+                      "UDim2": [
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ]
+                    },
+                    "BackgroundColor3": [
+                      1.0,
+                      0.549,
+                      0.118
+                    ],
+                    "BorderSizePixel": 0
+                  },
+                  "children": [
+                    {
+                      "name": "UICorner",
+                      "className": "UICorner",
+                      "properties": {
+                        "CornerRadius": {
+                          "UDim": [
+                            0.35,
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "UIStroke",
+                      "className": "UIStroke",
+                      "properties": {
+                        "Color": [
+                          0.157,
+                          0.11,
+                          0.078
+                        ],
+                        "Thickness": 4,
+                        "ApplyStrokeMode": "Border",
+                        "LineJoinMode": "Round"
+                      }
+                    },
+                    {
+                      "name": "TextLabel",
+                      "className": "TextLabel",
+                      "properties": {
+                        "Text": "FEED CALEB!",
+                        "RichText": true,
+                        "Font": "FredokaOne",
+                        "TextScaled": true,
+                        "TextColor3": [
+                          1,
+                          1,
+                          1
+                        ],
+                        "TextStrokeTransparency": 1,
+                        "BackgroundTransparency": 1,
+                        "AnchorPoint": [
+                          0.5,
+                          0.5
+                        ],
+                        "Position": {
+                          "UDim2": [
+                            [
+                              0.5,
+                              0
+                            ],
+                            [
+                              0.5,
+                              0
+                            ]
+                          ]
+                        },
+                        "Size": {
+                          "UDim2": [
+                            [
+                              0.88,
+                              0
+                            ],
+                            [
+                              0.8,
+                              0
+                            ]
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "name": "UIStroke",
+                          "className": "UIStroke",
+                          "properties": {
+                            "Color": [
+                              0.157,
+                              0.11,
+                              0.078
+                            ],
+                            "Thickness": 2.5,
+                            "ApplyStrokeMode": "Contextual",
+                            "LineJoinMode": "Round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "CartoonOutline",
