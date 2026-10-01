@@ -129,8 +129,11 @@ buttons appear there one at a time after Dropper 4.
 
 The stored amount is **not** shown as text. Instead:
 
-- Behind the Collect pad is a purple wall with a gold frame, a pink
-  "COOKIE JAR" sign, and a glass tank on an orange stand (the `CashTank` model).
+- The cookie jar stands on its own in the **middle of the first floor**,
+  facing the front (the spawn side). The Collect pad is only on its front;
+  behind it is a purple wall with a gold frame, a pink "COOKIE JAR" sign, and
+  a glass tank on an orange stand (the `CashTank` model). The wall's plain
+  back faces the back of the room, so you can only collect from the front.
 - Each drop that reaches the collector drops one small cookie into the jar,
   so it fills up as cookies wait (it stops adding at 60, when it looks
   full; the stored cookies keep adding up).
@@ -149,13 +152,13 @@ plot ("left" is −X, "back" is −Z):
 First floor (walls shown with `█`; they appear once built):
 
 ```
-   ██████████████████ BACK (z = -76)  [ cash tank ] ██████████████
-   █ Collector ■                      ( Collect )                █
+   ██████████████████ BACK (z = -76) ████████████████████████████
+   █ Collector ■                                                 █
    █         ║                                         stairs    █
-   █         ║  ▣ spot 4   ( Buy 4 )                    top  ▲   █
-   █ Conveyor║  ▣ spot 3   ( Buy 3 )   ( Build 3 )          ▲   █
-   █ (moves  ║  ▣ spot 2   ( Buy 2 )   ( Build 2 )          ▲   █
-   █ to back)║  ▣ spot 1   ( Buy 1 )   ( Build 1 )          ▲   █
+   █         ║  ▣ spot 4   ( Buy 4 ) [cookie jar]       top  ▲   █
+   █ Conveyor║  ▣ spot 3   ( Buy 3 ) ( Collect ) ( Build 3 ) ▲   █
+   █ (moves  ║  ▣ spot 2   ( Buy 2 )             ( Build 2 ) ▲   █
+   █ to back)║  ▣ spot 1   ( Buy 1 )             ( Build 1 ) ▲   █
    █         ║                                       bottom ▲   █
    █                ( Claim )                       [ Owner sign ]█
    ███████████████   doorway   ███████████████████████████████████
@@ -176,7 +179,7 @@ edge.
 | `DropperSpot1`–`4` | x −28, y 8, z −22 / −30 / −38 / −46 (above the conveyor) |
 | `BuyButton1`–`4` | x −20, z matching their spot (just right of the conveyor) |
 | `Collector` | (−28, 2.5, −69), back-left corner at the conveyor's end |
-| `CollectPad` | (0, 2.2, −68), centered on the back wall; `CashTank` right behind it |
+| `CollectPad` | (0, 2.2, −41), middle of floor 1, on the front side of the `CashTank` (jar wall's back at z −48.4); free-standing, so the jar's back faces the back of the room |
 | `ClaimPad` | (0, 2.2, −15), front center |
 | `OwnerSign` | (23, 5, −12), front-right corner |
 | `BuildButton1`–`3` | x 16, y 2.2, z −26 / −34 / −42 (right side of floor 1) |
