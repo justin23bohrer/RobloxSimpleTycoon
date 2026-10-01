@@ -16,6 +16,8 @@
 --   * Chance stats are probabilities 0..1 per event.
 --   * DoubleJump is a flag: any value > 0 enables it.
 
+local Config = require(script.Parent.Config)
+
 local TrophyPowers = {}
 
 TrophyPowers.Stat = table.freeze({
@@ -28,5 +30,42 @@ TrophyPowers.Stat = table.freeze({
 	JumpHeight = "JumpHeight", -- +bonus to Humanoid.JumpHeight
 	DoubleJump = "DoubleJump", -- flag (> 0 = can jump once more in the air)
 })
+
+-- The total bonus per stat for a list of displayed variant ids (pure: no
+-- side effects, same input -> same output). Applies the stacking rule above:
+-- each distinct definition counts once, values add, each total is clamped to
+-- [0, Config.TrophyStatCaps[stat]]. Unknown stats are ignored; stats with no
+-- bonus are left out (read them as 0).
+function TrophyPowers.Compute(variantIds: { string }): { [string]: number }
+	-- Required here, not at the top: TrophyVariants may require this module
+	-- for the Stat names, and a top-level require both ways would be a cycle.
+	local TrophyVariants = require(script.Parent.TrophyVariants) :: any
+	local totals: { [string]: number } = {}
+	local counted: { [any]: boolean } = {}
+	for _, id in variantIds do
+		-- Get never returns nil; an unknown id is the Fallback definition,
+		-- which is still counted only once.
+		local definition = TrophyVariants.Get(id) :: any
+		if counted[definition] then
+			continue
+		end
+		counted[definition] = true
+		local powers = definition.Powers
+		if type(powers) ~= "table" then
+			continue
+		end
+		for stat, value in powers do
+			if TrophyPowers.Stat[stat] and type(value) == "number" and value == value then
+				totals[stat] = (totals[stat] or 0) + value
+			end
+		end
+	end
+	for stat, total in totals do
+		local cap = Config.TrophyStatCaps[stat] or 0
+		local clamped = math.clamp(total, 0, cap)
+		totals[stat] = if clamped > 0 then clamped else nil
+	end
+	return totals
+end
 
 return table.freeze(TrophyPowers)

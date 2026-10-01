@@ -8,6 +8,7 @@ local Services = script.Parent.Services
 local CalebCycle = require(Services.CalebCycle)
 local DataService = require(Services.DataService)
 local PlayerDataService = require(Services.PlayerDataService)
+local PowerService = require(Services.PowerService)
 local StatueService = require(Services.StatueService)
 local TrophyService = require(Services.TrophyService)
 local TycoonService = require(Services.TycoonService)
@@ -23,6 +24,7 @@ TrophyService.Start(statue) -- podium claim + Trophy Case display
 local function onPlayerAdded(player: Player)
 	PlayerDataService.OnPlayerAdded(player)
 	CalebCycle.OnPlayerAdded(player)
+	PowerService.OnPlayerAdded(player) -- trophy power attributes + respawn movement
 	DataService.OnPlayerAdded(player) -- loads saved house + trophies in the background
 end
 
@@ -30,6 +32,7 @@ local function onPlayerRemoving(player: Player)
 	TycoonService.OnPlayerRemoving(player) -- stop systems and free the plot
 	StatueService.OnPlayerRemoving(player)
 	PlayerDataService.OnPlayerRemoving(player)
+	PowerService.OnPlayerRemoving(player)
 	DataService.OnPlayerRemoving(player) -- saves and releases (does not yield)
 end
 
