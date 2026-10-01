@@ -87,6 +87,11 @@ local Config = {
 	StatueFeedRange = 12,
 	-- Seconds a player must wait between feeds (anti-spam).
 	StatueFeedCooldown = 0.5,
+	-- While Caleb is not eating (Full, Celebration, TrophyClaim) the feed pads
+	-- turn these colors (pad, ring, sign) and the feed pop-up won't open.
+	StatueFeedPadOffColor = Color3.fromRGB(150, 150, 150),
+	StatueFeedPadOffRingColor = Color3.fromRGB(90, 90, 90),
+	StatueFeedPadOffSignColor = Color3.fromRGB(120, 120, 120),
 	-- The "Caleb: N / 1,000,000" bar floating above the statue (client only,
 	-- StatueBar.client.luau). Height is studs above the top of his Head (his
 	-- head never grows, so this stays clear of him at any size). Size is in
@@ -190,7 +195,7 @@ local Config = {
 	CalebShakeSeconds = 0.5,
 	CalebClosedMessageSeconds = 4,
 	CalebPartySaturation = 0.25,
-	CalebPartyBloom = 0.4,
+	CalebPartyBloom = 0.12,
 	CalebPartyFadeSeconds = 1.5,
 	-- Volume (0..1) of each sound above (CalebAudio.client). CookieRain loops
 	-- for the whole Celebration, so keep it quiet; Grow plays on every feed.

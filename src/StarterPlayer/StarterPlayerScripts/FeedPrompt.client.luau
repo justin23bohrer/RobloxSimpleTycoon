@@ -224,6 +224,14 @@ RunService.Heartbeat:Connect(function()
 		mustLeavePad = nil
 	end
 
+	-- Caleb isn't eating (full / event running): no pop-up at all.
+	if isFull() then
+		if ui.Gui.Enabled and not busy then
+			close()
+		end
+		return
+	end
+
 	if not ui.Gui.Enabled then
 		local pad = padUnderPlayer()
 		if pad and pad ~= mustLeavePad then
