@@ -148,12 +148,10 @@ walls both Stairs and the Trophy Case are offered).
   - **Ninja Kitchen** (🍪 10,000) along the front wall on the conveyor side:
     a cream cabinet with a granite top and white tile backsplash, a cast
     iron skillet, the Ninja ice cream maker, and the Ninja blender.
-  - **Gaming Desk** (🍪 25,000) in the back-right corner: a big black
-    **L-shaped corner desk** like the photo. The main top (about 23 studs)
-    runs along the back wall into the corner and the return (about 17 studs)
-    runs along the right wall toward the front, stopping short of the top of
-    the stairs. Three monitors (the standing-up one in the corner), a webcam, a white/blue keyboard,
-    mouse, a cup, the controller and headphones on the return, a black
+  - **Gaming Desk** (🍪 25,000) against the back wall, right of the bed:
+    one big straight black desk (about 20 studs long, no side piece) with
+    three monitors (two wide ones and one standing up), a webcam, a
+    white/blue keyboard, mouse, a cup, the controller, headphones, a black
     leather office chair,
     and a backpack on the floor.
   - **Bed** (🍪 12,000) at the back, next to the desk: a big bed (about
@@ -260,7 +258,7 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `OwnerSign` | (23, 5, −12), front-right corner |
 | `BuildButton1`–`4` | x 16, y 2.2, z −26 / −34 / −42 / −50 (right side of floor 1) |
 | `BuildButton5`–`9` | 2nd floor (y 18.2), in front of each piece of furniture: Bed (−3, −50), Gaming Desk (15.5, −55), Shelves + TV (8, −21), Mini Fridge (−13.5, −63), Ninja Kitchen (−8, −21) |
-| `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; L-shaped desk in the back-right corner (main top x 9.1..31.75 along the back wall, return x 26.35..31.75 along the right wall out to z −58, 6 studs short of the top of the stairs) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
+| `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; straight desk against the back wall (x 8.1..28.4, out to z −69.4) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
 | `TrophyCase` (model) | Against the back wall, x 3.5..16.5, z −75..−71.4, y 2..10 (sign up to y 12): `CaseBase` (top y 4), `CaseBack`, `CaseSideLeft`/`Right`, `CaseTop`, glass `CaseGlass`, gold `CaseShelfTrim`/`CaseTopTrim`, `CaseSign`, and `TrophySlot1`–`5` (gold pads on the shelf at x 10 / 7.5 / 12.5 / 5 / 15, turned to face into the room; slot 1 in the middle). Between the back windows; clear of the conveyor, collector, cookie jar, stairs, and doorway. |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |

@@ -11,8 +11,8 @@ other, shelves + TV along the front wall, desk and bed at the back):
 
   Bed             black headboard and frame, gray sheets, white + gray
                   pillows, a rumpled gray blanket
-  GamingDesk      black L-shaped corner desk (back wall + right wall),
-                  3 monitors (one standing up in the corner), webcam,
+  GamingDesk      one straight black desk on the back wall with
+                  3 monitors (one standing up), webcam,
                   white/blue keyboard, mouse, controller, headphones, a cup,
                   black office chair, backpack on the floor
   ShelvesTV       dark cube bookshelf full of books with the Barad-dur LEGO
@@ -222,48 +222,41 @@ def monitor(it, name, x, z, width, height, screen_color, top):
 
 
 def gaming_desk():
-    """An L-shaped corner desk like the photo: the main top runs along the
-    back wall to the back-right corner, and the return runs along the right
-    wall toward the front, with the standing-up monitor in the corner.
-    Designed at normal cartoon size around the corner, then grown."""
+    """One straight desk against the back wall (no side piece), with three
+    monitors on it (the right one standing up, like the photo). Designed at
+    normal cartoon size around the back-right corner, then grown."""
     it = Item("GamingDesk")
     top = F + 3.4
-    x1 = RIGHT  # the corner
-    x0 = x1 - 16.8  # left end of the main top
-    depth = 4.0  # main top, out from the back wall
-    ret_w, ret_len = 4.0, 12.4  # return: width out from the right wall, length out from the back wall
-    rx = x1 - ret_w / 2
+    x1 = RIGHT - 2.5  # right end, a little away from the right wall
+    x0 = x1 - 15.0  # left end
+    depth = 4.0
     it.part("DeskTop", (x1 - x0, 0.5, depth), ((x0 + x1) / 2, top - 0.25, BACK + depth / 2), BLACK, "Wood")
-    it.part("ReturnTop", (ret_w, 0.5, ret_len - depth), (rx, top - 0.25, BACK + (depth + ret_len) / 2), BLACK, "Wood")
-    it.part("CornerTrim", (ret_w, 0.12, 0.12), (rx, top + 0.02, BACK + depth), CHARCOAL, collide=False)
-    it.part("SideLeft", (0.5, 2.9, depth), (x0 + 0.25, F + 1.45, BACK + depth / 2), BLACK, "Wood")
-    it.part("ReturnEnd", (ret_w, 2.9, 0.5), (rx, F + 1.45, BACK + ret_len - 0.25), BLACK, "Wood")
-    it.part("InnerLeg", (0.5, 2.9, 0.5), (x1 - ret_w + 0.25, F + 1.45, BACK + depth - 0.25), BLACK, "Wood")
-    it.part("BackPanel", (x1 - x0 - ret_w - 0.5, 1.8, 0.3), ((x0 + x1 - ret_w) / 2, F + 2.2, BACK + 0.3), CHARCOAL, "Wood", collide=False)
-    it.part("ReturnPanel", (0.3, 1.8, ret_len - 0.5), (x1 - 0.3, F + 2.2, BACK + ret_len / 2), CHARCOAL, "Wood", collide=False)
+    for side, x in (("Left", x0 + 0.25), ("Right", x1 - 0.25)):
+        it.part(f"Side{side}", (0.5, 2.9, depth), (x, F + 1.45, BACK + depth / 2), BLACK, "Wood")
+    it.part("BackPanel", (x1 - x0 - 1.0, 1.8, 0.3), ((x0 + x1) / 2, F + 2.2, BACK + 0.3), CHARCOAL, "Wood", collide=False)
 
     z = BACK + 1.4
-    monitor(it, "Monitor1", 17.7, z, 4.2, 2.5, SCREEN_BLUE, top)
-    m2_top = monitor(it, "Monitor2", 22.1, z, 4.2, 2.5, SCREEN_GREEN, top)
-    monitor(it, "Monitor3", 27.0, z, 2.5, 4.2, SCREEN_PURPLE, top)  # standing up, in the corner
-    it.part("Webcam", (0.9, 0.45, 0.5), (22.1, m2_top + 0.22, z - 0.2), BLACK, collide=False)
-    it.ball("WebcamLens", 0.3, (22.1, m2_top + 0.22, z + 0.05), (60, 60, 70), collide=False)
+    monitor(it, "Monitor1", 17.0, z, 4.2, 2.5, SCREEN_BLUE, top)
+    m2_top = monitor(it, "Monitor2", 21.4, z, 4.2, 2.5, SCREEN_GREEN, top)
+    monitor(it, "Monitor3", 25.3, z, 2.5, 4.2, SCREEN_PURPLE, top)  # standing up
+    it.part("Webcam", (0.9, 0.45, 0.5), (21.4, m2_top + 0.22, z - 0.2), BLACK, collide=False)
+    it.ball("WebcamLens", 0.3, (21.4, m2_top + 0.22, z + 0.05), (60, 60, 70), collide=False)
 
-    it.part("Keyboard", (3.4, 0.25, 1.2), (19.9, top + 0.125, BACK + 3.0), WHITE, collide=False)
-    it.part("Keycaps", (3.0, 0.12, 0.8), (19.9, top + 0.3, BACK + 3.0), KEYS, collide=False)
-    it.part("Mouse", (0.5, 0.25, 0.8), (22.5, top + 0.125, BACK + 3.0), BLACK, collide=False)
-    it.cyl("Cup", 0.9, 0.7, (16.0, top + 0.45, BACK + 3.0), WHITE, collide=False)
-    # On the return: the controller and the headphones (cups facing sideways).
-    it.part("Controller", (1.4, 0.4, 0.9), (rx, top + 0.2, BACK + 6.5), WHITE, collide=False)
-    it.part("ControllerTouchpad", (0.6, 0.1, 0.4), (rx, top + 0.45, BACK + 6.4), BLACK, collide=False)
+    it.part("Keyboard", (3.4, 0.25, 1.2), (19.2, top + 0.125, BACK + 3.0), WHITE, collide=False)
+    it.part("Keycaps", (3.0, 0.12, 0.8), (19.2, top + 0.3, BACK + 3.0), KEYS, collide=False)
+    it.part("Mouse", (0.5, 0.25, 0.8), (21.8, top + 0.125, BACK + 3.0), BLACK, collide=False)
+    it.cyl("Cup", 0.9, 0.7, (15.4, top + 0.45, BACK + 3.0), WHITE, collide=False)
+    it.part("Controller", (1.4, 0.4, 0.9), (24.6, top + 0.2, BACK + 3.0), WHITE, collide=False)
+    it.part("ControllerTouchpad", (0.6, 0.1, 0.4), (24.6, top + 0.45, BACK + 2.9), BLACK, collide=False)
     for side, dx in (("Left", -0.4), ("Right", 0.4)):
-        it.ball(f"ControllerStick{side}", 0.3, (rx + dx, top + 0.45, BACK + 6.7), BLACK, collide=False)
-    for side, dz in (("Left", -0.7), ("Right", 0.7)):
-        it.cyl(f"Headphone{side}", 0.45, 1.1, (rx, top + 0.75, BACK + 10.0 + dz), BLACK, rot=ALONG_Z, collide=False)
-    it.part("HeadphoneBand", (0.45, 0.3, 1.8), (rx, top + 1.55, BACK + 10.0), BLACK, collide=False)
+        it.ball(f"ControllerStick{side}", 0.3, (24.6 + dx, top + 0.45, BACK + 3.2), BLACK, collide=False)
+    # Headphones standing at the right end, cups facing sideways.
+    for side, dx in (("Left", -0.7), ("Right", 0.7)):
+        it.cyl(f"Headphone{side}", 0.45, 1.1, (27.9 + dx, top + 0.75, BACK + 2.2), BLACK, rot=IDENTITY, collide=False)
+    it.part("HeadphoneBand", (1.8, 0.3, 0.45), (27.9, top + 1.55, BACK + 2.2), BLACK, collide=False)
 
-    # Office chair (black leather) facing the main desk.
-    cx, cz = 19.9, BACK + 6.2
+    # Office chair (black leather) facing the desk.
+    cx, cz = 19.2, BACK + 6.2
     it.part("ChairSeat", (3.0, 0.6, 3.0), (cx, F + 2.4, cz), BLACK, "Leather")
     it.part("ChairBack", (3.0, 3.6, 0.7), (cx, F + 4.6, cz + 1.4), BLACK, "Leather", rot=rot_x(-8))
     for side, dx in (("Left", -1.6), ("Right", 1.6)):
@@ -276,7 +269,7 @@ def gaming_desk():
         it.part(f"ChairLeg{i + 1}", (0.3, 0.25, 1.8), (cx + dx, F + 0.55, cz + dz), CHARCOAL, rot=rot_y(a), collide=False)
         it.ball(f"ChairWheel{i + 1}", 0.45, (cx + dx * 2, F + 0.22, cz + dz * 2), BLACK, collide=False)
 
-    it.grow((x1, F, BACK), *DESK_GROW)
+    it.grow((RIGHT, F, BACK), *DESK_GROW)
 
     # Backpack on the floor between the bed and the desk (not grown).
     bx, bz = 6.3, BACK + 8.5
