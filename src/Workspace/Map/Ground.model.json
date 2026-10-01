@@ -2,9 +2,9 @@
   "className": "Part",
   "properties": {
     "Size": [
-      140,
+      280,
       1,
-      140
+      280
     ],
     "CFrame": {
       "CFrame": {
