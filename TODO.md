@@ -39,6 +39,7 @@ user's approval first.
 - [x] Grass ground: everything outside the tycoon plot is green grass; the plot itself is unchanged (approved by the user 2026-10-01). (code done; Studio test pending: QA V4)
 - [x] Fun collect area: cash tank wall behind the Collect pad that fills with a gold cube per collected drop, pad sparkles/glow/bouncing arrow, no amount text (approved 2026-09-30). (code done; Studio test pending: QA CT1–CT7)
 - [x] Bigger plot (100 × 100, ground 280 × 280); conveyor + droppers + buy buttons along the left side, Collect pad + cash tank on the back wall; conveyor direction worked out from the Collector's position (approved by the user 2026-10-01). (code done; Studio test pending: QA LY1–LY4, T2)
+- [x] Plot shrunk to 2/3 (66 × 66), same layout (approved by the user 2026-10-01). (Studio test pending: QA LY1–LY4, T2)
 - [ ] Next (approved direction, not started): walls around the plot and stairs up to a second floor. The right side of the plot is kept free for this.
 
 ## Post-MVP (needs approval)

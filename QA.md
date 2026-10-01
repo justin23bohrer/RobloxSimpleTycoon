@@ -29,17 +29,17 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | T1 | Player joins; look at the plot. | Only the floor and a round blue pad with a "CLAIM TYCOON!" sign show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
-| T2 | Look at the map. | Exactly one 100 × 100 plot, in front of the spawn. No other plots. | |
+| T2 | Look at the map. | Exactly one 66 × 66 plot, in front of the spawn. No other plots. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays. | |
 | T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 / FREE!", with yellow spot 1 above the conveyor. | |
 | T5 | Stepping on your own Collect pad right after claiming. | Nothing happens (nothing stored). | |
 | T6 | Press Play and check Output before anyone claims. | No warnings about a missing `ClaimPad` or other plot parts; no "no free plot" warning on join. | |
 
-## Layout (100 × 100 plot)
+## Layout (66 × 66 plot)
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| LY1 | Press Play; walk from the spawn to the plot and around its edges. | The plot floor is twice as long and wide as before, starts just in front of the spawn, and the grass ground reaches past it on every side (no falling off the back). | |
+| LY1 | Press Play; walk from the spawn to the plot and around its edges. | The plot floor is 66 × 66 (2/3 the width and length of the old 100 × 100 one), starts just in front of the spawn, and the grass ground reaches past it on every side (no falling off the back). | |
 | LY2 | Claim; stand at the front looking in. | Conveyor runs along the **left** side from front to back; collector in the back-left corner; Collect pad and cash tank centered on the **back** edge; owner sign at the front-right. The right half is empty. | |
 | LY3 | Buy Dropper 1, then 2–4 (Server cash 4300). | Each button appears just right of the conveyor next to its yellow spot. Drops land on the conveyor and ride it **toward the back** into the collector (none fall off the sides); stored cash rises. | |
 | LY4 | Collect at the back wall. | The tank fills with cubes as drops arrive at the collector; stepping on the Collect pad pays out as before. | |
