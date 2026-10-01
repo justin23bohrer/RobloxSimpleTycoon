@@ -135,6 +135,20 @@ local Config = {
 		TrophyClaim = "",
 		EventEnd = "",
 	}),
+	-- Event UI + screen effects (client only, CalebEventUI.client.luau).
+	-- TickSeconds: how often the countdowns refresh. ConfettiCount: pooled
+	-- UI confetti pieces per burst (capped at 100). Shake: camera shake
+	-- strength (studs) and length when Caleb gets full. ClosedMessage: how
+	-- long "TROPHY CLAIM CLOSED" stays. Party*: Celebration lighting
+	-- (ColorCorrection saturation, Bloom intensity, fade in/out seconds).
+	CalebUITickSeconds = 0.25,
+	CalebConfettiCount = 60,
+	CalebShakeStuds = 0.6,
+	CalebShakeSeconds = 0.5,
+	CalebClosedMessageSeconds = 4,
+	CalebPartySaturation = 0.25,
+	CalebPartyBloom = 0.4,
+	CalebPartyFadeSeconds = 1.5,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",
