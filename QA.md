@@ -158,7 +158,7 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | V1 | Look at the spawn and Claim pad; then claim and look at the Buy button and Collect pad. | Each is a flat circle lying on the ground with a darker ring around its edge; labels float readably above the pads. | |
-| CT1 | Look behind the Collect pad. | Purple wall with a gold frame, pink "COOKIE JAR" sign readable from the pad side, glass tank on an orange stand. The wall doesn't block walking onto the pad. | |
+| CT1 | Look behind the Collect pad. | Purple wall with a gold frame, cartoony "COOKIE JAR" sign (see V6) readable from the pad side, glass tank on an orange stand. The wall doesn't block walking onto the pad. | |
 | CT2 | Look above the pad. | A gold ▼ arrow bounces up and down, always. | |
 | CT3 | Buy Dropper 1; watch a drop reach the collector. | One small cookie falls into the jar per drop; pad starts sparkling and glowing. | |
 | CT4 | Buy several droppers; let 60+ drops arrive. | Tank fills, stops at about 60 small cookies, nothing spills out; collecting still pays the full stored amount. | |
@@ -169,6 +169,7 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | V5 | Claim the plot; look at the owner sign at the front-right from the spawn side, then from inside the plot, in daylight and at night. | The name is on the wall itself (not floating): a purple rounded panel with a thick dark outline inside a gold frame, white chunky text with a dark outline reading "<DisplayName>'s Tycoon", on both sides. Not darkened at night. In Studio the name is your Studio test name (e.g. "Player1"). After leaving and a new claim, it shows the new owner's name. | |
 | V3 | Look at the signs above the Claim pad, then (after claiming) the buy button and Collect pad. Check from close up and ~40 studs away, in daylight and at night (Lighting `ClockTime = 0`). | Each sign is a bright rounded panel with a thick dark outline and white chunky text (same font as the cash display) with a dark outline: blue "CLAIM TYCOON!", red "Dropper N" with the price in yellow underneath (e.g. "🍪 300"; "FREE!" for Dropper 1; the cookie emoji renders, not a box), green "COLLECT!". Text stays inside the panel; no raw tags like `<font>` show; colors are not darkened at night; the Collect sign doesn't overlap the bouncing arrow. | |
 | V4 | Look around the map from the spawn and from the plot. | All ground outside the plot is green grass (grass texture up close). The plot's gray floor, pads, conveyor, and cookie jar look the same as before. | |
+| V6 | Claim the plot; stand on the Collect pad and look up at the "COOKIE JAR" sign, then from ~30 studs away, in daylight and at night (Lighting `ClockTime = 0`). Repeat on Plots 2–4. | The sign matches the other cartoony signs: a pink rounded panel with a thick dark outline inside a thin gold frame, white chunky "COOKIE JAR" text with a dark outline, centered with space around it (not touching the edges, not squashed or stretched). It faces the Collect pad (front); the back of the jar wall shows no text. Not darkened at night. The glass lid doesn't cover it. | |
 
 ## Cookie display (client UI)
 

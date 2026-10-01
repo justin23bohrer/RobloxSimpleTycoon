@@ -155,7 +155,7 @@ The stored amount is **not** shown as text. Instead:
 
 - The cookie jar stands on its own in the **middle of the first floor**,
   facing the front (the spawn side). The Collect pad is only on its front;
-  behind it is a purple wall with a gold frame, a pink "COOKIE JAR" sign, and
+  behind it is a purple wall with a gold frame, a cartoony "COOKIE JAR" sign, and
   a glass tank on an orange stand (the `CashTank` model). The wall's plain
   back faces the back of the room, so you can only collect from the front.
 - Each drop that reaches the collector drops one small cookie into the jar,
@@ -315,5 +315,12 @@ white `FredokaOne` `TextLabel` with a 7 px dark Contextual `UIStroke`. Same
 look as the pad signs, scaled for a surface. `RichText` stays off so a
 player's name is always shown as plain text. TycoonService sets every
 TextLabel on the sign.
+Cookie jar sign: the `TankSign` part (on the jar wall, 10 × 2.2) is gold
+(`255,200,40`) and acts as the frame, like the owner sign. Its pad-facing
+`Back` face has a `SurfaceGui` `SignGui` (`PixelsPerStud` 50,
+`LightInfluence = 0`) → pink (`255,90,160`) `Panel` (94% × 84%) with
+`UICorner` (0.35 scale) and a 6 px dark `UIStroke` → white `FredokaOne`
+`TextLabel` "COOKIE JAR" (86% × 70%, centered, `TextScaled`) with a 3.5 px
+dark Contextual `UIStroke`. No code touches it.
 Label panels: Claim `0,162,255` "CLAIM TYCOON!"; Buy `255,60,60` "Dropper N" +
 yellow (`#FFE14D`) price; Collect `0,200,80` "COLLECT!".
