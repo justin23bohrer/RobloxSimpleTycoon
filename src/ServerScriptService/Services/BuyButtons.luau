@@ -9,7 +9,7 @@
 -- disappear. Hidden buttons cannot be touched.
 --
 -- Button N (BuyButtonN in the plot) belongs to Config.Droppers[N]. Its label
--- text ("Dropper N" over a yellow "$Cost", or "FREE!") is built from Config so
+-- text ("Dropper N" over a yellow "🍪 Cost", or "FREE!") is built from Config so
 -- prices live in one place.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -21,7 +21,7 @@ local BuyButtons = {}
 
 -- Looks only. The map's buttons start red.
 local FOR_SALE_COLOR = Color3.fromRGB(255, 0, 0)
-local PRICE_COLOR = "#FFE14D" -- sunny yellow, like the cash display panel
+local PRICE_COLOR = "#FFE14D" -- sunny yellow
 
 -- Name of the plot part for the dropper at this position in Config.Droppers.
 function BuyButtons.PartName(index: number): string
@@ -70,7 +70,7 @@ function BuyButtons.HideAll(plot: Model)
 			local label = button:FindFirstChild("TextLabel", true)
 			if label and label:IsA("TextLabel") then
 				-- Two lines: name, then the price in yellow (the label is RichText).
-				local price = if entry.Cost == 0 then "FREE!" else `${entry.Cost}`
+				local price = if entry.Cost == 0 then "FREE!" else `🍪 {entry.Cost}`
 				label.Text = `Dropper {index}\n<font color="{PRICE_COLOR}">{price}</font>`
 			end
 		end

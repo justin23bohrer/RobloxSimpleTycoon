@@ -35,6 +35,7 @@ user's approval first.
 - [x] Claim pad + step-by-step unlocks: plot shows only a Claim pad until claimed; claiming shows the collect area and a FREE Dropper 1 button; each purchase reveals the next dropper's button; order enforced on the server (approved by the user 2026-09-30). (code done; Studio test pending: QA T1, T4–T6, U0–U7, M1, M3–M4, L1, L3)
 - [x] Fun cartoony signs above the Claim, Buy, and Collect pads in the cash display's style (FredokaOne, rounded panel, dark outline); buy price on its own yellow line (approved by the user 2026-09-30). (code done; Studio test pending: QA V3)
 - [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
+- [x] Cookie theme: the currency is cookies (leaderstat `Cookies`, cookie drops with chips, "🍪 Cost" prices, cookie icon in the display, "COOKIE JAR" with small cookies). Code identifiers still say "cash" (approved by the user 2026-09-30). (code done; Studio test pending: QA CK1–CK2, C1–C2, P2)
 - [x] Fun collect area: cash tank wall behind the Collect pad that fills with a gold cube per collected drop, pad sparkles/glow/bouncing arrow, no amount text (approved 2026-09-30). (code done; Studio test pending: QA CT1–CT7)
 
 ## Post-MVP (needs approval)

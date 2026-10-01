@@ -7,7 +7,7 @@ It is intentionally empty. The current MVP needs **no** remotes:
 
 - Buying and collecting happen when a character touches a part. The server
   receives `Touched` directly, so no client message is needed.
-- Cash is shown with `leaderstats`, which Roblox replicates automatically.
+- Cookies (the currency) are shown with `leaderstats`, which Roblox replicates automatically.
 
 Only add a remote when the client truly must tell the server something the
 server cannot observe itself (for example, clicking a UI button). When you do:

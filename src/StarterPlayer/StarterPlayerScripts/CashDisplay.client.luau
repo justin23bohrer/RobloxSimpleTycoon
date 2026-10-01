@@ -1,8 +1,9 @@
 -- CashDisplay (client only)
--- Shows the local player's cash in a cartoony panel at the bottom-center of
--- the screen, e.g. "$1,250", and gives it a quick "pop" when the value changes.
+-- Shows the local player's cookies in a cartoony panel at the bottom-center of
+-- the screen (a drawn cookie and e.g. "1,250"), and gives it a quick "pop"
+-- when the value changes.
 --
--- Display only: reads the replicated leaderstats.Cash value. It never changes
+-- Display only: reads the replicated leaderstats.Cookies value. It never changes
 -- cash and never talks to the server. The built-in player list is untouched.
 --
 -- Lives in StarterPlayerScripts, so it runs once per session. The ScreenGui is
@@ -16,7 +17,15 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 -- Look (presentation only, so these stay here rather than in Config)
 local PANEL_COLOR = Color3.fromRGB(255, 214, 64) -- sunny yellow
-local COIN_COLOR = Color3.fromRGB(88, 214, 96) -- money green
+local COOKIE_COLOR = Color3.fromRGB(214, 160, 90) -- golden-brown dough
+local CHIP_COLOR = Color3.fromRGB(70, 40, 20) -- chocolate
+-- Chip centers on the cookie icon, as fractions of its size.
+local CHIP_SPOTS = {
+	Vector2.new(0.32, 0.3),
+	Vector2.new(0.66, 0.38),
+	Vector2.new(0.4, 0.68),
+	Vector2.new(0.7, 0.7),
+}
 local TEXT_COLOR = Color3.fromRGB(255, 255, 255)
 local OUTLINE_COLOR = Color3.fromRGB(40, 28, 20) -- thick dark outline
 local FONT = Enum.Font.FredokaOne
@@ -25,14 +34,14 @@ local POP_SCALE = 1.15
 local POP_TIME = 0.25
 
 -- "1250" -> "1,250"; "-1250" -> "-1,250"
-local function formatCash(amount: number): string
+local function formatCookies(amount: number): string
 	local digits = tostring(math.floor(math.abs(amount)))
 	local withCommas = digits:reverse():gsub("(%d%d%d)", "%1,"):reverse()
 	if withCommas:sub(1, 1) == "," then
 		withCommas = withCommas:sub(2)
 	end
 	local sign = if amount < 0 then "-" else ""
-	return sign .. "$" .. withCommas
+	return sign .. withCommas
 end
 
 local function addCorner(parent: GuiObject, radius: UDim)
@@ -85,22 +94,30 @@ local popScale = Instance.new("UIScale")
 popScale.Scale = 1
 popScale.Parent = panel
 
--- Round green coin with a "$" on the left.
-local coin = Instance.new("TextLabel")
-coin.Name = "Coin"
-coin.AnchorPoint = Vector2.new(0, 0.5)
-coin.Position = UDim2.fromScale(0.05, 0.5)
-coin.Size = UDim2.fromScale(0.7, 0.7)
-coin.SizeConstraint = Enum.SizeConstraint.RelativeYY
-coin.BackgroundColor3 = COIN_COLOR
-coin.Font = FONT
-coin.Text = "$"
-coin.TextColor3 = TEXT_COLOR
-coin.TextScaled = true
-coin.Parent = panel
+-- Round chocolate chip cookie on the left, drawn with plain frames.
+local cookie = Instance.new("Frame")
+cookie.Name = "Cookie"
+cookie.AnchorPoint = Vector2.new(0, 0.5)
+cookie.Position = UDim2.fromScale(0.05, 0.5)
+cookie.Size = UDim2.fromScale(0.7, 0.7)
+cookie.SizeConstraint = Enum.SizeConstraint.RelativeYY
+cookie.BackgroundColor3 = COOKIE_COLOR
+cookie.Parent = panel
 
-addCorner(coin, UDim.new(0.5, 0))
-addStroke(coin, 3, Enum.ApplyStrokeMode.Border)
+addCorner(cookie, UDim.new(0.5, 0))
+addStroke(cookie, 3, Enum.ApplyStrokeMode.Border)
+
+for _, spot in CHIP_SPOTS do
+	local chip = Instance.new("Frame")
+	chip.Name = "Chip"
+	chip.AnchorPoint = Vector2.new(0.5, 0.5)
+	chip.Position = UDim2.fromScale(spot.X, spot.Y)
+	chip.Size = UDim2.fromScale(0.16, 0.16)
+	chip.BackgroundColor3 = CHIP_COLOR
+	chip.BorderSizePixel = 0
+	chip.Parent = cookie
+	addCorner(chip, UDim.new(0.5, 0))
+end
 
 local amountLabel = Instance.new("TextLabel")
 amountLabel.Name = "Amount"
@@ -109,7 +126,7 @@ amountLabel.Position = UDim2.fromScale(0.32, 0.5)
 amountLabel.Size = UDim2.fromScale(0.62, 0.62)
 amountLabel.BackgroundTransparency = 1
 amountLabel.Font = FONT
-amountLabel.Text = "$0"
+amountLabel.Text = "0"
 amountLabel.TextColor3 = TEXT_COLOR
 amountLabel.TextScaled = true
 amountLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -120,7 +137,7 @@ addStroke(amountLabel, 3, Enum.ApplyStrokeMode.Contextual)
 
 screenGui.Parent = playerGui
 
--- Hook up to cash -----------------------------------------------------------
+-- Hook up to cookies --------------------------------------------------------
 
 local popTween: Tween? = nil
 
@@ -138,11 +155,11 @@ local function pop()
 end
 
 local leaderstats = player:WaitForChild("leaderstats")
-local cash = leaderstats:WaitForChild("Cash") :: IntValue
+local cookies = leaderstats:WaitForChild("Cookies") :: IntValue
 
-amountLabel.Text = formatCash(cash.Value)
+amountLabel.Text = formatCookies(cookies.Value)
 
-cash.Changed:Connect(function(newValue: number)
-	amountLabel.Text = formatCash(newValue)
+cookies.Changed:Connect(function(newValue: number)
+	amountLabel.Text = formatCookies(newValue)
 	pop()
 end)
