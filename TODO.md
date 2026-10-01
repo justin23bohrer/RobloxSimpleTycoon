@@ -36,6 +36,7 @@ user's approval first.
 - [x] Fun cartoony signs above the Claim, Buy, and Collect pads in the cash display's style (FredokaOne, rounded panel, dark outline); buy price on its own yellow line (approved by the user 2026-09-30). (code done; Studio test pending: QA V3)
 - [x] Cartoony cash display at the bottom-center (client only; approved 2026-09-30). (code done; Studio test pending: QA C1–C4)
 - [x] Cookie theme: the currency is cookies (leaderstat `Cookies`, cookie drops with chips, "🍪 Cost" prices, cookie icon in the display, "COOKIE JAR" with small cookies). Code identifiers still say "cash" (approved by the user 2026-09-30). (code done; Studio test pending: QA CK1–CK2, C1–C2, P2)
+- [x] Grass ground: everything outside the tycoon plot is green grass; the plot itself is unchanged (approved by the user 2026-10-01). (code done; Studio test pending: QA V4)
 - [x] Fun collect area: cash tank wall behind the Collect pad that fills with a gold cube per collected drop, pad sparkles/glow/bouncing arrow, no amount text (approved 2026-09-30). (code done; Studio test pending: QA CT1–CT7)
 
 ## Post-MVP (needs approval)

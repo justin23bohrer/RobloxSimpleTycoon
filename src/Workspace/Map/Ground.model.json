@@ -34,13 +34,13 @@
     },
     "Color": {
       "Color3uint8": [
-        99,
-        95,
-        98
+        86,
+        166,
+        64
       ]
     },
     "Anchored": true,
-    "Material": "SmoothPlastic",
+    "Material": "Grass",
     "TopSurface": "Smooth",
     "BottomSurface": "Smooth"
   }
