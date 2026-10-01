@@ -83,6 +83,14 @@ local Config = {
 	StatueFeedRange = 12,
 	-- Seconds a player must wait between feeds (anti-spam).
 	StatueFeedCooldown = 0.5,
+	-- The "Caleb: N / 1,000,000" bar floating above the statue (client only,
+	-- StatueBar.client.luau). Height is studs above the top of his Head (his
+	-- head never grows, so this stays clear of him at any size). Size is in
+	-- screen pixels, so it reads the same from near and far. MaxDistance is
+	-- studs from the camera (the map is 300 x 300).
+	StatueBarHeight = 9,
+	StatueBarSize = Vector2.new(300, 80),
+	StatueBarMaxDistance = 500,
 
 	-- TESTING ONLY. When true, players start with DevStartingCash instead of
 	-- StartingCash, but only inside Roblox Studio (RunService:IsStudio()). It

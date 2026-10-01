@@ -81,6 +81,19 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | FD20 | Open the pop-up; pick a small amount (10), a medium one (100,000), and feed until the bar is full. Check up close and on a phone (Device emulator). | The cookie-colored fill and the lighter preview always stay inside the white track with a thin white gap; they never touch or cover the dark outline, and the rounded ends stay clean. | |
 | FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
 
+## Statue progress bar
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| SB1 | Press Play; look at Caleb from the spawn. | A yellow rounded panel with a thick dark outline floats above his head (clear of the hair): "Caleb: 0 / 1,000,000 🍪" in FredokaOne over an empty white bar. It looks like the feed pop-up's bar. | |
+| SB2 | Walk to each plot (and inside a house) and look toward the statue. | The bar is visible and readable from every plot, drawn over roofs; it stays the same size on screen. | |
+| SB3 | Feed 10 cookies. | Text "Caleb: 10 / 1,000,000 🍪"; a thin sliver of fill slides in; the panel pops. | |
+| SB4 | Feed 500,000 (dev cash). | Text "Caleb: 500,010 / 1,000,000 🍪" (commas); bar just over half full. | |
+| SB5 | Feed until 1,000,000. | Text "Caleb is FULL! 1,000,000 🍪"; bar completely full, fill stays inside the outline. As Caleb reaches max size the bar is still clear of his head. | |
+| SB6 | 2 players: Player 1 feeds. | Player 2's bar updates at the same time, wherever Player 2 is. | |
+| SB7 | 2 players: Player 1 feeds some cookies, then Player 2 joins (late joiner). | Player 2's bar shows the current total right away, not 0. | |
+| SB8 | Reset character; phone (Device emulator). | The bar stays (no duplicate bars after respawn); readable on a phone. No errors in Output. | |
+
 ## Purchase
 
 | ID | Test | Expected | Status |
