@@ -66,7 +66,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
 - [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
-- [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.
+- [x] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [ ] Celebration music (ask the user for a track).
 
 ## Post-MVP (needs approval)

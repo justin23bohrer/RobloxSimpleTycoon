@@ -17,6 +17,7 @@ local Config = {
 	-- (After = nil: it appears as soon as the plot is claimed). The server
 	-- refuses to sell anything whose After is not bought yet. Today's chain:
 	--   Dropper1-4 -> Walls -> Stairs -> SecondFloor -> Dropper5-8
+	--                Walls -> TrophyCase (side branch)
 	-- Every Id (droppers and builds together) must be unique.
 
 	-- The droppers a player can buy. Entry N uses the plot's DropperSpotN and
@@ -56,6 +57,9 @@ local Config = {
 			After = "Stairs",
 			Parts = table.freeze({ "SecondFloor", "Conveyor2", "Collector2" }),
 		}),
+		-- Shows the owner's Caleb Trophies (TrophyService). Its model holds
+		-- TrophySlot1..TrophySlotN (N = TrophyCaseSlots).
+		table.freeze({ Id = "TrophyCase", Name = "Trophy Case", Cost = 7500, After = "Walls", Parts = table.freeze({ "TrophyCase" }) }),
 	}),
 
 	-- Seconds between drops (shared by all droppers).
@@ -154,8 +158,16 @@ local Config = {
 	DataStoreName = "SimpleTycoon_v1",
 	-- Seconds between autosaves of each player's data.
 	DataAutosaveSeconds = 120,
-	-- Trophy Case (a build in every house): how many trophies it shows.
+	-- Trophy Case (a build in every house): how many trophies it shows (the
+	-- newest ones), and the size of each trophy in it (1 = about 3.5 studs tall).
 	TrophyCaseSlots = 5,
+	TrophyCaseScale = 1.2,
+	-- The big claim trophy on Caleb's pedestal during TrophyClaim
+	-- (TrophyService): its size, and its "Claim Caleb Trophy" prompt (studs
+	-- from the trophy's base, and seconds to hold the key).
+	TrophyPodiumScale = 6,
+	TrophyClaimPromptDistance = 22,
+	TrophyClaimHoldSeconds = 0.5,
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
 	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 20 s, TrophyClaim
