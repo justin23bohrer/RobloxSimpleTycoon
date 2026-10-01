@@ -63,7 +63,8 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
 - [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
 - [ ] Cookie rain (client, pooled).
-- [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
+- [x] Sound effects: `tools/audio/generate_sfx.py` + `CalebAudio.client` (original, synthesized).
+- [ ] Upload `tools/audio/out/*.wav` to Roblox and paste the ids into `Config.CalebSounds` (user; steps in `tools/audio/README.md`).
 - [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
 - [ ] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01).
 - [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.

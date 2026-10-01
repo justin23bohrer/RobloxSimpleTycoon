@@ -33,7 +33,8 @@ src/
 │       ├── CashDisplay.client.luau → LocalScript: bottom-center cookie counter
 │       ├── FeedPrompt.client.luau  → LocalScript: "feed Caleb" pop-up logic
 │       ├── FeedPromptUI.luau       → ModuleScript: builds the feed pop-up (+ the shared cookie progress bar)
-│       └── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       ├── StatueBar.client.luau   → LocalScript: progress bar floating above the statue
+│       └── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects
 ├── StarterGui/                 → client UI (empty; UI is built by LocalScripts)
 └── Workspace/
     └── Map/                    → Folder in Workspace
@@ -74,6 +75,12 @@ three times, turned around the statue's center, into `Plot2`–`Plot4` (with
 `PlotId` 2–4) and `SpawnLocation2`–`4`. **After any change to Plot1 or the
 spawn, re-run it**: `python3 tools/house/generate_house.py` (if the house
 changed), then `python3 tools/plots/generate_plots.py`.
+
+`tools/audio/generate_sfx.py` (plain Python 3 standard library) synthesizes
+the original Caleb Full Event sound effects into `tools/audio/out/*.wav`
+(committed). They are not synced by Rojo: the user uploads them to Roblox and
+pastes the asset ids into `Config.CalebSounds` (steps in
+`tools/audio/README.md`).
 
 ## Server / client responsibilities
 
@@ -141,6 +148,7 @@ changes cash, ownership, or purchases, and never talks to the server.
 | `StarterPlayerScripts/CashDisplay.client.luau` | Builds a `CashDisplay` ScreenGui (`ResetOnSpawn = false`) with a cartoony panel at the bottom-center. Waits for `leaderstats.Cookies`, shows it as `1,250` (comma separators) next to a cookie icon, and on `.Changed` updates the text and plays a short `UIScale` "pop" tween. Built-in UI only (UICorner, UIStroke, FredokaOne, a cookie icon drawn from round `Frame`s). Scale sizing + `UIAspectRatioConstraint` + `UISizeConstraint` keep it readable on phone and PC. The built-in player list still shows cash too. |
 | `StarterPlayerScripts/FeedPrompt.client.luau` + `FeedPromptUI.luau` | When the local character stands on one of the statue's `FeedPads` (checked every frame against the pads loaded right now, so it works with content streaming; not `Touched` on pads found at start), shows a cartoony pop-up (same style as the cookie counter): "How many cookies do you want to feed Caleb?", progress `eaten / max` with a bar, an amount box (digits only), quick buttons 10 / 100 / 1K (each click **adds** that amount) / ALL (sets everything you can feed), Cancel and FEED!. The bar (fill + preview inside an `Inner` frame inset 4 px so they never touch the outline) is exact (eaten / `StatueMaxCookies`, with a thin minimum sliver above 0) plus a lighter preview of eaten + typed amount (red if unaffordable), and the text shows the exact %. FEED! invokes `Remotes.FeedStatue` with the amount and shows the server's answer. Closes on Cancel, right after a successful feed (with a `SendNotification` "Caleb ate N cookies!"), or when the player walks away; won't reopen until they step off the pad. Decides nothing. `FeedPromptUI.ProgressBar(parent, position, size)` builds that bar (track, fill, preview) and is reused by `StatueBar`. |
 | `StarterPlayerScripts/StatueBar.client.luau` | A `BillboardGui` (in PlayerGui, `AlwaysOnTop`, pixel-sized `Config.StatueBarSize`, `MaxDistance = Config.StatueBarMaxDistance`) above Caleb's head that every player sees: a yellow rounded panel with "Caleb: 12,345 / 1,000,000 🍪" (or "Caleb is FULL! 1,000,000 🍪") over the same cookie bar as the feed pop-up (`FeedPromptUI.ProgressBar`, fill only, same thin minimum sliver). Reads the statue's replicated `CookiesEaten` attribute at start (late joiners) and on `GetAttributeChangedSignal`, tweens the fill and pops the panel. Adorned to an `Attachment` in `Workspace.Terrain` placed `Config.StatueBarHeight` studs above the top of the `Head` (re-placed whenever the Head streams in or changes), so it stays visible when the statue's parts stream out. No remotes; decides nothing. |
+| `StarterPlayerScripts/CalebAudio.client.luau` | Caleb Full Event sound effects (no music). Creates one `Sound` per non-empty `Config.CalebSounds` id, once, in a `SoundService.CalebAudio` folder (volumes from `Config.CalebSoundVolumes`), and reuses them. Driven only by attributes: `CalebState` → `Full` plays Full; → `Celebration` plays CelebrationStart and starts the looping CookieRain; leaving `Celebration` fades the loop out (0.8 s, then `Stop`) and plays EventEnd; `CookiesEaten` going up in `Normal` plays Grow (at most every `Config.CalebGrowSoundInterval` s); the local player's `CalebTrophyClaimed` turning true plays TrophyClaim. A late joiner hears no old one-shots; only the loop starts if it is mid-Celebration. Empty ids are skipped (one info print in Studio). Touches no other sounds. |
 
 UI is created by LocalScripts in `StarterPlayerScripts` (which run once per
 session) rather than stored as instances in `StarterGui`. Colors and sizes
@@ -158,7 +166,8 @@ read everything in ReplicatedStorage.
 `DropInterval`, `NumberOfTycoonPlots`, `ConveyorSpeed`, `DropLifetime`,
 `DevUnlimitedCash`, `DevStartingCash`, `StatueName`, `StatueMaxCookies`,
 `StatueFeedRange`, `StatueFeedCooldown`, `StatueBarHeight`, `StatueBarSize`,
-`StatueBarMaxDistance`). It is frozen (including each
+`StatueBarMaxDistance`, and the Caleb Full Event settings, including
+`CalebSounds`, `CalebSoundVolumes`, `CalebGrowSoundInterval`). It is frozen (including each
 `Droppers` and `Builds` entry), so code cannot change it at runtime.
 
 `Droppers` is a list of `{ Id, Cost, DropValue, After, Conveyor }`. Entry N

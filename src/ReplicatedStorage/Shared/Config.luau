@@ -124,6 +124,18 @@ local Config = {
 		TrophyClaim = "",
 		EventEnd = "",
 	}),
+	-- Volume (0..1) of each sound above (CalebAudio.client). CookieRain loops
+	-- for the whole Celebration, so keep it quiet; Grow plays on every feed.
+	CalebSoundVolumes = table.freeze({
+		Full = 0.8,
+		CelebrationStart = 0.7,
+		Grow = 0.25,
+		CookieRain = 0.2,
+		TrophyClaim = 0.7,
+		EventEnd = 0.5,
+	}),
+	-- Fewest seconds between two Grow sounds (feeds in between are silent).
+	CalebGrowSoundInterval = 0.35,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",

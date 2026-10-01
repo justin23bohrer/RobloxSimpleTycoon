@@ -10,6 +10,8 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   server; the server decides and spends.
 - `StatueBar.client.luau` — progress bar above Caleb's head ("Caleb: N /
   1,000,000 🍪"), reusing `FeedPromptUI.ProgressBar`. Display only.
+- `CalebAudio.client.luau` — Caleb Full Event sound effects, driven only by
+  the statue's / player's attributes (`Config.CalebSounds`).
 
 Client code may handle input, visual effects, and presentation. It must never
 be trusted for cash, ownership, purchases, drops, or collection.
