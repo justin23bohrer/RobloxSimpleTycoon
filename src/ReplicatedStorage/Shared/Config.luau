@@ -63,7 +63,7 @@ local Config = {
 
 	-- Must match the number of Plot models in Workspace.Map.Plots.
 	-- TycoonService warns at startup if they differ.
-	NumberOfTycoonPlots = 1,
+	NumberOfTycoonPlots = 4,
 
 	-- Studs per second a drop moves along the conveyor.
 	ConveyorSpeed = 8,

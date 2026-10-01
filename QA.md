@@ -29,7 +29,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | T1 | Player joins; look at the plot. | Only the floor and a round blue pad with a "CLAIM TYCOON!" sign show. No sign, conveyor, collector, Collect pad, cash tank, buy buttons, or yellow spots. You can walk where they would be. `OwnerUserId` is not set. | |
-| T2 | Look at the map. | Exactly one 66 × 66 plot, in front of the spawn. No other plots. | |
+| T2 | Look at the map (fly around in Studio). | Four 66 × 66 plots around the statue, all the same distance from it, each with its Claim pad and front doorway facing the statue, and a blue spawn pad between each plot and the statue. All on grass; nothing overlaps. Output shows no `NumberOfTycoonPlots` warning. | |
 | T3 | Player 2 steps on Player 1's Buy button / Collect pad. | Nothing happens to either player's cash or plot; button stays. | |
 | T4 | Step on the Claim Tycoon pad. | Claim pad disappears. Sign shows "<DisplayName>'s Tycoon"; `OwnerUserId` = your UserId. Conveyor (not moving), collector, Collect pad ("COLLECT!", bouncing arrow), and the empty cash tank appear. Only **one** buy button appears: "Dropper 1 / FREE!", with yellow spot 1 above the conveyor. | |
 | T5 | Stepping on your own Collect pad right after claiming. | Nothing happens (nothing stored). | |
@@ -187,6 +187,10 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | M2 | Player 2 steps on Player 1's Collect pad. | Player 2 gets nothing; Player 1's jar cookies and stored cash are unchanged. | |
 | M3 | Player 2 steps on Player 1's Buy button (the one showing). | Nothing happens; Player 2's cash stays 100; the button stays. |
 | M4 | Both players step on the Claim pad at the same moment. | Exactly one of them owns the plot; the other has none. | |
+| M5 | Four players (Test > Clients and Servers, 4 players). Each claims a different plot. | Each player owns exactly one plot; each sign shows its owner's name. A player who already owns a plot can't claim a second one. | |
+| M6 | With 4 players, each buys Dropper 1 and collects. | Each plot's cup drops cookies onto its own conveyor, into its own collector and cookie jar; collecting pays only that plot's owner. Cookies on the turned plots (2–4) ride toward their own back-left collector and land inside their jar (not stuck in the glass). | |
+| M7 | Join several times. | You appear at one of the four spawn pads (it varies). | |
+| M8 | Player on Plot3 leaves. | Only Plot3 resets to its Claim pad; the other three keep running. | |
 
 ## Respawn
 

@@ -19,6 +19,9 @@ The part names and sizes of the walls and floor slabs match the earlier
 plain version, so the plot layout (doorway, stair hole, heights) is the same.
 Edit the numbers below and re-run this script instead of hand-editing the
 JSON. Plain parts only: no textures, decals, or meshes.
+
+Afterwards run `python3 tools/plots/generate_plots.py` so Plots 2-4 (turned
+copies of Plot1) get the change too.
 """
 
 import json
