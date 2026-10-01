@@ -52,13 +52,28 @@ user's approval first.
 - [x] Feeder upgrade: 10 / 100 / 1K add on every click; progress bar is exact (eaten / 1,000,000, exact % in the text) with a preview of the picked amount; pop-up closes right after a successful feed (approved by the user 2026-10-01). (code done; Studio test pending: QA FD4, FD14–FD17, FD19)
 - [x] Cookie jar sign restyle: the "COOKIE JAR" sign on the jar wall uses the cartoony sign style (pink rounded panel, thick dark outline, gold frame, FredokaOne), facing the Collect pad (requested by the user 2026-10-01). (done; Studio test pending: QA V6, CT1)
 - [x] Progress bar above Caleb's head that everyone sees: "Caleb: N / 1,000,000 🍪" in the pop-up's style, "FULL!" at the max; client only, reads `CookiesEaten` (requested by the user 2026-10-01). (code done; Studio test pending: QA SB1–SB8)
-- [ ] Decide what happens when Caleb reaches 1,000,000 cookies (currently: max size, stops eating).
+- [x] Decide what happens when Caleb reaches 1,000,000 cookies: the Caleb Full Event (approved by the user 2026-10-01; see below).
+
+## Caleb Full Event (approved by the user 2026-10-01)
+
+Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user will pick a track); sound effects only for now.
+
+- [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
+- [ ] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id.
+- [ ] Caleb grows (fatness + overall scale), "I'm full" animation, dance, hidden during trophy claim.
+- [ ] Event UI + screen VFX: "CALEB IS FULLLL!!!", COOKIE PARTY countdown, trophy claim countdown / closed.
+- [ ] Cookie rain (client, pooled).
+- [ ] Sound effects (original, uploaded by the user; Config.CalebSounds).
+- [ ] Podium leaderboard "CALEB'S TOP FEEDERS".
+- [ ] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01).
+- [ ] Caleb Trophies: unique variants, 5-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them.
+- [ ] Celebration music (ask the user for a track).
 
 ## Post-MVP (needs approval)
 
 - [ ] Teleport players to their plot on join/respawn.
 - [ ] Handle a full server more gracefully than a warning.
-- [ ] DataStore persistence for cash and purchases.
+- [ ] DataStore persistence for cash (purchases and trophies: see Caleb Full Event).
 
 ## Polish (needs approval)
 

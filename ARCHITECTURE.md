@@ -251,6 +251,81 @@ type Tycoon = {
 - Dev cash: `DevUnlimitedCash` only changes the *starting* amount, and only
   in Studio. Purchases still go through `EconomyService.TrySpend`.
 
+## Caleb Full Event (contract)
+
+Approved by the user 2026-10-01. Built by several agents in parallel, so
+**this section is the contract**: names here are fixed. Change them only with
+the lead's OK, and update this section in the same PR.
+
+### Shared state (server → everyone)
+
+The server publishes everything as attributes; clients read and reconcile to
+them (also when joining mid-event). Names and helpers are in
+`ReplicatedStorage/Shared/CalebEvent.luau` (`CalebEvent.Attr`,
+`CalebEvent.PlayerAttr`, `CalebEvent.State`, `MaxCookies()`, `Duration()`,
+`TimeLeft()`, `GetState()`, `Progress()`). Always use those constants, never
+string literals.
+
+| Where | Attribute | Type | Meaning |
+| ----- | --------- | ---- | ------- |
+| `Workspace.Map.Statue` | `CookiesEaten` | number | shared total this cycle |
+| `Workspace.Map.Statue` | `CalebMaxCookies` | number | the goal |
+| `Workspace.Map.Statue` | `CalebState` | string | `Normal` / `Full` / `Celebration` / `TrophyClaim` |
+| `Workspace.Map.Statue` | `CalebCycleId` | string | unique id of this cycle (`HttpService:GenerateGUID(false)`) |
+| `Workspace.Map.Statue` | `CalebStateEndsAt` | number | `Workspace:GetServerTimeNow()` when this state ends; 0 in Normal |
+| `Workspace.Map.Statue` | `CalebTopFeeders` | string | JSON `[{UserId, Name, Cookies}]`, best first, ≤ `Config.CalebLeaderboardSize`, updated at most every `Config.CalebLeaderboardInterval` s |
+| each `Player` | `CalebFed` | number | cookies this player fed Caleb this cycle (restored if they rejoin the same server) |
+| each `Player` | `CalebTrophyClaimed` | boolean | claimed this cycle's trophy |
+
+A player is **eligible** for this cycle's trophy when `CalebFed > 0` and
+`CalebTrophyClaimed` is not true, during `TrophyClaim`. Players who join
+after the goal is reached have `CalebFed = 0`, so they are not eligible.
+
+### Timeline (`CalebCycle`, server)
+
+`Normal` → (total reaches the goal) → `Full` (`Config.CalebFullSeconds`) →
+`Celebration` (`Config.CalebCelebrationSeconds`) → `TrophyClaim`
+(`Config.CalebTrophyClaimSeconds`) → reset (total 0, contributions cleared,
+Caleb back to his smallest size and visible, new `CalebCycleId`) → `Normal`.
+`Config.DevCalebFastCycle` (Studio only) shortens all of it for testing.
+
+Only `CalebCycle` changes the state, once per transition, guarded by the
+current state, so it can never fire twice. Feeding is refused outside
+`Normal`. Luau runs one server thread at a time and `EconomyService.TrySpend`
+does not yield, so two simultaneous feeds are processed one after the other
+and the total can never pass the goal.
+
+### Server modules and their APIs
+
+| Module (Services/) | Owner | Public API |
+| ------------------ | ----- | ---------- |
+| `CalebCycle` | Core | `Start(statue)`, `GetState(): string`, `GetCycleId(): string`, `CanFeed(): boolean`, `AddCookies(player, cookies)` (called by StatueService after a successful spend; records the contribution, updates attributes, starts `Full` at the goal), `GetContribution(userId): number`, `IsEligible(userId): boolean`, `MarkTrophyClaimed(userId)`, `OnPlayerAdded(player)` (restores `CalebFed`/`CalebTrophyClaimed`), `StateChanged: RBXScriptSignal` (fires `(state, cycleId)`) |
+| `StatueService` | Core | unchanged `FeedStatue` remote; asks `CalebCycle.CanFeed()` and `CalebCycle.AddCookies` |
+| `StatueShape` | Statue look | `Setup(statue)`, `Apply(progress, seconds)` (progress 0..1 = cookies / goal; fatness + overall scale), `SetHidden(hidden)` (hide/show Caleb's body; never the pedestal, `FeedPads`, or `Podium`) |
+| `DataService` | Saving | `OnPlayerAdded(player)`, `OnPlayerRemoving(player)`, `IsLoaded(player): boolean`, `WaitForData(player): boolean`, `GetPurchases(player): {[string]: true}`, `SetPurchased(player, id)`, `GetTrophies(player): {TrophyRecord}`, `AddTrophy(player, record): boolean` (false if not loaded or `EventId` already owned), `TrophiesChanged: RBXScriptSignal` (fires `(player)`) |
+| `TrophyService` | Trophy (wave 2) | podium claim + Trophy Case display |
+
+```lua
+type TrophyRecord = {
+	Variant: string, -- key into Shared/TrophyVariants
+	EventId: string, -- the CalebCycleId it was earned in
+	EarnedAt: number, -- os.time()
+}
+```
+
+Statue children: Caleb's body parts, `Pedestal*` parts, `FeedPads` (folder),
+and `Podium` (folder: leaderboard board and other podium decoration).
+Scaling, hiding, and client animation touch **only Caleb's body parts**.
+
+### Who does presentation
+
+All presentation is client-side and driven only by the attributes above:
+`CalebAnimator.client` (full animation + dance), `CalebEventUI.client` (big
+message, countdowns, trophy prompt text, screen VFX), `CookieRain.client`,
+`CalebAudio.client`, `CalebLeaderboard.client` (podium board), and the
+existing `StatueBar.client`. No new RemoteEvents for the event: state is
+attributes; the trophy claim uses a server `ProximityPrompt`.
+
 ## Adding a feature (for future agents)
 
 1. Confirm the feature is approved (in `GAME_DESIGN.md` / `TODO.md`).
