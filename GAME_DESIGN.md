@@ -130,11 +130,19 @@ walls both Stairs and the Trophy Case are offered).
   cookies and cookie jar as floor 1; the owner collects them all on the
   Collect pad downstairs.
 - **Trophy Case** (🍪 7,500, after the walls; button `BuildButton4` at the
-  back of the build area): a wooden cabinet with a glass front and a red
-  velvet back against the middle of the back wall (x 3.5..16.5), under a
-  red "🏆 TROPHY CASE" sign. It has **5 gold slots** in a row; the owner's
-  Caleb Trophies stand on them (see "Caleb Trophies" below). It is saved and
-  restored like the other builds.
+  back of the build area): the house's big centerpiece (user, 2026-10-01:
+  "significantly larger than a normal shelf"). A tall dark-wood display
+  cabinet (about 25 wide × 14.6 tall) with gold trim, a red velvet back, two
+  shelf rows behind a glass front, dim warm lights inside (on only while
+  trophies are shown; no Neon), and a red cartoony "MY CALEB TROPHIES"
+  sign on top. It stands against the middle of the back wall (x −12.4..12.4,
+  in front of the middle back window). It has **10 trophy slots** (two rows
+  of 5); the first 5 (the bottom row, at eye level, slot 1 in the middle)
+  are used now, the top row is room to grow. Each trophy shown has a small
+  gold-rimmed nameplate in front of it: its name in its rarity color and
+  its power (if it has one). The owner's Caleb Trophies stand on the slots
+  (see "Caleb Trophies" below). It is saved and restored like the other
+  builds.
 - **Second-floor furniture** (requested by the user 2026-10-01): cartoony
   versions of the user's real stuff (photos in `agent-office/assets`), laid
   out like the user's sketch. All five orange buttons appear **when the 2nd
@@ -259,7 +267,7 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `BuildButton1`–`4` | x 16, y 2.2, z −26 / −34 / −42 / −50 (right side of floor 1) |
 | `BuildButton5`–`9` | 2nd floor (y 18.2), in front of each piece of furniture: Bed (−3, −50), Gaming Desk (15.5, −55), Shelves + TV (8, −21), Mini Fridge (−13.5, −63), Ninja Kitchen (−8, −21) |
 | `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; straight desk against the back wall (x 8.1..28.4, out to z −69.4) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
-| `TrophyCase` (model) | Against the back wall, x 3.5..16.5, z −75..−71.4, y 2..10 (sign up to y 12): `CaseBase` (top y 4), `CaseBack`, `CaseSideLeft`/`Right`, `CaseTop`, glass `CaseGlass`, gold `CaseShelfTrim`/`CaseTopTrim`, `CaseSign`, and `TrophySlot1`–`5` (gold pads on the shelf at x 10 / 7.5 / 12.5 / 5 / 15, turned to face into the room; slot 1 in the middle). Between the back windows; clear of the conveyor, collector, cookie jar, stairs, and doorway. |
+| `TrophyCase` (model) | Against the middle of the back wall, x −12.4..12.4, z −74.7..−69.55, y 2..16.6 (the 2nd floor starts at y 17): `CaseBase` (top y 4 = bottom row), `CaseSideLeft`/`Right`, velvet `CaseBack`, `CaseShelf` (top y 9.3 = top row), `CaseTop` (y 14.2..14.8), glass `CaseGlassLower`/`Upper` (Transparency 0.65), gold `GoldBase`/`GoldShelfRail`/`GoldEdgeLeft`/`Right`/`GoldTop`, `CaseSign` ("MY CALEB TROPHIES", y 14.8..16.6), warm `SurfaceLight`s `RowLight1`/`2` (start disabled), and invisible `TrophySlot1`–`10` (z −72.5, turned to face into the room; per row x 0 / −4.48 / 4.48 / −8.96 / 8.96, slots 1–5 on the bottom row, 6–10 on the top row). Covers the middle back window from inside; clear of the conveyor, collector, cookie jar/Collect pad (≥ 21 studs), stairs, `BuildButton4`, and doorway. **Generated** by `tools/trophycase/generate_trophy_case.py`. |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
 | `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
@@ -393,21 +401,52 @@ feed pads can be touched). The JSON is generated by
   every claim. One trophy per player per round; clicking twice never gives
   two. When the claim period ends, the trophy and prompt disappear and no
   more claims are accepted.
-- Each claim gives a **random variant** (`Shared/TrophyVariants.luau`):
-  12 to start, Common / Rare / Epic / Legendary, each with its own colors,
-  material, pose, accessories, and effect (e.g. Bronze Caleb, Party Caleb,
-  Chef Caleb, Cool Caleb, Ruby Caleb, Diamond Caleb, Neon Caleb, Golden
-  Caleb, Cookie King Caleb). Rarer ones have a smaller weight. A player
-  gets a variant they **don't own yet** whenever there is one left, so
-  every round's trophy is a new look until they have them all. Adding a
-  variant = adding one entry to that list.
+- Each claim gives a **random trophy** (`TrophyVariants.RollReward`; the
+  definitions are in `Shared/TrophyVariantList.luau`). First a **rarity**
+  is rolled by `Config.TrophyRarityChances` (Common 60%, Uncommon 20%,
+  Rare 10%, Epic 6%, Legendary 3%, Mythic 1%), then a trophy of that rarity
+  (by its Weight). Within the rolled rarity a player gets one they **don't
+  own yet** whenever there is one left. Each trophy has its own colors,
+  material, pose, accessories, effect, a fun description, and a **power**
+  (only while displayed in a built Trophy Case, see `TrophyPowers`):
+
+  | Trophy | Rarity | Power |
+  | ------ | ------ | ----- |
+  | Bronze Caleb | Common | +5% cookie production |
+  | Party Caleb | Common | +5% walk speed |
+  | Cookie Caleb (giant cookie) | Common | +25% cookie production |
+  | Chef Caleb | Uncommon | +5% cookies when you collect |
+  | Snack Time Caleb | Uncommon | 3% chance for an extra cookie |
+  | Speed Caleb (lightning bolt, running) | Uncommon | +20% walk speed |
+  | Jump Caleb (on springs) | Uncommon | +50% jump height |
+  | Cool Caleb | Rare | +12% walk speed |
+  | Stuffed Caleb | Rare | +15% cookie production |
+  | Ruby Caleb | Rare | 4% chance for 5x cookies |
+  | Fire Caleb (flame hair) | Rare | droppers 25% faster |
+  | Clone Caleb (two mini Calebs) | Rare | 15% chance for an extra cookie |
+  | Big Brain Caleb (big pink brain) | Rare | +10% cookies when you collect |
+  | Diamond Caleb | Epic | 10% chance for 5x cookies |
+  | Neon Caleb | Epic | droppers 30% faster |
+  | Midnight Caleb | Epic | +40% jump height, +10% walk speed |
+  | Rocket Caleb (rocket pack) | Epic | double jump, +20% jump height |
+  | Rainbow Caleb (rainbow arch) | Epic | +10% cookies, walk speed, jump height, dropper speed |
+  | Golden Caleb | Legendary | 2x cookie production |
+  | Cookie King Caleb | Legendary | +60% cookies, +15% when you collect |
+  | King Caleb (crown + cape, glows) | Mythic | +50% cookies, +15% walk speed |
+
+  Chef and Snack Time Caleb moved from Common to Uncommon (saved trophies
+  keep their Id; only the rarity label changed). Adding a trophy = adding
+  one entry to that list.
 - A message tells the player what they got ("You got Golden Caleb
   (Legendary)!"). Trophies are **saved** (DataService). If saving isn't
   working for them (DataStore down, or Studio without API access) they still
   get it for this server session (and can equip it) until they leave the
   server, and the message says it couldn't be saved.
 - Each trophy is a small statue of Caleb on a plinth with a gold
-  "CALEB TROPHY" nameplate showing the variant's name in its rarity color.
+  "CALEB TROPHY" nameplate showing the variant's name in its rarity color;
+  the band around the top of the plinth is the rarity color too (gray,
+  green, blue, purple, gold, pink), and Mythic trophies give off a soft
+  glow.
 - The **Trophy Case** (a house build, see Building) shows the owner's
   **equipped** trophies (up to 5, in equip order). A new trophy is equipped
   automatically when one of the 5 slots is free; otherwise it is kept
@@ -420,6 +459,45 @@ feed pads can be touched). The JSON is generated by
   after the goal: not eligible. Next round: new event id, so you can earn
   another (different) trophy. Server shutdown: trophies were already saved
   right after the claim (and again on close).
+
+### Trophy powers
+
+- A Caleb Trophy's power only works while it is **displayed in your built
+  Trophy Case** (equipped, up to 5). Two of the same trophy count once.
+- Powers of the same kind **add up** and each has a cap (`Config.TrophyStatCaps`):
+  more cookies per drop (up to 3×), faster droppers (up to 2× as many drops),
+  a chance for an extra cookie (up to 50%), a chance for a gold **lucky
+  cookie** worth 5× (up to 25%), a bonus when you collect at the Collect pad
+  (up to +50%), faster walking (up to +50%), higher jumps (up to 2×), and a
+  **double jump** (jump again once in the air).
+- Cookie powers work on **your own plot** (the owner's trophies), for every
+  dropper, and change from the next cookie when you equip or unequip.
+- Walk speed and jump height stay after you respawn. Each player's powers are
+  their own.
+
+### My Caleb Trophies (inventory screen)
+
+- A yellow **"🏆 TROPHIES"** button on the left side of the screen opens
+  (and closes) the **"MY CALEB TROPHIES"** panel; it also has an X button.
+- The top shows **"🏆 COLLECTION N / M"** (different trophies owned / how
+  many can be collected) and **"ACTIVE TROPHIES: n / 5"**.
+- Every trophy the player owns is a tile in a scrolling grid (works with
+  100+): its icon, rarity (in the rarity's color, also the tile's border),
+  name, and an **EQUIPPED** badge. Equipped ones come first, then the
+  rarest, then the newest. No trophies yet: "No trophies yet! Feed Caleb to
+  earn one 🏆".
+- Tapping a tile shows its details: name, **⭐ RARITY**, its power in big
+  text (e.g. "2x COOKIE PRODUCTION"), and its description in quotes, with
+  **EQUIP** / **UNEQUIP**. When 5 are already equipped, the button is grey
+  "Case full (5/5)": unequip one first. If the server says no, its reason is
+  shown under the description.
+- Equipped trophies are the ones shown in the Trophy Case, and only they give
+  powers. Without a built Trophy Case the panel says **"Build your Trophy
+  Case at home to activate trophy powers!"**; you can still equip, and the
+  powers start once the case is built.
+- The bottom line lists the powers active right now, e.g. "Active powers:
+  +125% cookies, +20% speed" (or "none"). "Saving is off this session"
+  shows when the player's trophies aren't being saved.
 
 ### Caleb Full Event: what players see on screen
 
