@@ -3,7 +3,7 @@
 --   Full         "🍪 CALEB IS FULLLL!!! 🍪" slams in, white flash, camera
 --                shake, confetti.
 --   Celebration  "COOKIE PARTY!" banner with the time left; party lighting.
---   TrophyClaim  eligible: trophy banner with "TROPHY CLAIM: 4:32";
+--   TrophyClaim  eligible: trophy banner with "TROPHY CLAIM: 1:52";
 --                claimed: "Trophy claimed! 🏆"; not eligible: "CALEB IS
 --                RESTING — new round soon" with the countdown.
 --   Normal       nothing ("TROPHY CLAIM CLOSED" for a few seconds right

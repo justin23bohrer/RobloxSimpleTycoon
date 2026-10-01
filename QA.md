@@ -128,7 +128,7 @@ Tip: set `DevCalebFastCycle = true` (and `DevUnlimitedCash = true`) in Studio fo
 | CE7 | Player A feeds this cycle, leaves before TrophyClaim, rejoins the same server. | After rejoining, `CalebFed` is restored (same number) and `CalebTrophyClaimed` is unchanged; during TrophyClaim A is still eligible (`CalebCycle.IsEligible(A.UserId)`). | |
 | CE8 | Player B joins after the goal is reached (during Full/Celebration/TrophyClaim). | B's `CalebFed = 0`; B is not eligible. | |
 | CE9 | After the reset (back to Normal). | New `CalebCycleId`; `CookiesEaten = 0`; `CalebTopFeeders = []` right away; everyone's `CalebFed = 0` and `CalebTrophyClaimed = false`; Caleb visible at his smallest size; pads say "FEED CALEB!"; feeding works again and the next goal starts a new event. | |
-| CE10 | Fast cycle off (normal). | Goal 1,000,000; Full 5 s, Celebration 115 s, TrophyClaim 300 s. `DevCalebFastCycle` has no effect in a published game. | |
+| CE10 | Fast cycle off (normal). | Goal 1,000,000; Full 5 s, Celebration 60 s, TrophyClaim 120 s. `DevCalebFastCycle` has no effect in a published game. | |
 
 ## Feed pads while Caleb is full, and glare
 
