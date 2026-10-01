@@ -149,7 +149,7 @@ as an outline:
 | ------------------ | ---------------------------------------------------- |
 | `Base`             | 66 × 66 plot floor, in front of the spawn. Always visible. |
 | `ClaimPad`         | Round blue pad with a dark blue ring at the front of the plot, label "CLAIM TYCOON!". Shown only while the plot is unclaimed. |
-| `OwnerSign`        | Shows the owner's name.                              |
+| `OwnerSign`        | Gold-framed wall with a purple cartoony panel on both faces showing "<DisplayName>'s Tycoon" (hidden until claimed). |
 | `BuyButton1`–`4`   | Round red pads with dark red rings, in a line just right of the conveyor, each next to its dropper spot. Buy droppers 1–4. |
 | `DropperSpot1`–`4` | Transparent yellow blocks above the conveyor where each dropper goes. |
 | `Conveyor`         | Dark strip that carries drops.                       |
@@ -189,5 +189,13 @@ Buy button colors: pad `255,0,0` (BuyButtons.luau resets the buttons to this
 exact red), ring `110,0,0`. Collect pad: `0,220,70` / ring `0,95,35`.
 Spawn (14 studs wide): `70,160,255` / ring `20,60,150`.
 Claim pad: `0,162,255` / ring `0,70,140`.
+Owner sign: the `OwnerSign` wall is gold (`255,200,40`) and acts as the frame.
+Each face (`Back` toward the spawn, `Front` into the plot) has a `SurfaceGui`
+(`OwnerLabelBack` / `OwnerLabelFront`, `PixelsPerStud` 50, `LightInfluence = 0`)
+→ purple (`150,70,230`) `Panel` with `UICorner` and a 12 px dark `UIStroke` →
+white `FredokaOne` `TextLabel` with a 7 px dark Contextual `UIStroke`. Same
+look as the pad signs, scaled for a surface. `RichText` stays off so a
+player's name is always shown as plain text. TycoonService sets every
+TextLabel on the sign.
 Label panels: Claim `0,162,255` "CLAIM TYCOON!"; Buy `255,60,60` "Dropper N" +
 yellow (`#FFE14D`) price; Collect `0,200,80` "COLLECT!".
