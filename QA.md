@@ -920,3 +920,29 @@ committing).
 | GG6 | Lights: before buying, at night (`Lighting.ClockTime = 0`); then buy the garage. | No glow from the hidden garage before buying (the `GarageLight`s are saved disabled). After buying (or on restore), `PlotStages` turns them on: warm light inside the garage. After the owner leaves, they go off with the garage. | |
 | GG7 | The pad: max the house (logic in). | A gold pad with a dark purple ring and a purple sign on the grass in front of the driveway, same style as the other trophy pads. It does not overlap the ramp. | |
 | GG8 | All 4 plots: walk to Plot2, Plot3 and Plot4 (or claim each). | Each house has the same garage on its own right side, door facing the statue side. No garage touches a neighbor plot, a spawn, the statue, or another plot's garage/pad. | |
+
+## Drivable car
+
+Setup: max the house (`Config.DevUnlimitedCash = true`) and build the
+Garage with a Caleb Trophy (`Config.DevAllTrophies = true` helps; set both
+back to **false** before committing). Physics numbers are `Config.Car*`;
+note any you change. Use **Test → Clients and Servers** (2 players) for
+CAR6–CAR8 and CAR13.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CAR1 | Build the Garage; look in the Server view under `Workspace.Cars`. | A `Plot1Car` appears parked exactly where the white ID.4 was (nose out, wheels on the floor, no jump or jitter); the anchored `GarageCar` is hidden (only one car visible). Windows are a little see-through. No errors in Output. | |
+| CAR2 | Walk to the driver's side (the car's left); press E on "Drive". | You sit in the driver's seat, visible through the window. Default vehicle controls work. | |
+| CAR3 | Drive: W/S gas and reverse, A/D steer. Drive out of the garage, down the ramp, around the map, up and down the 1-stud plot edges. | W drives forward (nose first), S backs up, D turns right, A left (if any is reversed, report it: a sign in `CarSeats.drive`). Top speed about 60 studs/s; no wheelies, no flipping in normal turns, tires don't sink into the body. Releasing W slows the car to a stop. | |
+| CAR4 | Physics ownership: while driving, in the Server view select the car's `Body` (Studio: show network owner, or check that driving feels lag-free). Get out. | While you drive, your client owns the car (smooth, no input lag). Empty, the server owns it. | |
+| CAR5 | Jump to get out (from the driver and the passenger seat). | You land standing beside your door, facing the way the car points; you can walk normally right away (not frozen or stuck in the car). | |
+| CAR6 | 2 players: Player 2 walks to Player 1's car and presses E on "Drive". | Nothing happens for Player 2 (prompt shows "<owner>'s car" but they don't get in). | |
+| CAR7 | 2 players: Player 2 presses F on "Ride". Player 1 then drives around. | Player 2 sits in the passenger seat and rides along; Player 1 drives. Each prompt hides while its seat is taken. | |
+| CAR8 | 2 players: in the Server view, with Player 2's Humanoid, try `DriverSeat:Sit(humanoid)` (simulates a cheat). | Player 2 is thrown out of the driver's seat at once and put beside the door. | |
+| CAR9 | Drive off the edge of the map (any side), with and without a passenger. | Within about half a second of going over and falling (or by y −20), the car is back parked in its garage, and the driver (and passenger) respawn at the spawn in front of their own plot (a passenger without a plot: a normal spawn). Nobody falls forever; no errors. | |
+| CAR10 | Flip the car (drive up something steep, or in the Server view rotate the `Body` onto its roof) and leave it still. | After about 4 s it is back parked in its garage, upright. | |
+| CAR11 | Leave the car anywhere on the map, then (owner) leave the game. | The car disappears with the garage; nothing is left in `Workspace.Cars`. Rejoin and claim a plot: when the Garage is restored the car is back parked in the garage. | |
+| CAR12 | Owner leaves while Player 2 rides as passenger. | The car disappears; Player 2 stands where it was and can walk. | |
+| CAR13 | Turned plots: claim Plot 2, 3 and 4 (or 4 players), build the Garage on each. | Each car spawns in its own garage, nose out of the door; driving, getting in/out, edge respawn (to that plot's spawn) and flip reset work the same. | |
+| CAR14 | Plot without a garage map (branch without `GarageCar`). | No car, no errors (CarService skips the plot). | |
+

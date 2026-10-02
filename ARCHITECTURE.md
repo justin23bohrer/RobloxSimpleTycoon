@@ -30,6 +30,9 @@ src/
 │       ├── Purchases.luau      → read-only catalog of droppers, builds + trophy builds (ids, buttons, unlock order)
 │       ├── BackyardGate.luau   → locks each plot's backyard until its owner owns 5 Caleb Trophies (push-out loop)
 │       ├── BackyardDoor.luau   → helper for BackyardGate (back door swing + "x/5 Caleb Trophies" sign)
+│       ├── CarService.luau     → the drivable garage car per plot (spawn, remove, fall/flip re-park)
+│       ├── CarBuild.luau       → helper for CarService (turns a GarageCar copy into a physics car)
+│       ├── CarSeats.luau       → helper for CarService (Drive/Ride prompts, owner-only seat, wheels, network owner)
 │       ├── DropperService.luau
 │       ├── DropperCup.luau     → helper for DropperService (builds the red cup dropper)
 │       ├── CollectorService.luau
@@ -190,7 +193,7 @@ reach the server.
 ## Services (server only)
 
 `ServerMain.server.luau` is the only server Script. It calls
-`TycoonService.Start()`, `BackyardGate.Start()`, `StatueService.Start()`, `CalebCycle.Start(statue)`,
+`TycoonService.Start()`, `BackyardGate.Start()`, `CarService.Start()`, `StatueService.Start()`, `CalebCycle.Start(statue)`,
 `CookiePartyService.Start(statue)`, `TrophyService.Start(statue)`, then
 routes join/leave in a fixed order:
 
@@ -211,6 +214,9 @@ routes join/leave in a fixed order:
 | `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, clean `Cash`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanCash(value)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending; refused while `IsCashLoading`). `OnPlayerAdded` applies the saved cookies once `DataService` loaded (saved + earned while loading); every later change goes to `DataService.SetSavedCash` (not with dev cash). `OnPlayerRemoving` forgets the player. | Implemented |
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers, builds and trophy builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a trophy build needs the house maxed (`Purchases.IsHouseMaxed`) and the owner to own at least the entry's `Trophies` (`#TrophyInventory.GetOwned(player)`, server data only), costs no cookies and spends no trophies; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free (then, if the house is maxed, the saved trophy builds). Every applied purchase that leaves the house maxed also calls `PlotStages.ShowTrophyButtons`. The Garage + Backyard parts (`TrophyButtonN`, trophy build `Parts`, `BackDoor`) are optional at startup: missing ones are warned about, never make the plot invalid. Tells `PlotStages` what to show. `TryPurchase` calls `TycoonSounds.Purchased` after a successful buy and `TycoonSounds.CantAfford` when `TrySpend` fails or a trophy build's owner has too few trophies (sounds only; never on restore). `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
+| `CarService` | The drivable garage car (see "Garage + Backyard (contract)" → Drivable car). One car per plot while its Garage is built and the plot is owned: spawned on `TycoonService.PurchaseApplied` for the trophy build whose `Parts` include `GarageCar` (bought or restored), removed when the plot's `OwnerUserId` changes. Hides the anchored `GarageCar` look (`PlotVisibility`) while the car exists. Every `Config.CarCheckInterval` re-parks a fallen/edge car (riders respawn) or a flipped, still one. Cars live in `Workspace.Cars` as `<Plot>Car`. Changes no cash and no ownership. | Implemented (`Start`) |
+| `CarBuild` (helper) | Used only by `CarService`. `Build(template)` clones a `GarageCar` look into a physics car: root = `Body`, look parts welded + `Massless`, 4 `Tire<Wheel>` on Motor hinges (`Drive<Wheel>`), front tires on invisible `Knuckle<Wheel>` Servo hinges (`Steer<Wheel>`), tire/body `NoCollisionConstraint`s, invisible untouchable `DriverSeat` (VehicleSeat) + `PassengerSeat` (Seat), an `Upright` AlignOrientation, see-through windows. Returns nil without `Body` or a tire. | Implemented |
+| `CarSeats` (helper) | Used only by `CarService`. `Setup(car, owner)`: "Drive" (E, owner only) and "Ride" (F, anyone) prompts that `Sit` the player (server checks range, alive, not seated, seat free); ejects a non-owner from the `DriverSeat`; places riders who get out beside their door; network owner = driver, else passenger, else server (a rider's own body goes back to them on exit); sets motors/steering from `Throttle`/`Steer`. `Riders(car)`. | Implemented |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's or trophy build's `Parts`, shows the buttons it unlocks), `ShowTrophyButtons(plot, purchased)` (house maxed: shows the `TrophyButtonN` of every trophy build not bought). `ShowUnclaimed` also hides every build's and trophy build's `Parts`; a trophy build's fires/smoke/sparkles/particle emitters/lights (saved `Enabled = false` in the map, like the Trophy Case's `CaseLight`; e.g. `Hangout`'s `FireCore` `Fire`, `Embers`, `FireLight`) are switched on when its `Parts` are shown (bought or restored) and off when hidden. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
 | `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds` + `Config.TrophyBuilds`: `Get(id)`, `All()`, `UnlockedBy(id?)` (house purchases only), `IsHouse(purchase)`, `IsHouseMaxed(purchased)` (every dropper and build bought), `TrophyBuilds()`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`/`"TrophyBuild"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN` / `TrophyButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
@@ -249,7 +255,8 @@ out in any horizontal direction. Layout and positions are in `GAME_DESIGN.md` �
 Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purchases`, `DropperService`,
 `CollectorService`, `EconomyService`, `DataService`, `TrophyInventory` (read-only: `GetOwned`), `TycoonSounds`.
 `BackyardGate` → `BackyardDoor` (→ nothing), `DataService` (`TrophiesChanged`), `TrophyInventory` (`GetOwned`, `ATTRIBUTE`),
-`TycoonService` (read-only: `GetPlotOwner`, `GetTycoon`), `Config`; nothing requires `BackyardGate` except `ServerMain`. `DataService` → `DataSchema`, `Purchases`, `Config`
+`TycoonService` (read-only: `GetPlotOwner`, `GetTycoon`), `Config`; nothing requires `BackyardGate` except `ServerMain`.
+`CarService` → `CarBuild` (→ `Config`), `CarSeats` (→ `CarBuild` types, `Config`), `PlotVisibility`, `TycoonService` (read-only: `GetPlotOwner`, `GetTycoon`, `PurchaseApplied`), `Config`; nothing requires `CarService` except `ServerMain`. `DataService` → `DataSchema`, `Purchases`, `Config`
 (never `TycoonService`). `DataSchema` → `Purchases`. `PlotStages` → `BuyButtons`, `PlotVisibility`, `Purchases`.
 `BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
 `CollectorService` → `CollectorDisplay` (→ `JarCounter`), `DropperService` (`ClaimDrop`), `EconomyService`, `PowerService` (`Get`) and `TycoonSounds`. `TycoonSounds` → `Purchases`, `Config` only (never a Service). `DropperService` → `DropperCup`, `PowerService` (`Get`), `PlotPowerVisuals` (`AddDropper`).
@@ -340,7 +347,12 @@ no `Cost`). Entry N uses the plot part `TrophyButtonN`; all appear once the
 house is maxed. `Trophies` = Caleb Trophies the owner must own (not spent).
 Their buttons and `Parts` are optional on a plot. `BackyardTrophies` (5),
 `BackyardCheckInterval`, `BackyardPushOutDistance`, `BackyardPushOutHeight`
-tune `BackyardGate`.
+tune `BackyardGate`. The `Car*` values (`CarMaxSpeed`, `CarReverseSpeed`,
+`CarTorque`, `CarBrakeTorque`, `CarWheelAcceleration`, `CarSteerAngle`,
+`CarSteerSpeed`, `CarSteerTorque`, `CarWheelDensity`, `CarWheelFriction`,
+`CarUprightTorque`, `CarCheckInterval`, `CarFallY`, `CarFallSpeed`,
+`CarFlippedSeconds`) tune the drivable car (`CarService`, `CarBuild`,
+`CarSeats`).
 `NumberOfTycoonPlots` must match the plot models in the map; TycoonService
 warns if it does not.
 
@@ -867,6 +879,39 @@ come from `tools/plots/generate_plots.py`):
   the house. Only CFrames change, never Transparency/CanCollide, so it never
   fights `PlotVisibility`. Sign: "🔒 BACKYARD" + gold "🏆 x/5 Caleb Trophies"
   (unclaimed: "🏆 5 Caleb Trophies"), or "BACKYARD OPEN!".
+
+### Drivable car (CarService)
+
+Requested by the user 2026-10-02 (lead: owner-only driver, passenger seat for anyone, driver owns physics while driving). Built at
+runtime from the map's `GarageCar` look (no map changes; the generators
+are untouched).
+
+- **Exists** while the plot is owned and its Garage is built (bought or
+  restored). Spawned parked where `GarageCar` stands (0.2 studs up), as a
+  copy of the look taken the first time (right after `PlotStages` showed
+  it). `GarageCar` is hidden while the car exists; it is never shown again
+  by `CarService` (on release `PlotStages` keeps it hidden; on the next
+  Garage purchase `PlotStages` shows it and `CarService` hides it again).
+  Removed when `OwnerUserId` changes away from the car's owner.
+- **Seats:** `DriverSeat` (VehicleSeat, car's left) only for the plot's
+  owner; `PassengerSeat` (Seat, right) for anyone. Both have
+  `CanTouch = false`: the only way in is the server-handled prompt. A
+  non-owner who ends up in the `DriverSeat` anyway is ejected (its
+  `SeatWeld` destroyed). Exiting (jump) puts the rider beside their door.
+- **Driving:** server reads `VehicleSeat.Throttle`/`Steer` and sets the 4
+  wheel motors (`CarMaxSpeed`/`CarReverseSpeed` ÷ wheel radius, `CarTorque`;
+  no throttle = 0 speed at `CarBrakeTorque`) and the front servos
+  (`±CarSteerAngle`). **Network owner**: the driver while driving, else the
+  passenger, else the server.
+- **Resets** (every `CarCheckInterval`): root below `CarFallY`, or outside
+  `Workspace.Map.Ground`'s footprint (in its object space) and falling
+  faster than `CarFallSpeed` → the car is destroyed and re-spawned parked,
+  and its riders `LoadCharacter` and are moved onto their own plot's spawn
+  (`SpawnLocation` for Plot 1, `SpawnLocationN` otherwise; no plot = a
+  normal spawn). On its side/roof (`UpVector.Y < 0.3`) and nearly still for
+  `CarFlippedSeconds`, or its parts destroyed → re-parked, nobody respawns.
+- Everything is in the car's own frame (`Body`'s CFrame), so the turned
+  Plots 2–4 work unchanged.
 
 ## Adding a feature (for future agents)
 

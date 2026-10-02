@@ -196,8 +196,8 @@ Rewards for Caleb Trophy collectors once the house is done.
   build in the chain above, furniture and Trophy Case included), four
   gold/purple trophy buttons appear. They need no cookies.
 - **Garage** (`TrophyButton1`, needs **1** Caleb Trophy): on the house's
-  right side (the stairs side), outside the base: a garage with a parked
-  white VW ID.4.
+  right side (the stairs side), outside the base: a garage with a white
+  VW ID.4 the owner can **drive** (see "Driving the garage car").
 - **Backyard** behind the house, inside a fence: **Pool**, **Path** and
   **Fire Pit Hangout** (`TrophyButton2..4`, each needs **5** Caleb
   Trophies), in any order. Their buttons are inside the backyard, next to
@@ -223,9 +223,29 @@ Rewards for Caleb Trophy collectors once the house is done.
   a second: anyone inside a locked backyard is put back inside the house,
   in front of the back door, standing up. This also works before the walls
   are built (no door yet).
-- Everything is decoration: a walk-in pool (hop in, run around waist deep,
-  climb out by the steps), a parked car, a glowing fire pit. No swimming or
-  driving.
+- The backyard is decoration: a walk-in pool (hop in, run around waist
+  deep, climb out by the steps), a glowing fire pit. No swimming. The
+  garage car can be driven (below).
+
+### Driving the garage car (requested by the user 2026-10-02)
+
+- Once a plot's Garage is built, its car waits in the garage, nose out.
+- **Owner only drives:** walking up to the driver's side shows "Drive"
+  (E) to everyone, but only the plot's owner gets in. Anyone may take the
+  passenger seat with "Ride" (F). Jump to get out; you land beside your
+  door.
+- Default Roblox vehicle controls: W/S (or up/down) gas and reverse, A/D
+  steer. Top speed about 60 studs/s forward, 25 backward. A gentle force
+  keeps the car's wheels down, so it is hard to flip.
+- **Drive off the edge of the map:** the car is put back in its garage and
+  everyone in it respawns at the spawn in front of their own plot (a
+  normal spawn if they have no plot).
+- A car left on its side or roof for a few seconds goes back to its garage.
+- The car disappears when its owner leaves (the plot resets) and comes back
+  parked when they claim a plot again (the Garage is saved).
+- The server decides everything (who sits, respawns, re-parking); the
+  driver's game only simulates the car's physics while driving (normal
+  Roblox vehicle practice). Tuning numbers are in `Config` (`Car*`).
 
 ## Droppers
 
@@ -468,7 +488,7 @@ copies.
 | Part | Look and position |
 | ---- | ----------------- |
 | `Garage` (model) | An attached one-car garage on the house's **right** (stairs) side, outside the 66 × 66 base: x 33.3..58.3 (walls; trim/eaves to 59.8), z −38..−10 (front flush with the house front, roof overhang −39.2..−8.8), concrete floor slab with its top at y 2 like `Base`. No left wall of its own: the house's right wall is its left wall (the first-floor window at z −22 looks into it). Off-white brick walls y 2..17 (`WallRight`, `WallBack`, `WallFrontLeft`/`Right`, `DoorHeader`, `WallBackFiller`), gray corner posts, plinth and floor band like the house, two house-style windows in the right wall (z −17, −31), and a gray `Slate` gable roof (ridge along z at x 45.8, y 23) with brick gable triangles, rake boards, a ridge cap, a round gable vent, and gray `Flashing` where it meets the house. Door opening x 37.8..53.8, up to y 13 (16 × 11, like the house doorway), facing +Z toward the statue side, with a gray frame and lanterns on both sides; the door is **rolled up** (`DoorRollBox` above the opening inside, the white `DoorBottomEdge` peeking out under the frame, side tracks). A concrete `Driveway` ramp (wedge) from the grass (y 1) up to the floor, z −10..−6.5. Inside: white `Ceiling` at y 16.6..17, two tube lights (`LightFrontTube`/`LightBackTube`, each with a `SurfaceLight` `GarageLight`, **saved disabled** because `PlotVisibility` does not hide lights; `PlotStages` turns them on while the garage is shown and off when it is hidden), a wooden workbench with a pegboard of tools, a red toolbox and a vise (back right, x 47.5..56.5), a metal storage rack with bins, boxes and paint cans (back left, x 34.5..41.5), a white EV wall charger on the house wall (z −29) with its cable along the floor to the car's charge port, a yellow wheel stop and an oil spot. Walls, floor, ramp, roof, ceiling, bench and rack are solid; trim and small details are looks only. Every part is `Anchored` and `CanTouch = false`. |
-| `GarageCar` (model) | A cartoony white **Volkswagen ID.4** (2021–2024) parked in the middle of the garage, nose out (+Z): x 42.3..49.3 (mirrors to 41.4..50.2), z −31.2..−16, roof rails at y ≈ 8.5. Smooth rounded white body (rounded nose and tail corners), dark windows, black roof, pillars and roof spoiler, silver roof rails, black wheel arches, sills and bumpers, 4 side doors (gray seams, flush handles) + tailgate, black mirrors. Front: slim headlights with white DRL strips joined by a thin white light bar, a VW roundel (silver ring, navy disc, silver V over W), a black bumper with an intake and a white plate. Back: red taillights joined by a red light bar, a VW roundel, a rear wiper, reflectors and a plate. Wheels: black tires, silver rims with black spokes and a black center cap. Charge port flap on the right rear. About 116 parts; only `Body`, `Belt`, `Hood`, `SideGlass` and `Roof` are solid. |
+| `GarageCar` (model) | A cartoony white **Volkswagen ID.4** (2021–2024) parked in the middle of the garage, nose out (+Z): x 42.3..49.3 (mirrors to 41.4..50.2), z −31.2..−16, roof rails at y ≈ 8.5. Smooth rounded white body (rounded nose and tail corners), dark windows, black roof, pillars and roof spoiler, silver roof rails, black wheel arches, sills and bumpers, 4 side doors (gray seams, flush handles) + tailgate, black mirrors. Front: slim headlights with white DRL strips joined by a thin white light bar, a VW roundel (silver ring, navy disc, silver V over W), a black bumper with an intake and a white plate. Back: red taillights joined by a red light bar, a VW roundel, a rear wiper, reflectors and a plate. Wheels: black tires, silver rims with black spokes and a black center cap. Charge port flap on the right rear. About 116 parts; only `Body`, `Belt`, `Hood`, `SideGlass` and `Roof` are solid. In the game this anchored model is only the look the drivable car is copied from (hidden while the car exists, see "Driving the garage car"). |
 | `TrophyButton1` | The garage's trophy pad: same structure as `BuildButton1` (pad, `TrophyButton1Ring`, `Label` sign with one `TextLabel`) in the trophy colors: gold pad `255,200,40`, dark purple ring `110,40,170`, purple sign panel `150,70,230` (like `TrophyButton2`–`4`). On the grass in front of the driveway at (45.8, 1.2, −2.5) (the grass top is y 1, so it sits 1 stud lower than the plot pads). Saved label "Garage"; the game sets the real text. |
 
 ### Statue (Caleb)
