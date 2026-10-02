@@ -113,4 +113,5 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Powers: `PowerService`, drop/collect/movement hooks, double jump. (code done; Studio test pending: QA PW1–PW12)
 - [x] Big Trophy Case + nameplates: `tools/trophycase/generate_trophy_case.py` (~25 × 14.6 case, 10 slots, sign, warm lights), `TrophyCaseDisplay` slot order + nameplates, `TrophyCaseSlots = 10`. (code done; Studio test pending: QA TR9, TR16–TR18)
 - [x] Inventory UI: `TrophyInventory.client` + `TrophyInventoryUI` / `TrophyInventoryIcon` / `TrophyInventoryData` (needs Studio QA: TI1–TI14).
+- [x] Bigger walk speed trophies (+35%..+75%) and glowing feet (requested by the user 2026-10-01). (code done; Studio test pending: QA SG1–SG10)
 

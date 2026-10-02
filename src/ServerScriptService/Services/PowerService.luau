@@ -14,6 +14,9 @@
 --   character's own value when it spawned (saved on the Humanoid as
 --   attributes), so re-applying never compounds. The Humanoid is switched to
 --   JumpHeight (UseJumpPower = false). CharacterAdded re-applies on respawn.
+-- * Glowing feet: whenever movement is applied, PowerVisuals.SetSpeedGlow
+--   shows (WalkSpeed bonus > 0) or removes (0) the glow on the character's
+--   feet; it is made here on the server so every player sees it.
 -- * Character physics is client-owned in Roblox, so movement bonuses (and
 --   DoubleJump.client's double jump) are presentation-level: an exploiter
 --   could move faster anyway. Cookie values stay fully server-side.
@@ -25,6 +28,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
+local PowerVisuals = require(script.Parent.PowerVisuals)
 
 local PowerService = {}
 
@@ -56,6 +60,13 @@ local function applyMovement(player: Player, character: Model?)
 	humanoid.UseJumpPower = false
 	humanoid.WalkSpeed = baseWalk * (1 + PowerService.Get(player, Stat.WalkSpeed))
 	humanoid.JumpHeight = baseJump * (1 + PowerService.Get(player, Stat.JumpHeight))
+	PowerVisuals.SetSpeedGlow(character, PowerService.Get(player, Stat.WalkSpeed))
+end
+
+local function watchCharacter(player: Player, character: Model)
+	PowerVisuals.Watch(player, character, function()
+		return PowerService.Get(player, Stat.WalkSpeed)
+	end)
 end
 
 local function publish(player: Player)
@@ -93,10 +104,12 @@ function PowerService.OnPlayerAdded(player: Player)
 	characterConnections[player] = player.CharacterAdded:Connect(function(character)
 		character:WaitForChild("Humanoid", 10)
 		if player.Character == character then
+			watchCharacter(player, character)
 			applyMovement(player, character)
 		end
 	end)
 	if player.Character then
+		watchCharacter(player, player.Character)
 		applyMovement(player, player.Character)
 	end
 end
@@ -109,6 +122,7 @@ function PowerService.OnPlayerRemoving(player: Player)
 		connection:Disconnect()
 		characterConnections[player] = nil
 	end
+	PowerVisuals.Forget(player)
 end
 
 return PowerService
