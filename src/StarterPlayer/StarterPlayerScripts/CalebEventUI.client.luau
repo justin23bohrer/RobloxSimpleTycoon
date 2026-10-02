@@ -2,7 +2,13 @@
 -- The Caleb Full Event's screen UI and screen effects:
 --   Full         "🍪 CALEB IS FULLLL!!! 🍪" slams in, white flash, camera
 --                shake, confetti.
---   Celebration  "COOKIE PARTY!" banner with the time left; party lighting.
+--   Celebration  the Cookie Party: "COOKIE PARTY!" banner with the time
+--                left, party lighting, phase callouts and the 10..1
+--                countdown (CookiePartyFX).
+--   finale       Celebration -> TrophyClaim, seen live: cookie explosion
+--                (CookiePartyFinale), white flash, big shake, confetti; the
+--                trophy UI shows right away. CookiePartyFinale(reward) from
+--                the server pops "+N 🍪 PARTY BONUS!".
 --   TrophyClaim  eligible: trophy banner with "TROPHY CLAIM: 1:52";
 --                claimed: "Trophy claimed! 🏆"; not eligible: "CALEB IS
 --                RESTING — new round soon" with the countdown.
@@ -13,8 +19,9 @@
 -- attributes and the local player's CalebFed / CalebTrophyClaimed (all set
 -- by the server; see Shared/CalebEvent.luau). Reads them at start, so joining
 -- mid-event shows the right thing, and handles any state jump. The UI is
--- built once (CalebEventUIBuild) and only updated here; effects live in
--- CalebEventFX.
+-- built once (CalebEventUIBuild + CookiePartyUIBuild) and only updated
+-- here; effects live in CalebEventFX / CookiePartyFX / CookiePartyFinale.
+-- The only remote is CookiePartyFinale (server -> client, display only).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -23,8 +30,12 @@ local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
+local CookieParty = require(ReplicatedStorage.Shared.CookieParty)
 local CalebEventUIBuild = require(script.Parent:WaitForChild("CalebEventUIBuild"))
 local CalebEventFX = require(script.Parent:WaitForChild("CalebEventFX"))
+local CookiePartyUIBuild = require(script.Parent:WaitForChild("CookiePartyUIBuild"))
+local CookiePartyFX = require(script.Parent:WaitForChild("CookiePartyFX"))
+local CookiePartyFinale = require(script.Parent:WaitForChild("CookiePartyFinale"))
 
 local State = CalebEvent.State
 local NAME = string.upper(Config.StatueName)
@@ -32,6 +43,7 @@ local NAME = string.upper(Config.StatueName)
 local player = Players.LocalPlayer
 local statue = Workspace:WaitForChild("Map"):WaitForChild("Statue")
 local parts = CalebEventUIBuild.Build(player:WaitForChild("PlayerGui"))
+CookiePartyFX.Init(parts, CookiePartyUIBuild.Build(parts.Gui))
 
 local POP_IN = TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
@@ -125,6 +137,7 @@ local function enter(state: string, previous: string?, joining: boolean)
 	end
 	if state ~= State.Celebration then
 		parts.PartyBanner.Visible = false
+		CookiePartyFX.Stop()
 		CalebEventFX.SetParty(false)
 	end
 
@@ -138,7 +151,16 @@ local function enter(state: string, previous: string?, joining: boolean)
 	elseif state == State.Celebration then
 		popIn(parts.PartyBanner, parts.PartyScale)
 		CalebEventFX.SetParty(true)
+		CookiePartyFX.Start(statue)
 	elseif state == State.TrophyClaim then
+		if previous == State.Celebration then
+			-- The finale. Only for players who saw the party live (previous
+			-- is nil on join), and it never delays the trophy UI below.
+			CookiePartyFinale.Play(statue)
+			CalebEventFX.Flash(parts)
+			CalebEventFX.Shake(Config.CookiePartyFinaleShakeStuds, Config.CookiePartyFinaleShakeSeconds)
+			CalebEventFX.Confetti(parts)
+		end
 		refreshTrophy()
 	elseif previous == State.TrophyClaim then
 		showClosed()
@@ -168,6 +190,12 @@ local function onPlayerAttr()
 end
 player:GetAttributeChangedSignal(CalebEvent.PlayerAttr.Fed):Connect(onPlayerAttr)
 player:GetAttributeChangedSignal(CalebEvent.PlayerAttr.TrophyClaimed):Connect(onPlayerAttr)
+
+-- The server paid the party's final reward: a short pop (display only; the
+-- cash itself is EconomyService's). Waits for the remote off the main path.
+task.spawn(function()
+	CookieParty.GetRemote(CookieParty.Remote.Finale).OnClientEvent:Connect(CookiePartyFX.ShowReward)
+end)
 
 -- Countdown: a few times per second, only while a timed banner is up.
 task.spawn(function()

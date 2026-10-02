@@ -185,15 +185,53 @@ Set `DevCalebFastCycle = true` (Studio only) to run the event quickly
 ## Cookie Party: server cookies and rewards
 
 Set `Config.DevCalebFastCycle = true` (Studio only; the party is still 60 s)
-and dev cash, then feed Caleb to the goal.
+and dev cash, then feed Caleb to the goal. Set both back to false before
+committing. Until the client cookies exist, watch spawns from a client's
+command bar: `game.ReplicatedStorage.Remotes.CookiePartySpawn.OnClientEvent:Connect(function(b) for _, c in b do print(c.Id, c.Type, c.Position, c.LandAt, c.FromCaleb) end end)`
+(and the same for `CookiePartyCollected`). Fire collects with
+`game.ReplicatedStorage.Remotes.CookiePartyCollect:FireServer(id)`.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| PS1 | Watch the server through Celebration (Output, Script Performance, Workspace). | `CookiePartySpawn` batches arrive about 4×/s from the start of the party; ids go up 1, 2, 3…; more per second as the phases go Start → Hype → Frenzy → Countdown; no Golden/Giant in the first 20 s. Never more than 80 (`CookiePartyMaxAlive`) alive. No new parts in Workspace from the server; no errors. | |
+| PS2 | Look at spawn positions, also while standing inside a house on the 1st and on the 2nd floor. | Every `Position` is within 140 studs of the statue, on visible ground/floors/roofs/pads (not under the map, not on Caleb's head, not in mid-air). Many land near players, and near-player cookies land on the floor the player is on, also inside houses (not on the roof above them). `LandAt` ≈ now + 1.6, `ExpiresAt` = `LandAt` + 8. About 15–40 % `FromCaleb = true` (more later). | |
+| PS3 | Walk onto a landed cookie of each type and fire a collect for its id. | Cookies go up by exactly its value (Normal 50, Chocolate 150, Golden 1,000, Giant 5,000; Giant also accepted from up to ~12 studs away). `CookiePartyEarned` rises by the value and `CookiePartyCount` by 1. Everyone receives `CookiePartyCollected(id, yourUserId, value, type)`. | |
+| PS4 | 2 players stand on the same cookie; both fire a collect for its id (and fire it twice yourself). | Only one player is paid, once; one `CookiePartyCollected` for that id. | |
+| PS5 | Fake ids: `FireServer(999999)`, `FireServer(1.5)`, `FireServer("5")`, `FireServer(0/0)`, `FireServer(math.huge)`, `FireServer(nil)`, `FireServer({})`. | Nothing paid, no errors in server Output, no kick. | |
+| PS6 | Fire a collect for a real cookie that landed far (> 12 studs) from you, and one under/over you by more than 25 studs (e.g. you on a roof, cookie on the ground far below). | Not paid; the cookie stays collectable for someone else. | |
+| PS7 | Fire a collect for a cookie right after it appears (before `LandAt` − 0.3) while standing on its spot. | Not paid. Once it has landed, the same request pays. | |
+| PS8 | Wait until a cookie's `ExpiresAt` passes, then try to collect it. | `CookiePartyCollected(id, 0, 0, type)` arrives within ~0.75 s after `ExpiresAt`; collecting it after that pays nothing. | |
+| PS9 | Spam: fire a collect 100 times in one frame for ids you stand near, plus random ids. | At most 12 requests per second are looked at; only real, valid cookies pay; server stays smooth; no errors. | |
+| PS10 | While dead (reset and fire before respawn), or before Celebration / during TrophyClaim, fire collects with old ids. | Nothing paid. | |
+| PS11 | Let the party end (2 players). | At the switch to `TrophyClaim` each player gets exactly +5,000 (`CookiePartyFinalReward`) once and one `CookiePartyFinale(5000)`. Every still-alive cookie gets `CookiePartyCollected(id, 0, 0, type)`. No spawns in the last 1.6 s or after the party. | |
+| PS12 | Two cycles in a row. | Second party starts at id > the first party's last id, earnings reset to 0 at its start, final reward paid once per party (never twice, never for a stale cycle). No leftover loop (spawns stop between parties). | |
+| PS13 | Player 2 joins mid-party. | Player 2 gets one `CookiePartySpawn` with all currently alive cookies right away (then the normal batches), has `CookiePartyEarned = 0`, can collect, and receives the final reward if still in the server at the end. A player who left before the end gets no final reward. | |
+| PS14 | Player leaves mid-party and rejoins the same server. | No errors; their party earnings start again at 0; they get the alive cookies and the final reward (if present at the end). Cookie total (`leaderstats`) behaves like any rejoin. | |
 
 ## Cookie Party: collectable cookies (client)
 
+Needs the party server (`CookiePartyService`). Set `Config.DevCalebFastCycle = true`
+(Studio only; the party is still 60 s) and dev cash, then feed Caleb to the goal.
+Sounds need ids in `Config.CookiePartySounds` (empty = silent, no errors).
+
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| PK1 | Before the goal and during `Full`. | No collectable cookies, no `CookiePartyCookies` folder in Workspace (client view), no "🍪 +0" counter. | |
+| PK2 | Party starts (`Celebration`). | The "🍪 +0" counter appears at the right side, upper-middle (not over the top banner, the bottom cookie counter, or the trophies button). Collectable cookies start falling from the sky with spin/wobble; a faint glowing disc appears where each will land and gets stronger as it falls. | |
+| PK3 | Watch cookies land. | Each touches down right on its glowing disc (not floating, not under the ground), puffs, bounces once, then bobs and spins standing up like a coin. Giants hop. | |
+| PK4 | Look at the four types. | Normal: golden-brown with dark chips. Chocolate: dark brown with white chips. Golden: bright gold, glowing, sparkling, slow spin, light pillar. Giant: about 2.7× bigger, chunky, pink beacon + pillar. | |
+| PK5 | Watch Caleb during the party. | Some cookies arc out of Caleb's mouth and land around the map at the same moment they would from the sky. | |
+| PK6 | Run into a Normal cookie. | Right away: it leans toward you, then pops (grows, shrinks into you), a sparkle + confetti burst, a yellow "+50" rises and fades, the collect sound plays; the counter shows "🍪 +50" with a pop and the bottom cash counter goes up 50. | |
+| PK7 | Collect a Golden and a Giant. | Bigger gold "GOLDEN! +1,000" / pink "GIANT!! +5,000", bigger burst, their own sounds (if ids are set). | |
+| PK8 | Collect 3+ cookies quickly. | "x3 COMBO!", "x4 COMBO!"… under the counter; the collect sound pitch rises a little each time; after ~1.4 s without collecting the combo text hides. | |
+| PK9 | Stand still and let a cookie sit. | It blinks for its last ~1.5 s, then fades out. | |
+| PK10 | 2 players: both run to the same cookie. | Only one gets it (the server decides). The winner sees the pop and "+N"; the other sees a small puff and the cookie vanishes (no "+N", their counter unchanged). | |
+| PK11 | Lag test: Studio network settings with incoming replication lag ~0.5 s; collect cookies, including standing right at the edge of a cookie and sweeping fast through a pile. | No double rewards. A cookie the server refuses comes back within ~1 s and is asked for again while you stay on it (it still picks up; never more than one request in flight per cookie), at most 3 requests per cookie in all. No errors. | |
+| PK12 | Player 2 joins in the middle of the party. | Counter shows right away; the cookies already on the ground appear (no fall), new ones fall normally. | |
+| PK13 | Party ends (`TrophyClaim`). | The counter hides (no summary screen); all collectable cookies vanish (a pop already playing finishes); within a second the client's `Workspace.CookiePartyCookies` folder, the `CookiePartyBurst` attachment and the `CookiePartyNumber` attachments in `Terrain`, and the `CookiePartyNumber` guis in PlayerGui are gone. | |
+| PK14 | Rain ramp: watch the visual rain from Start to Countdown. | Light rain at the start, clearly heavier in Hype, heavy in Frenzy/Countdown; golden-looking rain cookies appear from Hype and are common at the end. They still can't be picked up (no "+N"). Client view: never more than 170 rain `Cookie` parts in `Workspace.CookieRain`. | |
+| PK15 | Two parties in a row (fast cycle). | Everything works again in the second party; no duplicate folders/guis; the counter starts at 0. | |
+| PK16 | 4 players during Frenzy/Countdown; check FPS (Shift+F5 / MicroProfiler) and Output. | Smooth on every client; no errors or warnings. | |
 
 ## Cookie Party: Caleb
 
@@ -217,8 +255,27 @@ Phases by seconds left: Start 60–40, Hype 40–20, Frenzy 20–10, Countdown 1
 
 ## Cookie Party: countdown, VFX, finale, audio
 
+Set `Config.DevCalebFastCycle = true` (Studio only; the party is still 60 s)
+and dev cash, then feed Caleb to the goal. Sound cases need the
+`tools/audio/` WAVs uploaded and their ids in `Config.CookiePartySounds`
+(except PX12). Set the dev flags back before committing.
+
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| PX1 | Watch the whole 60 s party. | Banner "🎉 COOKIE PARTY! 🎉" + m:ss at the top. 60–40: pink, gentle pulse. At 40: banner turns orange, "MORE COOKIES! 🍪" slams in mid-upper screen, holds ~1.5 s, fades. At 20: gold banner, "✨ GOLDEN COOKIE FRENZY! ✨", the banner wobbles/shakes a little. At 10: red banner, stronger shake. Confetti bursts get more frequent (about every 8 → 5 → 3 → 2 s). | |
+| PX2 | Watch the lighting through the party. | Warm tint + glow fades in at the start and gets more saturated/glowy toward the end, with a soft pulse about once per second in later phases. Nothing flashes full-screen more than ~2 times per second; it stays comfortable to play. | |
+| PX3 | Last 10 seconds. | Huge numbers 10, 9, … 1 in the middle of the screen, each exactly once, slamming in (big + tilted → normal) in changing colors, with a small camera zoom punch. 3, 2, 1 are red, bigger, with a gold glow on the screen edges and a stronger punch. No "0". | |
+| PX4 | 2 players (Test > Clients and Servers), both watching the countdown. | Both show the same number at the same time (within a frame or two of each other); neither skips or repeats a number. | |
+| PX5 | Moment the party ends (Celebration → TrophyClaim), standing near the statue. | ~48 cookies (some golden) burst out of Caleb's head in every direction, arc, spin, bounce on the ground and fade; a crumb/sparkle burst, a quick glowing ball, an expanding ring on the ground, a white flash, a strong short camera shake, full confetti. | |
+| PX6 | Same moment, as a player who fed. | The gold "🏆 CALEB TROPHY AVAILABLE!" banner with "TROPHY CLAIM: m:ss" shows immediately (during the explosion), exactly as before. No "Cookie Party Complete" screen, no party leaderboard. The trophy claim works as before. | |
+| PX7 | Same moment: watch the middle of the screen. | "+5,000 🍪 PARTY BONUS!" pops, then flies down toward the cookie counter and fades, gone within ~2 s. The counter goes up by 5,000 (the server paid it). | |
+| PX8 | ~3 s after the finale: check Workspace (client view) and the camera. | No `CookiePartyFinale` folder and no finale cookies/ring/ball left. Countdown, callout, edge glow are hidden; the party banner is gone; `Camera.FieldOfView` is back to its normal value (70 by default). Run 2 cycles: still nothing left over, no errors in Output. | |
+| PX9 | Player 2 joins during TrophyClaim. | No explosion, flash, shake, boom or reward pop for Player 2; just the TrophyClaim UI. | |
+| PX10 | Player 2 joins mid-party (e.g. during Frenzy, or during the countdown). | Banner in the right phase color, lighting at the right level, no callout for the phase already running; if in the last 10 s, the countdown starts from the current number. At the end Player 2 sees the full finale (PX5–PX7). | |
+| PX11 | Spend the party and finale far from the statue (at your plot). | Everything still runs; the finale still flashes/shakes and the trophy UI appears; no errors if Caleb's head is streamed out (explosion comes from above the pedestal instead). | |
+| PX12 | All `CookiePartySounds` ids empty; run a full cycle. | Silent party (other sounds as configured). Output has at most one `[CalebAudio] no sound id ...` line (listing the missing ones) and no errors or warnings. | |
+| PX13 | With ids: listen through the party. | Upbeat chiptune music starts with the party, loops without a click, gets faster at 40 / 20 / 10 s left and a little louder toward the end. A tick each second from 10 to 1, higher each time. At the finale the music stops at once and a big boom plays; the old descending end chime follows ~1.6 s later. | |
+| PX14 | Run `python3 tools/audio/generate_sfx.py` twice. | 14 WAVs in `tools/audio/out/` (16-bit, 44.1 kHz, mono); effects under 300 KB, the music ~700 KB; re-running gives identical files. | |
 
 ## Caleb leaderboard (podium)
 

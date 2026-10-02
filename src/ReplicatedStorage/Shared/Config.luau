@@ -166,10 +166,12 @@ local Config = {
 	CalebLeaderboardSize = 10,
 	CalebLeaderboardInterval = 1,
 	-- Cookie rain (client only, visual): most falling cookies alive at once
-	-- per client, and the radius (studs, around the statue) they fall in.
+	-- per client (during the Cookie Party: CookiePartyRainMaxCookies), and
+	-- the radius (studs, around the statue) they fall in.
 	CookieRainMaxCookies = 120,
 	CookieRainRadius = 150,
-	-- New cookies per second (fewer if CookieRainMaxCookies are all in use),
+	-- New cookies per second (times CookiePartyRainRate for the party phase;
+	-- fewer if the pool is all in use),
 	-- fall speed (studs/s), height above the landing spot they start at
 	-- (studs), and spin (radians/s); each cookie varies these a little.
 	CookieRainPerSecond = 25,
@@ -270,6 +272,9 @@ local Config = {
 	CookiePartyLifetime = 8,
 	-- Most collect requests per player per second the server will look at.
 	CookiePartyMaxCollectsPerSecond = 12,
+	-- Seconds between the server's spawn/expire ticks while the party runs
+	-- (CookiePartyService). Each tick's new cookies go out as one batch.
+	CookiePartyTickSeconds = 0.25,
 	-- Paid to every player in the server when the party ends (the finale).
 	CookiePartyFinalReward = 5_000,
 	-- Caleb's party dance gets faster/bigger per phase (CalebAnimator):
@@ -358,6 +363,55 @@ local Config = {
 		CalebSpit = 0.4,
 	}),
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
+	-- Collectable cookies on each client (CookiePartyCookies.client). The
+	-- client asks to collect when the player is this many studs inside the
+	-- type's CollectRadius, sends at most ClientCollectsPerSecond requests
+	-- (keep it under CookiePartyMaxCollectsPerSecond), and gives the server
+	-- ClientCollectTimeout seconds to confirm before the cookie goes back and
+	-- may be asked for again (one request in flight per cookie, at most
+	-- ClientCollectTries requests per cookie in all).
+	CookiePartyClientCollectMargin = 1,
+	CookiePartyClientCollectsPerSecond = 10,
+	CookiePartyClientCollectTimeout = 1,
+	CookiePartyClientCollectTries = 3,
+	-- Collects this many seconds apart (or closer) grow the "x5 COMBO!"
+	-- streak and raise the collect sound's pitch. Presentation only.
+	CookiePartyComboSeconds = 1.2,
+	-- The visual rain (CookieRain.client) ramps with the party, per phase:
+	-- CookieRainPerSecond is multiplied by RainRate, the pool may grow to
+	-- RainMaxCookies (keep it ≤ 200: each rain cookie is 6 parts moved every
+	-- frame), and RainGoldenShare (0..1) of new rain cookies look golden
+	-- (still visual only, not collectable).
+	CookiePartyRainRate = table.freeze({ Start = 0.6, Hype = 1, Frenzy = 1.6, Countdown = 2 }),
+	CookiePartyRainMaxCookies = table.freeze({ Start = 120, Hype = 120, Frenzy = 160, Countdown = 170 }),
+	CookiePartyRainGoldenShare = table.freeze({ Start = 0, Hype = 0.08, Frenzy = 0.2, Countdown = 0.3 }),
+	-- Party FX (client only, looks only: CalebEventUI / CookiePartyFX /
+	-- CookiePartyFinale / CalebAudio). The music's tempo at PlaybackSpeed 1
+	-- (tools/audio party_music.wav); the lighting and banner pulse once every
+	-- 2 beats, so never more than ~1.2 pulses per second.
+	CookiePartyMusicBPM = 120,
+	-- Per phase: pulse strength (0..1), seconds between UI confetti bursts,
+	-- and pieces per burst (taken from the CalebConfettiCount pool).
+	CookiePartyPulse = table.freeze({ Start = 0.15, Hype = 0.45, Frenzy = 0.75, Countdown = 1 }),
+	CookiePartyConfettiEvery = table.freeze({ Start = 8, Hype = 5, Frenzy = 3, Countdown = 2 }),
+	CookiePartyConfettiPieces = 20,
+	-- Added on top of CalebPartySaturation / CalebPartyBloom as the party
+	-- goes from 0 to 1 (CookieParty.Intensity).
+	CookiePartyExtraSaturation = 0.2,
+	CookiePartyExtraBloom = 0.25,
+	-- Countdown 10..1: camera FieldOfView punch in degrees (Big = 3, 2, 1).
+	CookiePartyCountdownFOVPunch = 2,
+	CookiePartyCountdownFOVPunchBig = 4,
+	-- Finale explosion (CookiePartyFinale): cookies thrown out of Caleb, how
+	-- long it lasts before everything is removed, launch speed range
+	-- (studs/s), gravity (studs/s²), and the camera shake.
+	CookiePartyFinaleCookies = 48,
+	CookiePartyFinaleSeconds = 2.5,
+	CookiePartyFinaleSpeedMin = 30,
+	CookiePartyFinaleSpeedMax = 65,
+	CookiePartyFinaleGravity = 80,
+	CookiePartyFinaleShakeStuds = 1.4,
+	CookiePartyFinaleShakeSeconds = 0.8,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",

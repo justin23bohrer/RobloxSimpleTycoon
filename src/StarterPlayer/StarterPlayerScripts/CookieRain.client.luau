@@ -2,12 +2,15 @@
 -- While Caleb's CalebState is "Celebration", chocolate chip cookies rain
 -- from the sky within Config.CookieRainRadius of the statue, more of them
 -- near the local player. They spin and wobble as they fall, then give a
--- little bounce and puff where they land and fade away.
+-- little bounce and puff where they land and fade away. The rain ramps up
+-- with the Cookie Party's phase (Shared/CookieParty): more cookies per second
+-- (Config.CookiePartyRainRate), a bigger pool (CookiePartyRainMaxCookies),
+-- and more of them golden (CookiePartyRainGoldenShare) toward the end.
 --
 -- Visual only: no rewards, no remotes, nothing on the server. Everything
 -- lives in a client-local Workspace folder (created by this LocalScript, so it
--- is never replicated). Cookies come from a pool of at most
--- Config.CookieRainMaxCookies that is reused, never rebuilt per cookie; one
+-- is never replicated). Cookies come from a pool of at most the phase's
+-- Config.CookiePartyRainMaxCookies (never over 200) that is reused, never rebuilt per cookie; one
 -- Heartbeat connection moves them all (BulkMoveTo) and exists only while
 -- cookies are falling. When the celebration ends no new cookies spawn; the
 -- falling ones land and fade, then the folder, pool and connection are gone.
@@ -19,6 +22,7 @@ local Workspace = game:GetService("Workspace")
 
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
+local CookieParty = require(ReplicatedStorage.Shared.CookieParty)
 local CookieRainLook = require(script.Parent:WaitForChild("CookieRainLook"))
 
 local player = Players.LocalPlayer
@@ -32,6 +36,7 @@ local BOUNCE_STUDS = 1.2
 local FADE_SECONDS = 0.5
 local PUFF_COUNT = 6
 local RAY_HEIGHT = 300 -- landing raycasts start this far above the statue
+local POOL_LIMIT = 200 -- hard cap whatever Config says (6 parts per cookie)
 
 type Slot = {
 	Cookie: CookieRainLook.Cookie,
@@ -104,7 +109,7 @@ local function landingY(x: number, z: number): number
 	return center.Y -- nothing visible (or not streamed in): ground level
 end
 
-local function spawnCookie(): boolean
+local function spawnCookie(maxCookies: number, goldenShare: number): boolean
 	local slot: Slot? = nil
 	for _, candidate in slots do
 		if not candidate.Active then
@@ -113,7 +118,7 @@ local function spawnCookie(): boolean
 		end
 	end
 	if not slot then
-		if #slots >= Config.CookieRainMaxCookies or not folder then
+		if #slots >= maxCookies or not folder then
 			return false
 		end
 		slot = { Cookie = CookieRainLook.Build(folder :: Folder) } :: any
@@ -129,6 +134,7 @@ local function spawnCookie(): boolean
 	s.Age = 0
 	s.LandedAt = nil
 	s.Active = true
+	CookieRainLook.SetGolden(s.Cookie, math.random() < goldenShare)
 	CookieRainLook.SetTransparency(s.Cookie, 0)
 	return true
 end
@@ -189,10 +195,14 @@ end
 local function onHeartbeat(dt: number)
 	if raining then
 		updateCenter()
-		spawnBudget = math.min(spawnBudget + dt * Config.CookieRainPerSecond, 5)
+		local phase = CookieParty.GetPhase(CookieParty.TimeLeft(statue))
+		local rate = Config.CookieRainPerSecond * (Config.CookiePartyRainRate[phase] or 1)
+		local maxCookies = math.min(Config.CookiePartyRainMaxCookies[phase] or Config.CookieRainMaxCookies, POOL_LIMIT)
+		local goldenShare = Config.CookiePartyRainGoldenShare[phase] or 0
+		spawnBudget = math.min(spawnBudget + dt * rate, 5)
 		while spawnBudget >= 1 do
 			spawnBudget -= 1
-			if not spawnCookie() then
+			if not spawnCookie(maxCookies, goldenShare) then
 				spawnBudget = 0 -- pool full: skip, don't save up a burst
 			end
 		end

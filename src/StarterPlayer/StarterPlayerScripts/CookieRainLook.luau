@@ -1,7 +1,9 @@
 -- CookieRainLook (client only, ModuleScript)
 -- Builds one falling cookie for CookieRain.client: a round golden-brown disc
 -- with dark chocolate chips, the same look as the server's cookie drops
--- (DropperService), just a little bigger so it reads from far away.
+-- (DropperService), just a little bigger so it reads from far away. Late in
+-- the Cookie Party some rain cookies turn golden (SetGolden), still visual
+-- only.
 --
 -- Looks only. Every part is anchored and has CanCollide, CanTouch and
 -- CanQuery off: no physics, nothing to touch, invisible to raycasts. The
@@ -30,13 +32,19 @@ local CHIP_SPOTS = {
 	{ X = 0.45, Z = 0.3, Side = -1 },
 }
 
+-- Golden rain cookies: shiny gold, but not Neon (only the collectable
+-- Golden cookies glow, so players can tell them apart).
+local GOLDEN_DOUGH_COLOR = Color3.fromRGB(245, 195, 60)
+local GOLDEN_CHIP_COLOR = Color3.fromRGB(170, 110, 20)
+
 local PUFF_COLOR = Color3.fromRGB(240, 215, 170) -- crumbly dough dust
 
 CookieRainLook.HalfThickness = THICKNESS / 2
 
 export type Cookie = {
-	Parts: { BasePart },
+	Parts: { BasePart }, -- Parts[1] is the disc, the rest are chips
 	Offsets: { CFrame }, -- Parts[i].CFrame = cookieFrame * Offsets[i]
+	Golden: boolean,
 }
 
 local function decorate(part: BasePart)
@@ -77,13 +85,32 @@ function CookieRainLook.Build(parent: Instance): Cookie
 	for _, part in parts do
 		part.Parent = parent
 	end
-	return { Parts = parts, Offsets = offsets }
+	return { Parts = parts, Offsets = offsets, Golden = false }
 end
 
 -- Shows or fades the whole cookie (0 = solid, 1 = invisible).
 function CookieRainLook.SetTransparency(cookie: Cookie, transparency: number)
 	for _, part in cookie.Parts do
 		part.Transparency = transparency
+	end
+end
+
+-- Makes the cookie golden (shiny gold dough and chips) or a normal
+-- chocolate chip cookie again. Does nothing if it already is.
+function CookieRainLook.SetGolden(cookie: Cookie, golden: boolean)
+	if cookie.Golden == golden then
+		return
+	end
+	cookie.Golden = golden
+	for i, part in cookie.Parts do
+		local isDisc = i == 1
+		if golden then
+			part.Color = if isDisc then GOLDEN_DOUGH_COLOR else GOLDEN_CHIP_COLOR
+			part.Material = Enum.Material.Foil
+		else
+			part.Color = if isDisc then DOUGH_COLOR else CHIP_COLOR
+			part.Material = Enum.Material.SmoothPlastic
+		end
 	end
 end
 
