@@ -112,5 +112,6 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Inventory: saved InstanceIds + Equipped (Version 2), equip remote, reward roll at claim, display rules. `DataSchema`, `DataService`, `TrophyService` (+ `TrophyInventory`). (code done; Studio test pending: QA TE1–TE12, TR13)
 - [x] Powers: `PowerService`, drop/collect/movement hooks, double jump. (code done; Studio test pending: QA PW1–PW12)
 - [x] Big Trophy Case + nameplates: `tools/trophycase/generate_trophy_case.py` (~25 × 14.6 case, 10 slots, sign, warm lights), `TrophyCaseDisplay` slot order + nameplates, `TrophyCaseSlots = 10`. (code done; Studio test pending: QA TR9, TR16–TR18)
+- [x] Trophy powers show on the house: fire on droppers, shine on the Collect pad (requested by the user 2026-10-01). (code done; Studio test pending: QA PV1–PV10)
 - [x] Inventory UI: `TrophyInventory.client` + `TrophyInventoryUI` / `TrophyInventoryIcon` / `TrophyInventoryData` (needs Studio QA: TI1–TI14).
 
