@@ -408,6 +408,24 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | V4 | Look around the map from the spawn and from the plot. | All ground outside the plot is green grass (grass texture up close). The plot's gray floor, pads, conveyor, and cookie jar look the same as before. | |
 | V6 | Claim the plot; stand on the Collect pad and look up at the "COOKIE JAR" sign, then from ~30 studs away, in daylight and at night (Lighting `ClockTime = 0`). Repeat on Plots 2–4. | The sign matches the other cartoony signs: a pink rounded panel with a thick dark outline inside a thin gold frame, white chunky "COOKIE JAR" text with a dark outline, centered with space around it (not touching the edges, not squashed or stretched). It faces the Collect pad (front); the back of the jar wall shows no text. Not darkened at night. The glass lid doesn't cover it. | |
 
+## Cookie jar counter
+
+The "🍪 N" plaque on top of the cookie jar (`CashTank.JarCounter`). It shows
+the plot's stored (uncollected) cookies; the owner's Collect Bonus is added
+only when they collect.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| JC1 | Claim the plot; stand on the Collect pad and look at the jar. Then from ~40 studs away, at night (`ClockTime = 0`), and in the Device emulator on a phone (e.g. iPhone SE landscape). Repeat on Plots 2–4. | A pink-framed gold plaque on top of the jar's gold frame, above the "COOKIE JAR" sign, reads "🍪 0" in white chunky text with a dark outline (emoji renders). It faces the pad, doesn't overlap the sign or the glass, isn't cut by the 2nd floor (build it to check), isn't darkened at night, and is readable on the phone from the pad. Gone past ~120 studs. | |
+| JC2 | Buy Dropper 1 and watch drops reach the collector. | Each drop adds its value (e.g. 🍪 0 → 🍪 10 → 🍪 20 with Dropper 1's DropValue of 10, no trophies); the plaque pops a little each time. Matches the cookies you then get from collecting (without Collect Bonus). | |
+| JC3 | Let it pass 1,000 (or use droppers with bigger values). | Commas: "🍪 1,250", "🍪 12,345". Text stays inside the panel. | |
+| JC4 | Step on the Collect pad. | Counter goes back to "🍪 0" at the same time as the tank empties and the burst plays; your cookies go up by the shown number (plus Collect Bonus if equipped). | |
+| JC5 | Trophy powers: equip a CookieMultiplier trophy, then a CollectBonus trophy (Trophy Case built). | With CookieMultiplier each drop adds its boosted value to the counter. With CollectBonus the counter still shows the stored number; the payout is floor(shown × (1 + bonus)). | |
+| JC6 | Build the 2nd floor and buy a 2nd-floor dropper as well as floor-1 droppers. | Drops reaching `Collector` and `Collector2` both add to the same counter; one collect pays and resets it. | |
+| JC7 | 2 players: Player 2 watches Player 1's jar fill and get collected; Player 2 steps on Player 1's Collect pad. | Player 2 sees the same number and pop; stepping on Player 1's pad changes nothing. | |
+| JC8 | Unclaimed / released: look at an unclaimed plot; then claim, let cookies build up, and leave (watch from Player 2). | Unclaimed plot: no plaque and no text anywhere. After leaving: the plaque hides with the jar; the next claim shows "🍪 0" (not the old number). | |
+| JC9 | Rejoin: with cookies in the jar, leave and rejoin (claim again). | Counter starts at "🍪 0" (stored cookies are not saved, as before) and counts up normally. No errors in Output. | |
+
 ## Cookie display (client UI)
 
 | ID | Test | Expected | Status |

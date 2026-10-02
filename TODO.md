@@ -51,6 +51,7 @@ user's approval first.
 - [x] Feed Caleb: 4 feed pads around the statue; cartoony "How many cookies do you want to feed Caleb?" pop-up; server-validated feeding via the `FeedStatue` RemoteFunction; Caleb gets fatter up to 1,000,000 cookies, then is full (approved by the user 2026-10-01). (code done; Studio test pending: QA FD1–FD13)
 - [x] Feeder upgrade: 10 / 100 / 1K add on every click; progress bar is exact (eaten / 1,000,000, exact % in the text) with a preview of the picked amount; pop-up closes right after a successful feed (approved by the user 2026-10-01). (code done; Studio test pending: QA FD4, FD14–FD17, FD19)
 - [x] Cookie jar sign restyle: the "COOKIE JAR" sign on the jar wall uses the cartoony sign style (pink rounded panel, thick dark outline, gold frame, FredokaOne), facing the Collect pad (requested by the user 2026-10-01). (done; Studio test pending: QA V6, CT1)
+- [x] Cookie jar shows how many cookies are in it (requested by the user 2026-10-01). (code done; Studio test pending: QA JC1–JC9)
 - [x] Progress bar above Caleb's head that everyone sees: "Caleb: N / 1,000,000 🍪" in the pop-up's style, "FULL!" at the max; client only, reads `CookiesEaten` (requested by the user 2026-10-01). (code done; Studio test pending: QA SB1–SB8)
 - [x] Decide what happens when Caleb reaches 1,000,000 cookies: the Caleb Full Event (approved by the user 2026-10-01; see below).
 
