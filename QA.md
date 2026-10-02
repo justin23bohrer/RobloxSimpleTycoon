@@ -677,9 +677,28 @@ Player (Client or Server view). Until the Inventory UI exists, equip from the
 ## House security
 
 Needs 2 players (Test > Clients and Servers). Both claim plots and build Walls.
+Tip: `DevUnlimitedCash = true` locally (never commit it) to buy the walls fast.
+Sounds need ids in `Config.HouseSecuritySounds`; with them empty, check the
+rest and mark the sound part "skipped (no id)".
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| HR1 | Claim a plot; before Walls look inside. Then buy Walls. Also look at an unclaimed plot. | Before Walls (and on unclaimed plots): no pad, no bars, no stash, nothing to touch. After Walls: a round **green** pad inside, left of the doorway (a few steps in, not on the straight walk-in line); a gold "STASH STOLEN TROPHIES HERE" pad in the back-right corner; no bars visible in the doorway. | |
+| HR2 | Stash placement: walk around the stash. | It is clear of the conveyor, collector, cookie jar/Collect pad, Trophy Case, stairs and every button; its label reads clearly. | |
+| HR3 | Owner (Player 1) steps on the green pad. | At once: pad turns **red** (glows red), red metal bars rise out of the floor across the whole doorway (round bars + rails, real-looking metal, not invisible/forcefield) with the close sound (whir + clang). Server: Plot1 `SecurityActive = true`, `SecurityEndsAt` ≈ `workspace:GetServerTimeNow() + 30`. | |
+| HR4 | Owner walks out and back in through their bars. | Player 1 passes straight through both ways, no snag. | |
+| HR5 | Player 2 tries to walk / run / jump through Player 1's bars, and squeeze between them. | Player 2 is blocked; no gap fits a character (also check the gaps at the door frame sides and the top). | |
+| HR6 | Player 2 inside Player 1's house when the bars rise. | Player 2 cannot leave through the doorway until the bars drop. | |
+| HR7 | Timing: note when the pad turns red, watch until it turns green (stopwatch or `SecurityEndsAt` vs `GetServerTimeNow()`). | The bars start dropping exactly 30 s after activation (open sound), the pad turns green, `SecurityActive = false`, `SecurityEndsAt = 0`; after the drop the doorway is open for Player 2. | |
+| HR8 | While red, Player 1 steps off and on the pad repeatedly. | Nothing changes; the 30 s timer is not extended or restarted. | |
+| HR9 | No cooldown: step on the pad the moment it turns green (even while the bars are still sinking). | It turns red again at once and the bars rise again, another full 30 s. | |
+| HR10 | Player 2 steps on Player 1's green pad. | Nothing happens (pad stays green, no bars, no attribute change). | |
+| HR11 | No UI: watch both players' screens through a whole cycle. | No "HOUSE LOCKED" text, no countdown, no HUD or pop-up anywhere; only the pad color, the bars and the sounds. | |
+| HR12 | Independent per house: both players activate their own pads a few seconds apart. Then Player 2 tries Player 1's bars and vice versa. | Each house has its own red pad, bars and timer; each owner passes only their own bars; each drops 30 s after its own activation. | |
+| HR13 | Release: Player 1 activates, then leaves before 30 s (watch from Player 2). | Plot 1 goes unclaimed: bars down and hidden, pad hidden (and green when the plot is claimed and walled again), `SecurityActive = false`, `SecurityEndsAt = 0`; no error and no late "bars drop" sound when the old 30 s would have ended. | |
+| HR14 | Ownership change (3 clients): after HR13, Player 3 claims Plot 1 and builds Walls; Player 1 rejoins and claims another plot. Player 3 activates Plot 1. | Player 3 passes through Plot 1's bars; Player 1 and Player 2 are blocked by them (nobody keeps pass-through for a plot they no longer own). | |
+| HR15 | Rejoin with a saved house (Walls restored on claim). | Pad, stash and (down) bars appear with the Walls; activating works the first time. | |
+| HR16 | Exploit (Server view): a non-owner client sets the bars' `CanCollide = false` locally, or fires touches on the pad. | Only that client's own view changes (characters are client-simulated, so an exploiter could clip their own character: a Roblox limitation); the server's `SecurityActive` / `IsProtected` stay correct and theft is still refused while protected. | |
 
 ## Trophy stealing
 

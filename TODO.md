@@ -94,7 +94,8 @@ Contract: ARCHITECTURE.md "House Raid (contract)". Permanent theft is
 intentional. No weapons, no dropped trophies, no security UI, no prestige houses.
 
 - [x] Contract: `Shared/HouseRaid.luau`, Config block, remotes, service stubs wired into `ServerMain` (lead).
-- [ ] Security: `SecurityPad` (green/red), red `SecurityBars` for exactly 30 s, no cooldown, owner passes through, `TrophyStash` pad in the map. (QA HR*)
+- [x] Security: `SecurityPad` (green/red), red `SecurityBars` for exactly 30 s, no cooldown, owner passes through, `TrophyStash` pad in the map. `HouseSecurityService`, `HouseSecurity.client`, `tools/security/generate_security.py`, sounds in `tools/audio/`. (code done; Studio test pending: QA HR1–HR16)
+- [ ] Upload `security_close.wav` / `security_open.wav` and paste the ids into `Config.HouseSecuritySounds` (user).
 - [ ] Theft: steal prompt on displayed trophies, carry over head, all powers off while carrying, returns on push/death/leave, permanent transfer at the thief's `TrophyStash`, offline owner handling. (QA TH*)
 - [ ] Push: input + animation + phone button, server-validated hit, knockback, stops thieves. (QA PU*)
 

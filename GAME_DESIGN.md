@@ -173,6 +173,37 @@ walls both Stairs and the Trophy Case are offered).
 - Built parts are hidden (invisible, can't be touched or walked on) until
   bought.
 
+### House security (House Raid, approved by the user 2026-10-01)
+
+Built with the **Walls** (hidden on unclaimed plots and before the walls):
+
+- **Security pad:** a round **green** glowing button on the floor inside the
+  house, a few steps in and to the left of the doorway (not on the straight
+  walk-in line), in a dark metal ring. Only the house's **owner** stepping
+  on it counts; anyone else does nothing.
+- Owner steps on the green pad → it turns **red** (and glows red) at once,
+  and **red metal security bars** (10 round vertical bars with a top, middle
+  and bottom rail) rise out of the floor across the whole doorway, with a
+  mechanical whir + clang. They stay up for **exactly 30 s**
+  (`Config.HouseSecuritySeconds`), then sink back into the floor with a
+  mechanical sound, the pad turns green, and the owner can step on it again
+  right away. **No cooldown.** Stepping on the red pad does nothing.
+- The bars are solid for everyone else (nobody fits between them); the
+  owner walks straight through their own bars.
+- **No security UI:** no "HOUSE LOCKED" text, no countdown, no HUD. The pad
+  and the bars are the only signal. Each house has its own pad and bars.
+- While the bars are up nobody can start stealing from that house.
+- Leaving the game (plot released) puts the bars down and the pad green.
+- **Trophy stash:** a gold floor pad with a purple ring in the back-right
+  corner of floor 1, labeled "STASH STOLEN TROPHIES HERE". A thief who
+  reaches **their own** stash while carrying a stolen trophy keeps it (see
+  ARCHITECTURE.md "House Raid (contract)").
+- The doorway is the only way into the house at ground level (windows are
+  looks only; the walls behind them are solid). Before the 2nd Floor is
+  built the house has no ceiling: walls are 15 studs high, so a player with
+  strong jump trophies (JumpHeight + double jump) may be able to jump over
+  them. Once the 2nd Floor is built the house is closed.
+
 ## Droppers
 
 A bought dropper looks like an **upside-down red party cup** (red with
@@ -277,6 +308,9 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `BuildButton5`–`9` | 2nd floor (y 18.2), in front of each piece of furniture: Bed (−3, −50), Gaming Desk (15.5, −55), Shelves + TV (8, −21), Mini Fridge (−13.5, −63), Ninja Kitchen (−8, −21) |
 | `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; straight desk against the back wall (x 8.1..28.4, out to z −69.4) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
 | `TrophyCase` (model) | Against the middle of the back wall, x −12.4..12.4, z −74.7..−69.55, y 2..16.6 (the 2nd floor starts at y 17): `CaseBase` (top y 4 = bottom row), `CaseSideLeft`/`Right`, velvet `CaseBack`, `CaseShelf` (top y 9.3 = top row), `CaseTop` (y 14.2..14.8), glass `CaseGlassLower`/`Upper` (Transparency 0.65), gold `GoldBase`/`GoldShelfRail`/`GoldEdgeLeft`/`Right`/`GoldTop`, `CaseSign` ("MY CALEB TROPHIES", y 14.8..16.6), warm `SurfaceLight`s `RowLight1`/`2` (start disabled), and invisible `TrophySlot1`–`10` (z −72.5, turned to face into the room; per row x 0 / −4.48 / 4.48 / −8.96 / 8.96, slots 1–5 on the bottom row, 6–10 on the top row). Covers the middle back window from inside; clear of the conveyor, collector, cookie jar/Collect pad (≥ 21 studs), stairs, `BuildButton4`, and doorway. **Generated** by `tools/trophycase/generate_trophy_case.py`. |
+| `SecurityPad` | (−13, 2.2, −16), 5 across (ring 6.5): inside the house, 5 studs left of the doorway and 4.5 in from the front wall (Walls build) |
+| `SecurityBars` (model) | Across the doorway at z −10.5: `Bar1`–`Bar10` (red `Metal` cylinders, 0.5 thick, x −6.75..6.75 every 1.5) and `RailBottom`/`RailMiddle`/`RailTop` (darker red `DiamondPlate`, x −7.4..7.4). Closed: y 2..12.4 (floor to the door frame). Saved **down**, 11 studs lower (all below the floor); the model's `RiseStuds` = 11 (Walls build). **Generated** by `tools/security/generate_security.py`. |
+| `TrophyStash` | (21, 2.2, −64), 7 across (ring 8.5): back-right corner of floor 1, clear of the stairs (≥ 8 studs), Trophy Case (≥ 4), `BuildButton4`, conveyor, collector and cookie jar (Walls build) |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
 | `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
@@ -732,6 +766,11 @@ yet (the user will pick a track).
 Buy button colors: pad `255,0,0` (BuyButtons.luau resets the buttons to this
 exact red), ring `110,0,0`. Collect pad: `0,220,70` / ring `0,95,35`.
 Claim pad: `0,162,255` / ring `0,70,140`.
+Security pad (5 across, `Neon`): green `40,200,70` / red `230,30,30` while
+the bars are up (`Config.HouseSecurityPad*Color`), ring dark metal
+`60,64,70` `DiamondPlate`; no label. Trophy stash (7 across): gold
+`255,196,40` / ring purple `120,50,190`, purple label "STASH STOLEN TROPHIES
+HERE". Both generated by `tools/security/generate_security.py`.
 Owner sign: the `OwnerSign` wall is gold (`255,200,40`) and acts as the frame.
 Each face (`Back` toward the spawn, `Front` into the plot) has a `SurfaceGui`
 (`OwnerLabelBack` / `OwnerLabelFront`, `PixelsPerStud` 50, `LightInfluence = 0`)

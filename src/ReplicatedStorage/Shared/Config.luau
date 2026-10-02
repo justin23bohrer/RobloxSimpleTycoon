@@ -48,7 +48,14 @@ local Config = {
 	--   After - purchase id that unlocks this one (see above).
 	--   Parts - plot parts/models that appear once it is built (hidden before).
 	Builds = table.freeze({
-		table.freeze({ Id = "Walls", Name = "Build Walls", Cost = 5000, After = "Dropper4", Parts = table.freeze({ "Walls" }) }),
+		-- Walls also brings the House Raid security parts (pad, bars, stash).
+		table.freeze({
+			Id = "Walls",
+			Name = "Build Walls",
+			Cost = 5000,
+			After = "Dropper4",
+			Parts = table.freeze({ "Walls", "SecurityPad", "SecurityBars", "TrophyStash" }),
+		}),
 		table.freeze({ Id = "Stairs", Name = "Build Stairs", Cost = 8000, After = "Walls", Parts = table.freeze({ "Stairs" }) }),
 		table.freeze({
 			Id = "SecondFloor",
@@ -492,6 +499,20 @@ local Config = {
 	-- Security: the owner steps on the green SecurityPad; red bars block the
 	-- doorway for exactly this many seconds; then they drop. No cooldown.
 	HouseSecuritySeconds = 30,
+	-- How long the bars take to rise out of the floor / sink back (seconds).
+	HouseSecurityBarsSeconds = 0.8,
+	-- The pad's color while open (green) and while the bars are up (red).
+	HouseSecurityPadOpenColor = Color3.fromRGB(40, 200, 70),
+	HouseSecurityPadLockedColor = Color3.fromRGB(230, 30, 30),
+	-- Bars sounds, played from the doorway on the server (everyone nearby
+	-- hears them). Roblox audio asset ids ("rbxassetid://123..."); empty =
+	-- skipped. Originals to upload: tools/audio/out/security_close.wav and
+	-- security_open.wav.
+	HouseSecuritySounds = table.freeze({
+		Close = "",
+		Open = "",
+	}),
+	HouseSecuritySoundVolume = 0.8,
 	-- Stealing a displayed trophy: hold the StealPrompt this long, from at
 	-- most this many studs.
 	TheftHoldSeconds = 3,
