@@ -339,6 +339,21 @@ as an outline:
 | `SpawnLocation`, `SpawnLocation2`–`4` | Invisible 14 × 14 spawn areas (`Block`, `Transparency = 1`, `Anchored`, no ring or decal) sunk into the ground so the top is flush with the grass (center Y = 0.5, top Y = 1), in `Map` (not the plots), one between each plot and the statue. Where players appear (a random one). `SpawnLocation2`–`4` are generated. |
 | `Statue`           | In `Map` (not the plot), behind the spawn at z ≈ 44, facing it: turn around after spawning to see it. See below. |
 
+### Garage + car (look) (approved by the user 2026-10-02)
+
+Part of "Garage + Backyard": once the house is maxed, `TrophyButton1`
+appears and unlocks the garage for 1 Caleb Trophy (the game logic shows and
+hides `Garage`, `GarageCar`, and `TrophyButton1`). Decoration only.
+**Generated** by `tools/garage/generate_garage.py` (the car by
+`tools/garage/id4_car.py`). Positions are Plot1's; Plots 2–4 are turned
+copies.
+
+| Part | Look and position |
+| ---- | ----------------- |
+| `Garage` (model) | An attached one-car garage on the house's **right** (stairs) side, outside the 66 × 66 base: x 33.3..58.3 (walls; trim/eaves to 59.8), z −38..−10 (front flush with the house front, roof overhang −39.2..−8.8), concrete floor slab with its top at y 2 like `Base`. No left wall of its own: the house's right wall is its left wall (the first-floor window at z −22 looks into it). Off-white brick walls y 2..17 (`WallRight`, `WallBack`, `WallFrontLeft`/`Right`, `DoorHeader`, `WallBackFiller`), gray corner posts, plinth and floor band like the house, two house-style windows in the right wall (z −17, −31), and a gray `Slate` gable roof (ridge along z at x 45.8, y 23) with brick gable triangles, rake boards, a ridge cap, a round gable vent, and gray `Flashing` where it meets the house. Door opening x 37.8..53.8, up to y 13 (16 × 11, like the house doorway), facing +Z toward the statue side, with a gray frame and lanterns on both sides; the door is **rolled up** (`DoorRollBox` above the opening inside, the white `DoorBottomEdge` peeking out under the frame, side tracks). A concrete `Driveway` ramp (wedge) from the grass (y 1) up to the floor, z −10..−6.5. Inside: white `Ceiling` at y 16.6..17, two tube lights (`LightFrontTube`/`LightBackTube`, each with a `SurfaceLight` `GarageLight`, **saved disabled** because `PlotVisibility` does not hide lights; the game turns them on with the garage), a wooden workbench with a pegboard of tools, a red toolbox and a vise (back right, x 47.5..56.5), a metal storage rack with bins, boxes and paint cans (back left, x 34.5..41.5), a white EV wall charger on the house wall (z −29) with its cable along the floor to the car's charge port, a yellow wheel stop and an oil spot. Walls, floor, ramp, roof, ceiling, bench and rack are solid; trim and small details are looks only. Every part is `Anchored` and `CanTouch = false`. |
+| `GarageCar` (model) | A cartoony white **Volkswagen ID.4** (2021–2024) parked in the middle of the garage, nose out (+Z): x 42.3..49.3 (mirrors to 41.4..50.2), z −31.2..−16, roof rails at y ≈ 8.5. Smooth rounded white body (rounded nose and tail corners), dark windows, black roof, pillars and roof spoiler, silver roof rails, black wheel arches, sills and bumpers, 4 side doors (gray seams, flush handles) + tailgate, black mirrors. Front: slim headlights with white DRL strips joined by a thin white light bar, a VW roundel (silver ring, navy disc, silver V over W), a black bumper with an intake and a white plate. Back: red taillights joined by a red light bar, a VW roundel, a rear wiper, reflectors and a plate. Wheels: black tires, silver rims with black spokes and a black center cap. Charge port flap on the right rear. About 116 parts; only `Body`, `Belt`, `Hood`, `SideGlass` and `Roof` are solid. |
+| `TrophyButton1` | The garage's trophy pad: same structure as `BuildButton1` (pad, `TrophyButton1Ring`, `Label` sign with one `TextLabel`) in the trophy colors: gold pad `255,200,40`, dark purple ring `110,40,170`, purple sign panel `150,70,230` (like `TrophyButton2`–`4`). On the grass in front of the driveway at (45.8, 1.2, −2.5) (the grass top is y 1, so it sits 1 stud lower than the plot pads). Saved label "Garage"; the game sets the real text. |
+
 ### Statue (Caleb)
 
 A giant cartoony statue (about **43 studs** tall, roughly two stories)

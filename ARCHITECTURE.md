@@ -140,13 +140,20 @@ it, because `PlotVisibility` does not hide lights), and per slot a riser,
 `TrophySlotN`, and `NameplateN` with its `NameplateGui` (`SLOTS` there must
 equal `Config.TrophyCaseSlots`, 5). It does not touch
 `BuildButton4`.
+`tools/garage/generate_garage.py` (same idea; the car is in
+`tools/garage/id4_car.py`, shared part helpers in `tools/garage/parts.py`)
+rewrites only `Garage`, `GarageCar`, and `TrophyButton1` (in place, or added
+at the end), so it can run before or after the other generators. Its
+`GarageLight` SurfaceLights are saved disabled (`PlotVisibility` does not
+hide lights); the garage logic switches them.
 `tools/plots/generate_plots.py` then copies Plot1 (and the first spawn)
 three times, turned around the statue's center, into `Plot2`–`Plot4` (with
 `PlotId` 2–4) and `SpawnLocation2`–`4`. **After any change to Plot1 or the
 spawn, re-run it**: `python3 tools/house/generate_house.py` (if the house
 changed), `python3 tools/furniture/generate_furniture.py` (if the furniture
 changed), `python3 tools/trophycase/generate_trophy_case.py` (if the Trophy
-Case changed), then `python3 tools/plots/generate_plots.py`.
+Case changed), `python3 tools/garage/generate_garage.py` (if the garage
+changed), then `python3 tools/plots/generate_plots.py`.
 
 `tools/audio/generate_sfx.py` (plain Python 3 standard library) synthesizes
 the original Caleb Full Event sound effects into `tools/audio/out/*.wav`

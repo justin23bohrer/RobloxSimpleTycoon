@@ -126,3 +126,11 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Studio test switch DevAllTrophies: every trophy × N, session only (requested by the user 2026-10-02). (code done; Studio test pending: QA DT1–DT7)
 - [x] Power-up looks: speed trail + glowing feet, jump and double-jump effects (requested by the user 2026-10-02). (code done; Studio test pending: QA PL1–PL11)
 
+
+## Garage + Backyard (approved by the user 2026-10-02)
+
+After the house is maxed: a garage (1 Caleb Trophy, `TrophyButton1`) on the
+house's right side, and a backyard with 3 spots (5 trophies each,
+`TrophyButton2`–`4`) behind the house. Decoration only.
+
+- [x] Garage + car model: `tools/garage/generate_garage.py` (+ `id4_car.py`) adds `Garage` (attached brick garage, rolled-up door, workbench, rack, charger, disabled `GarageLight`s), `GarageCar` (white VW ID.4, nose out) and the gold `TrophyButton1` pad to Plot1; Plots 2–4 regenerated. (built; Studio look check pending: QA GG1–GG8)
