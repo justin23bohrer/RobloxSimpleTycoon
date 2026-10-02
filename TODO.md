@@ -93,7 +93,7 @@ No completion screen (only the short "YOU COLLECTED" total), no leaderboard, no 
 
 - [ ] Teleport players to their plot on join/respawn.
 - [ ] Handle a full server more gracefully than a warning.
-- [ ] DataStore persistence for cash (purchases and trophies: see Caleb Full Event).
+- [x] DataStore persistence for cash (user approved 2026-10-02): `Cash` in the DataService record (Version 3), applied by `EconomyService` on load. (code done; Studio test pending: QA CS1–CS10)
 
 ## Polish (needs approval)
 

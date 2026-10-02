@@ -20,18 +20,24 @@ next, more expensive dropper's button has appeared, so they save up for it.
 
 ## Player
 
-- Starts each session with **100 cookies** (`Config.StartingCash`).
+- A new player starts with **100 cookies** (`Config.StartingCash`); a
+  returning player gets their saved cookies back.
 - Cookies are shown in the Roblox player list (`leaderstats.Cookies`) and in
   a cartoony panel at the bottom-center of the screen (a drawn chocolate chip
   cookie and e.g. "1,250") that bounces when the amount changes.
 - **Saving** (approved by the user 2026-10-01): the player's **house** (every
   dropper and build they bought) and their **Caleb trophies** are saved
-  between sessions. Cookies are **not** saved: every session starts at 100.
+  between sessions. **Cookies are saved too** (approved 2026-10-02): leave
+  and rejoin and you have the same cookies (saved every couple of minutes,
+  on leave, and when the server shuts down). Players who saved before
+  cookies were saved get 100 the first time. For the first moment after
+  joining (while the save loads) cookies can't be spent; cookies earned in
+  that moment are added on top of the saved amount.
   When a returning player claims any free plot, their house comes back
   exactly as they left it (built parts, running droppers, the right next
   buy buttons), for free. If their data can't be loaded (Roblox DataStore
-  down, or Studio without API access), they play unsaved that session and
-  their old save is left untouched.
+  down, or Studio without API access), they play unsaved that session
+  (starting with 100 cookies) and their old save is left untouched.
 
 ## Tycoon
 
@@ -196,7 +202,8 @@ each collector, so cookies can't fall off.
 - `Config.DevUnlimitedCash = true` makes players start with
   `Config.DevStartingCash` (1,000,000,000 cookies) instead of 100, **only** in
   Roblox Studio. It never applies in a published game. Buying still spends
-  cookies normally. Must be `false` in commits.
+  cookies normally. While it is on, cookies are neither loaded nor saved, so
+  the dev cookies never reach a real save. Must be `false` in commits.
 - `Config.DevAllTrophies = true` (Studio only) gives each player
   `Config.DevAllTrophiesCopies` (5) copies of every collectable Caleb Trophy
   when they join, to test every trophy and stacking: buy the Trophy Case,

@@ -72,6 +72,7 @@ To try every dropper without grinding for cookies:
    and reopen the place, or let `rojo serve` sync it into Studio.
 3. Press **Play**. Output shows `[DEV] Unlimited cash is ON ...` and you start
    with `DevStartingCash` (1,000,000,000 cookies). Buying still spends cookies normally.
+   Cookies are not loaded or saved while it is on (your real save keeps its cookies).
 
 It only works inside Roblox Studio (`RunService:IsStudio()`), never in a
 published game. Set it back to `false` before committing.
@@ -94,8 +95,8 @@ it back to `false` before committing.
 
 ## Testing saving (Studio)
 
-The player's house and Caleb trophies are saved with a DataStore (cookies
-are not). In Studio this needs a published place and **Game Settings →
+The player's cookies, house, and Caleb trophies are saved with a DataStore
+(cookies only with `DevUnlimitedCash = false`). In Studio this needs a published place and **Game Settings →
 Security → Enable Studio Access to API Services**. Without it the game
 still runs, unsaved, and Output shows one warning: "Enable Studio Access to
 API Services to test saving". Studio saves go to the real DataStore of the

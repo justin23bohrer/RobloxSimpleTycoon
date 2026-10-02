@@ -132,6 +132,9 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 		return false, `{Config.StatueName} is FULL!`
 	end
 	local cookies = math.min(amount, room)
+	if EconomyService.IsCashLoading(player) then
+		return false, "Your cookies are still loading..."
+	end
 	if not EconomyService.TrySpend(player, cookies) then
 		return false, "You don't have that many cookies!"
 	end

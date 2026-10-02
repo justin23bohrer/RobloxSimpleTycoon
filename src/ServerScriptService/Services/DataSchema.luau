@@ -5,6 +5,7 @@
 --
 -- Saved record (key "Player_<UserId>" in Config.DataStoreName):
 --   Version       number   CURRENT_VERSION
+--   Cash          number   cookies, a whole number 0..MAX_CASH
 --   Purchases     { [purchaseId]: true }   house purchases (droppers + builds)
 --   Trophies      { TrophyRecord }         Caleb trophies, oldest first
 --   Equipped      { InstanceId }           equipped trophies, display order
@@ -18,6 +19,8 @@
 --   2  every trophy gets an InstanceId; Equipped added. Migrating 1 -> 2
 --      gives each old trophy a new InstanceId and equips the newest
 --      Config.TrophyActiveSlots (what the old Trophy Case showed).
+--   3  Cash added (cookies are saved). Migrating 2 -> 3 (or 1 -> 3) gives
+--      Config.StartingCash, what every session used to start with.
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -27,10 +30,13 @@ local Purchases = require(script.Parent.Purchases)
 
 local DataSchema = {}
 
-DataSchema.CURRENT_VERSION = 2
+DataSchema.CURRENT_VERSION = 3
 
 local MAX_STRING = 100 -- Variant / EventId
 local MAX_INSTANCE_ID = 64
+-- Highest cash ever saved or loaded: far above anything playable, and well
+-- inside the whole numbers a double (and an IntValue) holds exactly.
+local MAX_CASH = 1_000_000_000_000_000
 
 export type TrophyRecord = {
 	InstanceId: string, -- unique per earned trophy, never reused
@@ -41,6 +47,7 @@ export type TrophyRecord = {
 
 export type PlayerData = {
 	Version: number,
+	Cash: number, -- whole number, 0..MAX_CASH
 	Purchases: { [string]: true },
 	Trophies: { TrophyRecord },
 	Equipped: { string }, -- InstanceIds, unique, owned, <= TrophyActiveSlots
@@ -85,9 +92,25 @@ function DataSchema.CleanTrophy(record: any): TrophyRecord?
 	return { InstanceId = instanceId, Variant = record.Variant, EventId = eventId, EarnedAt = earnedAt }
 end
 
+-- A safe cash amount from any value: not a number, NaN or infinite ->
+-- Config.StartingCash; negative -> 0; fractions are rounded down; anything
+-- above MAX_CASH -> MAX_CASH.
+function DataSchema.CleanCash(value: any): number
+	if typeof(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
+		return Config.StartingCash
+	end
+	return math.clamp(math.floor(value), 0, MAX_CASH)
+end
+
 -- Fresh data for a player who has never saved.
 function DataSchema.Default(): PlayerData
-	return { Version = DataSchema.CURRENT_VERSION, Purchases = {}, Trophies = {}, Equipped = {} }
+	return {
+		Version = DataSchema.CURRENT_VERSION,
+		Cash = Config.StartingCash,
+		Purchases = {},
+		Trophies = {},
+		Equipped = {},
+	}
 end
 
 -- The newest `TrophyActiveSlots` trophies' ids, newest first (trophies are
@@ -125,6 +148,7 @@ end
 -- Turns a stored value into clean PlayerData. Returns nil plus a reason when
 -- the value must NOT be used or overwritten (not a table, or written by a
 -- newer version of the game that this server does not understand).
+-- Cash is cleaned with CleanCash (versions before 3 get Config.StartingCash).
 -- Unknown purchase ids, bad trophy records, a second trophy for the same
 -- EventId, and bad Equipped ids are dropped; a repeated InstanceId gets a
 -- new one (the trophy is kept).
@@ -144,6 +168,9 @@ function DataSchema.FromStored(raw: any): (PlayerData?, string?)
 	local version = raw.Version or 1 -- treat an unversioned table as version 1
 
 	local data = DataSchema.Default()
+	if version >= 3 then
+		data.Cash = DataSchema.CleanCash(raw.Cash)
+	end -- older saves keep Default's Config.StartingCash (2 -> 3)
 	if typeof(raw.Purchases) == "table" then
 		for id, owned in raw.Purchases do
 			if owned == true and typeof(id) == "string" and Purchases.Get(id) then
@@ -184,6 +211,7 @@ function DataSchema.ToStored(data: PlayerData): { [string]: any }
 	end
 	return {
 		Version = DataSchema.CURRENT_VERSION,
+		Cash = DataSchema.CleanCash(data.Cash),
 		Purchases = purchases,
 		Trophies = DataSchema.CopyTrophies(data.Trophies),
 		Equipped = table.clone(data.Equipped),

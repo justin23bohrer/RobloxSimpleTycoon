@@ -22,7 +22,7 @@ Record the date and result when you run a case.
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | P1 | Player joins. | Player spawns on the grass at one of the four spawn areas; no errors in Output. | |
-| P2 | Check the player list (with `DevUnlimitedCash = false`). | The column is named **Cookies** and shows **100**. | |
+| P2 | Check the player list (with `DevUnlimitedCash = false`) as a new player (no save, or API access off). | The column is named **Cookies** and shows **100** (a returning player shows their saved cookies, see CS1). | |
 
 ## Tycoon (claiming and unlocking)
 
@@ -528,11 +528,11 @@ only when they collect.
 
 Needs a published place with **Game Settings → Security → Enable Studio
 Access to API Services** ON, except SV2. Watch Output (Server view).
-Cookies are never saved: every session starts at 100.
+Cookies are saved too: see "Cookie saving" below.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| SV1 | API access ON. Claim, buy Dropper 1–4, Walls, Stairs (Dev cash on). Stop. Play again, claim any plot. | Within a moment the plot shows exactly what you had: walls + stairs built, 4 cups dropping on the conveyor, and the **2nd Floor** button showing (not Dropper 1–4, Walls, Stairs). Cookies are back at the starting amount; nothing was charged for the restore. No warnings. | |
+| SV1 | API access ON. Claim, buy Dropper 1–4, Walls, Stairs (Dev cash on). Stop. Play again, claim any plot. | Within a moment the plot shows exactly what you had: walls + stairs built, 4 cups dropping on the conveyor, and the **2nd Floor** button showing (not Dropper 1–4, Walls, Stairs). Cookies are back at the dev amount (dev cash is never saved); nothing was charged for the restore. No warnings. | |
 | SV2 | API access OFF. Press Play, claim, buy Dropper 1. | Exactly **one** warning: "DataService: saving is OFF … Enable Studio Access to API Services to test saving …". No errors; the game plays normally. Stop/Play again: plot starts fresh. | |
 | SV3 | After SV1, buy SecondFloor and Dropper 5, then Stop right away (within 2 s). | Next Play + claim shows the 2nd floor and Dropper 5 (BindToClose saved them). Stop does not hang longer than ~25 s. | |
 | SV4 | Test > Clients and Servers, 2 players, API ON. Player 1 restores (SV1) on Plot2, leaves, rejoins, claims **Plot4**. | Plot2 resets to its Claim pad on leave; after rejoin Plot4 shows Player 1's full house. Player 2's plot is unaffected; Player 2's house is their own. | |
@@ -541,6 +541,27 @@ Cookies are never saved: every session starts at 100.
 | SV7 | Unknown saved id. After SV1, temporarily remove the `Stairs` entry from `Config.Builds` (and its `After` users) in a local copy, Play, claim. Undo afterwards. | `Stairs` is ignored (and anything that needed it is skipped); everything else restores; no errors. | |
 | SV8 | Autosave. Buy something, wait > `DataAutosaveSeconds` (120 s), then Stop. | No DataStore errors in Output; the purchase is restored next time. | |
 | SV9 | Respawn (Esc → Reset) after a restore. | House unchanged; nothing restored twice; cookies unchanged. | |
+
+## Cookie saving
+
+Needs a published place with **Game Settings → Security → Enable Studio
+Access to API Services** ON (except CS5), and `DevUnlimitedCash = false`
+(except CS6). Watch Output (Server view). Rule: until the save loads,
+spending is blocked and earned cookies are counted; then cookies = saved +
+earned while loading.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CS1 | Earn: claim, buy Dropper 1, collect until you have e.g. 250 cookies. Wait 2 s, Stop. Play again. | Right after the load the player list **Cookies** and the bottom cookie panel both show **250** (the panel pops once when it changes from 100). | |
+| CS2 | Spend: after CS1, buy something (or feed Caleb) so cookies drop, Stop, Play again. | Cookies show the lower amount: what you spent stays spent; nothing was refunded. | |
+| CS3 | Load window: with a slow load (e.g. temporarily add `task.wait(5)` at the start of `load` in `DataService`), join, claim, and collect cookies from the jar during those 5 s; also try to feed Caleb. Undo the edit. | Feeding says "Your cookies are still loading..." and spends nothing. Once loaded, cookies = saved amount + what you collected during the wait (not lost, not doubled). | |
+| CS4 | Old save: with a Version 2 record (saved before this change, or write `Version = 2` without `Cash` in a test key), Play. | Cookies show **100** (`StartingCash`); house and trophies still load. After the next save the record has `Version = 3` and `Cash`. | |
+| CS5 | DataStore off: API access OFF, Play, earn some cookies, Stop, Play again. | Starts at 100 each time; one "saving is OFF" warning; nothing saved; gameplay normal. | |
+| CS6 | Dev cash: after CS1 (real save has e.g. 250), set `DevUnlimitedCash = true`, Play, spend some, Stop. Set it back to `false`, Play. | Dev session: one "[DEV] ... cookies are NOT loaded or saved" line, 1,000,000,000 cookies. Next normal session: cookies show the CS1 amount again (dev cash never reached the save). | |
+| CS7 | Bad saved values: temporarily make `DataSchema.CleanCash` see NaN / -5 / "abc" / 1e20 / 12.7 (e.g. write them as `Cash` in a test key). | NaN, "abc" → 100; -5 → 0; 1e20 → 1e15; 12.7 → 12. No errors. | |
+| CS8 | Two servers (session lock): with a published place, join server A, earn cookies, then quickly join server B (server hop) while A is still saving. | B waits for A's leave save (or takes the lock after ~30 s) and shows A's latest cookies; A never writes over B afterwards ("another server took over" if it tries). | |
+| CS9 | Server shutdown: earn cookies, then Stop within 2 s (no autosave yet). | Next Play shows the new amount (BindToClose saved it). | |
+| CS10 | Autosave: earn cookies, wait > `DataAutosaveSeconds` (120 s), check there are no DataStore errors, Stop. | Next Play shows the amount; no warnings. Collecting many drops does not cause a DataStore write per drop. | |
 
 ## Caleb Trophies
 
