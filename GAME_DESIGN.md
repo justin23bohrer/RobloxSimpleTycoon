@@ -204,6 +204,48 @@ Built with the **Walls** (hidden on unclaimed plots and before the walls):
   strong jump trophies (JumpHeight + double jump) may be able to jump over
   them. Once the 2nd Floor is built the house is closed.
 
+### Trophy stealing (House Raid, approved by the user 2026-10-01)
+
+- **What can be stolen:** only trophies **displayed** in another player's
+  Trophy Case (equipped, case built). Trophies that are only in someone's
+  inventory can never be stolen. Never your own.
+- **When:** only while that house's security bars are **down**. While they
+  are up nobody can start a theft there.
+- **How:** walk up to a displayed trophy and hold **"Steal Trophy"** for
+  3 s (`Config.TheftHoldSeconds`, within `Config.TheftPromptDistance` = 8
+  studs). You don't see the prompt on your own trophies or while you are
+  already carrying one.
+- **Carrying:** the actual trophy rides **over your head** (everyone sees
+  it) and leaves an empty slot in the owner's case. While you carry it
+  **all your trophy powers are off**: no speed / jump bonus, no double jump,
+  no cookie / dropper / collect bonuses, no glowing feet or plot effects.
+  You walk at normal speed × 0.9 (`Config.TheftCarrySpeedMultiplier`). The
+  owner also loses that trophy's power until it is back.
+- **Stopped:** if anyone pushes you (F / X / the PUSH button), or you die,
+  reset, respawn or leave, the trophy goes **straight back** into the
+  owner's case at once. No dropped trophy, no scramble; your powers come
+  back. Moving impossibly fast (teleporting) also sends it back.
+- **Escaped:** reach the gold **Trophy Stash** in **your own** house while
+  carrying it and the trophy is **yours for good**: removed from the
+  owner's collection (and their case), added to yours (equipped
+  automatically if you have a free active slot), saved for both players,
+  still there after rejoining. No insurance, no automatic return. It can be
+  stolen back the same way.
+- **Owner left meanwhile:** the theft goes on. At the stash it is taken
+  from their saved data if no server has their data open; if it can't be
+  (they joined another server, or saving fails) the trophy stays theirs and
+  the thief gets a short message.
+- **Refused with a short message:** the bars are up; you have no house or
+  haven't built your walls (no stash); your trophies are still loading or
+  aren't saving this session (a saved trophy must stay saved).
+- **Same Caleb round is fine:** you can steal a trophy from a round you also
+  have a trophy from. Stolen trophies are marked as stolen and never count
+  for "one claimed trophy per round", so stealing this round's trophy during
+  the claim time never stops you from claiming your own.
+- One thief per trophy, one trophy per thief. Several houses can be robbed
+  at the same time.
+- No weapons, no theft UI beyond those small messages.
+
 ## Droppers
 
 A bought dropper looks like an **upside-down red party cup** (red with

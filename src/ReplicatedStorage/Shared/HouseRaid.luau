@@ -27,6 +27,9 @@ HouseRaid.PlayerAttr = table.freeze({
 	-- string: JSON { Variant, InstanceId, FromUserId } while this player
 	-- carries a stolen trophy; "" (or nil) when not carrying.
 	Carrying = "CarryingTrophy",
+	-- string: JSON { Id, Text }: a short message for the thief (why a theft
+	-- couldn't start or the trophy went back). Id changes every time.
+	TheftNotice = "TheftNotice",
 })
 
 -- On each displayed trophy Model in a plot's CaseTrophies folder (set by

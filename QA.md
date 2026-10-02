@@ -702,10 +702,43 @@ rest and mark the sound part "skipped (no id)".
 
 ## Trophy stealing
 
-Needs 2–3 players, the target with a built Trophy Case and equipped trophies.
+Needs 2–3 players (Test > Clients and Servers), the target with a built
+Trophy Case and equipped trophies, the thief with Walls built (their
+`TrophyStash` shows). "Owner" = Player 1, "thief" = Player 2. Tips:
+`DevUnlimitedCash` / `DevCalebFastCycle` locally (never commit them) to get
+houses and trophies fast. Persistence cases (TH11, TH13, TH14, TH24–TH26) need
+"Enable Studio Access to API Services" (or a published test place); without
+it every trophy is session-only (TH19). Watch the server Output for errors
+throughout.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| TH1 | Thief walks into the owner's house (bars down) to a displayed trophy. | A "Steal Trophy" prompt (with the trophy's name) appears within ~8 studs, one at a time even with several trophies close together. The owner sees **no** prompt on their own trophies. | |
+| TH2 | Thief holds the prompt 3 s. | The trophy disappears from its slot (that slot stays empty, the others stay put) and the **same trophy** appears over the thief's head, facing forward, for every player (check from a 3rd client). Server: the thief's `CarryingTrophy` = JSON `{Variant, InstanceId, FromUserId}`; `CarriedTrophy` model in the character, no anchored parts. The owner's `TrophyStats` drops that trophy's power. | |
+| TH3 | Refused while protected: owner turns the security bars on, then the thief (inside before the bars rose) holds the prompt. | Nothing is stolen; the thief sees "The security bars are up!…". After the bars drop the steal works. | |
+| TH4 | Own trophy / inventory-only: owner tries their own case (command bar: fire the prompt for them); thief looks for a trophy that is owned but **not equipped**. | No prompt on your own trophies (and a forced trigger does nothing). Unequipped trophies are not in the case, so they can't be stolen. | |
+| TH5 | Powers off: give the thief speed, jump, Rocket Caleb (double jump) and cookie/dropper/collect trophies displayed. Steal. | While carrying: WalkSpeed = normal × 0.9 (Server: `Humanoid.WalkSpeed` = `BaseWalkSpeed` × 0.9), JumpHeight = base, no double jump, no glowing feet, `TrophyStats` = `{}`, `CanDoubleJump = false`, no fire/luck/gold ring on the thief's plot, drops worth their base value and slower, collect pays no bonus. | |
+| TH6 | Pushed: owner (or a 3rd player) pushes the carrying thief. | The trophy instantly leaves the thief's head and is back in its slot in the owner's case (no dropped trophy); "STOPPED!"; the thief's `CarryingTrophy` is gone and all their powers/effects come back; the owner's power for it comes back. Saved data unchanged (both players' inventories). | |
+| TH7 | Escape: thief carries it home and steps on **their own** gold stash. | The trophy leaves the head; the owner's case slot stays empty and the trophy is gone from the owner's inventory (and Equipped); it is in the thief's inventory (auto-equipped and in the thief's case if a slot was free); the thief's powers come back, now including it if displayed. | |
+| TH8 | After TH7: thief unequips / re-equips the stolen trophy; the owner checks their 🏆 panel. | Thief can equip / unequip / display it like any trophy. The owner can't see or equip it any more. | |
+| TH9 | Someone else's stash: thief carries a trophy onto the owner's (or a 3rd player's) stash. | Nothing happens; only the thief's own stash counts. | |
+| TH10 | No house / no walls: a thief with no plot, then one with a plot but no Walls, holds the prompt. | Refused with "Claim a house first…" / "Build your walls first…". Nothing changes. | |
+| TH11 | Persistence (API access on): after TH7 both players leave and rejoin (claim plots again). | The thief still has the stolen trophy; the owner still doesn't. Never both, never neither. | |
+| TH12 | Thief dies / resets / leaves while carrying (three runs). | Each time the trophy goes straight back into the owner's case; the carried model is gone; no `CarryingTrophy`; a respawned thief has their powers. Leaving: no server errors. | |
+| TH13 | Owner leaves mid-theft (API access on), thief then reaches their stash. | The trophy transfers (Output shows no warning): it is in the thief's inventory; the owner rejoins later and it is gone from theirs. | |
+| TH14 | Owner leaves mid-theft and **joins another server** (or the DataStore errors) before the thief escapes. | Fail safe: the thief gets "Couldn't take the trophy right now…", the trophy is still the owner's when they rejoin, the thief doesn't have it. | |
+| TH15 | Two thieves hold the prompt on the same trophy and finish at about the same time. | Only one carries it; the other gets nothing (and no error). A second trigger on the trophy while in transit does nothing. | |
+| TH16 | Push at the exact moment of reaching the stash (the pusher waits on the stash). Repeat several times. | Each time exactly one result: either it went back to the owner (STOPPED! + full knockback) or it transferred (then the push is only a nudge). Never in both inventories, never in neither. | |
+| TH17 | Same Caleb round: the owner's displayed trophy and one of the thief's own trophies are from the same cycle (both fed and claimed in that round). Steal it and escape. | Allowed (no refusal). The thief now has both trophies of that round; in the Server view the stolen record has `StolenFrom` = the owner's UserId, their own claimed one has none. |
+| TH18 | Unsaved thief vs saved trophy: the thief's data failed to load (or is still loading) while the owner's is saved. | Refused: "Your trophies aren't saving right now…" (or "still loading"). | |
+| TH19 | Session trophies (Studio without API access: everyone unsaved): steal, push back once, then escape. | Push returns it; escape moves it to the thief's session inventory (gone from the owner's); works the same as saved, just not written. | |
+| TH20 | Teleport exploit: while carrying, the thief moves their root 50 studs with the command bar (client: `game.Players.LocalPlayer.Character:PivotTo(… + Vector3.new(50,0,0))`), and separately sets their own WalkSpeed to 60 on the client. | The theft is cancelled and the trophy goes back to the owner in both cases. Normal running, jumping, falling from the 2nd floor and riding a conveyor never cancel it. | |
+| TH21 | Multiple houses at once (3 players): Player 2 steals from Player 1 while Player 3 steals from Player 2's case; one escapes, one is pushed. | Each theft is independent: right trophy over the right head, each case shows its own empty slot, outcomes as in TH6 / TH7. Holding a prompt on a case is not cancelled when another trophy of that case is stolen or returned. | |
+| TH22 | Cleanup: after every case above, check the thief's character and attributes, and the owner's case. | No leftover `CarriedTrophy`, welds, `CarryingTrophy` attribute, or duplicate case trophies; the thief's speed is back to normal (with their own powers). | |
+| TH23 | Steal during TrophyClaim: both players fed Caleb this round; the owner claims and displays this round's trophy. Before claiming their own, the thief steals it and escapes, then claims at the podium. | The claim works ("NEW TROPHY!", not "already have this round's trophy"): the thief keeps both the stolen one and their own claimed one. |
+| TH24 | Persistence of TH17 / TH23 (API access on): thief and owner leave and rejoin (claim plots again). | The thief still has **both** same-round trophies (the stolen one still marked `StolenFrom`); the owner still doesn't have the stolen one. No trophy was dropped as a duplicate. |
+| TH25 | Steal back: after TH7 the original owner steals the trophy back from the thief's case and escapes to their own stash. | Works the same way: it moves back (same InstanceId, now `StolenFrom` = the thief's UserId), exactly one owner, saved after rejoin. |
+| TH26 | Old save (Version 2) after this change: join with data saved by the previous build. | Loads with no warnings; nothing lost; written back as Version 3. |
 
 ## Push
 
