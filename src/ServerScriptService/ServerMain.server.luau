@@ -8,6 +8,7 @@ local Services = script.Parent.Services
 local CalebCycle = require(Services.CalebCycle)
 local CookiePartyService = require(Services.CookiePartyService)
 local DataService = require(Services.DataService)
+local EconomyService = require(Services.EconomyService)
 local PlayerDataService = require(Services.PlayerDataService)
 local PowerService = require(Services.PowerService)
 local StatueService = require(Services.StatueService)
@@ -28,7 +29,8 @@ local function onPlayerAdded(player: Player)
 	CalebCycle.OnPlayerAdded(player) -- restores CalebFed; raises Caleb's goal in Normal
 	CookiePartyService.OnPlayerAdded(player) -- party earnings at 0; alive cookies if mid-party
 	PowerService.OnPlayerAdded(player) -- trophy power attributes + respawn movement
-	DataService.OnPlayerAdded(player) -- loads saved house + trophies in the background
+	DataService.OnPlayerAdded(player) -- loads saved cookies, house + trophies in the background
+	EconomyService.OnPlayerAdded(player) -- applies the saved cookies once loaded (not with dev cash)
 end
 
 local function onPlayerRemoving(player: Player)
@@ -37,6 +39,7 @@ local function onPlayerRemoving(player: Player)
 	CalebCycle.OnPlayerRemoving(player) -- lowers Caleb's goal in Normal
 	CookiePartyService.OnPlayerRemoving(player)
 	PlayerDataService.OnPlayerRemoving(player)
+	EconomyService.OnPlayerRemoving(player)
 	PowerService.OnPlayerRemoving(player)
 	DataService.OnPlayerRemoving(player) -- saves and releases (does not yield)
 end

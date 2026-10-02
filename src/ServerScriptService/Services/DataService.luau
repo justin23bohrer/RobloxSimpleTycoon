@@ -1,7 +1,13 @@
 -- DataService (server only)
--- Saves and loads each player's house purchases, Caleb trophies, and which
--- trophies are equipped with a DataStore (Config.DataStoreName, key "Player_<UserId>"). Cookies are NOT
--- saved: every session still starts at Config.StartingCash.
+-- Saves and loads each player's cookies (cash), house purchases, Caleb
+-- trophies, and which trophies are equipped with a DataStore
+-- (Config.DataStoreName, key "Player_<UserId>").
+--
+-- Cookies: DataService only keeps the saved copy. EconomyService (the only
+-- writer of cash) reads it with GetSavedCash once the data loaded, and hands
+-- every later change to SetSavedCash, which only marks the data dirty: the
+-- amount is written by the normal autosave / leave save / BindToClose, never
+-- once per drop.
 --
 -- The shape of the saved data and how bad data is cleaned is in DataSchema.
 --
@@ -321,6 +327,27 @@ function DataService.WaitForData(player: Player): boolean
 		loadFinished.Event:Wait()
 	end
 	return false
+end
+
+-- The saved cookie amount, or nil if the data is not loaded.
+function DataService.GetSavedCash(player: Player): number?
+	local session = getLoaded(player)
+	return if session then (session.Data :: DataSchema.PlayerData).Cash else nil
+end
+
+-- Records the player's current cookies for the next save (EconomyService
+-- only; it does not change anyone's cash). Ignored if the data is not loaded.
+function DataService.SetSavedCash(player: Player, amount: number)
+	local session = getLoaded(player)
+	if not session then
+		return
+	end
+	local data = session.Data :: DataSchema.PlayerData
+	local clean = DataSchema.CleanCash(amount)
+	if data.Cash ~= clean then
+		data.Cash = clean
+		session.Dirty = true
+	end
 end
 
 -- A copy of the saved purchase ids ({} if not loaded).

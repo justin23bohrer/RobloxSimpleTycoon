@@ -19,7 +19,7 @@ src/
 │   ├── ServerMain.server.luau  → Script: entry point, starts services
 │   └── Services/
 │       ├── PlayerDataService.luau
-│       ├── DataService.luau    → saving: house purchases + trophies (DataStore)
+│       ├── DataService.luau    → saving: cookies, house purchases + trophies (DataStore)
 │       ├── DataSchema.luau     → helper for DataService (saved shape, cleaning, migration)
 │       ├── EconomyService.luau
 │       ├── TycoonService.luau
@@ -173,20 +173,20 @@ routes join/leave in a fixed order:
 
 - Join: `PlayerDataService.OnPlayerAdded` → `CalebCycle.OnPlayerAdded` →
   `CookiePartyService.OnPlayerAdded` → `PowerService.OnPlayerAdded` →
-  `DataService.OnPlayerAdded`
-  (starts loading in the background; no plot yet; plots are claimed on the
+  `DataService.OnPlayerAdded` → `EconomyService.OnPlayerAdded`
+  (starts loading in the background, then applies the saved cookies; no plot yet; plots are claimed on the
   `ClaimPad`, see TycoonService)
 - Leave: `TycoonService.OnPlayerRemoving` → `StatueService.OnPlayerRemoving`
   → `CalebCycle.OnPlayerRemoving` → `CookiePartyService.OnPlayerRemoving` → `PlayerDataService.OnPlayerRemoving`
-  → `PowerService.OnPlayerRemoving` → `DataService.OnPlayerRemoving`
+  → `EconomyService.OnPlayerRemoving` → `PowerService.OnPlayerRemoving` → `DataService.OnPlayerRemoving`
   (saves and releases in the background; never yields)
 
 | Service | Responsibility | Status |
 | ------- | -------------- | ------ |
-| `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
-| `DataService` | Saves/loads each player's house purchases, Caleb trophies, and equipped trophy ids (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
-| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`. | Implemented |
-| `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
+| `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`; `IsDevCash()` then says cookies are not loaded or saved); forgets it on leave. | Implemented |
+| `DataService` | Saves/loads each player's cookies (`GetSavedCash`, `SetSavedCash`: the saved copy only, set by `EconomyService`), house purchases, Caleb trophies, and equipped trophy ids with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
+| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, clean `Cash`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanCash(value)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`. | Implemented |
+| `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending; refused while `IsCashLoading`). `OnPlayerAdded` applies the saved cookies once `DataService` loaded (saved + earned while loading); every later change goes to `DataService.SetSavedCash` (not with dev cash). `OnPlayerRemoving` forgets the player. | Implemented |
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
@@ -228,7 +228,7 @@ Dependencies (no cycles): `TycoonService` → `PlotStages`, `BuyButtons`, `Purch
 `BuyButtons` → `PlotVisibility`, `Purchases`. `Purchases` → `Config` only.
 `CollectorService` → `CollectorDisplay` (→ `JarCounter`), `DropperService` (`ClaimDrop`), `EconomyService` and `PowerService` (`Get`). `DropperService` → `DropperCup`, `PowerService` (`Get`), `PlotPowerVisuals` (`AddDropper`).
 `PowerService` → `PowerVisuals` (→ `Config`, `PowerLooks`, `PowerVisualsRoot` → `Config`, `PowerLooks`), `PlotPowerVisuals` and Shared (`TrophyPowers`, which requires `Config` and, lazily inside `Compute`, `TrophyVariants`). `PowerVisuals` and `PlotPowerVisuals` never require each other or any Service. `PlotPowerVisuals` → Shared only (`Config`, `TrophyPowers`); it never requires `TycoonService`, `DropperService` or `PowerService` (it finds the plot by `OwnerUserId`). `EconomyService` →
-`PlayerDataService`. `DropperService` and `CollectorService` never require
+`PlayerDataService`, `DataService` (`DataService` never requires `EconomyService`). `DropperService` and `CollectorService` never require
 `TycoonService`; they receive the plot and check ownership through the plot's
 `OwnerUserId` attribute. `DropperService` never requires `CollectorService`.
 `CalebCycle` → `CalebEvent`, `Config` only (it changes no cash); `ServerMain` starts it with the statue `StatueService.Start()` returns.
@@ -369,14 +369,15 @@ type Tycoon = {
 ## Persistence (DataService)
 
 Approved by the user 2026-10-01: the **house** (purchase ids) and **Caleb
-trophies** are saved. **Cookies are not saved** (every session starts at
-`StartingCash`).
+trophies** are saved. Approved 2026-10-02: **cookies (cash) are saved** too,
+in the same record, session, and lock (see **Cookies** below).
 
 Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 
 ```lua
 {
-	Version = 2,                       -- DataSchema.CURRENT_VERSION
+	Version = 3,                       -- DataSchema.CURRENT_VERSION
+	Cash = 1250,                       -- cookies, whole number 0..1e15
 	Purchases = { [purchaseId] = true },
 	Trophies = { TrophyRecord },       -- oldest first, one per non-empty EventId, unique InstanceId
 	Equipped = { InstanceId },         -- display order, owned, unique, <= Config.TrophyActiveSlots
@@ -399,12 +400,18 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   or repeated `InstanceId` gets a new one (the trophy is kept). `Equipped`
   keeps only owned string ids, each once, at most `TrophyActiveSlots`.
   A Version 1 server refuses a Version 2 record (newer version), so during a
-  rollout a player who reaches an old server plays unsaved there. A value that is not a table, or has a **newer**
+  rollout a player who reaches an old server plays unsaved there.
+- **Version 3 (cookies):** adds `Cash`. 2 → 3 (and 1 → 3) gives
+  `Config.StartingCash`, what every session started with before. Cleaning
+  (`DataSchema.CleanCash`, every load and every write): not a number, NaN or
+  ±infinity → `StartingCash`; negative → 0; fractions rounded down; above
+  1e15 → 1e15. A Version 2 server refuses a Version 3 record (plays unsaved). A value that is not a table, or has a **newer**
   `Version` than the server knows, is refused (not overwritten).
 - **Load failure** (all retries failed, refused data, Studio without API
   access): the player is **not loaded** for the session: `IsLoaded` is
   false, `GetPurchases`/`GetTrophies`/`GetEquipped` return `{}`,
-  `SetPurchased` is ignored, `AddTrophy` returns false, `SetEquipped`
+  `GetSavedCash` returns nil, `SetPurchased`/`SetSavedCash` are ignored,
+  `AddTrophy` returns false, `SetEquipped`
   returns `(false, "data not loaded")`, and **nothing is ever written** for
   them. A `warn` says so; gameplay works, unsaved.
 - **Retries:** every DataStore call is tried up to 5 times, waiting 1, 2, 4,
@@ -438,6 +445,24 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   but without spending. Saved ids that no longer exist, or whose `After`
   wasn't saved, are skipped. Until it finishes, `TryPurchase` refuses, so a
   player is never charged for something they own.
+- **Cookies:** `DataService` only keeps the saved copy; `EconomyService`
+  stays the only writer of cash. Join: `leaderstats.Cookies` starts at
+  `StartingCash` (a placeholder) and `EconomyService.OnPlayerAdded` waits for
+  `DataService.WaitForData`. **Load-window rule:** until that returns,
+  `TrySpend` refuses (`IsCashLoading` is true; the statue says "Your cookies
+  are still loading...") and `AddCash` counts what is earned. Loaded → cash =
+  `GetSavedCash` + earned while loading (nothing lost or doubled; the
+  placeholder was never spendable). Not loaded → the player keeps
+  `StartingCash` + earned and nothing is saved. After that every
+  `AddCash`/`TrySpend` calls `DataService.SetSavedCash(player, cash)`, which
+  only marks the data dirty, so cookies are written by the autosave
+  (`DataAutosaveSeconds`), the leave save, and `BindToClose`, never once per
+  drop. A player who leaves before the load finished keeps their saved
+  amount (what they earned in that window is lost). **Dev cash**
+  (`DevUnlimitedCash` in Studio, `PlayerDataService.IsDevCash()`):
+  `EconomyService` never reads or records cash, so the record's `Cash` is
+  written back unchanged and `DevStartingCash` never reaches a save; the
+  `[DEV]` print says so once.
 - **Trophies:** DataService only stores and returns them
   (`GetTrophies`, `AddTrophy`, `TrophiesChanged`, `GetEquipped`,
   `SetEquipped`, `EquippedChanged`, `IsLoading`); TrophyService awards,
@@ -485,7 +510,8 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 - Drop values are set by the server from the dropper's `Config.Droppers`
   `DropValue`, never taken from the client or from a property a client could change.
 - Dev cash: `DevUnlimitedCash` only changes the *starting* amount, and only
-  in Studio. Purchases still go through `EconomyService.TrySpend`.
+  in Studio; cookies are then neither loaded nor saved. Purchases still go
+  through `EconomyService.TrySpend`.
 - Dev trophies: `DevAllTrophies` (Studio only) adds session-only trophies in
   `DevTrophies`; nothing reaches `DataService`, so saves stay clean.
 
@@ -567,7 +593,7 @@ and the total can never pass the goal.
 | `CalebCycle` | Core | `Start(statue)`, `GetState(): string`, `GetCycleId(): string`, `GetGoal(): number` (the current goal), `CanFeed(): boolean`, `AddCookies(player, cookies)` (called by StatueService after a successful spend; records the contribution, updates attributes, starts `Full` at the goal), `GetContribution(userId): number`, `IsEligible(userId): boolean`, `MarkTrophyClaimed(userId)`, `OnPlayerAdded(player)` (restores `CalebFed`/`CalebTrophyClaimed`; recomputes the goal in Normal), `OnPlayerRemoving(player)` (recomputes the goal in Normal; may start `Full`), `StateChanged: RBXScriptSignal` (fires `(state, cycleId)`), `GoalChanged: RBXScriptSignal` (fires `(goal)` on a join/leave change in Normal) |
 | `StatueService` | Core | unchanged `FeedStatue` remote; asks `CalebCycle.CanFeed()`, caps to `CalebCycle.GetGoal()`, and calls `CalebCycle.AddCookies` |
 | `StatueShape` | Statue look | `Setup(statue)`, `Apply(progress, seconds)` (progress 0..1 = cookies / goal; fatness + overall scale), `SetHidden(hidden)` (hide/show Caleb's body; never the pedestal, `FeedPads`, or `Podium`) |
-| `DataService` | Saving | `OnPlayerAdded(player)`, `OnPlayerRemoving(player)`, `IsLoaded(player): boolean`, `WaitForData(player): boolean`, `GetPurchases(player): {[string]: true}`, `SetPurchased(player, id)`, `GetTrophies(player): {TrophyRecord}`, `AddTrophy(player, record): boolean` (false if not loaded or `EventId` already owned), `TrophiesChanged: RBXScriptSignal` (fires `(player)`) |
+| `DataService` | Saving | `OnPlayerAdded(player)`, `OnPlayerRemoving(player)`, `IsLoaded(player): boolean`, `WaitForData(player): boolean`, `GetPurchases(player): {[string]: true}`, `SetPurchased(player, id)`, `GetSavedCash(player): number?`, `SetSavedCash(player, amount)` (EconomyService only), `GetTrophies(player): {TrophyRecord}`, `AddTrophy(player, record): boolean` (false if not loaded or `EventId` already owned), `TrophiesChanged: RBXScriptSignal` (fires `(player)`) |
 | `TrophyService` | Trophy (wave 2) | `Start(statue?)`. Podium claim (`Workspace.Map.CalebClaimTrophy` + `ClaimPrompt` ProximityPrompt, only during `TrophyClaim`) + Trophy Case display. Uses `TycoonService.PurchaseApplied` (fires `(player, plot, purchaseId)` on buy and restore). |
 
 ```lua
