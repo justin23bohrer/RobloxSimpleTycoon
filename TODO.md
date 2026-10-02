@@ -72,6 +72,20 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [x] Caleb Trophies: unique variants, 2-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [ ] Celebration music (ask the user for a track).
 
+## Cookie Party upgrade (approved by the user 2026-10-01)
+
+The 60-second Cookie Party (Celebration) becomes one polished, chaotic,
+funny celebration with collectable cookies, then straight into the existing
+2-minute trophy claim. Contract: ARCHITECTURE.md "Cookie Party (contract)".
+No completion screen, no leaderboard, no mini-events, no trophy changes.
+
+- [x] Contract: `Shared/CookieParty.luau`, `Config.CookieParty*`, remotes, architecture section; Celebration is 60 s even in the fast dev cycle (lead).
+- [ ] Party server: `CookiePartyService` spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (QA PS*)
+- [ ] Party cookies (client): pooled collectable cookies, collect pop / floating numbers / sparkles / sounds / earnings counter, rain ramps up with the phases. (QA PK*)
+- [ ] Caleb party: dance energy ramps per phase, throws and spits cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. (QA CD*)
+- [ ] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX. (QA PX*)
+- [ ] Upload the new party sounds and a music track; paste ids into `Config.CookiePartySounds` (user).
+
 ## Post-MVP (needs approval)
 
 - [ ] Teleport players to their plot on join/respawn.
