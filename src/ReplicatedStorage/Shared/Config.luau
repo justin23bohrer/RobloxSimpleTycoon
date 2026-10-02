@@ -255,8 +255,8 @@ local Config = {
 		Purchase = "rbxassetid://96076101525911",
 		PurchaseBuild = "rbxassetid://96293552248472",
 		CantAfford = "rbxassetid://70416757906686",
-		Collect = "rbxassetid://76386552321822",
-		DropInJar = "rbxassetid://118671085931300",
+		Collect = "rbxassetid://128141289525872",
+		DropInJar = "", -- off: the user found the per-drop plink annoying (was rbxassetid://118671085931300)
 	}),
 	-- Volume (0..1) of each sound above. DropInJar plays often: keep it quiet.
 	TycoonSoundVolumes = table.freeze({
