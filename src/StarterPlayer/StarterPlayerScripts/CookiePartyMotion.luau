@@ -47,8 +47,9 @@ export type Live = {
 	Angle: number,
 	Pos: Vector3, -- where it was drawn last frame
 	Landed: boolean,
-	Asked: boolean, -- collect fired (only ever once)
+	Asked: boolean, -- a collect request is in flight (or no tries are left)
 	AskedAt: number?, -- waiting for the server since
+	Tries: number, -- collect requests sent for this cookie
 	Ending: string?, -- "Pop" (mine) or "Fade" (expired)
 	EndAt: number,
 }
@@ -98,6 +99,7 @@ function Motion.New(s: any, cookie: Look.Cookie, from: Vector3?, now: number): L
 		Pos = rest,
 		Landed = now >= s.LandAt, -- joined late: already on the ground, no bounce
 		Asked = false,
+		Tries = 0,
 		EndAt = 0,
 	}
 end
@@ -178,7 +180,9 @@ function Motion.Step(c: Live, now: number, dt: number, rootPos: Vector3?): (CFra
 	if c.AskedAt then -- waiting for the server: lean toward the player
 		local waited = now - c.AskedAt
 		if waited > Config.CookiePartyClientCollectTimeout then
-			c.AskedAt = nil -- not confirmed: back to normal (never asked again)
+			-- Not confirmed: back to normal; ask again unless out of tries.
+			c.AskedAt = nil
+			c.Asked = c.Tries >= Config.CookiePartyClientCollectTries
 		elseif rootPos then
 			pos = pos:Lerp(rootPos, 0.5 * math.min(1, waited / SUCK_SECONDS))
 		end

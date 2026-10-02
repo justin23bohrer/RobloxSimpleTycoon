@@ -2,8 +2,9 @@
 -- Draws the Cookie Party's collectable cookies and asks the server to collect
 -- them. The server (CookiePartyService) decides every cookie (CookiePartySpawn)
 -- and every collect (CookiePartyCollected); this script only draws what it
--- was sent, fires CookiePartyCollect(id) once per cookie when the local
--- character gets close, and plays the feedback.
+-- was sent, fires CookiePartyCollect(id) when the local character gets close
+-- (one request in flight per cookie; an unconfirmed one may be retried up to
+-- Config.CookiePartyClientCollectTries in all), and plays the feedback.
 --
 -- Each cookie falls from the sky (or arcs out of Caleb's mouth when
 -- FromCaleb) and touches down exactly at LandAt, bounces, then bobs and spins
@@ -111,7 +112,8 @@ local function addBatch(batch: { any }, now: number)
 end
 
 -- Asks the server for every cookie the local character is close enough to,
--- once per cookie, and at most ClientCollectsPerSecond.
+-- with at most one request in flight per cookie (Asked), ClientCollectTries
+-- per cookie in all, and at most ClientCollectsPerSecond overall.
 local function tryCollect(now: number, dt: number, rootPos: Vector3)
 	local rate = Config.CookiePartyClientCollectsPerSecond
 	collectBudget = math.min(collectBudget + dt * rate, 3)
@@ -125,6 +127,7 @@ local function tryCollect(now: number, dt: number, rootPos: Vector3)
 			local dx, dz = rootPos.X - c.Ground.X, rootPos.Z - c.Ground.Z
 			if dx * dx + dz * dz <= radius * radius and math.abs(rootPos.Y - c.Ground.Y) <= COLLECT_VERTICAL then
 				c.Asked, c.AskedAt = true, now
+				c.Tries += 1
 				collectBudget -= 1
 				collectRemote:FireServer(id)
 			end

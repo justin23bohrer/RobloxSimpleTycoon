@@ -306,10 +306,13 @@ local Config = {
 	-- client asks to collect when the player is this many studs inside the
 	-- type's CollectRadius, sends at most ClientCollectsPerSecond requests
 	-- (keep it under CookiePartyMaxCollectsPerSecond), and gives the server
-	-- ClientCollectTimeout seconds to confirm before the cookie goes back.
+	-- ClientCollectTimeout seconds to confirm before the cookie goes back and
+	-- may be asked for again (one request in flight per cookie, at most
+	-- ClientCollectTries requests per cookie in all).
 	CookiePartyClientCollectMargin = 1,
 	CookiePartyClientCollectsPerSecond = 10,
 	CookiePartyClientCollectTimeout = 1,
+	CookiePartyClientCollectTries = 3,
 	-- Collects this many seconds apart (or closer) grow the "x5 COMBO!"
 	-- streak and raise the collect sound's pitch. Presentation only.
 	CookiePartyComboSeconds = 1.2,
