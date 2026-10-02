@@ -101,6 +101,50 @@ function TrophyInventory.AddSessionTrophy(player: Player, record: TrophyRecord)
 	end
 end
 
+-- House Raid (TheftService): a session-only trophy by its owner's UserId
+-- (kept after they leave, until this server closes), or nil.
+function TrophyInventory.FindSessionTrophy(userId: number, instanceId: string): TrophyRecord?
+	for _, record in sessionTrophies[userId] or {} do
+		if record.InstanceId == instanceId then
+			return table.clone(record)
+		end
+	end
+	return nil
+end
+
+-- House Raid (TheftService): removes a session-only trophy (and unequips
+-- it). Returns the removed record, or nil if that UserId has no such trophy.
+function TrophyInventory.RemoveSessionTrophy(userId: number, instanceId: string): TrophyRecord?
+	local list = sessionTrophies[userId] or {}
+	for i, record in list do
+		if record.InstanceId == instanceId then
+			table.remove(list, i)
+			local equipped = sessionEquipped[userId] or {}
+			local slot = table.find(equipped, instanceId)
+			if slot then
+				table.remove(equipped, slot)
+			end
+			return record
+		end
+	end
+	return nil
+end
+
+-- True if the player already owns (saved or session-only) a trophy from this
+-- Caleb round. "" (no round) is never a match. Each player may hold only one
+-- trophy per round: a saved second one would be dropped on the next load.
+function TrophyInventory.HasEventTrophy(player: Player, eventId: string): boolean
+	if eventId == "" then
+		return false
+	end
+	for _, record in TrophyInventory.GetOwned(player) do
+		if record.EventId == eventId then
+			return true
+		end
+	end
+	return false
+end
+
 -- Equips or unequips one of the player's own trophies. Returns (true) or
 -- (false, friendly reason). Server data only; nothing changes on false.
 function TrophyInventory.SetEquippedState(player: Player, instanceId: string, equip: boolean): (boolean, string?)

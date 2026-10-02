@@ -29,6 +29,10 @@
 --   (TrophyCaseDisplay.Show) or clears the case, tells PowerService which
 --   variants are displayed (none without a built case), and republishes the
 --   TrophyInventory player attribute. Refreshes are batched per frame.
+-- * House Raid: a trophy a thief is carrying (TheftService.IsInTransit) is
+--   neither displayed (its slot stays empty) nor counted for powers, but it
+--   stays owned and equipped. TheftService.DisplayChanged asks for a refresh
+--   when a theft starts or ends. TheftService never requires this module.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -41,6 +45,7 @@ local TrophyVariants = require(ReplicatedStorage.Shared.TrophyVariants)
 local CalebCycle = require(script.Parent.CalebCycle)
 local DataService = require(script.Parent.DataService)
 local PowerService = require(script.Parent.PowerService)
+local TheftService = require(script.Parent.TheftService)
 local TrophyCaseDisplay = require(script.Parent.TrophyCaseDisplay)
 local TrophyInventory = require(script.Parent.TrophyInventory)
 local TrophyModel = require(script.Parent.TrophyModel)
@@ -76,15 +81,21 @@ local function refresh(player: Player)
 	local tycoon = TycoonService.GetTycoon(player)
 	local case = tycoon and tycoon.Plot:FindFirstChild(CASE_ID)
 	local caseBuilt = tycoon ~= nil and case ~= nil and TycoonService.HasPurchased(player, CASE_ID)
-	local displayed = if caseBuilt then TrophyInventory.GetEquippedRecords(player) else {}
+	-- By slot (slot N = the Nth equipped trophy); one being stolen is skipped.
+	local shown = {}
+	local variantIds = {}
+	if caseBuilt then
+		for slot, record in TrophyInventory.GetEquippedRecords(player) do
+			if not TheftService.IsInTransit(record.InstanceId) then
+				shown[slot] = record
+				table.insert(variantIds, record.Variant)
+			end
+		end
+	end
 	if tycoon and caseBuilt then
-		TrophyCaseDisplay.Show(tycoon.Plot, case :: Instance, displayed)
+		TrophyCaseDisplay.Show(tycoon.Plot, case :: Instance, shown, player.UserId)
 	elseif tycoon then
 		TrophyCaseDisplay.Clear(tycoon.Plot)
-	end
-	local variantIds = {}
-	for _, record in displayed do
-		table.insert(variantIds, record.Variant)
 	end
 	PowerService.SetDisplayed(player, variantIds)
 	TrophyInventory.Publish(player, caseBuilt)
@@ -233,6 +244,12 @@ function TrophyService.Start(statueModel: Instance?)
 	end)
 	DataService.TrophiesChanged:Connect(scheduleRefresh)
 	DataService.EquippedChanged:Connect(scheduleRefresh)
+	TheftService.DisplayChanged:Connect(function(userId: number)
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			scheduleRefresh(player) -- a trophy left the case, came back, or changed hands
+		end
+	end)
 
 	-- Join: publish at once (nothing owned yet), again once their data loaded.
 	local function onPlayerAdded(player: Player)

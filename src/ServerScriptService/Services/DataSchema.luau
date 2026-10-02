@@ -190,6 +190,23 @@ function DataSchema.ToStored(data: PlayerData): { [string]: any }
 	}
 end
 
+-- Removes the trophy with this InstanceId from `data`, and from Equipped
+-- (House Raid: a stolen trophy leaving its owner). Returns the removed
+-- record, or nil if `data` has no such trophy (then nothing changed).
+function DataSchema.TakeTrophy(data: PlayerData, instanceId: string): TrophyRecord?
+	for i, record in data.Trophies do
+		if record.InstanceId == instanceId then
+			table.remove(data.Trophies, i)
+			local slot = table.find(data.Equipped, instanceId)
+			if slot then
+				table.remove(data.Equipped, slot)
+			end
+			return record
+		end
+	end
+	return nil
+end
+
 function DataSchema.CopyTrophies(trophies: { TrophyRecord }): { TrophyRecord }
 	local copy = {}
 	for i, record in trophies do
