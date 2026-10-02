@@ -674,3 +674,21 @@ Player (Client or Server view). Until the Inventory UI exists, equip from the
 | TE11 | Unsaved (API access OFF): claim, then unequip/equip it. | The pop-up says it couldn't be saved this session; `Saved = false`; the trophy is auto-equipped and can be unequipped/equipped this session. Leave + rejoin the same server: still owned and equipped. New server: gone. | |
 | TE12 | Exploit: from the client, set your own `TrophyInventory` attribute or call `InvokeServer` with another player's id. | Client-side attribute changes affect only your own view; the server's state, the case, and powers don't change. | |
 
+## House security
+
+Needs 2 players (Test > Clients and Servers). Both claim plots and build Walls.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+
+## Trophy stealing
+
+Needs 2–3 players, the target with a built Trophy Case and equipped trophies.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+
+## Push
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
