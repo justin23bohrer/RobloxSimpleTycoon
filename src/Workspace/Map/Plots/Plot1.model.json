@@ -44630,19 +44630,215 @@
       "className": "Model",
       "children": [
         {
-          "name": "CopingLeft",
+          "name": "PoolWallLeft",
           "className": "Part",
           "properties": {
             "Size": [
-              1.5,
-              1,
+              2,
+              3.2,
               37
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  -29.25,
-                  1.5,
+                  -29,
+                  2.6,
+                  -98.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                214,
+                204,
+                182
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "PoolWallRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2,
+              3.2,
+              37
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -9,
+                  2.6,
+                  -98.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                214,
+                204,
+                182
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "PoolWallFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              18,
+              3.2,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -19,
+                  2.6,
+                  -81
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                214,
+                204,
+                182
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "PoolWallBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              18,
+              3.2,
+              2
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -19,
+                  2.6,
+                  -116
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                214,
+                204,
+                182
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "CopingLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              2,
+              0.4,
+              37
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -29,
+                  4.4,
                   -98.5
                 ],
                 "orientation": [
@@ -44683,15 +44879,15 @@
           "className": "Part",
           "properties": {
             "Size": [
-              1.5,
-              1,
+              2,
+              0.4,
               37
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
-                  -8.75,
-                  1.5,
+                  -9,
+                  4.4,
                   -98.5
                 ],
                 "orientation": [
@@ -44732,16 +44928,16 @@
           "className": "Part",
           "properties": {
             "Size": [
-              19,
-              1,
-              1.5
+              18,
+              0.4,
+              2
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -19,
-                  1.5,
-                  -80.75
+                  4.4,
+                  -81
                 ],
                 "orientation": [
                   [
@@ -44781,16 +44977,16 @@
           "className": "Part",
           "properties": {
             "Size": [
-              19,
-              1,
-              1.5
+              18,
+              0.4,
+              2
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -19,
-                  1.5,
-                  -116.25
+                  4.4,
+                  -116
                 ],
                 "orientation": [
                   [
@@ -44830,9 +45026,9 @@
           "className": "Part",
           "properties": {
             "Size": [
-              19,
+              18,
               0.2,
-              34
+              33
             ],
             "CFrame": {
               "CFrame": {
@@ -44875,13 +45071,217 @@
           }
         },
         {
+          "name": "LiningLeft",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.1,
+              3,
+              33
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -27.95,
+                  2.7,
+                  -98.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                222,
+                250
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "LiningRight",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              0.1,
+              3,
+              33
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -10.05,
+                  2.7,
+                  -98.5
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                222,
+                250
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "LiningFront",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              18,
+              3,
+              0.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -19,
+                  2.7,
+                  -82.05
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                222,
+                250
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "LiningBack",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              18,
+              3,
+              0.1
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -19,
+                  2.7,
+                  -114.95
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                150,
+                222,
+                250
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanTouch": false,
+            "CanQuery": false
+          }
+        },
+        {
           "name": "LaneLine",
           "className": "Part",
           "properties": {
             "Size": [
               0.8,
               0.05,
-              27
+              26
             ],
             "CFrame": {
               "CFrame": {
@@ -44939,7 +45339,7 @@
                 "position": [
                   -19,
                   1.225,
-                  -85
+                  -85.5
                 ],
                 "orientation": [
                   [
@@ -44990,7 +45390,7 @@
                 "position": [
                   -19,
                   1.225,
-                  -112
+                  -111.5
                 ],
                 "orientation": [
                   [
@@ -45032,15 +45432,15 @@
           "className": "Part",
           "properties": {
             "Size": [
-              19,
-              0.65,
-              34
+              18,
+              3,
+              33
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -19,
-                  1.525,
+                  2.7,
                   -98.5
                 ],
                 "orientation": [
@@ -45080,19 +45480,313 @@
           }
         },
         {
+          "name": "PoolStep1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              2.55,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -10.8,
+                  2.475,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                240,
+                248,
+                252
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "PoolStep2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              1.7,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -12.4,
+                  2.05,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                240,
+                248,
+                252
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "PoolStep3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              0.85,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -14,
+                  1.625,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                240,
+                248,
+                252
+              ]
+            },
+            "Anchored": true,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "DeckStep1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              2.7,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -7.2,
+                  2.35,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                232,
+                220,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "DeckStep2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              1.8,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -5.6,
+                  1.9,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                232,
+                220,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
+          "name": "DeckStep3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              1.6,
+              0.9,
+              6
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4,
+                  1.45,
+                  -85
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                232,
+                220,
+                190
+              ]
+            },
+            "Anchored": true,
+            "Material": "Slate",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanTouch": false
+          }
+        },
+        {
           "name": "BrickWall",
           "className": "Part",
           "properties": {
             "Size": [
               1.6,
-              4.5,
+              6.1,
               39
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -31,
-                  3.25,
+                  4.05,
                   -98.5
                 ],
                 "orientation": [
@@ -45141,7 +45835,7 @@
               "CFrame": {
                 "position": [
                   -31,
-                  5.7,
+                  7.3,
                   -98.5
                 ],
                 "orientation": [
@@ -45183,14 +45877,14 @@
           "properties": {
             "Size": [
               2,
-              5.3,
+              6.9,
               1.8
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -31,
-                  3.65,
+                  4.45,
                   -79.9
                 ],
                 "orientation": [
@@ -45239,7 +45933,7 @@
               "CFrame": {
                 "position": [
                   -31,
-                  6.5,
+                  8.1,
                   -79.9
                 ],
                 "orientation": [
@@ -45281,14 +45975,14 @@
           "properties": {
             "Size": [
               2,
-              5.3,
+              6.9,
               1.8
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -31,
-                  3.65,
+                  4.45,
                   -98.5
                 ],
                 "orientation": [
@@ -45337,7 +46031,7 @@
               "CFrame": {
                 "position": [
                   -31,
-                  6.5,
+                  8.1,
                   -98.5
                 ],
                 "orientation": [
@@ -45379,14 +46073,14 @@
           "properties": {
             "Size": [
               2,
-              5.3,
+              6.9,
               1.8
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -31,
-                  3.65,
+                  4.45,
                   -117.1
                 ],
                 "orientation": [
@@ -45435,7 +46129,7 @@
               "CFrame": {
                 "position": [
                   -31,
-                  6.5,
+                  8.1,
                   -117.1
                 ],
                 "orientation": [
@@ -45477,15 +46171,15 @@
           "properties": {
             "Size": [
               2.4,
-              1.6,
-              2.6
+              3.9,
+              2.4
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -19,
-                  1.8,
-                  -118.1
+                  2.95,
+                  -118.2
                 ],
                 "orientation": [
                   [
@@ -45527,14 +46221,14 @@
             "Size": [
               2,
               0.3,
-              7
+              7.5
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -19,
-                  2.75,
-                  -114.8
+                  5.05,
+                  -114.55
                 ],
                 "orientation": [
                   [
@@ -45582,8 +46276,8 @@
               "CFrame": {
                 "position": [
                   -19,
-                  2.95,
-                  -111.6
+                  5.25,
+                  -111.1
                 ],
                 "orientation": [
                   [
@@ -45633,8 +46327,8 @@
               "CFrame": {
                 "position": [
                   -15,
-                  2.15,
-                  -92.5
+                  4.5,
+                  -95.5
                 ],
                 "orientation": [
                   [
@@ -45685,7 +46379,7 @@
               "CFrame": {
                 "position": [
                   -24,
-                  2.05,
+                  4.4,
                   -106.5
                 ],
                 "orientation": [
@@ -64284,7 +64978,7 @@
             "position": [
               -3,
               1.2,
-              -90
+              -95
             ],
             "orientation": [
               [
@@ -64334,7 +65028,7 @@
                 "position": [
                   -3,
                   1.1,
-                  -90
+                  -95
                 ],
                 "orientation": [
                   [

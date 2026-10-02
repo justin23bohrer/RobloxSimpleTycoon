@@ -223,8 +223,9 @@ Rewards for Caleb Trophy collectors once the house is done.
   a second: anyone inside a locked backyard is put back inside the house,
   in front of the back door, standing up. This also works before the walls
   are built (no door yet).
-- Everything is decoration: pool water you can stand in, a parked car, a
-  glowing fire pit. No swimming or driving.
+- Everything is decoration: a walk-in pool (hop in, run around waist deep,
+  climb out by the steps), a parked car, a glowing fire pit. No swimming or
+  driving.
 
 ## Droppers
 
@@ -366,7 +367,7 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBackLeft`/`WallBackRight` (z −75.5, back door opening x 17..23, y 2..12) with `BackDoorHeader` (y 12..17), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`, `BackDoorFrame*`) and a `Windows` model (no first-floor window at x 20 on the back: the door is there). **Generated** by `tools/house/generate_house.py`. |
 | `BackDoor` (model) | In the back door opening (x 20). `Door`: the blocking panel (5.2 × 9.6 × 0.4, x 17.4..22.6, y 2..11.6, z −75.5, wood `156,92,52`, `CanCollide` on) whose looks (window, panels, gold knobs, both sides) are child parts of `Door`. `DoorSign`: gold 8 × 2.6 plaque above the door on the inside (y 12.4..15, z −75..−74.7) with a `SurfaceGui` `SignGui` facing into the house (purple panel, white FredokaOne `TextLabel`, saved as "🔒 BACKYARD"). Outside: gray `Casing*`, a slate `Awning`, and a stone `BackStep` (y 1..1.5) down to the grass. Shown with the walls. **Generated** by `tools/backyard/generate_backyard.py`. |
 | `Pool`, `BackyardPath`, `Hangout` (models) | The backyard (see "Backyard" below), behind the back wall between z −76 and −121. Hidden until built with Caleb Trophies. **Generated** by `tools/backyard/generate_backyard.py`. |
-| `TrophyButton2`–`4` | Gold pads with purple rings on the grass behind the house: Pool (−3, −90), Path (10.5, −85), Hangout (5.5, −104), y 1.2. |
+| `TrophyButton2`–`4` | Gold pads with purple rings on the grass behind the house: Pool (−3, −95), Path (10.5, −85), Hangout (5.5, −104), y 1.2. |
 | `BackyardFence` (model) | White picket fence about 8 tall (posts to y 9, pickets to y 8.85), on x ±32.5 from the house's back corners (z −76.8) to z −120.5, and along z −120.5. Solid (`CanCollide` on). Always there. |
 | `BackyardZone` | Invisible box over the inside of the fence: center (0, 40.5, −98), 64 × 79 × 44 (x −32..32, y 1..80, z −120..−76). `Transparency 1`, `CanCollide`/`CanTouch`/`CanQuery` off. Its +Z face (z −76, the back wall) is the house side. Always there. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
@@ -419,12 +420,20 @@ meshes, or decals). Laid out like the user's sketch, seen from the back door
   slate awning and a stone step outside, and a gold-framed purple sign above
   it on the inside ("🔒 BACKYARD" until the game code writes the trophy
   count).
-- **Pool** (left, x −30..−8, z −117..−80): a long pool running front to back.
-  Sand-colored coping level with the house floor (y 1..2), a light blue
-  floor with a dark blue lane line, and shallow, see-through blue water
-  (y 1.2..1.85, no collisions) you can walk in. A red brick wall with a stone
-  cap and three piers along its outer (−X) edge, a white diving board on a
-  blue stand at the far end, and a red and a yellow beach ball.
+- **Pool** (left, x −30..−8, z −117..−80): a long walk-in pool running front
+  to back. The ground is one shared slab, so the pool is a raised basin
+  standing on the grass: solid stone walls 2 studs thick with a sand-colored
+  coping on top (y 4.6, wide enough to walk around on), a solid light blue
+  floor (y 1.2) with a light blue lining and a dark blue lane line, and
+  see-through blue water (y 1.2..4.2, no collide/touch/query) you walk
+  through about waist deep. No swimming: you just run around on the floor.
+  In the front +X corner (nearest the back door) 3 sand-colored steps go
+  from the grass up to the coping and 3 white steps go down inside, in one
+  straight line, so you can walk in and out without jumping (each rise is
+  under a stud). A red brick wall with a stone cap and three piers along
+  its outer (−X) edge, a white diving board on a blue stand at the far end
+  (resting just above the coping, reaching out over the water), and a red
+  and a yellow beach ball floating on the water.
 - **Path** (`BackyardPath`): gray flagstones (rows of one wide or two half
   stones) on a dark base, 6 wide (x 17..23), from the back step (z −79)
   straight back to the patio (z −99), with round gray rocks and brown dirt

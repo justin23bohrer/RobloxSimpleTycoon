@@ -8,10 +8,13 @@ Laid out like the user's sketch, behind the house's back wall (z = -76) out
 to z = -121, between the plot's sides (x -33..33). Seen from the back door,
 looking out into the yard ("left" is -X):
 
-  Pool           a long pool on the left (x -30..-8) running front to back:
-                 sand-colored coping, a light blue floor, shallow see-through
-                 water you can stand in, a red brick wall along its outer
-                 (-X) edge, a diving board at the far end, two beach balls
+  Pool           a long walk-in pool on the left (x -30..-8) running front
+                 to back: a raised basin (stone walls, sand-colored coping
+                 3.6 studs above the grass, light blue floor and lining),
+                 see-through water about waist deep that you walk through,
+                 steps up to the coping and back out in its front +X corner,
+                 a red brick wall along its outer (-X) edge, a diving board
+                 at the far end, two beach balls
   BackyardPath   a flagstone path from the back door (x 20) straight back to
                  the hangout, gray rocks and brown dirt patches on both sides
   Hangout        a square stone patio at the end of the path with a fire pit
@@ -105,7 +108,7 @@ STEP_STONE = (168, 168, 174)
 # Pads: (index, build it shows next to, x, z, placeholder label). The game
 # code sets the real label text.
 PADS = [
-    (2, "Pool", -3, -90, "Build Pool"),
+    (2, "Pool", -3, -95, "Build Pool"),
     (3, "BackyardPath", 10.5, -85, "Build Path"),
     (4, "Hangout", 5.5, -104, "Build Hangout"),
 ]
@@ -290,12 +293,42 @@ def near_pad(x, z, margin):
 
 
 # --- pool -------------------------------------------------------------------
+#
+# A walk-in pool. The Ground is one big slab (y 0..1) shared by every plot,
+# so instead of digging into it the pool is a raised basin standing on the
+# grass: stone side walls up to the coping (COPING_TOP), a solid floor on the
+# ground, and no-collision water filling it to just under the coping. You
+# climb a few steps up to the coping, hop in (about waist deep) and run
+# around; steps inside the front +X corner (nearest the back door) lead back
+# up to the coping, with matching steps down to the grass on the outside.
 
 POOL_X = (-30, -8)
 POOL_Z = (-117, -80)
-COPING_W = 1.5
-COPING_TOP = FLOOR  # level with the house floor: easy to step over
-WATER_TOP = 1.85
+COPING_W = 2.0  # wide enough to walk around the pool on
+COPING_TOP = G + 3.6  # floor -> coping about 3.4 studs: waist deep
+COPING_CAP = 0.4  # the sand-colored cap on top of the side walls
+POOL_FLOOR_TOP = G + 0.2
+WATER_TOP = COPING_TOP - 0.4
+STEP_TREAD = 1.6
+STEP_WIDTH = 6.0  # along the +X wall, from the front corner back
+STEP_COUNT = 3  # steps between the floor (or grass) and the coping
+POOL_WALL = (214, 204, 182)
+POOL_STEP = (240, 248, 252)
+
+
+def steps(prefix, x_edge, direction, bottom, z0, z1, color, material="SmoothPlastic"):
+    """STEP_COUNT blocks against the wall face at x_edge, going down from the
+    coping in `direction` (+1 = +X, -1 = -X) to `bottom`. Each block stands
+    on `bottom` and is one equal rise lower than the one before it."""
+    rise = (COPING_TOP - bottom) / (STEP_COUNT + 1)
+    out = []
+    for k in range(1, STEP_COUNT + 1):
+        top = COPING_TOP - k * rise
+        xa = x_edge + direction * (k - 1) * STEP_TREAD
+        xb = x_edge + direction * k * STEP_TREAD
+        out.append(part(f"{prefix}{k}", (STEP_TREAD, top - bottom, z1 - z0),
+                        ((xa + xb) / 2, (bottom + top) / 2, (z0 + z1) / 2), color, material))
+    return out
 
 
 def pool():
@@ -303,51 +336,71 @@ def pool():
     z0, z1 = POOL_Z
     cx, cz = (x0 + x1) / 2, (z0 + z1) / 2
     w, d = x1 - x0, z1 - z0
-    ch = COPING_TOP - G
-    cy = G + ch / 2
     c = COPING_W
+    wall_top = COPING_TOP - COPING_CAP
+    wh, wy = wall_top - G, (G + wall_top) / 2
+    cap_y = wall_top + COPING_CAP / 2
     parts = [
-        # Coping (stone rim) around the water.
-        part("CopingLeft", (c, ch, d), (x0 + c / 2, cy, cz), COPING),
-        part("CopingRight", (c, ch, d), (x1 - c / 2, cy, cz), COPING),
-        part("CopingFront", (w - 2 * c, ch, c), (cx, cy, z1 - c / 2), COPING),
-        part("CopingBack", (w - 2 * c, ch, c), (cx, cy, z0 + c / 2), COPING),
+        # Solid side walls standing on the grass, with the coping on top.
+        part("PoolWallLeft", (c, wh, d), (x0 + c / 2, wy, cz), POOL_WALL, "Slate"),
+        part("PoolWallRight", (c, wh, d), (x1 - c / 2, wy, cz), POOL_WALL, "Slate"),
+        part("PoolWallFront", (w - 2 * c, wh, c), (cx, wy, z1 - c / 2), POOL_WALL, "Slate"),
+        part("PoolWallBack", (w - 2 * c, wh, c), (cx, wy, z0 + c / 2), POOL_WALL, "Slate"),
+        part("CopingLeft", (c, COPING_CAP, d), (x0 + c / 2, cap_y, cz), COPING),
+        part("CopingRight", (c, COPING_CAP, d), (x1 - c / 2, cap_y, cz), COPING),
+        part("CopingFront", (w - 2 * c, COPING_CAP, c), (cx, cap_y, z1 - c / 2), COPING),
+        part("CopingBack", (w - 2 * c, COPING_CAP, c), (cx, cap_y, z0 + c / 2), COPING),
     ]
     ix0, ix1, iz0, iz1 = x0 + c, x1 - c, z0 + c, z1 - c
     iw, idp = ix1 - ix0, iz1 - iz0
-    floor_top = G + 0.2
+    icx, icz = (ix0 + ix1) / 2, (iz0 + iz1) / 2
+    floor_top = POOL_FLOOR_TOP
+    lh, ly, t = wall_top - floor_top, (floor_top + wall_top) / 2, 0.1
     parts += [
-        part("PoolFloor", (iw, 0.2, idp), (cx, G + 0.1, cz), POOL_FLOOR),
-        # A dark blue lane line with a "T" at each end, under the water.
-        decor("LaneLine", (0.8, 0.05, idp - 7), (cx, floor_top + 0.025, cz), POOL_LANE),
-        decor("LaneEndFront", (3, 0.05, 0.8), (cx, floor_top + 0.025, iz1 - 3.5), POOL_LANE),
-        decor("LaneEndBack", (3, 0.05, 0.8), (cx, floor_top + 0.025, iz0 + 3.5), POOL_LANE),
-        # Shallow water you can walk in (no collisions).
-        decor("Water", (iw, WATER_TOP - floor_top, idp), (cx, (floor_top + WATER_TOP) / 2, cz), WATER,
+        part("PoolFloor", (iw, floor_top - G, idp), (icx, (G + floor_top) / 2, icz), POOL_FLOOR),
+        # Light blue lining on the inside of the walls (looks only).
+        decor("LiningLeft", (t, lh, idp), (ix0 + t / 2, ly, icz), POOL_FLOOR),
+        decor("LiningRight", (t, lh, idp), (ix1 - t / 2, ly, icz), POOL_FLOOR),
+        decor("LiningFront", (iw, lh, t), (icx, ly, iz1 - t / 2), POOL_FLOOR),
+        decor("LiningBack", (iw, lh, t), (icx, ly, iz0 + t / 2), POOL_FLOOR),
+        # A dark blue lane line with a "T" at each end, on the floor.
+        decor("LaneLine", (0.8, 0.05, idp - 7), (icx, floor_top + 0.025, icz), POOL_LANE),
+        decor("LaneEndFront", (3, 0.05, 0.8), (icx, floor_top + 0.025, iz1 - 3.5), POOL_LANE),
+        decor("LaneEndBack", (3, 0.05, 0.8), (icx, floor_top + 0.025, iz0 + 3.5), POOL_LANE),
+        # Water you walk through: no collide, touch or query.
+        decor("Water", (iw, WATER_TOP - floor_top, idp), (icx, (floor_top + WATER_TOP) / 2, icz), WATER,
               material="Glass", transparency=0.45),
     ]
+    # Steps in the front +X corner: down into the water on the inside, down
+    # to the grass on the outside, in one straight line across the coping.
+    sz0, sz1 = iz1 - STEP_WIDTH, iz1
+    parts += steps("PoolStep", ix1, -1, floor_top, sz0, sz1, POOL_STEP)
+    parts += steps("DeckStep", x1, 1, G, sz0, sz1, COPING, "Slate")
+
     # Red brick garden wall along the pool's outer (-X) edge, with a stone cap.
-    wall_x0, wall_x1, wall_top = -31.8, -30.2, G + 4.5
+    wall_x0, wall_x1, brick_top = -31.8, -30.2, COPING_TOP + 2.5
     wz0, wz1 = z0 - 1, z1 + 1
     wx = (wall_x0 + wall_x1) / 2
     parts += [
-        part("BrickWall", (wall_x1 - wall_x0, wall_top - G, wz1 - wz0), (wx, (G + wall_top) / 2, (wz0 + wz1) / 2), RED_BRICK, "Brick"),
-        part("BrickWallCap", (wall_x1 - wall_x0 + 0.4, 0.4, wz1 - wz0 + 0.4), (wx, wall_top + 0.2, (wz0 + wz1) / 2), WALL_CAP),
+        part("BrickWall", (wall_x1 - wall_x0, brick_top - G, wz1 - wz0), (wx, (G + brick_top) / 2, (wz0 + wz1) / 2), RED_BRICK, "Brick"),
+        part("BrickWallCap", (wall_x1 - wall_x0 + 0.4, 0.4, wz1 - wz0 + 0.4), (wx, brick_top + 0.2, (wz0 + wz1) / 2), WALL_CAP),
     ]
     for name, z in (("BrickPierFront", wz1 - 0.9), ("BrickPierMid", (wz0 + wz1) / 2), ("BrickPierBack", wz0 + 0.9)):
-        parts.append(part(name, (2, wall_top - G + 0.8, 1.8), (wx, (G + wall_top + 0.8) / 2, z), RED_BRICK, "Brick"))
-        parts.append(part(name + "Cap", (2.2, 0.4, 2.2), (wx, wall_top + 1.0, z), WALL_CAP))
-    # Diving board at the far end, over the water.
-    bx = cx
+        parts.append(part(name, (2, brick_top - G + 0.8, 1.8), (wx, (G + brick_top + 0.8) / 2, z), RED_BRICK, "Brick"))
+        parts.append(part(name + "Cap", (2.2, 0.4, 2.2), (wx, brick_top + 1.0, z), WALL_CAP))
+    # Diving board at the far end: a stand behind the pool, the board resting
+    # just above the back coping and reaching out over the water.
+    bx = icx
+    board_y = COPING_TOP + 0.45
     parts += [
-        part("DivingStand", (2.4, 1.6, 2.6), (bx, G + 0.8, z0 - 1.3 + 0.2), BOARD_STAND),
-        part("DivingBoard", (2, 0.3, 7), (bx, G + 1.75, z0 + 2.2), BOARD),
-        decor("DivingBoardTip", (2.1, 0.1, 0.6), (bx, G + 1.95, z0 + 5.4), BOARD_STAND),
+        part("DivingStand", (2.4, board_y - 0.15 - G, 2.4), (bx, (G + board_y - 0.15) / 2, z0 - 1.2), BOARD_STAND),
+        part("DivingBoard", (2, 0.3, 7.5), (bx, board_y, z0 + 2.45), BOARD),
+        decor("DivingBoardTip", (2.1, 0.1, 0.6), (bx, board_y + 0.2, z0 + 5.9), BOARD_STAND),
     ]
     # Two beach balls floating in the water.
     parts += [
-        decor("BeachBallRed", (1.6, 1.6, 1.6), (cx + 4, WATER_TOP + 0.3, cz + 6), (235, 64, 60), shape="Ball"),
-        decor("BeachBallYellow", (1.2, 1.2, 1.2), (cx - 5, WATER_TOP + 0.2, cz - 8), (250, 214, 60), shape="Ball"),
+        decor("BeachBallRed", (1.6, 1.6, 1.6), (icx + 4, WATER_TOP + 0.3, icz + 3), (235, 64, 60), shape="Ball"),
+        decor("BeachBallYellow", (1.2, 1.2, 1.2), (icx - 5, WATER_TOP + 0.2, icz - 8), (250, 214, 60), shape="Ball"),
     ]
     return model("Pool", parts)
 

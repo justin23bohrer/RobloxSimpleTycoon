@@ -879,12 +879,28 @@ everything at once before that logic exists, look in Studio **Edit** mode
 | BY2 | Walk along the fence inside the yard; try to walk through it; look at the corners. | White picket fence about 8 studs tall (pickets with pointed tips, posts with caps and balls, rails on the outside) on the left, right and back. It meets the house's back corners with no gap; you can't walk through or squeeze between pickets. | |
 | BY3 | Build the walls, then stand inside the house and look at the back wall's right side; also at night (`Lighting.ClockTime = 0`). | A wooden back door (window with panes, two panels, gold knob) fills a framed opening where the right back window used to be. Above it a gold-framed purple sign reads "🔒 BACKYARD" in chunky white text, readable from inside, not darkened at night. The door doesn't touch the Trophy Case, the stairs, the collector, or `BuildButton4`; no window frame pokes through it. | |
 | BY4 | Look at the back door from the yard. Walk from the step onto the grass. | Gray casing around the door, a small gray awning above it, a stone step below; the door has the same window/panels/knob on this side. Stepping from the house floor to the step to the grass is smooth (no getting stuck). | |
-| BY5 | Pool: walk around it, then into it. | Long pool on the left running front to back: sand-colored rim, light blue floor with a dark blue lane line, see-through blue water, a red brick wall with a stone cap and three piers along its outer side, a diving board at the far end, two beach balls. You step over the rim and stand on the pool floor with the water around your feet (no swimming, no falling through). | |
+| BY5 | Pool: walk around it. | Long raised pool on the left running front to back: stone walls with a sand-colored rim on top, light blue floor and lining with a dark blue lane line, see-through blue water up to just under the rim, steps up to the rim in the front corner nearest the back door, a red brick wall with a stone cap and three piers along its outer side (taller than the rim), a diving board at the far end, two beach balls floating on the water. (Getting in and out: WP1–WP6.) | |
 | BY6 | Path: walk from the back step to the patio. | Gray flagstones from the step all the way to the patio, with round gray rocks and brown dirt patches along both sides. Rocks and dirt don't block you. | |
 | BY7 | Hangout, in daylight and at night, with the fire turned on (by the game logic, or set `Fire`/`Embers`/`FireLight` `Enabled` in Edit mode). | Square stone patio with a tile grid at the end of the path. Fire pit in the middle: ring of stones, crossed logs, flames, glowing embers rising, warm orange light on the patio at night. Five colorful chairs face the fire with their backs leaning away from it; the path side is open. Nothing floats or sinks into the patio. With the fire off: no flames, embers or glow. | |
 | BY8 | Pads, with nothing in the yard built: walk out of the back door to each pad. | Three gold pads with dark purple rings and purple signs on the grass: right of the pool, left of where the path starts, at the patio's front-left corner. Each is reachable on foot from the back door, and none overlaps the pool rim, a rock, dirt, the path, or the patio. | |
 | BY9 | Select `BackyardZone` in the Explorer (Edit mode). | Invisible; not solid, can't be touched or clicked. Its box covers exactly the inside of the fence from the ground up to y 80, and its face toward the house lies along the house's back wall. | |
 | BY10 | Run `python3 tools/backyard/generate_backyard.py` twice, then `python3 tools/plots/generate_plots.py`, then `git status`. | The second run changes nothing; the plot files have no other changes. `rojo build` still succeeds. | |
+
+## Walk-in pool
+
+The pool is a raised basin (`tools/backyard/generate_backyard.py`). Build it
+first (5 Caleb Trophies; `Config.DevAllTrophies = true` helps, set it back to
+**false** before committing), or check the shape in Studio **Edit** mode.
+Use **Play** for movement. Check each case on **all 4 plots**.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| WP1 | Walk out of the back door to the pool's front corner nearest the house and walk up the outside steps (no jumping). | Three sand-colored steps take you from the grass onto the rim smoothly; no getting stuck on a step. The Pool pad is a little further back along the pool and doesn't touch the steps. | |
+| WP2 | From the rim, hop into the water anywhere. | You drop through the water onto the pool floor and stand there about waist deep, head and shoulders above the surface. No swimming animation, no falling through the floor, no bouncing on the water. | |
+| WP3 | Run around inside the pool, all the way to the far end and along every wall. | You run on the floor like on the ground, through the water (it never blocks you). The walls stop you at every side. Under the diving board you bump into it (it is solid); everywhere else is open. Beach balls don't block you. | |
+| WP4 | Walk out by the inside steps (front corner, near the house), no jumping. | Three white steps take you from the floor up onto the rim, then the outside steps down to the grass, in one straight line. | |
+| WP5 | Walk around the whole pool on the rim, then onto the diving board, and jump off into the water. | The rim is wide enough to walk on all the way round. From the far end's rim you step up onto the board, walk to its end, and land in the water. | |
+| WP6 | Before the pool is built (its trophy button still showing): walk where the pool and its steps would be. | Nothing there: no invisible walls, steps or floor block you (the whole Pool model is hidden and non-solid). After building it, WP1–WP5 work. | |
 
 ## Garage + car (look)
 
