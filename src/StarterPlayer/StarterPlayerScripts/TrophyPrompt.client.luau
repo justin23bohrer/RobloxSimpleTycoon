@@ -5,8 +5,10 @@
 --   (Workspace.Map.CalebClaimTrophy) for this player unless they are
 --   eligible: CalebFed > 0 and not CalebTrophyClaimed. Only a local
 --   visibility change; the server re-checks eligibility on every claim.
--- * Shows a notification when the server reports a claim result through
---   the CalebTrophyNotice player attribute.
+-- * When the server reports a claim result through the CalebTrophyNotice
+--   player attribute: a new trophy (Saved / Unsaved) opens the big
+--   "NEW TROPHY!" pop-up (TrophyClaimPopup, with EQUIP / CLOSE); AlreadyOwned
+--   and NotEligible show a small notification.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -15,7 +17,7 @@ local StarterGui = game:GetService("StarterGui")
 local Workspace = game:GetService("Workspace")
 
 local CalebEvent = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("CalebEvent"))
-local TrophyVariants = require(ReplicatedStorage.Shared:WaitForChild("TrophyVariants"))
+local TrophyClaimPopup = require(script.Parent:WaitForChild("TrophyClaimPopup"))
 
 local player = Players.LocalPlayer
 local PlayerAttr = CalebEvent.PlayerAttr
@@ -81,12 +83,9 @@ local function onNotice()
 		return
 	end
 	lastNoticeId = notice.Id
-	local name = if typeof(notice.Variant) == "string" then TrophyVariants.Get(notice.Variant).DisplayName else "Caleb Trophy"
-	local rarity = if typeof(notice.Variant) == "string" then TrophyVariants.Get(notice.Variant).Rarity else ""
-	if notice.Kind == "Saved" then
-		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! Equipped trophies in a built Trophy Case give their powers.`)
-	elseif notice.Kind == "Unsaved" then
-		notify("🏆 Caleb Trophy!", `You got {name} ({rarity})! It couldn't be saved, so you only have it until you leave this server.`)
+	if (notice.Kind == "Saved" or notice.Kind == "Unsaved") and typeof(notice.Variant) == "string" then
+		local instanceId = if typeof(notice.InstanceId) == "string" then notice.InstanceId else nil
+		TrophyClaimPopup.Show(notice.Kind, notice.Variant, instanceId)
 	elseif notice.Kind == "AlreadyOwned" then
 		notify("Caleb Trophy", "You already have this round's trophy.")
 	elseif notice.Kind == "NotEligible" then

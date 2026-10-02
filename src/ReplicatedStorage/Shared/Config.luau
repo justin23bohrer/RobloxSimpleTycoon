@@ -459,6 +459,14 @@ local Config = {
 	TrophyPodiumScale = 6,
 	TrophyClaimPromptDistance = 22,
 	TrophyClaimHoldSeconds = 0.5,
+	-- The "NEW TROPHY!" pop-up after a claim (TrophyClaimPopup, client only):
+	-- closes by itself after this many seconds; its sound is a Roblox audio
+	-- asset id ("rbxassetid://123..."), empty = no sound. (CalebSounds
+	-- .TrophyClaim already plays on a claim, so leave this empty unless a
+	-- different jingle is wanted.)
+	TrophyPopupSeconds = 20,
+	TrophyPopupSound = "",
+	TrophyPopupVolume = 0.6,
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
 	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim
