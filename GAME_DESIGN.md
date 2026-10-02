@@ -117,7 +117,9 @@ walls both Stairs and the Trophy Case are offered).
   15 studs high, around the edge of the plot, with gray trim (corner posts,
   a base strip, a band along the top) and dark windows with gray frames,
   grilles, and sills. The front has a gray-framed, garage-style doorway
-  (16 wide, 11 high) in the middle.
+  (16 wide, 11 high) in the middle. The back wall has a **back door** to the
+  backyard (x 17..23 on Plot1, 10 high, where the right back window used to
+  be; see "Backyard" below). It appears with the walls.
 - **Stairs:** 16 cream steps along the right wall, climbing from the front
   (z −20) to the back (z −52), ending level with the top of the walls.
 - **2nd Floor:** a floor on top of the walls with a hole where the stairs
@@ -264,9 +266,10 @@ They only react to what the server already decided.
 ## Plot layout (prototype)
 
 Plain parts only, no theme. Each plot floor is **66 × 66 studs** (2/3 of the
-earlier 100 × 100). The ground is 300 × 300 of green grass (`Material =
+earlier 100 × 100). The ground is 400 × 400 of green grass (`Material =
 Grass`, color `86,166,64`), centered on the statue at (0, 0.5, 44) so all
-four plots sit on it. The map and positions below are for **Plot1**; Plots
+four plots and their backyards sit on it (grown from 300 × 300 on
+2026-10-02 for the backyards). The map and positions below are for **Plot1**; Plots
 2–4 are the same, turned 90°, 180°, and 270° around the statue's center
 (0, 44). Seen from Plot1's spawn, looking at the plot ("left" is −X, "back"
 is −Z):
@@ -274,7 +277,16 @@ is −Z):
 First floor (walls shown with `█`; they appear once built):
 
 ```
-   ██████████████████ BACK (z = -76) ████████████████████████████
+   ┌┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬ picket fence (z = -121) ┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┬┐
+   ┤▓ ~~~~~~~~~~~ ║                         ┌───────────┐    ├
+   ┤▓ ~~ POOL ~~~ ║ diving board            │ ⌂  🔥  ⌂  │    ├
+   ┤▓ ~~~~~~~~~~~ ║          (Hangout pad)  │ HANGOUT   │    ├
+   ┤▓ ~~~~~~~~~~~ ║                         └─────┬─────┘    ├
+   ┤▓ ~~~~~~~~~~~ ║  (Pool pad)               • ▒ •          ├
+   ┤▓ ~~~~~~~~~~~ ║                (Path pad) • ▒ • path     ├
+   ┤▓ (brick wall)                            • ▒ •          ├
+   ┤                     BACKYARD                ▒ step       ├
+   ██████████████████ BACK (z = -76) ███████████▐door▌███████████
    █ Collector ■            [=TROPHY CASE=]                      █
    █         ║                                         stairs    █
    █         ║  ▣ spot 4   ( Buy 4 ) [cookie jar] ( Build 4 )▲   █
@@ -308,7 +320,12 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `BuildButton5`–`9` | 2nd floor (y 18.2), in front of each piece of furniture: Bed (−3, −50), Gaming Desk (15.5, −55), Shelves + TV (8, −21), Mini Fridge (−13.5, −63), Ninja Kitchen (−8, −21) |
 | `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; straight desk against the back wall (x 8.1..28.4, out to z −69.4) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
 | `TrophyCase` (model) | Against the middle of the back wall, x −12.4..12.4, z −74.7..−69.55, y 2..16.6 (the 2nd floor starts at y 17): `CaseBase` (y 2..5.6), `CaseSideLeft`/`Right`, velvet `CaseBack`, velvet `CaseStage` (top y 6.2), `CaseTop` (y 14.2..14.8), glass `CaseGlass` (y 5.6..14.2, Transparency 0.65), gold `GoldBase`/`GoldStageLip`/`GoldValance` (y 13.85..14.2)/`GoldEdgeLeft`/`Right`/`GoldTop`, `CaseSign` ("MY CALEB TROPHIES", y 14.8..16.6), warm `SurfaceLight` `CaseLight` on `CaseTop` (starts disabled); per slot N = 1–5 at x 0 / −4.48 / 4.48 / −8.96 / 8.96 (middle outward, as seen from the room): velvet `RiserN` + gold `RiserTrimN` (3.8 × 3.4, tops y 7.1 / 6.7 / 6.7 / 6.35 / 6.35), invisible `TrophySlotN` (z −72.4, top flush with the riser, turned to face into the room), and on the base's front a gold `NameplateFrameN` with a dark `NameplateN` (4 × 2.3, y 2.25..4.55, front at z −69.9) holding the `NameplateGui` SurfaceGui (`TrophyName`, `PowerText`; saved as a dim "EMPTY"). Covers the middle back window from inside; clear of the conveyor, collector, cookie jar/Collect pad (≥ 21 studs), stairs, `BuildButton4`, and doorway. **Generated** by `tools/trophycase/generate_trophy_case.py`. |
-| `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBack` (z −75.5), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`) and a `Windows` model. **Generated** by `tools/house/generate_house.py`. |
+| `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBackLeft`/`WallBackRight` (z −75.5, back door opening x 17..23, y 2..12) with `BackDoorHeader` (y 12..17), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`, `BackDoorFrame*`) and a `Windows` model (no first-floor window at x 20 on the back: the door is there). **Generated** by `tools/house/generate_house.py`. |
+| `BackDoor` (model) | In the back door opening (x 20). `Door`: the blocking panel (5.2 × 9.6 × 0.4, x 17.4..22.6, y 2..11.6, z −75.5, wood `156,92,52`, `CanCollide` on) whose looks (window, panels, gold knobs, both sides) are child parts of `Door`. `DoorSign`: gold 8 × 2.6 plaque above the door on the inside (y 12.4..15, z −75..−74.7) with a `SurfaceGui` `SignGui` facing into the house (purple panel, white FredokaOne `TextLabel`, saved as "🔒 BACKYARD"). Outside: gray `Casing*`, a slate `Awning`, and a stone `BackStep` (y 1..1.5) down to the grass. Shown with the walls. **Generated** by `tools/backyard/generate_backyard.py`. |
+| `Pool`, `BackyardPath`, `Hangout` (models) | The backyard (see "Backyard" below), behind the back wall between z −76 and −121. Hidden until built with Caleb Trophies. **Generated** by `tools/backyard/generate_backyard.py`. |
+| `TrophyButton2`–`4` | Gold pads with purple rings on the grass behind the house: Pool (−3, −90), Path (10.5, −85), Hangout (5.5, −104), y 1.2. |
+| `BackyardFence` (model) | White picket fence about 8 tall (posts to y 9, pickets to y 8.85), on x ±32.5 from the house's back corners (z −76.8) to z −120.5, and along z −120.5. Solid (`CanCollide` on). Always there. |
+| `BackyardZone` | Invisible box over the inside of the fence: center (0, 40.5, −98), 64 × 79 × 44 (x −32..32, y 1..80, z −120..−76). `Transparency 1`, `CanCollide`/`CanTouch`/`CanQuery` off. Its +Z face (z −76, the back wall) is the house side. Always there. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
 | `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
 | `Conveyor2` | (−28, 18.5, −42), 4 × 1 × 48, above `Conveyor` |
@@ -338,6 +355,54 @@ as an outline:
 | `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime, and the counter plaque (`JarCounter` part, made at runtime) sits directly on top of `TankSign`. |
 | `SpawnLocation`, `SpawnLocation2`–`4` | Invisible 14 × 14 spawn areas (`Block`, `Transparency = 1`, `Anchored`, no ring or decal) sunk into the ground so the top is flush with the grass (center Y = 0.5, top Y = 1), in `Map` (not the plots), one between each plot and the statue. Where players appear (a random one). `SpawnLocation2`–`4` are generated. |
 | `Statue`           | In `Map` (not the plot), behind the spawn at z ≈ 44, facing it: turn around after spawning to see it. See below. |
+
+### Backyard (look)
+
+Part of "Garage + Backyard" (approved by the user 2026-10-02). Behind the
+house, from the back wall (z −76 on Plot1) to z −121, across the whole plot
+(x −33..33), in the house's cartoony style. Plain parts only (no Terrain,
+meshes, or decals). Laid out like the user's sketch, seen from the back door
+(left is −X):
+
+- **Fence** (`BackyardFence`, always there): a white picket fence about 8
+  studs tall on the yard's left, right and back sides. Its first posts touch
+  the house's back corner posts, so the house and the fence close the yard.
+  Square posts with a cap and a ball on top, two rails on the outside,
+  pickets with pointed (diamond) tips. Solid, but a strong jump power can
+  clear it (the server pushes anyone out of a locked backyard using the
+  invisible `BackyardZone`).
+- **Back door** (`BackDoor`, with the walls): a wooden door with a 4-pane
+  window, two panels and gold knobs on both sides, a gray casing, a small
+  slate awning and a stone step outside, and a gold-framed purple sign above
+  it on the inside ("🔒 BACKYARD" until the game code writes the trophy
+  count).
+- **Pool** (left, x −30..−8, z −117..−80): a long pool running front to back.
+  Sand-colored coping level with the house floor (y 1..2), a light blue
+  floor with a dark blue lane line, and shallow, see-through blue water
+  (y 1.2..1.85, no collisions) you can walk in. A red brick wall with a stone
+  cap and three piers along its outer (−X) edge, a white diving board on a
+  blue stand at the far end, and a red and a yellow beach ball.
+- **Path** (`BackyardPath`): gray flagstones (rows of one wide or two half
+  stones) on a dark base, 6 wide (x 17..23), from the back step (z −79)
+  straight back to the patio (z −99), with round gray rocks and brown dirt
+  patches along both sides.
+- **Hangout**: a 20 × 20 stone patio (x 10..30, z −99..−119) with a 4 × 4
+  tile grid. In the middle a fire pit: ash bed, a ring of 11 chunky stones,
+  three crossed logs, a `Fire`, glowing embers and a warm `PointLight` (all
+  three saved disabled; the game code turns them on while the Hangout is
+  shown, because `PlotVisibility` does not hide effects). Five chunky
+  outdoor chairs (red, blue, yellow, green, purple) face the fire, leaving
+  the path side open.
+- **Pads** (`TrophyButton2`–`4`): gold pads with dark purple rings and a
+  purple sign (BuildButton1's structure), on the grass next to their build:
+  Pool pad right of the pool, Path pad left of where the path starts,
+  Hangout pad at the patio's front-left corner. All reachable from the back
+  door before anything is built.
+
+Generated by `tools/backyard/generate_backyard.py` (edit the script, not the
+JSON; re-running it only replaces its own instances), then
+`tools/plots/generate_plots.py`. The back door opening itself is cut by
+`tools/house/generate_house.py` (`BACK_DOOR_*`, same numbers in both).
 
 ### Statue (Caleb)
 
