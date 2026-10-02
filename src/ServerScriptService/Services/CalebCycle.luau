@@ -7,6 +7,11 @@
 --   leaving and rejoining the same server keeps it), and who claimed this
 --   cycle's trophy live only here. Everything is published as attributes on
 --   the statue and on each Player (CalebEvent.Attr / CalebEvent.PlayerAttr).
+-- * The goal is CalebEvent.GoalFor(players in the server). In Normal it
+--   follows players joining and leaving (OnPlayerAdded / OnPlayerRemoving);
+--   if a leave drops it to or below what Caleb already ate, he is full right
+--   away. In Full / Celebration / TrophyClaim it is locked; each new cycle
+--   computes it fresh. Published as the statue's CalebMaxCookies attribute.
 -- * StatueService spends the cookies and then calls AddCookies. Reaching the
 --   goal starts Full; timed states advance with task.delay. Every timer
 --   checks the cycle id and state it was started for, so a stale timer can
@@ -42,6 +47,11 @@ local claimed: { [number]: true } = {}
 local changed = Instance.new("BindableEvent")
 -- Fires (state, cycleId) after every transition (not on Start).
 CalebCycle.StateChanged = changed.Event
+
+local goalChanged = Instance.new("BindableEvent")
+-- Fires (goal) when the goal changes during Normal because a player joined
+-- or left (not on a new cycle; StateChanged covers that).
+CalebCycle.GoalChanged = goalChanged.Event
 
 -- Leaderboard throttle.
 local lastPublish = -math.huge
@@ -110,11 +120,30 @@ local function enter(newState: string)
 	end
 end
 
+-- Players in the server, not counting `leaving` (on PlayerRemoving the
+-- leaving player is still in Players:GetPlayers()).
+local function playerCount(leaving: Player?): number
+	local count = 0
+	for _, player in Players:GetPlayers() do
+		if player ~= leaving then
+			count += 1
+		end
+	end
+	return count
+end
+
+-- Starts Full. The only way into Full: a feed reaching the goal, or the goal
+-- dropping to or below what Caleb already ate.
+local function becomeFull()
+	enter(State.Full)
+	changed:Fire(state, cycleId)
+end
+
 -- Starts a fresh cycle: total 0, no contributions or claims, new id, Normal.
 local function newCycle()
 	local s = statue :: Instance
 	cycleId = HttpService:GenerateGUID(false)
-	goal = CalebEvent.MaxCookies()
+	goal = CalebEvent.GoalFor(playerCount())
 	eaten = 0
 	contributions = {}
 	claimed = {}
@@ -159,6 +188,11 @@ function CalebCycle.GetCycleId(): string
 	return cycleId
 end
 
+-- The current goal (what StatueService caps feeds to).
+function CalebCycle.GetGoal(): number
+	return goal
+end
+
 -- True only in Normal (and after Start) with room left under the goal.
 function CalebCycle.CanFeed(): boolean
 	return statue ~= nil and state == State.Normal and eaten < goal
@@ -188,8 +222,26 @@ function CalebCycle.AddCookies(player: Player, cookies: number)
 	requestBoard()
 
 	if eaten >= goal then
-		enter(State.Full)
-		changed:Fire(state, cycleId)
+		becomeFull()
+	end
+end
+
+-- Recomputes the goal from the players in the server (Normal only; the goal
+-- is locked during the event). If it drops to or below what Caleb already
+-- ate, he is full right away.
+local function updateGoal(leaving: Player?)
+	if not statue or state ~= State.Normal then
+		return
+	end
+	local newGoal = CalebEvent.GoalFor(playerCount(leaving))
+	if newGoal == goal then
+		return
+	end
+	goal = newGoal
+	statue:SetAttribute(Attr.MaxCookies, goal)
+	goalChanged:Fire(goal)
+	if eaten >= goal then
+		becomeFull()
 	end
 end
 
@@ -217,9 +269,17 @@ function CalebCycle.MarkTrophyClaimed(userId: number)
 end
 
 -- Called by ServerMain on join: restores CalebFed / CalebTrophyClaimed for a
--- player who left and rejoined during the same cycle (0 / false otherwise).
+-- player who left and rejoined during the same cycle (0 / false otherwise),
+-- and raises the goal in Normal.
 function CalebCycle.OnPlayerAdded(player: Player)
 	setPlayerAttributes(player)
+	updateGoal(nil)
+end
+
+-- Called by ServerMain on leave: lowers the goal in Normal (the player's
+-- contribution is kept, keyed by UserId, in case they rejoin).
+function CalebCycle.OnPlayerRemoving(player: Player)
+	updateGoal(player)
 end
 
 return CalebCycle

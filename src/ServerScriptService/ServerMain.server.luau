@@ -25,7 +25,7 @@ TrophyService.Start(statue) -- podium claim + Trophy Case display
 -- Players get a plot by stepping on a ClaimPad (TycoonService), not on join.
 local function onPlayerAdded(player: Player)
 	PlayerDataService.OnPlayerAdded(player)
-	CalebCycle.OnPlayerAdded(player)
+	CalebCycle.OnPlayerAdded(player) -- restores CalebFed; raises Caleb's goal in Normal
 	CookiePartyService.OnPlayerAdded(player) -- party earnings at 0; alive cookies if mid-party
 	PowerService.OnPlayerAdded(player) -- trophy power attributes + respawn movement
 	DataService.OnPlayerAdded(player) -- loads saved house + trophies in the background
@@ -34,6 +34,7 @@ end
 local function onPlayerRemoving(player: Player)
 	TycoonService.OnPlayerRemoving(player) -- stop systems and free the plot
 	StatueService.OnPlayerRemoving(player)
+	CalebCycle.OnPlayerRemoving(player) -- lowers Caleb's goal in Normal
 	CookiePartyService.OnPlayerRemoving(player)
 	PlayerDataService.OnPlayerRemoving(player)
 	PowerService.OnPlayerRemoving(player)

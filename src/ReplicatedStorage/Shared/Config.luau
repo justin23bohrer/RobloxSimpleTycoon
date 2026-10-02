@@ -49,11 +49,11 @@ local Config = {
 	--   Parts - plot parts/models that appear once it is built (hidden before).
 	Builds = table.freeze({
 		table.freeze({ Id = "Walls", Name = "Build Walls", Cost = 5000, After = "Dropper4", Parts = table.freeze({ "Walls" }) }),
-		table.freeze({ Id = "Stairs", Name = "Build Stairs", Cost = 8000, After = "Walls", Parts = table.freeze({ "Stairs" }) }),
+		table.freeze({ Id = "Stairs", Name = "Build Stairs", Cost = 5000, After = "Walls", Parts = table.freeze({ "Stairs" }) }),
 		table.freeze({
 			Id = "SecondFloor",
 			Name = "2nd Floor",
-			Cost = 15000,
+			Cost = 10000,
 			After = "Stairs",
 			Parts = table.freeze({ "SecondFloor", "Conveyor2", "Collector2" }),
 		}),
@@ -88,8 +88,16 @@ local Config = {
 	-- Feeding the statue (StatueService). Players spend cookies on the four
 	-- feed pads around the statue; the more Caleb has eaten (all players
 	-- together, this server session), the fatter he gets. He stops growing
-	-- and stops eating at StatueMaxCookies.
+	-- and stops eating at his goal (CalebCycle):
+	--   goal = CalebGoalPerPlayer x players in the server (at least 1),
+	--          never more than StatueMaxCookies.
+	-- In Normal the goal follows players joining and leaving; it is locked
+	-- during Full / Celebration / TrophyClaim and recomputed for each cycle.
 	StatueName = "Caleb",
+	-- Cookies each player in the server adds to the goal (about 3-4 minutes
+	-- of feeding at any server size).
+	CalebGoalPerPlayer = 350_000,
+	-- The most the goal can ever be (3+ players).
 	StatueMaxCookies = 1_000_000,
 	-- How close (studs, flat distance) a player must be to a feed pad's center
 	-- for the server to accept a feed.
@@ -101,7 +109,7 @@ local Config = {
 	StatueFeedPadOffColor = Color3.fromRGB(150, 150, 150),
 	StatueFeedPadOffRingColor = Color3.fromRGB(90, 90, 90),
 	StatueFeedPadOffSignColor = Color3.fromRGB(120, 120, 120),
-	-- The "Caleb: N / 1,000,000" bar floating above the statue (client only,
+	-- The "Caleb: N / goal" bar floating above the statue (client only,
 	-- StatueBar.client.luau). Height is studs above the top of his Head (his
 	-- head never grows, so this stays clear of him at any size). Size is in
 	-- screen pixels, so it reads the same from near and far. MaxDistance is
@@ -111,7 +119,7 @@ local Config = {
 	StatueBarMaxDistance = 500,
 
 	-- Caleb Full Event (see Shared/CalebEvent.luau and ARCHITECTURE.md).
-	-- When the shared total reaches StatueMaxCookies: Full (his "I'm full"
+	-- When the shared total reaches the goal: Full (his "I'm full"
 	-- animation) -> Celebration (dance, cookie rain) -> TrophyClaim (Caleb
 	-- hidden, contributors claim a trophy) -> reset to 0 and a new cycle.
 	CalebFullSeconds = 5,
@@ -522,7 +530,7 @@ local Config = {
 	TrophyPopupVolume = 0.6,
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
-	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim
+	-- Goal DevCalebFastMaxCookies (fixed, not scaled by players); Full 3 s, Celebration 60 s, TrophyClaim
 	-- 30 s (see CalebEvent.Duration; the Cookie Party always lasts the full
 	-- CalebCelebrationSeconds). Keep this false in commits.
 	DevCalebFastCycle = false,

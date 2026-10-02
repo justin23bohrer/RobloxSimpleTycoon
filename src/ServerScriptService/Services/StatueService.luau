@@ -11,10 +11,12 @@
 -- * CalebCycle owns the shared total, contributions, and the Caleb Full
 --   Event state. Feeding is refused unless CalebCycle.CanFeed() (Normal, room
 --   left). A bigger feed only spends what Caleb still has room for (up to
---   CalebEvent.MaxCookies()); after the spend, CalebCycle.AddCookies records
---   it (and starts the event at the goal).
--- * Caleb's size follows progress = eaten / goal (StatueShape.Apply). He is
---   hidden during TrophyClaim and shrinks back on reset. Pad signs say
+--   CalebCycle.GetGoal(), the current goal, which follows the player count
+--   in Normal); after the spend, CalebCycle.AddCookies records it (and
+--   starts the event at the goal).
+-- * Caleb's size follows progress = eaten / goal (StatueShape.Apply), also
+--   when the goal changes (CalebCycle.GoalChanged). He is hidden during
+--   TrophyClaim and shrinks back on reset. Pad signs say
 --   "FEED CALEB!" in Normal and "CALEB IS FULL!" otherwise.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -124,7 +126,7 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 	if not CalebCycle.CanFeed() then
 		return false, `{Config.StatueName} is FULL!`
 	end
-	local max = CalebEvent.MaxCookies()
+	local max = CalebCycle.GetGoal()
 	local room = max - eatenNow()
 	if room <= 0 then
 		return false, `{Config.StatueName} is FULL!`
@@ -137,6 +139,13 @@ local function onFeed(player: Player, amount: any): (boolean, number | string)
 	CalebCycle.AddCookies(player, cookies)
 	StatueShape.Apply(eatenNow() / max, Config.CalebGrowSeconds)
 	return true, cookies
+end
+
+-- A player joined or left in Normal: same cookies, new goal, new size.
+local function onGoalChanged(goal: number)
+	if goal > 0 then
+		StatueShape.Apply(eatenNow() / goal, Config.CalebGrowSeconds)
+	end
 end
 
 local function onStateChanged(state: string)
@@ -183,6 +192,7 @@ function StatueService.Start(): Model?
 	setPadLabels(feedText())
 	rememberPadColors()
 	CalebCycle.StateChanged:Connect(onStateChanged)
+	CalebCycle.GoalChanged:Connect(onGoalChanged)
 
 	local remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("FeedStatue") :: RemoteFunction
 	remote.OnServerInvoke = onFeed

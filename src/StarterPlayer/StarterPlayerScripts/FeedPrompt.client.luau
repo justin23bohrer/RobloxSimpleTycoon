@@ -42,8 +42,8 @@ local PREVIEW_COLOR = ui.ProgressPreview.BackgroundColor3
 local PREVIEW_TOO_MUCH_COLOR = Color3.fromRGB(255, 130, 130) -- you don't have that many
 local BAR_TWEEN = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local MAX_AMOUNT = 9_999_999_999 -- the amount box holds at most 10 digits
--- Anything above 0 gets at least this much bar so you can see it (1,000,000
--- cookies is the full bar, so 10 cookies would otherwise be invisible).
+-- Anything above 0 gets at least this much bar so you can see it (the goal,
+-- up to 1,000,000 cookies, is the full bar, so 10 would otherwise be invisible).
 -- The % in the text is always exact.
 local MIN_VISIBLE_BAR = 0.006
 
@@ -66,8 +66,8 @@ local function eaten(): number
 	return if typeof(value) == "number" then value else 0
 end
 
--- This cycle's goal, published by the server (CalebCycle), or the contract
--- default before it is set (also covers Config.DevCalebFastCycle).
+-- The current goal, published by the server (CalebCycle; changes live when
+-- players join or leave), or the contract fallback before it is set (also covers Config.DevCalebFastCycle).
 local function maxCookies(): number
 	local value = statue:GetAttribute(CalebEvent.Attr.MaxCookies)
 	return if typeof(value) == "number" and value > 0 then value else CalebEvent.MaxCookies()
