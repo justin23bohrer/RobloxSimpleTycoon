@@ -1,22 +1,26 @@
 -- CalebAnimator (client only)
--- Caleb's "I'm completely full" animation (state Full) and his dance (state
--- Celebration). Looks only: driven ONLY by the statue's CalebState and
--- CalebStateEndsAt attributes (Shared/CalebEvent); it never talks to the
--- server and changes nothing the server owns.
+-- Caleb's "I'm completely full" animation (state Full) and his Cookie Party
+-- (state Celebration: the dance that ramps up per phase, moves, and the
+-- "I'M FULL!" wind-up). Looks only: driven ONLY by the statue's CalebState,
+-- CalebStateEndsAt and CalebCycleId attributes (Shared/CalebEvent); it never
+-- talks to the server and changes nothing the server owns.
 --
 -- How it moves anchored parts without fighting the server:
 --   * Every frame while animating, each body part (Shared/CalebBody; never
 --     the pedestal, FeedPads, or Podium) is set locally to
 --       pose offset * base
 --     where base is the part's CFrame as the server last replicated it.
---   * A part whose CFrame is not what we wrote last frame was moved by the
---     server (or just streamed in): that value becomes its new base. So a
---     server tween (growth) during the animation is followed, not undone.
---   * In any other state we stop, put back every part's base CFrame (unless
---     the server already moved it), and disconnect from RenderStepped.
--- Timing comes from CalebStateEndsAt (server time), so a late joiner and
--- everyone else see the same moment of the dance.
--- Poses (the actual moves) are in CalebPoses; numbers in Config.
+--     The Belly's Size is set the same way (base size * pose.BellyScale).
+--   * A part whose CFrame (or the Belly's Size) is not what we wrote last
+--     frame was changed by the server (or just streamed in): that value
+--     becomes its new base. So a server tween (growth) is followed, not undone.
+--   * In any other state we stop, put back every part's base CFrame and Size
+--     (unless the server already changed it), stop the mouth effects
+--     (CalebMouth), and disconnect from RenderStepped.
+-- Timing comes from CalebStateEndsAt (server time) and the party's moves
+-- from CalebCycleId, so a late joiner and everyone else see the same moment.
+-- Poses are in CalebPoses (Full, the base dance) and CalebPartyPoses /
+-- CalebPartyMoves (the party); numbers in Config.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -24,15 +28,12 @@ local Workspace = game:GetService("Workspace")
 
 local CalebBody = require(ReplicatedStorage.Shared.CalebBody)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
-local Config = require(ReplicatedStorage.Shared.Config)
 local CalebPoses = require(script.Parent:WaitForChild("CalebPoses"))
+local CalebPartyPoses = require(script.Parent:WaitForChild("CalebPartyPoses"))
+local CalebMouth = require(script.Parent:WaitForChild("CalebMouth"))
 
 local State = CalebEvent.State
 local map = Workspace:WaitForChild("Map")
-
--- Puff look (presentation only)
-local PUFF_TEXTURE = "rbxasset://textures/particles/smoke_main.dds"
-local PUFF_COLOR = Color3.fromRGB(255, 248, 235)
 
 local statue: Instance? = nil
 local statueConnections: { RBXScriptConnection } = {}
@@ -40,11 +41,13 @@ local parts: { [BasePart]: string | false } = {} -- loaded body part -> pose gro
 local byName: { [string]: BasePart } = {}
 local base: { [BasePart]: CFrame } = {}
 local written: { [BasePart]: CFrame } = {}
+local baseSize: { [BasePart]: Vector3 } = {} -- Belly group only
+local writtenSize: { [BasePart]: Vector3 } = {}
 local stepConnection: RBXScriptConnection? = nil
 local animState: string? = nil
 local localStart = 0
 local puffed = false
-local puffEmitter: ParticleEmitter? = nil
+local seed = 0
 
 local function addPart(item: Instance)
 	local s = statue
@@ -56,6 +59,10 @@ local function addPart(item: Instance)
 	byName[part.Name] = part
 	base[part] = part.CFrame
 	written[part] = nil
+	writtenSize[part] = nil
+	if parts[part] == "Belly" then
+		baseSize[part] = part.Size
+	end
 end
 
 local function removePart(item: Instance)
@@ -65,6 +72,8 @@ local function removePart(item: Instance)
 	parts[item] = nil
 	base[item] = nil
 	written[item] = nil
+	baseSize[item] = nil
+	writtenSize[item] = nil
 	if byName[item.Name] == item then
 		byName[item.Name] = nil
 	end
@@ -89,44 +98,13 @@ local function about(point: Vector3?, rotation: CFrame): CFrame
 	return CFrame.new(point) * rotation * CFrame.new(-point)
 end
 
-local function puff(head: BasePart)
-	local emitter = puffEmitter
-	if not emitter then
-		local attachment = Instance.new("Attachment")
-		attachment.Name = "CalebPuff"
-		attachment.Parent = Workspace.Terrain
-		emitter = Instance.new("ParticleEmitter")
-		emitter.Enabled = false
-		emitter.Texture = PUFF_TEXTURE
-		emitter.Color = ColorSequence.new(PUFF_COLOR)
-		emitter.LightEmission = 0.2
-		emitter.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 2), NumberSequenceKeypoint.new(1, 7) })
-		emitter.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(1, 1) })
-		emitter.Lifetime = NumberRange.new(0.8, 1.4)
-		emitter.Speed = NumberRange.new(8, 14)
-		emitter.SpreadAngle = Vector2.new(25, 25)
-		emitter.Drag = 3
-		emitter.EmissionDirection = Enum.NormalId.Front
-		emitter.Parent = attachment
-		puffEmitter = emitter
-	end
-	local attachment = emitter.Parent :: Attachment
-	-- In front of his mouth (front, lower part of the head).
-	local radius = head.Size.Y / 2
-	attachment.WorldCFrame = head.CFrame * CFrame.new(0, -radius * 0.45, -radius * 0.9)
-	emitter:Emit(Config.CalebFullAnim.PuffParticles)
-end
-
--- Seconds into the current state, and seconds left.
-local function timing(s: Instance, state: string): (number, number)
-	local duration = CalebEvent.Duration(state)
+-- Seconds into the current state.
+local function elapsedIn(s: Instance, state: string): number
 	local endsAt = s:GetAttribute(CalebEvent.Attr.StateEndsAt)
 	if typeof(endsAt) == "number" and endsAt > 0 then
-		local left = CalebEvent.TimeLeft(s)
-		return math.max(0, duration - left), left
+		return math.max(0, CalebEvent.Duration(state) - CalebEvent.TimeLeft(s))
 	end
-	local elapsed = os.clock() - localStart
-	return elapsed, math.max(0, duration - elapsed)
+	return os.clock() - localStart
 end
 
 local function step()
@@ -134,19 +112,25 @@ local function step()
 	if not s or not animState then
 		return
 	end
-	local elapsed, left = timing(s, animState)
+	local elapsed = elapsedIn(s, animState)
 	local pose = if animState == State.Full
 		then CalebPoses.Full(elapsed, CalebEvent.Duration(State.Full))
-		else CalebPoses.Dance(elapsed, left)
+		else CalebPartyPoses.Pose(elapsed, seed)
 
-	-- Pick up anything the server moved (or that just streamed in).
+	-- Pick up anything the server moved or resized (or that just streamed in).
 	local lowest = math.huge
-	for part in parts do
+	for part, group in parts do
 		local w = written[part]
 		if w == nil or part.CFrame ~= w then
 			base[part] = part.CFrame
 		end
-		lowest = math.min(lowest, base[part].Position.Y - part.Size.Y / 2)
+		if group == "Belly" then
+			local ws = writtenSize[part]
+			if ws == nil or part.Size ~= ws then
+				baseSize[part] = part.Size
+			end
+		end
+		lowest = math.min(lowest, base[part].Position.Y - (baseSize[part] or part.Size).Y / 2)
 	end
 	if lowest == math.huge then
 		return -- nothing loaded
@@ -158,24 +142,40 @@ local function step()
 	local feet = Vector3.new(center.X, lowest, center.Z)
 	local head = byName.Head
 	local neck = if head and base[head] then base[head].Position - Vector3.new(0, head.Size.Y * 0.4, 0) else nil
+	local belly = byName.Belly
+	-- A bigger belly grows mostly forward (its back stays in the torso).
+	local bellyPush = if belly and baseSize[belly] then (pose.BellyScale - 1) * baseSize[belly].Z * 0.35 else 0
 
-	local body = about(feet, pose.Body)
+	local body = about(feet, CFrame.new(0, pose.BodyUp, 0) * CFrame.Angles(0, pose.BodyYaw, 0) * CFrame.Angles(pose.BodyPitch, 0, pose.BodyRoll))
+	local headTurn = about(neck, CFrame.Angles(pose.HeadPitch, pose.HeadYaw, pose.HeadRoll))
 	local groups = {
-		RightArm = about(topEnd(byName.RightArm), CFrame.Angles(0, 0, pose.RightArm)),
-		LeftArm = about(topEnd(byName.LeftUpperArm), CFrame.Angles(0, 0, -pose.LeftArm)),
-		Head = about(neck, pose.Head),
-		Belly = CFrame.new(pose.Belly),
+		RightArm = about(topEnd(byName.RightArm), CFrame.Angles(pose.RightArmFwd, 0, pose.RightArm)),
+		LeftArm = about(topEnd(byName.LeftUpperArm), CFrame.Angles(pose.LeftArmFwd, 0, -pose.LeftArm)),
+		Head = headTurn,
+		Mouth = headTurn * CFrame.new(0, -pose.MouthOpen, -pose.MouthOpen * 0.3),
+		RightCheek = headTurn * CFrame.new(pose.Cheeks, 0, -pose.Cheeks * 0.5),
+		LeftCheek = headTurn * CFrame.new(-pose.Cheeks, 0, -pose.Cheeks * 0.5),
+		Belly = CFrame.new(0, pose.BellyUp, -pose.BellyForward - bellyPush),
 	}
 
 	for part, group in parts do
 		local offset = if group then body * groups[group] else body
 		part.CFrame = offset * base[part]
 		written[part] = part.CFrame
+		if group == "Belly" then
+			part.Size = baseSize[part] * math.max(pose.BellyScale, 0.5)
+			writtenSize[part] = part.Size
+		end
 	end
 
-	if pose.Puff and not puffed and head and parts[head] ~= nil then
+	local headLoaded = head ~= nil and parts[head] ~= nil
+	if pose.Puff and not puffed and headLoaded then
 		puffed = true
-		puff(head)
+		CalebMouth.Puff((head :: BasePart).CFrame, (head :: BasePart).Size.Y / 2)
+	end
+	if animState == State.Celebration then
+		local headCFrame = if headLoaded then (head :: BasePart).CFrame else nil
+		CalebMouth.Update(headCFrame, if headLoaded then (head :: BasePart).Size.Y / 2 else 0, pose.Spit, pose.Laugh)
 	end
 end
 
@@ -190,14 +190,20 @@ local function stop()
 			part.CFrame = base[part] -- the server has not moved it since: put it back
 		end
 		written[part] = nil
+		local ws = writtenSize[part]
+		if ws ~= nil and part.Size == ws and baseSize[part] then
+			part.Size = baseSize[part]
+		end
+		writtenSize[part] = nil
 	end
+	CalebMouth.Stop()
 	animState = nil
 end
 
 local function refresh()
 	local s = statue
 	local state = if s then CalebEvent.GetState(s) else nil
-	if state ~= State.Full and state ~= State.Celebration then
+	if not s or (state ~= State.Full and state ~= State.Celebration) then
 		stop()
 		return
 	end
@@ -205,6 +211,8 @@ local function refresh()
 		animState = state
 		localStart = os.clock()
 		puffed = false
+		local cycleId = s:GetAttribute(CalebEvent.Attr.CycleId)
+		seed = CalebPartyPoses.Seed(if typeof(cycleId) == "string" then cycleId else nil)
 	end
 	if not stepConnection then
 		stepConnection = RunService.RenderStepped:Connect(step)
@@ -221,6 +229,8 @@ local function unbind()
 	table.clear(byName)
 	table.clear(base)
 	table.clear(written)
+	table.clear(baseSize)
+	table.clear(writtenSize)
 	statue = nil
 end
 
