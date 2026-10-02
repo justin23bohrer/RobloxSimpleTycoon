@@ -12,6 +12,12 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   1,000,000 🍪"), reusing `FeedPromptUI.ProgressBar`. Display only.
 - `CookieRain.client.luau` + `CookieRainLook.luau` (ModuleScript) — cookie
   rain during Caleb's Celebration. Client-only visuals, pooled; no rewards.
+  Ramps up with the Cookie Party phases.
+- `CookiePartyCookies.client.luau` + `CookiePartyLook` / `CookiePartyMotion` /
+  `CookiePartyFeedback` / `CookiePartyNumbers` / `CookiePartyHUD`
+  (ModuleScripts) — the Cookie Party's collectable cookies: draws what the
+  server spawns, asks the server to collect (it decides), and plays the
+  collect feedback + party earnings counter.
 - `CalebEventUI.client.luau` + `CalebEventUIBuild.luau` / `CalebEventFX.luau`
   and the Cookie Party's `CookiePartyUIBuild.luau` / `CookiePartyFX.luau` /
   `CookiePartyCountdown.luau` / `CookiePartyFinale.luau` (ModuleScripts) —
