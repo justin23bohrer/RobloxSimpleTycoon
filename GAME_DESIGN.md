@@ -237,8 +237,11 @@ Built with the **Walls** (hidden on unclaimed plots and before the walls):
   the thief gets a short message.
 - **Refused with a short message:** the bars are up; you have no house or
   haven't built your walls (no stash); your trophies are still loading or
-  aren't saving this session (a saved trophy must stay saved); you already
-  own a trophy from that same Caleb round (one per round per player).
+  aren't saving this session (a saved trophy must stay saved).
+- **Same Caleb round is fine:** you can steal a trophy from a round you also
+  have a trophy from. Stolen trophies are marked as stolen and never count
+  for "one claimed trophy per round", so stealing this round's trophy during
+  the claim time never stops you from claiming your own.
 - One thief per trophy, one trophy per thief. Several houses can be robbed
   at the same time.
 - No weapons, no theft UI beyond those small messages.

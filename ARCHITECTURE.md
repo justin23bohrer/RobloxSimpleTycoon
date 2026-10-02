@@ -196,7 +196,7 @@ routes join/leave in a fixed order:
 | ------- | -------------- | ------ |
 | `PlayerDataService` | Creates `leaderstats.Cookies` at `StartingCash` on join (or `DevStartingCash` when `DevUnlimitedCash` is on **and** `RunService:IsStudio()`); forgets it on leave. | Implemented |
 | `DataService` | Saves/loads each player's house purchases, Caleb trophies, and equipped trophy ids (not cookies) with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. House Raid: `RemoveTrophy(player, instanceId): boolean` (loaded player; unequips, saves, fires `TrophiesChanged` / `EquippedChanged`) and `TransferTrophyOffline(fromUserId, instanceId, toPlayer): (boolean, reason?)` (yields; see Persistence → Stolen trophies). | Implemented |
-| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`, `TakeTrophy(data, instanceId)` (removes a record and its Equipped entry; returns it or nil). | Implemented |
+| `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`, `TakeTrophy(data, instanceId)` (removes a record and its Equipped entry; returns it or nil), `HasClaimedEvent(trophies, eventId)` (a non-stolen record with that non-empty EventId). Version 3: `CleanTrophy` keeps a valid `StolenFrom` (positive whole number); `FromStored` drops only a second **claimed** record per EventId. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending). | Implemented |
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers and builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free. Tells `PlotStages` what to show. `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's `Parts`, shows the buttons it unlocks). `ShowUnclaimed` also hides every build's `Parts`. Decides nothing. | Implemented |
@@ -213,7 +213,7 @@ routes join/leave in a fixed order:
 | `StatueShape` (helper) | Presentation only. `Setup(statue)` remembers every body part's map position/size (body = `Shared/CalebBody`: not `Pedestal*`, `FeedPads`, `Podium`) and the pedestal top. `Apply(progress 0..1, seconds)` (progress = cookies / goal) tweens, from the original map values: fatness (Torso/Belt wider and deeper, arms/legs out and thicker, the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin` grow out, chain stays on the belly) with fatness = log(1 + p·`CalebFatnessCurve`)/log(1 + `CalebFatnessCurve`) (front-loaded), then scales every body part about the pedestal top by `CalebMinScale` → `CalebMaxScale` (p^`CalebScaleCurve`, plus a last `CalebFinalPopScale` jump at exactly the goal). `SetHidden(hidden)` hides/shows the body with `PlotVisibility`. | Implemented |
 | `StatueShape` (helper) | Used only by `StatueService`; presentation only. `Setup(statue)` remembers every statue part's map position/size; `Apply(fatness 0..1, seconds)` tweens Torso/Belt wider and deeper, moves arms/legs out and thickens them, grows the hidden `Belly`, `RightCheek`, `LeftCheek`, `Chin`, and keeps the chain on the belly. `StatueService` passes progress = eaten / goal (linear). | Implemented |
 | `TrophyService` | Caleb Trophies. On `CalebCycle.StateChanged` → `TrophyClaim` puts a big golden trophy (`Workspace.Map.CalebClaimTrophy`, `Config.TrophyPodiumScale`) on top of the highest `Pedestal*` part with a server `ProximityPrompt` "Claim Caleb Trophy"; any other state (and `Start`) removes it. `Triggered`: `CalebCycle.IsEligible` → (waits only if the player's data is still loading, then re-checks) → `TrophyVariants.RollReward(ownedVariantIds)` → `DataService.AddTrophy` (or, if data is not loaded, `TrophyInventory.AddSessionTrophy`: kept by UserId until the server closes) → `CalebCycle.MarkTrophyClaimed`, with no yield between the last check and the mark. Reports the result in the `CalebTrophyNotice` player attribute. Handles the `TrophyEquip` remote (rules in `TrophyInventory`). **Display rule:** only equipped trophies in a **built** Trophy Case are displayed, and only displayed trophies give powers. On join/load, trophy added, equip change, `PurchaseApplied("TrophyCase")` (buy or restore), and plot claimed/released (`OwnerUserId`), it calls `TrophyCaseDisplay.Show(plot, case, equippedRecordsInSlotOrder)` (or `Clear`), `PowerService.SetDisplayed(player, displayedVariantIds)` (empty without a built case, after release, and on leave), and republishes the `TrophyInventory` attribute; refreshes are batched per frame. **House Raid:** an equipped trophy that `TheftService.IsInTransit` is skipped for both display (its slot stays empty) and powers, but stays owned and equipped; `TheftService.DisplayChanged(userId)` schedules a refresh for that player. | Implemented (`Start(statue?)`) |
-| `TrophyInventory` (helper) | Used by `TrophyService` and the Theft helpers. Owned = saved (`DataService`) + session-only trophies; Equipped = saved list then equipped session-only ones (≤ `TrophyActiveSlots`). `NewRecord`, `GetOwned`, `GetEquipped`, `GetEquippedRecords`, `AddSessionTrophy` (auto-equips into a free slot), `SetEquippedState`, `HandleRequest(player, action, instanceId)` (the remote's checks), `Publish(player, caseBuilt)`, `OnPlayerRemoving`. House Raid: `FindSessionTrophy(userId, instanceId)`, `RemoveSessionTrophy(userId, instanceId)` (session-only trophies are kept by UserId, so they work after their owner left), `HasEventTrophy(player, eventId)`. | Implemented |
+| `TrophyInventory` (helper) | Used by `TrophyService` and the Theft helpers. Owned = saved (`DataService`) + session-only trophies; Equipped = saved list then equipped session-only ones (≤ `TrophyActiveSlots`). `NewRecord`, `GetOwned`, `GetEquipped`, `GetEquippedRecords`, `AddSessionTrophy` (auto-equips into a free slot), `SetEquippedState`, `HandleRequest(player, action, instanceId)` (the remote's checks), `Publish(player, caseBuilt)`, `OnPlayerRemoving`. House Raid: `FindSessionTrophy(userId, instanceId)`, `RemoveSessionTrophy(userId, instanceId)` (session-only trophies are kept by UserId, so they work after their owner left), and `Publish` includes each record's `StolenFrom`. | Implemented |
 | `TrophyModel` (helper) | Used by `TrophyService`, `TrophyCaseDisplay` and `TheftCarry`; presentation only. `Build(variantId, scale?, label?)` returns an anchored, non-colliding Model (pivot = bottom center of the plinth, facing -Z): plinth + gold trim + "CALEB TROPHY" nameplate (variant name in its rarity color, or `label`), a mini Caleb in the statue's style in the variant's color/material and pose (arm angles per pose), accessories, and effect (`Sparkles` on the head or a `PointLight` glow). Unknown variant ids use `TrophyVariants.Fallback`. | Implemented |
 | `TrophyCaseDisplay` (helper) | Used only by `TrophyService`; presentation only. `Show(plot, case, recordsBySlot, ownerUserId)` shows `recordsBySlot[N]` on slot N (a missing N leaves that slot empty, e.g. while its trophy is being carried), up to `Config.TrophyCaseSlots`: each is built with `TrophyModel` (`Config.TrophyCaseScale`), stood on `TrophySlotN` facing the slot's LookVector, with a tilted gold-rimmed `Nameplate` part at the slot's front edge (SurfaceGui, `LightInfluence = 0`, `MaxDistance = 60`: `DisplayName` in `TrophyVariants.Rarities[rarity].Color` (white if missing) and the definition's `PowerText` if it has one), all in a runtime `CaseTrophies` folder in the plot (outside the `TrophyCase` model, so `PlotVisibility` never tracks them); then it enables the case's `Light`s. A slot that already shows exactly that trophy (same `TrophyInstanceId`, owner and `Variant`) is kept, so a refresh never cancels someone holding its prompt; other slots are rebuilt or emptied. No loops. `Clear(plot)` destroys that folder and disables the plot's `TrophyCase` lights. **House Raid:** each trophy Model gets the `TrophyOwnerUserId` / `TrophyInstanceId` attributes and a server `ProximityPrompt` `StealPrompt` on its `Plinth` ("Steal Trophy", ObjectText = the trophy's name, `HoldDuration = TheftHoldSeconds`, `MaxActivationDistance = TheftPromptDistance`, `RequiresLineOfSight = false`); `Triggered` only fires the `StealTriggered: RBXScriptSignal (player, trophyModel)` signal, which `TheftService` handles. | Implemented |
 | `TrophyAccessories` (helper) | Used only by `TrophyModel`: `Add(make, names, anchors)` builds `Crown`, `PartyHat`, `ChefHat`, `Sunglasses`, `Cookie` (right hand), `BowTie`; unknown names are skipped. | Implemented |
@@ -221,7 +221,7 @@ routes join/leave in a fixed order:
 | `TheftService` | House Raid trophy thefts (see "House Raid (contract)" → Stealing). `Start()` connects `TrophyCaseDisplay.StealTriggered`. A trigger is checked by `TheftRules.Check` (no yield), then recorded at once: `IsInTransit(instanceId)` true (so `TrophyService` hides it and drops its power for the owner, via `DisplayChanged(ownerUserId)`), `PowerService.SetSuppressed(thief, true)`, `TheftCarry.Attach` (the trophy welded over the head as `CarriedTrophy`), and the thief's `CarryingTrophy` attribute. One `Heartbeat` connection per theft checks: same character, alive, still has a plot, not too fast (`TheftCarry.MovedTooFast`, limit = the server's WalkSpeed + `TheftMoveSlack`), and on their own shown `TrophyStash` (`TheftCarry.IsOnStash`). `Died`, `CharacterRemoving`, `StopThief` (push), leaving, the owner's record disappearing (`DataService.TrophiesChanged`) and the checks above **stop** it: the trophy goes back to the owner's case, saved data untouched. On the stash the state flips to `Transferring` first (so a same-frame push returns false), then `TheftTransfer.Run` (pcall'd) moves it; a failure leaves it with the owner and sets the thief's `TheftNotice`. Every path ends in one `finish()`: carried model, connections and `CarryingTrophy` removed, `SetSuppressed(false)`, `DisplayChanged` for owner and thief. API: `IsCarrying(player)` (true while carrying or transferring), `StopThief(thief, byPlayer?)` (true only if it cancelled a carrying theft), `IsInTransit(instanceId)`, `DisplayChanged: RBXScriptSignal (userId)`, `OnPlayerRemoving(player)` (a thief who leaves: stopped; an owner who leaves: the theft goes on). | Implemented (Studio test pending: QA TH*) |
 | `TheftRules` (helper) | Used only by `TheftService`; reads only, never yields. `Check(thief, trophy, isCarrying, isInTransit)` → `(Start?, message?)`: the model's `TrophyOwnerUserId` / `TrophyInstanceId` are only a hint; it checks not your own, not in transit, not already carrying, the owner is here, the model is in the owner's plot, the owner has that InstanceId equipped and owned (`TrophyInventory`), the plot is not `HouseSecurityService.IsProtected`, the thief is alive and within `TheftPromptDistance` + 4 studs of the trophy, has a plot whose `TrophyStash` is shown (a plot without one only warns once), and `TheftTransfer.CanReceive`. Returns `{FromUserId, Record, Character, Humanoid, Root, Stash}`. | Implemented |
 | `TheftCarry` (helper) | Used only by `TheftService`; decides nothing. `Attach(character, variantId)`: `TrophyModel.Build` (scale 1) placed 0.4 studs above the head, every part unanchored, `Massless`, no collide/touch/query, `WeldConstraint` to the `HumanoidRootPart`, named `CarriedTrophy` in the character (replicates to everyone). `Detach(model)`. `FindStash(plot)` (recursive find of `TrophyStash`, part or model) / `IsShown(stash)` (any part with `Transparency < 1`; `PlotVisibility` hides it until Walls). `IsOnStash(stash, rootPosition)`: inside the stash's world-axis box (+0.5 studs) and at most 7 studs above its top (works for the flat Cylinder pad). `NewTracker` / `MovedTooFast(tracker, position, now, maxSpeed)`: horizontal average speed over the last 0.5 s > maxSpeed, or a single step longer than maxSpeed studs (one second's worth). | Implemented |
-| `TheftTransfer` (helper) | Used only by `TheftService` / `TheftRules`. `CanReceive(thief, record, sessionOnly)`: a saved trophy needs the thief's data loaded (not loading, not unsaved); refuses a thief who already owns a trophy with the same non-empty `EventId` (one per Caleb round: a second saved one would be dropped on the next load) or that InstanceId. `Run(thief, fromUserId, record)`: (1) session-only trophy → `TrophyInventory.RemoveSessionTrophy` + `AddSessionTrophy`; (2) owner here and loaded → `DataService.AddTrophy(thief)` then `RemoveTrophy(owner)` (add undone if the remove fails); (3) otherwise → `DataService.TransferTrophyOffline` (yields). Same `InstanceId`/`Variant`/`EventId`/`EarnedAt`; auto-equipped for the thief if a slot is free. Returns `(true)` or `(false, message for the thief)`. | Implemented |
+| `TheftTransfer` (helper) | Used only by `TheftService` / `TheftRules`. `CanReceive(thief, record, sessionOnly)`: a saved trophy needs the thief's data loaded (not loading, not unsaved); refuses a thief who already owns that InstanceId (can't happen; keeps the undo exact). The Caleb round doesn't matter. `Run(thief, fromUserId, record)`: (1) session-only trophy → `TrophyInventory.RemoveSessionTrophy` + `AddSessionTrophy`; (2) owner here and loaded → `DataService.AddTrophy(thief)` then `RemoveTrophy(owner)` (add undone if the remove fails); (3) otherwise → `DataService.TransferTrophyOffline` (yields). Same `InstanceId`/`Variant`/`EventId`/`EarnedAt`, plus `StolenFrom = fromUserId` on the thief's copy (all three paths; exempt from one-per-EventId); auto-equipped for the thief if a slot is free. Returns `(true)` or `(false, message for the thief)`. | Implemented |
 | `PowerService` | A player's active Caleb Trophy powers. `SetDisplayed(player, variantIds)` (called by `TrophyService`) stores `TrophyPowers.Compute(variantIds)`, publishes the `TrophyStats` (JSON) and `CanDoubleJump` player attributes, and applies movement: `WalkSpeed = base × (1 + WalkSpeed)`, `JumpHeight = base × (1 + JumpHeight)` with `UseJumpPower = false`; the base is the Humanoid's own spawn value, saved as `BaseWalkSpeed` / `BaseJumpHeight` attributes on it so re-applying never compounds. Each time movement is applied it also calls `PowerVisuals.SetSpeedGlow(character, WalkSpeed bonus)`. `Get(player, stat)` is the capped total (0 if none). `OnPlayerAdded` re-applies on every `CharacterAdded` (and `PowerVisuals.Watch`es the new character); `OnPlayerRemoving` forgets. `SetDisplayed` also calls `PlotPowerVisuals.Apply(player, totals)`. **`SetSuppressed(player, on)`** (server only, `TheftService` while carrying): every power off: `Get` returns 0 for every stat (so every dropper / collect bonus stops, since those read `Get`), `TrophyStats` = `{}`, `CanDoubleJump = false`, `WalkSpeed = base × Config.TheftCarrySpeedMultiplier`, `JumpHeight = base`, no glowing feet, and `PlotPowerVisuals.Apply(player, {})`. The displayed totals are kept, so turning it off restores exactly what the case displays. Event-driven, no loops. | Implemented |
 | `PowerVisuals` | Helper for `PowerService`: glowing feet. `SetSpeedGlow(character, bonus)` puts one `SpeedGlow` Attachment at the bottom of each foot (R15 `LeftFoot`/`RightFoot`, R6 `Left Leg`/`Right Leg`) with a `PointLight` and a `ParticleEmitter`, scaled from `Config.TrophySpeedGlow*` Min to Max by bonus / `TrophyStatCaps.WalkSpeed`; bonus ≤ 0 removes it; idempotent (one per foot). Built on the server inside the character so it replicates to every client. `Watch(player, character, getBonus)` (one `ChildAdded` connection per player, replaced per character) re-applies when a foot part is added after spawn; `Forget(player)` on leave. | Implemented |
 | `PlotPowerVisuals` (helper) | Presentation only: shows the plot owner's active powers on what they boost, built on the server so everyone sees it. `Apply(player, totals)` (from `PowerService.SetDisplayed`) stores the totals and redraws the plot whose `OwnerUserId` is the player; `AddDropper(plot, cup)` (from `DropperService.Start`) registers a cup (forgotten on `Destroying`) and draws it at once. CookieMultiplier/DropperSpeed > 0 → an invisible `PowerFX` part on top of each cup with a `Fire` + `PointLight` scaled by the sum (full at +1.0), plus a `PowerSparks` emitter when both are > 0; ExtraCookieChance/LuckyCookieChance > 0 → a slow green/gold `PowerLuck` emitter on the same part; CollectBonus > 0 → `PowerPadFX`, a gold Neon ring around the CollectPad (a child of the plot, not the pad, so `PlotVisibility` never tracks it) with a `PowerShine` emitter and light, scaled by bonus / cap. Each effect stores a `PowerKey` attribute and is rebuilt only when its powers change. It watches every plot's `OwnerUserId` and redraws on change, so release/leave clears the plot and a new owner gets their own powers. Never shows player-body powers. | Implemented |
@@ -397,9 +397,9 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 
 ```lua
 {
-	Version = 2,                       -- DataSchema.CURRENT_VERSION
+	Version = 3,                       -- DataSchema.CURRENT_VERSION
 	Purchases = { [purchaseId] = true },
-	Trophies = { TrophyRecord },       -- oldest first, one per non-empty EventId, unique InstanceId
+	Trophies = { TrophyRecord },       -- oldest first, one CLAIMED per non-empty EventId (stolen exempt), unique InstanceId
 	Equipped = { InstanceId },         -- display order, owned, unique, <= Config.TrophyActiveSlots
 	SessionJobId = "<JobId>" | nil,    -- session lock (DataService only)
 	SessionTime = os.time(),           -- last write by the lock holder
@@ -416,11 +416,21 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   load writes the migrated record at once, so the new ids stick. Cleaning
   (every load): a record without a non-empty `Variant` string or with a bad
   `EarnedAt` is dropped; a non-string `EventId` becomes `""`; a second
-  record with the same non-empty `EventId` is dropped; a missing, invalid,
+  **claimed** record (no `StolenFrom`) with the same non-empty `EventId` is
+  dropped (stolen records are never dropped for it); a `StolenFrom` that is
+  not a positive whole number is removed; a missing, invalid,
   or repeated `InstanceId` gets a new one (the trophy is kept). `Equipped`
   keeps only owned string ids, each once, at most `TrophyActiveSlots`.
   A Version 1 server refuses a Version 2 record (newer version), so during a
-  rollout a player who reaches an old server plays unsaved there. A value that is not a table, or has a **newer**
+  rollout a player who reaches an old server plays unsaved there.
+- **Version 3 (stolen trophies, House Raid):** a `TrophyRecord` may carry
+  `StolenFrom` (the UserId it was last stolen from; nil = claimed). Stolen
+  records are exempt from "one per `EventId`" everywhere (load cleaning,
+  `AddTrophy`), so a thief can hold a stolen trophy next to their own trophy
+  from the same Caleb round, and a stolen one never blocks their own claim.
+  2 → 3 changes no data; the bump exists so a Version 2 server (which would
+  drop `StolenFrom` and then the stolen same-round trophy) refuses the
+  record and plays that player unsaved instead. A value that is not a table, or has a **newer**
   `Version` than the server knows, is refused (not overwritten).
 - **Load failure** (all retries failed, refused data, Studio without API
   access): the player is **not loaded** for the session: `IsLoaded` is
@@ -462,8 +472,9 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
 - **Trophies:** DataService only stores and returns them
   (`GetTrophies`, `AddTrophy`, `TrophiesChanged`, `GetEquipped`,
   `SetEquipped`, `EquippedChanged`, `IsLoading`); TrophyService awards,
-  equips, and shows them. `AddTrophy` assigns an `InstanceId` if missing
-  and **auto-equips** the new trophy when fewer than `TrophyActiveSlots`
+  equips, and shows them. `AddTrophy` assigns an `InstanceId` if missing,
+  refuses a second **claimed** trophy for an `EventId` (records with
+  `StolenFrom` are exempt both ways), and **auto-equips** the new trophy when fewer than `TrophyActiveSlots`
   are equipped (so a first trophy shows up in a built case at once);
   `SetEquipped` validates loaded / owned / no repeats / limit, marks the
   data dirty (saved by autosave or on leave), and fires `EquippedChanged`.
@@ -496,10 +507,12 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
     Refused (fail safe, the owner keeps it) when saving is off / closing.
   - **Session-only trophy:** moves between `TrophyInventory` session lists
     (by UserId, so it works after the owner left); never written.
+  - The thief's copy is marked `StolenFrom = <owner's UserId>` on every path
+    (same `InstanceId`, `Variant`, `EventId`, `EarnedAt`). Stolen records
+    never count for the one-claimed-trophy-per-`EventId` rule, so the Caleb
+    round never blocks a theft or a later claim.
   - A saved trophy can only go to a thief whose data is loaded (an unsaved
-    thief is refused at the start), and nobody gets a second trophy of the
-    same Caleb round (`EventId`): refused at the start (and re-checked at the
-    stash), because `FromStored` would drop the second one on the next load.
+    thief is refused at the start).
   - Risk: the two keys are written by two separate saves; a server crash
     between them could leave both or neither saved. Each save retries, and a
     failed save stays dirty for the next autosave / leave save.
@@ -770,9 +783,10 @@ insurance, no security UI, no weapons.
     built); otherwise the start is refused with a message. "Standing inside
     the house" is the range check (the case is inside, the doorway is the
     only way in).
-  * Refused at the start with a message: the house is protected, a saved
-    trophy and the thief's data is loading / unsaved, or the thief already
-    owns a trophy from the same Caleb round (`EventId`).
+  * Refused at the start with a message: the house is protected, or a saved
+    trophy and the thief's data is loading / unsaved. The Caleb round does
+    **not** matter: the thief's copy gets `StolenFrom` and is exempt from
+    one-per-`EventId` (lead review of PR #68).
   * The stolen trophy keeps its `InstanceId`; it is auto-equipped for the
     thief if they have a free slot.
   * Messages to the thief: player attribute `TheftNotice` = JSON
@@ -817,7 +831,7 @@ User decisions: no Magnet Caleb; Big Brain = Collect pad bonus; trophy claim
 stays 2 minutes; the Trophy Case stays a purchase and **a trophy's power only
 works while it is displayed in a built Trophy Case**.
 
-### Data (DataService / DataSchema, Version 2)
+### Data (DataService / DataSchema, Version 3)
 
 ```lua
 type TrophyRecord = {
@@ -825,12 +839,15 @@ type TrophyRecord = {
 	Variant: string,    -- definition id in Shared/TrophyVariants (never renamed)
 	EventId: string,    -- the CalebCycleId it was earned in ("" for none)
 	EarnedAt: number,   -- os.time()
+	StolenFrom: number?, -- House Raid (Version 3): UserId it was last stolen from; nil = claimed
 }
 PlayerData.Equipped: { string } -- InstanceIds in display order, unique, owned, at most Config.TrophyActiveSlots
 ```
 
 Version 1 → 2 migration: every old record gets a new InstanceId; Equipped =
-the newest `TrophyActiveSlots` records (what the old case showed).
+the newest `TrophyActiveSlots` records (what the old case showed). 2 → 3
+changes no data (adds the optional `StolenFrom`). One **claimed** trophy per
+non-empty `EventId`; stolen records (`StolenFrom`) never count.
 
 ### Shared modules
 
@@ -865,7 +882,7 @@ client.
 
 | Attribute | Type | Meaning |
 | --------- | ---- | ------- |
-| `TrophyInventory` | string | JSON `{ Owned = [{InstanceId, Variant, EventId, EarnedAt}], Equipped = [InstanceId], CaseBuilt = bool, Max = TrophyActiveSlots, Saved = bool }` |
+| `TrophyInventory` | string | JSON `{ Owned = [{InstanceId, Variant, EventId, EarnedAt, StolenFrom?}], Equipped = [InstanceId], CaseBuilt = bool, Max = TrophyActiveSlots, Saved = bool }` |
 | `TrophyStats` | string | JSON `{[Stat] = total}` of active powers |
 | `CanDoubleJump` | boolean | Rocket Caleb's double jump is active |
 

@@ -11,8 +11,9 @@
 --   preferring trophies the player doesn't own), saves it with
 --   DataService.AddTrophy, then CalebCycle.MarkTrophyClaimed. The check, the
 --   save, and the mark run without yielding in between, so double triggers
---   can never give two trophies. AddTrophy also refuses a second trophy for
---   the same EventId (cycle id).
+--   can never give two trophies. AddTrophy also refuses a second CLAIMED
+--   trophy for the same EventId (cycle id); stolen trophies (StolenFrom)
+--   never count, so stealing this round's trophy doesn't block your claim.
 -- * If the player's data is not loaded (DataStore down, or Studio without
 --   API access), the trophy is kept session-only by TrophyInventory (by
 --   UserId, until this server closes) and can still be equipped.

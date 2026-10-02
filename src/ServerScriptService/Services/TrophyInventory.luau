@@ -130,21 +130,6 @@ function TrophyInventory.RemoveSessionTrophy(userId: number, instanceId: string)
 	return nil
 end
 
--- True if the player already owns (saved or session-only) a trophy from this
--- Caleb round. "" (no round) is never a match. Each player may hold only one
--- trophy per round: a saved second one would be dropped on the next load.
-function TrophyInventory.HasEventTrophy(player: Player, eventId: string): boolean
-	if eventId == "" then
-		return false
-	end
-	for _, record in TrophyInventory.GetOwned(player) do
-		if record.EventId == eventId then
-			return true
-		end
-	end
-	return false
-end
-
 -- Equips or unequips one of the player's own trophies. Returns (true) or
 -- (false, friendly reason). Server data only; nothing changes on false.
 function TrophyInventory.SetEquippedState(player: Player, instanceId: string, equip: boolean): (boolean, string?)
@@ -214,6 +199,7 @@ function TrophyInventory.Publish(player: Player, caseBuilt: boolean)
 			Variant = record.Variant,
 			EventId = record.EventId,
 			EarnedAt = record.EarnedAt,
+			StolenFrom = record.StolenFrom, -- nil for claimed trophies
 		})
 	end
 	local inventory = {

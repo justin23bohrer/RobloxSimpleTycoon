@@ -390,10 +390,10 @@ local function addRecord(player: Player, session: Session, record: TrophyRecord)
 		return false
 	end
 	local data = session.Data :: DataSchema.PlayerData
+	if clean.StolenFrom == nil and DataSchema.HasClaimedEvent(data.Trophies, clean.EventId) then
+		return false -- already claimed this round (stolen trophies never count)
+	end
 	for _, owned in data.Trophies do
-		if clean.EventId ~= "" and owned.EventId == clean.EventId then
-			return false
-		end
 		if owned.InstanceId == clean.InstanceId then
 			clean.InstanceId = DataSchema.NewInstanceId()
 		end
@@ -415,8 +415,10 @@ local function addRecord(player: Player, session: Session, record: TrophyRecord)
 end
 
 -- Adds a trophy and saves right away. False if the data is not loaded, the
--- record is invalid, or it is an event trophy (EventId ~= "") and the player
--- already has one for that EventId. A missing InstanceId (or one the player
+-- record is invalid, or it is a claimed event trophy (EventId ~= "", no
+-- StolenFrom) and the player already has a claimed one for that EventId
+-- (stolen trophies are exempt both ways: a stolen record is always allowed,
+-- and stolen records never block a claim). A missing InstanceId (or one the player
 -- already owns) is replaced by a new one. If an active slot is free
 -- (fewer than Config.TrophyActiveSlots equipped), the new trophy is equipped
 -- too, so a first trophy shows up in the Trophy Case right away.
@@ -540,7 +542,8 @@ end
 -- `toPlayer` (loaded here). Yields. Refused while any server holds the
 -- owner's session lock (another server, or this one while their leave save
 -- still runs: that is waited for first). The owner's key loses the trophy in
--- one UpdateAsync, and only then is it added to toPlayer like AddTrophy.
+-- one UpdateAsync, and only then is it added to toPlayer like AddTrophy,
+-- marked StolenFrom = fromUserId (a failed add puts back the original).
 -- toPlayer's leave / shutdown save waits for this, so it is saved even if
 -- they leave meanwhile. If it can't be added after all (toPlayer's data was
 -- taken over by another server meanwhile), it is put back on the owner's key.
@@ -563,7 +566,9 @@ function DataService.TransferTrophyOffline(fromUserId: number, instanceId: strin
 	end)
 	local added = false
 	if outcome == "ok" and taken then
-		added = session.Status == "Loaded" and not session.Released and addRecord(toPlayer, session, taken)
+		local given = table.clone(taken :: TrophyRecord)
+		given.StolenFrom = fromUserId
+		added = session.Status == "Loaded" and not session.Released and addRecord(toPlayer, session, given)
 	end
 	session.Incoming -= 1
 	if outcome == "ok" and taken and not added then

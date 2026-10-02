@@ -14,10 +14,10 @@
 --    elsewhere: DataService.TransferTrophyOffline (yields; refused while any
 --    server holds the owner's session lock).
 --
--- Same Caleb round: a player may hold only one trophy per EventId (a second
--- saved one would be dropped on the next load), so a thief who already owns
--- one from that round can't steal another from it (CanReceive refuses at the
--- start, and again at the stash).
+-- The thief's copy is marked StolenFrom = the UserId it was taken from, so
+-- it never counts for "one claimed trophy per Caleb round": a thief may hold
+-- it next to their own trophy from the same round, and a stolen one never
+-- blocks their own claim. Unique InstanceIds keep one owner per trophy.
 
 local Players = game:GetService("Players")
 
@@ -32,7 +32,6 @@ type TrophyRecord = DataSchema.TrophyRecord
 -- Messages for the thief (a small notification).
 local LOADING = "Your trophies are still loading. Try again in a moment."
 local UNSAVED = "Your trophies aren't saving right now, so you can't keep a stolen trophy."
-local SAME_ROUND = "You already have a trophy from that Caleb round."
 local GONE = "That trophy isn't there anymore."
 local FAILED = "Couldn't take the trophy right now, so it went back to its owner."
 
@@ -46,7 +45,8 @@ local function owns(list: { TrophyRecord }, instanceId: string): TrophyRecord?
 end
 
 -- Can `thief` receive this trophy? A saved trophy needs the thief's data
--- loaded (it must stay saved). Returns (true) or (false, message).
+-- loaded (it must stay saved). The Caleb round doesn't matter (the copy is
+-- marked stolen). Returns (true) or (false, message).
 function TheftTransfer.CanReceive(thief: Player, record: TrophyRecord, sessionOnly: boolean): (boolean, string?)
 	if not sessionOnly then
 		if DataService.IsLoading(thief) then
@@ -55,9 +55,6 @@ function TheftTransfer.CanReceive(thief: Player, record: TrophyRecord, sessionOn
 		if not DataService.IsLoaded(thief) then
 			return false, UNSAVED
 		end
-	end
-	if TrophyInventory.HasEventTrophy(thief, record.EventId) then
-		return false, SAME_ROUND
 	end
 	if owns(TrophyInventory.GetOwned(thief), record.InstanceId) then
 		return false, GONE -- can't happen (unique ids); keeps the undo below exact
@@ -79,6 +76,7 @@ function TheftTransfer.Run(thief: Player, fromUserId: number, record: TrophyReco
 			return false, why
 		end
 		local moved = TrophyInventory.RemoveSessionTrophy(fromUserId, instanceId) :: TrophyRecord
+		moved.StolenFrom = fromUserId
 		TrophyInventory.AddSessionTrophy(thief, moved)
 		return true
 	end
@@ -95,7 +93,9 @@ function TheftTransfer.Run(thief: Player, fromUserId: number, record: TrophyReco
 		if not saved then
 			return false, GONE
 		end
-		if not DataService.AddTrophy(thief, saved) then
+		local given = table.clone(saved)
+		given.StolenFrom = fromUserId
+		if not DataService.AddTrophy(thief, given) then
 			return false, FAILED
 		end
 		if not DataService.RemoveTrophy(owner, instanceId) then
@@ -105,7 +105,8 @@ function TheftTransfer.Run(thief: Player, fromUserId: number, record: TrophyReco
 		return true
 	end
 
-	-- 3. Owner's saved key (they left, or their data is open elsewhere).
+	-- 3. Owner's saved key (they left, or their data is open elsewhere);
+	-- DataService marks the thief's copy StolenFrom.
 	local moved = DataService.TransferTrophyOffline(fromUserId, instanceId, thief)
 	return moved, if moved then nil else FAILED
 end
