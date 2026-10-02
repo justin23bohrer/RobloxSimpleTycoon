@@ -88,6 +88,16 @@ No completion screen (only the short "YOU COLLECTED" total), no leaderboard, no 
 - [x] End-of-party total: "YOU COLLECTED 🍪 N!" (requested by the user 2026-10-01). `CookiePartyTotal` + `CookiePartyTotalBuild`. (code done; Studio test pending: QA PT1–PT9)
 - [ ] Upload the new party sounds and a music track; paste ids into `Config.CookiePartySounds` (user).
 
+## House Raid: trophy stealing, house security, push (approved by the user 2026-10-01)
+
+Contract: ARCHITECTURE.md "House Raid (contract)". Permanent theft is
+intentional. No weapons, no dropped trophies, no security UI, no prestige houses.
+
+- [x] Contract: `Shared/HouseRaid.luau`, Config block, remotes, service stubs wired into `ServerMain` (lead).
+- [ ] Security: `SecurityPad` (green/red), red `SecurityBars` for exactly 30 s, no cooldown, owner passes through, `TrophyStash` pad in the map. (QA HR*)
+- [ ] Theft: steal prompt on displayed trophies, carry over head, all powers off while carrying, returns on push/death/leave, permanent transfer at the thief's `TrophyStash`, offline owner handling. (QA TH*)
+- [ ] Push: input + animation + phone button, server-validated hit, knockback, stops thieves. (QA PU*)
+
 ## Post-MVP (needs approval)
 
 - [ ] Teleport players to their plot on join/respawn.

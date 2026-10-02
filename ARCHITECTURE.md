@@ -306,6 +306,9 @@ warns if it does not.
 | ------ | ---- | --------- | ---------- | ------------------------- | ------- |
 | `FeedStatue` | RemoteFunction | client → server (`InvokeServer`) | `StatueService` | `amount`: cookies to feed | `(true, cookiesEaten)` or `(false, reason)` |
 | `TrophyEquip` | RemoteFunction | client → server (`InvokeServer`) | `TrophyService` (`TrophyInventory.HandleRequest`) | `action`: `"Equip"`/`"Unequip"`, `instanceId`: string ≤ 64 | `(true)` or `(false, reason)` |
+| `PushRequest` | RemoteEvent | client → server | `PushService` | none (server finds the target) | — |
+| `PushFX` | RemoteEvent | server → all clients | push client script | `(pusherUserId, targetUserId?)` | — |
+| `PushKnockback` | RemoteEvent | server → the pushed player | push client script | `(velocity: Vector3)` | — |
 | `CookiePartyCollect` | RemoteEvent | client → server | `CookiePartyService` | `id`: number (a cookie id the server sent) | — (answer is `CookiePartyCollected` to everyone) |
 | `CookiePartySpawn` | RemoteEvent | server → all clients | `CookiePartyCookies.client` | `{ CookieParty.Spawn }` batch | — |
 | `CookiePartyCollected` | RemoteEvent | server → all clients | `CookiePartyCookies.client` | `(id, userId, value, cookieType)`; `userId` 0 = expired/removed | — |
@@ -622,6 +625,101 @@ land in the right phase.
 Everything created for the party (client parts, pools, connections, lighting
 effects, server tables) is cleaned up when `Celebration` ends (the finale
 explosion may finish its ~2 s animation into `TrophyClaim`, then is gone).
+
+## House Raid (contract)
+
+Approved by the user 2026-10-01 (the "Permanent Trophy Stealing, House Locks
+& PvP Escape System" spec). Built by several agents in parallel: **this
+section is the contract**; names are fixed (change only with the lead's OK,
+and update this section in the same PR). Names are in
+`ReplicatedStorage/Shared/HouseRaid.luau`; numbers in `Config` (House Raid
+block). Stubs of `HouseSecurityService`, `TheftService` and `PushService`
+with the final APIs are already in `Services/` and wired into `ServerMain`.
+
+Loop: protect your house (security pad) → steal a **displayed** trophy from
+an unprotected house (3 s hold) → it rides over your head and **all your
+trophy powers turn off** → run home → anyone who pushes you sends the trophy
+straight back to its owner's case **or** you reach your own `TrophyStash`
+and the trophy is **permanently yours** (removed from the owner's saved
+data, added to yours). No dropped trophies, no temporary ownership, no
+insurance, no security UI, no weapons.
+
+### House security (HouseSecurityService, Security worker)
+
+* Map (Plot1, copied to Plot2–4 by `tools/plots/generate_plots.py`):
+  `SecurityPad` (round floor button inside the house, near the doorway),
+  `SecurityBars` (Model of red metal bars across the front doorway,
+  x −8..8 at z −10.5, lowered/hidden when off), and `TrophyStash` (a floor
+  pad inside the house where a thief delivers). Visible only once `Walls` is
+  built (follow how builds are shown); the doorway is the house's only way in.
+* Owner steps on the **green** pad → bars rise (tweened, mechanical sound),
+  pad turns **red**, plot attributes `SecurityActive = true`,
+  `SecurityEndsAt = now + Config.HouseSecuritySeconds` (30). After exactly
+  30 s the bars drop (sound), pad green, `SecurityActive = false`. **No
+  cooldown.** Non-owners stepping on it do nothing.
+* Bars collide for everyone on the server; the owner's client turns
+  `CanCollide` off locally for its own plot's bars, so only the owner walks
+  through. `HouseSecurityService.IsProtected(plot)` is the server truth (theft
+  refuses to start while protected).
+* `ResetPlot(plot)` on release: bars down, pad green, timer cancelled.
+
+### Stealing (TheftService, Theft worker)
+
+* `TrophyCaseDisplay` tags each displayed trophy Model with
+  `TrophyOwnerUserId` / `TrophyInstanceId` and gives it a server
+  `ProximityPrompt` named `StealPrompt` (HoldDuration
+  `Config.TheftHoldSeconds`, MaxActivationDistance `Config.TheftPromptDistance`).
+  Each client hides the prompt on its own house's trophies (looks only).
+* On `Triggered` the server checks: the thief is not the owner; the owner is
+  in the server and owns that InstanceId (DataService/TrophyInventory); it is
+  displayed right now and not already in transit; the plot is not protected;
+  the thief is alive, not already carrying, standing inside the house, and
+  within range. Then the theft starts (one per trophy, one per thief):
+  * the trophy leaves the owner's case (`IsInTransit(instanceId)` = true, so
+    TrophyService neither displays it nor counts its power);
+  * the thief carries the **actual trophy model** (TrophyModel) welded over
+    their head, named `CarriedTrophy` inside the character (everyone sees it);
+  * the thief's `CarryingTrophy` attribute = JSON `{Variant, InstanceId, FromUserId}`;
+  * **all** the thief's trophy powers are off via PowerService (movement
+    back to the no-trophy base × `TheftCarrySpeedMultiplier`, no double jump,
+    and no production/collect bonuses on their plot) until the theft ends.
+* The trophy **stays in the owner's saved data** the whole time it is carried.
+* Ends (exactly one, decided in one server step; first event wins):
+  * **Stopped:** `StopThief` (a push), thief dies/resets/leaves, the trophy
+    or owner data disappears, an anti-teleport speed check fails, or the
+    thief's own plot is gone. The trophy goes back to the owner's display
+    (if they're still here); nothing changes in saved data.
+  * **Escaped:** the thief touches their **own** `TrophyStash` while
+    carrying. The server re-checks, then transfers atomically: remove from
+    the owner, add to the thief (same Variant/EventId, new or same
+    InstanceId), unequip it for the owner, save both. If the owner left the
+    server meanwhile, the removal is done on their saved key with
+    `UpdateAsync` (only if no other server holds their session lock;
+    otherwise the theft fails safe and the trophy stays the owner's). Session
+    (unsaved) trophies transfer as session trophies. If the add fails, the
+    remove is undone: never zero owners, never two.
+* Powers come back (PowerService recompute) when the theft ends either way.
+
+### Push (PushService, Push worker)
+
+* A Push key/button (e.g. F on PC, an on-screen button on phone, ButtonX on
+  a gamepad) plays a short push animation and fires `PushRequest`.
+  The server checks cooldown (`Config.PushCooldown`), finds the closest
+  other player within `Config.PushRange` in front of the pusher, and fires
+  `PushFX(pusher, target?)` to everyone (hit feedback). On a hit it sends
+  `PushKnockback(velocity)` to the target (whose client applies it, since
+  characters are client-owned) and, if the target is carrying, calls
+  `TheftService.StopThief(target, pusher)`. Anyone may push a thief.
+  Pushing a non-carrier gives only a small nudge (no griefing launches).
+
+### Who owns what
+
+| Part | Owner | Files |
+| ---- | ----- | ----- |
+| Contract, stubs, wiring | lead | `Shared/HouseRaid.luau`, Config block, remotes, `ServerMain` |
+| Security | Security worker | `HouseSecurityService`, a client script for owner pass-through, Plot1 map (`SecurityPad`, `SecurityBars`, `TrophyStash`) + `tools/plots/generate_plots.py` output, `PlotStages`/`TycoonService` only as needed to show/hide/reset them |
+| Theft + transfer | Theft worker | `TheftService` (+ helpers), `TrophyCaseDisplay` (tags + prompt), `TrophyService` (in-transit), `TrophyInventory`, `DataService` (remove / transfer / offline), `PowerService` (suppress while carrying), a client script hiding the prompt on your own trophies |
+| Push | Push worker | `PushService`, a push client script (input, animation, phone button, knockback, hit FX) |
 
 ## Trophy Collection + Powers (contract)
 

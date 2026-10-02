@@ -487,6 +487,29 @@ local Config = {
 	TrophyPopupSound = "",
 	TrophyPopupVolume = 0.6,
 
+	-- House Raid (ARCHITECTURE.md "House Raid (contract)", approved by the
+	-- user 2026-10-01): house security, trophy stealing, the push.
+	-- Security: the owner steps on the green SecurityPad; red bars block the
+	-- doorway for exactly this many seconds; then they drop. No cooldown.
+	HouseSecuritySeconds = 30,
+	-- Stealing a displayed trophy: hold the StealPrompt this long, from at
+	-- most this many studs.
+	TheftHoldSeconds = 3,
+	TheftPromptDistance = 8,
+	-- While carrying: every trophy power is off, and walk speed is the
+	-- character's normal (no-trophy) speed times this.
+	TheftCarrySpeedMultiplier = 0.9,
+	-- Anti-teleport: a thief moving faster than (carry speed + this many
+	-- studs/s, averaged over a short window) has the theft cancelled.
+	TheftMoveSlack = 12,
+	-- The push: range (studs from the pusher's root to the target's root,
+	-- in front of the pusher), seconds between pushes, and knockback speed
+	-- (studs/s, mostly away from the pusher, a little up).
+	PushRange = 7,
+	PushCooldown = 1.2,
+	PushKnockbackSpeed = 70,
+	PushKnockbackUp = 25,
+
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
 	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim
 	-- 30 s (see CalebEvent.Duration; the Cookie Party always lasts the full
