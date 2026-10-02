@@ -192,8 +192,28 @@ and dev cash, then feed Caleb to the goal.
 
 ## Cookie Party: collectable cookies (client)
 
+Needs the party server (`CookiePartyService`). Set `Config.DevCalebFastCycle = true`
+(Studio only; the party is still 60 s) and dev cash, then feed Caleb to the goal.
+Sounds need ids in `Config.CookiePartySounds` (empty = silent, no errors).
+
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| PK1 | Before the goal and during `Full`. | No collectable cookies, no `CookiePartyCookies` folder in Workspace (client view), no "🍪 +0" counter. | |
+| PK2 | Party starts (`Celebration`). | The "🍪 +0" counter appears at the right side, upper-middle (not over the top banner, the bottom cookie counter, or the trophies button). Collectable cookies start falling from the sky with spin/wobble; a faint glowing disc appears where each will land and gets stronger as it falls. | |
+| PK3 | Watch cookies land. | Each touches down right on its glowing disc (not floating, not under the ground), puffs, bounces once, then bobs and spins standing up like a coin. Giants hop. | |
+| PK4 | Look at the four types. | Normal: golden-brown with dark chips. Chocolate: dark brown with white chips. Golden: bright gold, glowing, sparkling, slow spin, light pillar. Giant: about 2.7× bigger, chunky, pink beacon + pillar. | |
+| PK5 | Watch Caleb during the party. | Some cookies arc out of Caleb's mouth and land around the map at the same moment they would from the sky. | |
+| PK6 | Run into a Normal cookie. | Right away: it leans toward you, then pops (grows, shrinks into you), a sparkle + confetti burst, a yellow "+50" rises and fades, the collect sound plays; the counter shows "🍪 +50" with a pop and the bottom cash counter goes up 50. | |
+| PK7 | Collect a Golden and a Giant. | Bigger gold "GOLDEN! +1,000" / pink "GIANT!! +5,000", bigger burst, their own sounds (if ids are set). | |
+| PK8 | Collect 3+ cookies quickly. | "x3 COMBO!", "x4 COMBO!"… under the counter; the collect sound pitch rises a little each time; after ~1.4 s without collecting the combo text hides. | |
+| PK9 | Stand still and let a cookie sit. | It blinks for its last ~1.5 s, then fades out. | |
+| PK10 | 2 players: both run to the same cookie. | Only one gets it (the server decides). The winner sees the pop and "+N"; the other sees a small puff and the cookie vanishes (no "+N", their counter unchanged). | |
+| PK11 | Lag test: Studio network settings with incoming replication lag ~0.5 s; collect cookies. | No double rewards; a cookie the server refuses comes back within ~1 s and is not asked for again. No errors. | |
+| PK12 | Player 2 joins in the middle of the party. | Counter shows right away; the cookies already on the ground appear (no fall), new ones fall normally. | |
+| PK13 | Party ends (`TrophyClaim`). | The counter hides (no summary screen); all collectable cookies vanish (a pop already playing finishes); within a second the client's `Workspace.CookiePartyCookies` folder, the `CookiePartyBurst` attachment and the `CookiePartyNumber` attachments in `Terrain`, and the `CookiePartyNumber` guis in PlayerGui are gone. | |
+| PK14 | Rain ramp: watch the visual rain from Start to Countdown. | Light rain at the start, clearly heavier in Hype, heavy in Frenzy/Countdown; golden-looking rain cookies appear from Hype and are common at the end. They still can't be picked up (no "+N"). Client view: never more than 170 rain `Cookie` parts in `Workspace.CookieRain`. | |
+| PK15 | Two parties in a row (fast cycle). | Everything works again in the second party; no duplicate folders/guis; the counter starts at 0. | |
+| PK16 | 4 players during Frenzy/Countdown; check FPS (Shift+F5 / MicroProfiler) and Output. | Smooth on every client; no errors or warnings. | |
 
 ## Cookie Party: Caleb
 

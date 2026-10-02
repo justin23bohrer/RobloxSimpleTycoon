@@ -167,10 +167,12 @@ local Config = {
 	CalebLeaderboardSize = 10,
 	CalebLeaderboardInterval = 1,
 	-- Cookie rain (client only, visual): most falling cookies alive at once
-	-- per client, and the radius (studs, around the statue) they fall in.
+	-- per client (during the Cookie Party: CookiePartyRainMaxCookies), and
+	-- the radius (studs, around the statue) they fall in.
 	CookieRainMaxCookies = 120,
 	CookieRainRadius = 150,
-	-- New cookies per second (fewer if CookieRainMaxCookies are all in use),
+	-- New cookies per second (times CookiePartyRainRate for the party phase;
+	-- fewer if the pool is all in use),
 	-- fall speed (studs/s), height above the landing spot they start at
 	-- (studs), and spin (radians/s); each cookie varies these a little.
 	CookieRainPerSecond = 25,
@@ -300,6 +302,25 @@ local Config = {
 		CalebSpit = 0.4,
 	}),
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
+	-- Collectable cookies on each client (CookiePartyCookies.client). The
+	-- client asks to collect when the player is this many studs inside the
+	-- type's CollectRadius, sends at most ClientCollectsPerSecond requests
+	-- (keep it under CookiePartyMaxCollectsPerSecond), and gives the server
+	-- ClientCollectTimeout seconds to confirm before the cookie goes back.
+	CookiePartyClientCollectMargin = 1,
+	CookiePartyClientCollectsPerSecond = 10,
+	CookiePartyClientCollectTimeout = 1,
+	-- Collects this many seconds apart (or closer) grow the "x5 COMBO!"
+	-- streak and raise the collect sound's pitch. Presentation only.
+	CookiePartyComboSeconds = 1.2,
+	-- The visual rain (CookieRain.client) ramps with the party, per phase:
+	-- CookieRainPerSecond is multiplied by RainRate, the pool may grow to
+	-- RainMaxCookies (keep it ≤ 200: each rain cookie is 6 parts moved every
+	-- frame), and RainGoldenShare (0..1) of new rain cookies look golden
+	-- (still visual only, not collectable).
+	CookiePartyRainRate = table.freeze({ Start = 0.6, Hype = 1, Frenzy = 1.6, Countdown = 2 }),
+	CookiePartyRainMaxCookies = table.freeze({ Start = 120, Hype = 120, Frenzy = 160, Countdown = 170 }),
+	CookiePartyRainGoldenShare = table.freeze({ Start = 0, Hype = 0.08, Frenzy = 0.2, Countdown = 0.3 }),
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",
