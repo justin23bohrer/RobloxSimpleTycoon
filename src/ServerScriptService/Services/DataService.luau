@@ -22,10 +22,6 @@
 --   for everyone in parallel in game:BindToClose.
 -- * In Studio without "Enable Studio Access to API Services" every DataStore
 --   call errors: that is detected, warned once, and the game runs unsaved.
--- * House Raid (stolen trophies): RemoveTrophy takes a trophy from a loaded
---   player; TransferTrophyOffline takes one from the saved key of a player who
---   is not in this server (only while no server holds their session lock) and
---   gives it to a loaded player, whose leave / shutdown save waits for it.
 
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
@@ -49,9 +45,6 @@ local LOCK_WAIT_ATTEMPTS = 6 -- then take the lock over (~30 s)
 local LOCK_EXPIRE_SECONDS = 30 * 60 -- older locks belong to a dead server
 local LOCK_REFRESH_SECONDS = 10 * 60 -- autosave rewrites unchanged data this often
 local CLOSE_TIMEOUT_SECONDS = 25 -- BindToClose gets 30 s in total
-local OFFLINE_ATTEMPTS = 2 -- tries for an offline trophy transfer (a thief is waiting)
-local OFFLINE_RELEASE_WAIT_SECONDS = 10 -- for the owner's leave save in this server
-local INCOMING_WAIT_SECONDS = 20 -- a leave save waits this long for transfers into it
 
 -- game.JobId is "" in Studio, so make up a unique id there.
 local SERVER_ID = if game.JobId ~= "" then game.JobId else `Studio-{HttpService:GenerateGUID(false)}`
@@ -64,7 +57,6 @@ type Session = {
 	Saving: boolean,
 	Released: boolean, -- lock given back on leave; never write again
 	Leaving: boolean,
-	Incoming: number, -- offline trophy transfers into this data in flight (TransferTrophyOffline)
 }
 
 local sessions: { [Player]: Session } = {}
@@ -119,12 +111,10 @@ local function keyFor(player: Player): string
 	return `Player_{player.UserId}`
 end
 
--- Calls fn up to `attempts` (default MAX_ATTEMPTS) times. Returns (true,
--- result) or (false, error).
-local function withRetries(what: string, fn: () -> any, attempts: number?): (boolean, any)
+-- Calls fn up to MAX_ATTEMPTS times. Returns (true, result) or (false, error).
+local function withRetries(what: string, fn: () -> any): (boolean, any)
 	local lastError = "saving is off"
-	local maxAttempts = attempts or MAX_ATTEMPTS
-	for attempt = 1, maxAttempts do
+	for attempt = 1, MAX_ATTEMPTS do
 		if savingDisabled then
 			return false, lastError
 		end
@@ -137,11 +127,11 @@ local function withRetries(what: string, fn: () -> any, attempts: number?): (boo
 			disableSaving(lastError)
 			return false, lastError
 		end
-		if attempt < maxAttempts then
+		if attempt < MAX_ATTEMPTS then
 			task.wait(RETRY_BASE_SECONDS * 2 ^ (attempt - 1))
 		end
 	end
-	warn(`DataService: {what} failed after {maxAttempts} tries: {lastError}`)
+	warn(`DataService: {what} failed after {MAX_ATTEMPTS} tries: {lastError}`)
 	return false, lastError
 end
 
@@ -152,16 +142,12 @@ local function toStored(data: DataSchema.PlayerData, lockedBy: string?): { [stri
 	return stored
 end
 
--- True if some server (this one included) holds a fresh session lock.
-local function isLocked(stored: any): boolean
+local function isLockedByOtherServer(stored: any): boolean
 	return typeof(stored) == "table"
 		and typeof(stored.SessionJobId) == "string"
+		and stored.SessionJobId ~= SERVER_ID
 		and typeof(stored.SessionTime) == "number"
 		and os.time() - stored.SessionTime < LOCK_EXPIRE_SECONDS
-end
-
-local function isLockedByOtherServer(stored: any): boolean
-	return isLocked(stored) and stored.SessionJobId ~= SERVER_ID
 end
 
 -- Reads the player's data and takes the session lock in one UpdateAsync.
@@ -249,19 +235,6 @@ local function getLoaded(player: Player): Session?
 	return if session and session.Status == "Loaded" then session else nil
 end
 
--- The last save (leave or shutdown) that gives the lock back. First lets
--- offline trophy transfers into this data finish (TransferTrophyOffline).
--- Counted in `busy` the whole time, so BindToClose waits for it.
-local function finalSave(player: Player, session: Session)
-	busy += 1
-	local deadline = os.clock() + INCOMING_WAIT_SECONDS
-	while session.Incoming > 0 and os.clock() < deadline do
-		task.wait(0.1)
-	end
-	save(player, session, true)
-	busy -= 1
-end
-
 -- Called by ServerMain when a player joins. Loads in the background.
 function DataService.OnPlayerAdded(player: Player)
 	if sessions[player] then
@@ -275,7 +248,6 @@ function DataService.OnPlayerAdded(player: Player)
 		Saving = false,
 		Released = false,
 		Leaving = false,
-		Incoming = 0,
 	}
 	sessions[player] = session
 	busy += 1
@@ -323,7 +295,7 @@ function DataService.OnPlayerRemoving(player: Player)
 	local userId = player.UserId
 	releasingUserIds[userId] = true
 	task.spawn(function()
-		finalSave(player, session)
+		save(player, session, true)
 		releasingUserIds[userId] = nil
 	end)
 end
@@ -382,18 +354,23 @@ function DataService.GetTrophies(player: Player): { TrophyRecord }
 	return if session then DataSchema.CopyTrophies((session.Data :: DataSchema.PlayerData).Trophies) else {}
 end
 
--- AddTrophy's work on a session (also used for a trophy taken offline, when
--- the receiver may be leaving: then their leave save writes it).
-local function addRecord(player: Player, session: Session, record: TrophyRecord): boolean
+-- Adds a trophy and saves right away. False if the data is not loaded, the
+-- record is invalid, or it is an event trophy (EventId ~= "") and the player
+-- already has one for that EventId. A missing InstanceId (or one the player
+-- already owns) is replaced by a new one. If an active slot is free
+-- (fewer than Config.TrophyActiveSlots equipped), the new trophy is equipped
+-- too, so a first trophy shows up in the Trophy Case right away.
+function DataService.AddTrophy(player: Player, record: TrophyRecord): boolean
+	local session = getLoaded(player)
 	local clean = DataSchema.CleanTrophy(record)
-	if not clean then
+	if not session or not clean then
 		return false
 	end
 	local data = session.Data :: DataSchema.PlayerData
-	if clean.StolenFrom == nil and DataSchema.HasClaimedEvent(data.Trophies, clean.EventId) then
-		return false -- already claimed this round (stolen trophies never count)
-	end
 	for _, owned in data.Trophies do
+		if clean.EventId ~= "" and owned.EventId == clean.EventId then
+			return false
+		end
 		if owned.InstanceId == clean.InstanceId then
 			clean.InstanceId = DataSchema.NewInstanceId()
 		end
@@ -406,43 +383,6 @@ local function addRecord(player: Player, session: Session, record: TrophyRecord)
 	session.Dirty = true
 	trophiesChanged:Fire(player)
 	if autoEquipped then
-		equippedChanged:Fire(player)
-	end
-	if not session.Leaving then
-		task.spawn(save, player, session, false)
-	end
-	return true
-end
-
--- Adds a trophy and saves right away. False if the data is not loaded, the
--- record is invalid, or it is a claimed event trophy (EventId ~= "", no
--- StolenFrom) and the player already has a claimed one for that EventId
--- (stolen trophies are exempt both ways: a stolen record is always allowed,
--- and stolen records never block a claim). A missing InstanceId (or one the player
--- already owns) is replaced by a new one. If an active slot is free
--- (fewer than Config.TrophyActiveSlots equipped), the new trophy is equipped
--- too, so a first trophy shows up in the Trophy Case right away.
-function DataService.AddTrophy(player: Player, record: TrophyRecord): boolean
-	local session = getLoaded(player)
-	return session ~= nil and addRecord(player, session, record)
-end
-
--- House Raid: removes one of a loaded player's trophies (a stolen trophy
--- leaving its owner), unequips it, and saves right away. False (nothing
--- changed) if the data is not loaded or they don't own that InstanceId.
-function DataService.RemoveTrophy(player: Player, instanceId: string): boolean
-	local session = getLoaded(player)
-	if not session then
-		return false
-	end
-	local data = session.Data :: DataSchema.PlayerData
-	local wasEquipped = table.find(data.Equipped, instanceId) ~= nil
-	if not DataSchema.TakeTrophy(data, instanceId) then
-		return false
-	end
-	session.Dirty = true
-	trophiesChanged:Fire(player)
-	if wasEquipped then
 		equippedChanged:Fire(player)
 	end
 	task.spawn(save, player, session, false)
@@ -503,89 +443,6 @@ function DataService.SetEquipped(player: Player, ids: { string }): (boolean, str
 	return true
 end
 
--- One UpdateAsync on an offline player's key that runs `change(data)` on
--- their clean saved data, only while NO server holds their session lock (a
--- fresh SessionJobId, this server's included). The lock fields are written
--- back unchanged. `change` returns true to write, false to leave it as is.
--- Returns "ok", "locked", "unreadable", "unchanged", or "error".
-local function changeOffline(userId: number, what: string, change: (DataSchema.PlayerData) -> boolean): string
-	local outcome = "error"
-	local ok = withRetries(what, function()
-		return (store :: DataStore):UpdateAsync(`Player_{userId}`, function(stored)
-			-- May run more than once; only the last run counts.
-			if isLocked(stored) then
-				outcome = "locked"
-				return nil
-			end
-			local data = DataSchema.FromStored(stored)
-			if not data then
-				outcome = "unreadable"
-				return nil -- never overwrite data we can't read
-			end
-			if not change(data) then
-				outcome = "unchanged"
-				return nil
-			end
-			outcome = "ok"
-			local out = toStored(data, nil)
-			local old = if typeof(stored) == "table" then stored else {}
-			out.SessionJobId = old.SessionJobId -- none, or an expired lock: as it was
-			out.SessionTime = old.SessionTime
-			return out, { userId }
-		end)
-	end, OFFLINE_ATTEMPTS)
-	return if ok then outcome else "error"
-end
-
--- House Raid: moves a trophy from the SAVED data of a player who is not in
--- this server (TheftService: the owner left before the thief escaped) to
--- `toPlayer` (loaded here). Yields. Refused while any server holds the
--- owner's session lock (another server, or this one while their leave save
--- still runs: that is waited for first). The owner's key loses the trophy in
--- one UpdateAsync, and only then is it added to toPlayer like AddTrophy,
--- marked StolenFrom = fromUserId (a failed add puts back the original).
--- toPlayer's leave / shutdown save waits for this, so it is saved even if
--- they leave meanwhile. If it can't be added after all (toPlayer's data was
--- taken over by another server meanwhile), it is put back on the owner's key.
--- Returns (true) or (false, reason); on false the owner still has it.
-function DataService.TransferTrophyOffline(fromUserId: number, instanceId: string, toPlayer: Player): (boolean, string?)
-	local session = getLoaded(toPlayer)
-	if not session or not store or savingDisabled or closing then
-		return false, "saving is off"
-	end
-	busy += 1
-	session.Incoming += 1
-	local deadline = os.clock() + OFFLINE_RELEASE_WAIT_SECONDS
-	while releasingUserIds[fromUserId] and os.clock() < deadline do
-		task.wait(0.2)
-	end
-	local taken: TrophyRecord? = nil
-	local outcome = changeOffline(fromUserId, `taking a trophy from Player_{fromUserId}`, function(data)
-		taken = DataSchema.TakeTrophy(data, instanceId)
-		return taken ~= nil
-	end)
-	local added = false
-	if outcome == "ok" and taken then
-		local given = table.clone(taken :: TrophyRecord)
-		given.StolenFrom = fromUserId
-		added = session.Status == "Loaded" and not session.Released and addRecord(toPlayer, session, given)
-	end
-	session.Incoming -= 1
-	if outcome == "ok" and taken and not added then
-		local record = taken :: TrophyRecord
-		local back = changeOffline(fromUserId, `giving a trophy back to Player_{fromUserId}`, function(data)
-			table.insert(data.Trophies, record)
-			return true
-		end)
-		if back ~= "ok" then
-			warn(`DataService: trophy {record.InstanceId} ({record.Variant}) left Player_{fromUserId} but could not be added to {toPlayer.Name} or put back ({back}).`)
-		end
-		outcome = "not added"
-	end
-	busy -= 1
-	return added, if added then nil else outcome
-end
-
 -- Autosave: only changed data, plus an occasional rewrite to keep the lock fresh.
 task.spawn(function()
 	while true do
@@ -603,7 +460,7 @@ end)
 game:BindToClose(function()
 	closing = true
 	for player, session in sessions do
-		task.spawn(finalSave, player, session)
+		task.spawn(save, player, session, true)
 	end
 	local deadline = os.clock() + CLOSE_TIMEOUT_SECONDS
 	while busy > 0 and os.clock() < deadline do

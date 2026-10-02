@@ -13,10 +13,6 @@ Remotes here:
   clients): the Cookie Party's collectable cookies. Handled by
   `CookiePartyService`; see ARCHITECTURE.md "Cookie Party (contract)".
 
-- `PushRequest` (RemoteEvent, client → server), `PushFX`, `PushKnockback`
-  (server → clients): the House Raid push. Handled by `PushService`; see
-  ARCHITECTURE.md "House Raid (contract)".
-
 Everything else needs no remote:
 
 - Buying and collecting happen when a character touches a part. The server
