@@ -89,6 +89,7 @@ No completion screen (only the short "YOU COLLECTED" total), no leaderboard, no 
 - [x] Caleb party: dance energy ramps per phase, throws cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. `CalebAnimator.client` + `CalebPartyPoses` / `CalebPartyMoves` / `CalebMouth`, `CalebPartyBubble.client`. (code done; Studio test pending: QA CD1–CD12)
 - [x] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX; original party SFX + music loop in `tools/audio/`. (code done; Studio test pending: QA PX1–PX14)
 - [x] End-of-party total: "YOU COLLECTED 🍪 N!" (requested by the user 2026-10-01). `CookiePartyTotal` + `CookiePartyTotalBuild`. (code done; Studio test pending: QA PT1–PT9)
+- [x] Fix: party cookies not collected with Caleb Trophy powers (bug found by the user 2026-10-02). Lag-aware server reach (`CookiePartyReach`: recent path + speed slack + jump reach), faster client re-asks, higher server rate limit. (code done; Studio test pending: QA CP1–CP7)
 - [ ] Upload the new party sounds; paste ids into `Config.CookiePartySounds` (user).
 
 ## Post-MVP (needs approval)

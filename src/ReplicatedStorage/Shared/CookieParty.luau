@@ -94,6 +94,19 @@ function CookieParty.Intensity(timeLeft: number): number
 	return math.clamp(1 - timeLeft / total, 0, 1)
 end
 
+-- Most studs between a player's HumanoidRootPart and a cookie's landing spot
+-- (vertically) for a collect: CookiePartyCollectMaxVertical plus how high the
+-- player can jump (Humanoid.JumpHeight, twice with "CanDoubleJump"), at most
+-- CookiePartyCollectJumpAllowanceMax more. The server and the client use the
+-- same rule (the client asks a little inside it).
+function CookieParty.VerticalReach(player: Player, humanoid: Humanoid?): number
+	local jump = if humanoid then math.max(0, humanoid.JumpHeight) else 0
+	if player:GetAttribute("CanDoubleJump") == true then
+		jump *= 2
+	end
+	return Config.CookiePartyCollectMaxVertical + math.min(jump, Config.CookiePartyCollectJumpAllowanceMax)
+end
+
 -- The RemoteEvent with this CookieParty.Remote name (waits for it).
 function CookieParty.GetRemote(name: string): RemoteEvent
 	return ReplicatedStorage:WaitForChild("Remotes"):WaitForChild(name) :: RemoteEvent

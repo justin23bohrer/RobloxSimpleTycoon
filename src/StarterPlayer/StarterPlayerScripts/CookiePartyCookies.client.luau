@@ -3,8 +3,9 @@
 -- them. The server (CookiePartyService) decides every cookie (CookiePartySpawn)
 -- and every collect (CookiePartyCollected); this script only draws what it
 -- was sent, fires CookiePartyCollect(id) when the local character gets close
--- (one request in flight per cookie; an unconfirmed one may be retried up to
--- Config.CookiePartyClientCollectTries in all), and plays the feedback.
+-- (also when it ran past between two frames; at most one request per cookie
+-- per Config.CookiePartyClientCollectTimeout, re-asked while still near, up
+-- to Config.CookiePartyClientCollectTries in all), and plays the feedback.
 --
 -- Each cookie falls from the sky (or arcs out of Caleb's mouth when
 -- FromCaleb) and touches down exactly at LandAt, bounces, then bobs and spins
@@ -41,7 +42,8 @@ local collectedRemote = CookieParty.GetRemote(CookieParty.Remote.Collected)
 -- Not tuning: looks, or mirrors of the server's checks (ARCHITECTURE.md).
 local CLEANUP_GRACE = 0.6
 local COLLECT_EARLY = 0.3 -- the server accepts from LandAt - 0.3
-local COLLECT_VERTICAL = 20 -- the server allows 25
+local VERTICAL_MARGIN = 5 -- ask this many studs inside CookieParty.VerticalReach
+local MAX_FRAME_STEP = 25 -- a longer move in one frame (teleport) is not a path
 local QUEUE_MAX = 100
 
 type Live = Motion.Live
@@ -56,6 +58,7 @@ local built = 0
 local queued: { any } = {} -- batches that came just before the state did
 local collectBudget = 0
 local combo, lastCollect = 0, 0
+local lastRootPos: Vector3? = nil -- the local root's position last frame
 
 local function getRoot(): BasePart?
 	local character = player.Character
@@ -112,11 +115,15 @@ local function addBatch(batch: { any }, now: number)
 end
 
 -- Asks the server for every cookie the local character is close enough to,
--- with at most one request in flight per cookie (Asked), ClientCollectTries
--- per cookie in all, and at most ClientCollectsPerSecond overall.
-local function tryCollect(now: number, dt: number, rootPos: Vector3)
+-- measured to the path it moved along since last frame (`from` -> `rootPos`),
+-- so a fast run never skips one. At most one request per cookie at a time
+-- (Asked, cleared by CookiePartyMotion after ClientCollectTimeout),
+-- ClientCollectTries per cookie in all, ClientCollectsPerSecond overall.
+local function tryCollect(now: number, dt: number, from: Vector3, rootPos: Vector3, vertical: number)
 	local rate = Config.CookiePartyClientCollectsPerSecond
 	collectBudget = math.min(collectBudget + dt * rate, 3)
+	local abx, abz = rootPos.X - from.X, rootPos.Z - from.Z
+	local lengthSq = abx * abx + abz * abz
 	for id, c in cookies do
 		if collectBudget < 1 then
 			return
@@ -124,8 +131,13 @@ local function tryCollect(now: number, dt: number, rootPos: Vector3)
 		if not c.Asked and not c.Ending and now >= c.LandAt - COLLECT_EARLY and now < c.ExpiresAt then
 			local info = Config.CookiePartyTypes[c.Type]
 			local radius = (if info then info.CollectRadius else 6) - Config.CookiePartyClientCollectMargin
-			local dx, dz = rootPos.X - c.Ground.X, rootPos.Z - c.Ground.Z
-			if dx * dx + dz * dz <= radius * radius and math.abs(rootPos.Y - c.Ground.Y) <= COLLECT_VERTICAL then
+			local t = 0
+			if lengthSq > 1e-6 then
+				t = math.clamp(((c.Ground.X - from.X) * abx + (c.Ground.Z - from.Z) * abz) / lengthSq, 0, 1)
+			end
+			local point = from:Lerp(rootPos, t)
+			local dx, dz = point.X - c.Ground.X, point.Z - c.Ground.Z
+			if dx * dx + dz * dz <= radius * radius and math.abs(point.Y - c.Ground.Y) <= vertical then
 				c.Asked, c.AskedAt = true, now
 				c.Tries += 1
 				collectBudget -= 1
@@ -166,9 +178,18 @@ local function onHeartbeat(dt: number)
 	if #parts > 0 then
 		Workspace:BulkMoveTo(parts, frames, Enum.BulkMoveMode.FireCFrameChanged)
 	end
-	if partyOn and rootPos then
-		tryCollect(now, dt, rootPos)
-	elseif not partyOn and (not any or os.clock() - stoppedAt > CLEANUP_GRACE) then
+	if partyOn then
+		if rootPos then
+			local from = lastRootPos or rootPos
+			if (rootPos - from).Magnitude > MAX_FRAME_STEP then
+				from = rootPos -- teleported: only where it is now counts
+			end
+			local character = player.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			tryCollect(now, dt, from, rootPos, CookieParty.VerticalReach(player, humanoid) - VERTICAL_MARGIN)
+		end
+		lastRootPos = rootPos
+	elseif not any or os.clock() - stoppedAt > CLEANUP_GRACE then
 		teardown()
 	end
 end

@@ -427,8 +427,30 @@ local Config = {
 	-- landed cookie stays collectable before it disappears.
 	CookiePartyFallSeconds = 1.6,
 	CookiePartyLifetime = 8,
-	-- Most collect requests per player per second the server will look at.
-	CookiePartyMaxCollectsPerSecond = 12,
+	-- Most collect requests per player per second the server will look at
+	-- (keep it well above CookiePartyClientCollectsPerSecond + its burst of 3,
+	-- so a fast player sweeping through a pile is never capped).
+	CookiePartyMaxCollectsPerSecond = 20,
+	-- Collect checks (CookiePartyService + CookiePartyReach; see
+	-- ARCHITECTURE.md "Cookie Party (contract)"). The server sees a moving
+	-- player late (replication lag), more studs late the faster they go
+	-- (WalkSpeed powers stack with no limit), so the horizontal reach is
+	--   CollectRadius + CollectSlack
+	--     + min(current horizontal speed x CollectLagSeconds, CollectLagSlackMax)
+	-- and it is measured to the path the player's HumanoidRootPart took over
+	-- the last CollectHistorySeconds (positions the server saw itself; the
+	-- client never sends a position). A step between two samples longer than
+	-- CollectMaxStep studs (a teleport or respawn) is not counted as a path.
+	CookiePartyCollectSlack = 2,
+	CookiePartyCollectLagSeconds = 0.3,
+	CookiePartyCollectLagSlackMax = 30,
+	CookiePartyCollectHistorySeconds = 0.6,
+	CookiePartyCollectMaxStep = 25,
+	-- Vertical reach (CookieParty.VerticalReach): MaxVertical studs plus the
+	-- player's Humanoid.JumpHeight (twice with double jump), that extra at
+	-- most JumpAllowanceMax studs.
+	CookiePartyCollectMaxVertical = 25,
+	CookiePartyCollectJumpAllowanceMax = 40,
 	-- Seconds between the server's spawn/expire ticks while the party runs
 	-- (CookiePartyService). Each tick's new cookies go out as one batch.
 	CookiePartyTickSeconds = 0.25,
@@ -522,15 +544,18 @@ local Config = {
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
 	-- Collectable cookies on each client (CookiePartyCookies.client). The
 	-- client asks to collect when the player is this many studs inside the
-	-- type's CollectRadius, sends at most ClientCollectsPerSecond requests
-	-- (keep it under CookiePartyMaxCollectsPerSecond), and gives the server
+	-- type's CollectRadius (measured to the path the character moved along
+	-- since the last frame, so a fast run never skips a cookie), sends at
+	-- most ClientCollectsPerSecond requests (keep it well under
+	-- CookiePartyMaxCollectsPerSecond), and gives the server
 	-- ClientCollectTimeout seconds to confirm before the cookie goes back and
-	-- may be asked for again (one request in flight per cookie, at most
-	-- ClientCollectTries requests per cookie in all).
+	-- is asked for again while the player is still near it (at most one
+	-- request per cookie per ClientCollectTimeout, ClientCollectTries per
+	-- cookie in all).
 	CookiePartyClientCollectMargin = 1,
 	CookiePartyClientCollectsPerSecond = 10,
-	CookiePartyClientCollectTimeout = 1,
-	CookiePartyClientCollectTries = 3,
+	CookiePartyClientCollectTimeout = 0.35,
+	CookiePartyClientCollectTries = 6,
 	-- Collects this many seconds apart (or closer) grow the "x5 COMBO!"
 	-- streak and raise the collect sound's pitch. Presentation only.
 	CookiePartyComboSeconds = 1.2,

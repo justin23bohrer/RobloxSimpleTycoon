@@ -14,15 +14,15 @@ local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
 local Config = require(ReplicatedStorage.Shared.Config)
 local CookieParty = require(ReplicatedStorage.Shared.CookieParty)
 local CalebCycle = require(script.Parent.CalebCycle)
+local CookiePartyReach = require(script.Parent.CookiePartyReach)
 local CookiePartySpawner = require(script.Parent.CookiePartySpawner)
 local EconomyService = require(script.Parent.EconomyService)
 
--- Collect checks (contract): time slack around LandAt / ExpiresAt, extra
--- horizontal studs for lag, and the most vertical studs from the cookie.
+-- Collect checks (contract): time slack around LandAt / ExpiresAt. The
+-- distance check (lag slack, path, jump reach) is in CookiePartyReach, with
+-- its numbers in Config.CookiePartyCollect*.
 local EARLY_SLACK = 0.3
 local LATE_SLACK = 0.5
-local RADIUS_SLACK = 2
-local MAX_VERTICAL = 25
 
 local PlayerAttr = CookieParty.PlayerAttr
 local State = CalebEvent.State
@@ -113,6 +113,7 @@ local function startParty(cycleId: string)
 	end
 	partyCycle = cycleId
 	budget = 0
+	CookiePartyReach.Start()
 	for _, player in Players:GetPlayers() do
 		resetPlayer(player)
 	end
@@ -130,6 +131,7 @@ end
 local function endParty(state: string, cycleId: string)
 	local endedCycle = partyCycle
 	partyCycle = nil -- stops the spawn loop
+	CookiePartyReach.Stop()
 	for id in alive do
 		removeCookie(id)
 	end
@@ -194,9 +196,8 @@ local function onCollect(player: Player, id: unknown)
 	if not (root and root:IsA("BasePart")) or not humanoid or humanoid.Health <= 0 then
 		return
 	end
-	local offset = root.Position - cookie.Position
-	local radius = Config.CookiePartyTypes[cookie.Type].CollectRadius + RADIUS_SLACK
-	if Vector2.new(offset.X, offset.Z).Magnitude > radius or math.abs(offset.Y) > MAX_VERTICAL then
+	local radius = Config.CookiePartyTypes[cookie.Type].CollectRadius
+	if not CookiePartyReach.InReach(player, root, humanoid, cookie.Position, radius) then
 		return
 	end
 
@@ -247,6 +248,7 @@ end
 
 function CookiePartyService.OnPlayerRemoving(player: Player)
 	buckets[player] = nil
+	CookiePartyReach.Forget(player)
 end
 
 return CookiePartyService
