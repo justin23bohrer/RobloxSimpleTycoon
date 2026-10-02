@@ -93,10 +93,10 @@ back before committing. Feed amounts below are for the 1,000 goal.
 | CG2 | Feed up to 250, 500, 750, 900, 990 total, looking at him from the same spot after each. | Every step is visibly bigger than the last (fatter first, then clearly taller/wider); feet always stay on the pedestal top; belly, cheeks, chin, chain, arms, and hair stay attached at every size. Each change is a bouncy grow. | |
 | CG3 | Feed the last 10 (to 1,000). | A visible final jump to max size (1.6×). Then the Full animation starts. | |
 | CG4 | Watch the Full state. | He waddles, leans back with arms out, belly bounces, puffs a white cloud from his mouth with a head jolt, settles. Looks funny, nothing detaches or flies off. | |
-| CG5 | Watch Celebration. | He dances the whole time: sway + hop per beat, arms alternate waving, head bobs, belly jiggles, a full spin every ~8 s. Only Caleb moves: pedestal, feed pads, podium stay put. No errors in Output. | |
+| CG5 | Watch Celebration. | He dances the whole time: sway + hop per beat, arms alternate waving, head bobs, belly jiggles, with party moves mixed in (see "Cookie Party: Caleb"). Only Caleb moves: pedestal, feed pads, podium stay put. No errors in Output. | |
 | CG6 | Wait for TrophyClaim. | Caleb's body is gone (invisible, can walk through where he was); the pedestal, the 4 feed pads, and the podium are still there. The cartoon outline doesn't draw a ghost of him. | |
 | CG7 | Wait for the reset (back to Normal). | Caleb is back, at his smallest, thin, in his normal pose, feet on the pedestal; not stuck in a dance pose. | |
-| CG8 | 2 players: Player 2 joins in the middle of Celebration. | Player 2 sees him dancing right away, at the same moment of the dance as Player 1 (spins line up). When it ends both see him stop in the normal pose. | |
+| CG8 | 2 players: Player 2 joins in the middle of Celebration. | Player 2 sees him dancing right away, at the same moment of the dance as Player 1 (moves line up). When it ends both see him stop in the normal pose. | |
 | CG9 | During Celebration, walk far away (until the statue streams out) and come back; also reset your character mid-dance. | He is dancing again when you come back; no part stays offset or frozen; one dance only (no double speed). | |
 | CG10 | Performance: in Normal and TrophyClaim, check the MicroProfiler / Script Performance for `CalebAnimator`. | No per-frame work outside Full/Celebration. | |
 
@@ -235,8 +235,23 @@ Sounds need ids in `Config.CookiePartySounds` (empty = silent, no errors).
 
 ## Cookie Party: Caleb
 
+Feed Caleb to the goal (fast dev cycle is fine; the party is still 60 s).
+Phases by seconds left: Start 60–40, Hype 40–20, Frenzy 20–10, Countdown 10–0.
+
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| CD1 | Watch the first seconds of the party (Start). | He eases into the dance and opens with a big laugh (head back and shaking, belly jiggling, bouncing, hands on his belly). Then roughly every 3.5 s a move, with plain dancing in between. Bubble: a Start line ("I'M SO FULL!!", "COOKIE PARTYYY!", ...) pops in above the progress bar. | |
+| CD2 | Watch the phase changes at 40 s and 20 s left (Hype, Frenzy). | The dance gets faster and bigger each time **without a jump or snap** (it blends in over about a second; the beat never skips). Moves come more often and are bigger (Frenzy: back to back, spins are double spins, jumps higher). | |
+| CD3 | Watch each move a few times. | THROW: one arm winds back and flings forward, body twists. SPIT: head tilts back with puffed cheeks and a swollen belly, then snaps forward, mouth drops open and brown crumbs spray out of his mouth and fall. LAUGH (as CD1). SPIN: hopping spin with arms out. JUMP: dip, big jump with arms up, squashy landing. DRUM: hands take turns slapping his belly, belly jiggles. Nothing detaches or stays offset; mouth, teeth, chin and cheeks go back into place after. | |
+| CD4 | Frenzy (20–10 s left). | He goes crazy: fast alternating moves with a wobble/shake on top of everything. | |
+| CD5 | Countdown (10–2.5 s left). | Bounces faster and faster; belly gets bigger and jiggles more; a few moves still. Bubbles: "SOMETHING'S HAPPENING...", "TOO... MANY... COOKIES...", "UH OH...". | |
+| CD6 | Last 2.5 s. | No more moves: he crouches a little, arms pulled in hugging his belly, trembling harder and harder, belly puffing faster, cheeks puffed. In the last ~0.3 s he pops: arms flung wide, head thrown back, body pops up, belly pops big, mouth wide open, landing right at 0 together with the bubble "I'M FULL!!!" (yellow, big, shaking, shown for the last second) and the finale explosion. | |
+| CD7 | The moment the party ends (TrophyClaim). | Caleb is hidden at once (the explosion is CookiePartyFinale's); no crumbs, bubble, or sound are left behind. Client view: `PlayerGui.CalebPartyBubble.Enabled` is false; `Terrain.CalebMouth` emitters are `Enabled = false` with no particles. After the reset he is back in his normal pose and normal belly size (not swollen). | |
+| CD8 | 2 players (Test → Clients and Servers): watch both windows side by side. | Same move, same bubble line at the same moment on both (within network lag). | |
+| CD9 | Player 2 joins mid-party (e.g. in Hype, and again in the last 3 s). | Player 2 sees the right phase right away: same dance speed, same move and line as Player 1; joining during the wind-up shows the wind-up (not the start of the dance). | |
+| CD10 | Look at the bubble from right next to the statue, from mid-map, and from a plot. | The bubble is always above the progress bar, never overlapping it, and clear of the center-screen countdown and top banner (it is in world space); disappears beyond the bar's max distance like the bar. | |
+| CD11 | Sounds: with `Config.CookiePartySounds.CalebLaugh` / `CalebSpit` empty, then with real ids. | Empty: no errors, nothing plays. With ids: a laugh at each LAUGH start and a spit sound at each SPIT, heard from Caleb's position (quieter far away). Nothing keeps playing after the party. | |
+| CD12 | Performance + cleanup: MicroProfiler / Script Performance in Normal and TrophyClaim. | No per-frame work from `CalebAnimator` or `CalebPartyBubble` outside Full/Celebration. No new instances per party after the first (one `CalebMouth` attachment, one bubble billboard, reused). | |
 
 ## Cookie Party: countdown, VFX, finale, audio
 

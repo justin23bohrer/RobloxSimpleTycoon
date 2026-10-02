@@ -613,10 +613,27 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
   waddles side to side (dying down), leans back with his arms out and his
   belly bouncing, then puffs out a white cloud from his mouth (a burp) and
   his head jolts back, and settles. Numbers: `Config.CalebFullAnim`.
-- **Celebration**: a dance loop for the whole state: sways to a side and
-  hops on every beat, arms take turns waving up (with a wiggle), head bobs,
-  belly jiggles, and a full spin every few seconds. Eases in and out over a
-  beat. Numbers: `Config.CalebDance`.
+- **Celebration** (the Cookie Party): Caleb is the center of the party. A
+  dance loop (sways to a side and hops on every beat, arms take turns
+  waving up with a wiggle, head bobs, belly jiggles; `Config.CalebDance`)
+  gets faster and bigger every phase (`CookiePartyDanceEnergy`, blended
+  smoothly), with funny moves mixed in (`Config.CookiePartyCaleb`):
+  **throw** (an arm winds up and flings), **spit** (head back, cheeks and
+  belly puff, then a snap forward and crumbs spray out of his mouth),
+  **laugh** (head shaking, belly jiggling, bouncing), **spin**, **jump**,
+  **belly drum**. Start: he opens with a laugh and celebrates; Hype: more
+  energetic, more moves; Frenzy: goes crazy (back-to-back moves, double
+  spins, a wobble on top); Countdown: bounces faster and faster and his
+  belly swells, then in the last 2.5 s the **"I'M FULL!" wind-up** (crouch,
+  arms hugging his belly, trembling, belly puffing) that pops (arms flung
+  wide, head back, belly pop) exactly when the party ends, right into the
+  finale explosion. Every player sees the same move at the same moment
+  (timed from server time; the moves are picked from the cycle id).
+  Speech bubbles above the progress bar pop in and out with short lines
+  per phase (`Config.CookiePartyCalebLines`: "COOKIE PARTYYY!", "CATCH!",
+  "I CAN'T STOP!!", "TOO... MANY... COOKIES..."), faster and shakier
+  later, and "I'M FULL!!!" for the last second. Optional laugh/spit sounds
+  (`CookiePartySounds.CalebLaugh` / `CalebSpit`). Looks only.
 - **TrophyClaim**: Caleb's body is hidden (the pedestal, feed pads, and
   podium stay). After the reset he is back, small, in his normal pose.
 - Only Caleb's body moves; the pedestal, feed pads, and podium never do.

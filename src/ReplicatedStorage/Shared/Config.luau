@@ -149,8 +149,9 @@ local Config = {
 		PuffParticles = 30,
 	}),
 	-- Celebration: a dance loop. One sway to a side and one hop per beat,
-	-- arms take turns waving, head bobs, belly jiggles, and a full spin every
-	-- SpinEverySeconds (lasting SpinSeconds).
+	-- arms take turns waving, head bobs, belly jiggles. These are the sizes at
+	-- energy 1; the Cookie Party speeds it up and mixes in moves (spins,
+	-- throws, ...): see CookiePartyDanceEnergy and CookiePartyCaleb.
 	CalebDance = table.freeze({
 		BeatSeconds = 0.55,
 		SwayDegrees = 9,
@@ -159,8 +160,6 @@ local Config = {
 		ArmWiggleDegrees = 12,
 		HeadBobDegrees = 7,
 		BellyJiggle = 0.8,
-		SpinEverySeconds = 8,
-		SpinSeconds = 1.2,
 	}),
 	-- Podium "CALEB'S TOP FEEDERS" board: how many rows, and the fewest
 	-- seconds between leaderboard updates (feeds in between are batched).
@@ -281,6 +280,65 @@ local Config = {
 	-- Caleb's party dance gets faster/bigger per phase (CalebAnimator):
 	-- multipliers on CalebDance's beat speed and move sizes.
 	CookiePartyDanceEnergy = table.freeze({ Start = 1, Hype = 1.25, Frenzy = 1.6, Countdown = 2 }),
+	-- Caleb at the party (CalebAnimator + CalebPartyPoses/CalebPartyMoves,
+	-- client only, looks only). Everything is timed from CalebStateEndsAt,
+	-- so every player sees the same move at the same moment.
+	--   EnergyRampSeconds: the dance blends into a new phase's energy over
+	--     this many seconds (no pop). CountdownEnergy: the Countdown phase's
+	--     energy keeps rising to this by the wind-up (faster and faster).
+	--   SizeShare: how much of the energy also makes the dance bigger
+	--     (0 = only faster, 1 = as much bigger as faster). ArmMaxDegrees: the
+	--     dance never swings an arm out further than this.
+	--   Moves: a new move may start every MoveEvery[phase] seconds (counted
+	--     from the phase's start). It lasts MoveSeconds[move] / MoveSpeed[phase]
+	--     (at most MoveEvery) and is MoveSize[phase] times bigger. MoveWeights
+	--     [move][phase] = relative chance (0 = never in that phase). The party
+	--     always opens with a Laugh.
+	--   ShakeDegrees[phase]: a wobble on top of everything ("goes crazy").
+	--   CountdownBelly: how much bigger (share) the belly swells during the
+	--     Countdown. WindUpSeconds: the "I'M FULL!" wind-up at the very end (no
+	--     moves then); its last PeakSeconds are the pop (arms flung wide, head
+	--     back, belly PeakBelly bigger, body PeakHeight studs up) landing at 0.
+	--   SpitCrumbsPerSecond: crumbs sprayed from his mouth during a Spit.
+	CookiePartyCaleb = table.freeze({
+		EnergyRampSeconds = 1,
+		CountdownEnergy = 2.3,
+		SizeShare = 0.6,
+		ArmMaxDegrees = 150,
+		MoveEvery = table.freeze({ Start = 3.5, Hype = 2.4, Frenzy = 1.2, Countdown = 1.8 }),
+		MoveSpeed = table.freeze({ Start = 1, Hype = 1.15, Frenzy = 1.5, Countdown = 1.3 }),
+		MoveSize = table.freeze({ Start = 1, Hype = 1.2, Frenzy = 1.5, Countdown = 1.35 }),
+		MoveSeconds = table.freeze({ Throw = 1.2, Spit = 1.5, Laugh = 1.6, Spin = 1.3, Jump = 1.1, Drum = 1.4 }),
+		MoveWeights = table.freeze({
+			Throw = table.freeze({ Start = 4, Hype = 4, Frenzy = 3, Countdown = 2 }),
+			Spit = table.freeze({ Start = 2, Hype = 3, Frenzy = 3, Countdown = 2 }),
+			Laugh = table.freeze({ Start = 3, Hype = 3, Frenzy = 3, Countdown = 3 }),
+			Spin = table.freeze({ Start = 1, Hype = 2, Frenzy = 3, Countdown = 1 }),
+			Jump = table.freeze({ Start = 1, Hype = 2, Frenzy = 3, Countdown = 1 }),
+			Drum = table.freeze({ Start = 2, Hype = 2, Frenzy = 2, Countdown = 3 }),
+		}),
+		ShakeDegrees = table.freeze({ Start = 0, Hype = 0, Frenzy = 4, Countdown = 3 }),
+		CountdownBelly = 0.12,
+		WindUpSeconds = 2.5,
+		PeakSeconds = 0.3,
+		PeakBelly = 0.35,
+		PeakHeight = 3,
+		SpitCrumbsPerSecond = 70,
+	}),
+	-- Caleb's speech bubbles (CalebPartyBubble.client): a new line every
+	-- CookiePartyCalebLineSeconds[phase] seconds (counted from the phase's
+	-- start), shown for most of that time, then FinalLine for the last
+	-- FinalLineSeconds. Lines play in list order (Start/Hype/Frenzy begin at
+	-- a different line each party), so every player sees the same one.
+	CookiePartyCalebLines = table.freeze({
+		Start = table.freeze({ "I'M SO FULL!!", "COOKIE PARTYYY!", "GRAB 'EM!", "WHEEEE!" }),
+		Hype = table.freeze({ "MORE COOKIES!!", "HAHAHAHA", "CATCH!", "YUMMY YUMMY!" }),
+		Frenzy = table.freeze({ "GOLDEN COOKIES!!!", "I CAN'T STOP!!", "AAAAAA!", "COOKIES EVERYWHERE!!" }),
+		Countdown = table.freeze({ "SOMETHING'S HAPPENING...", "TOO... MANY... COOKIES...", "UH OH..." }),
+	}),
+	CookiePartyCalebLineSeconds = table.freeze({ Start = 4, Hype = 3, Frenzy = 2, Countdown = 3 }),
+	CookiePartyCalebFinalLine = "I'M FULL!!!",
+	CookiePartyCalebFinalLineSeconds = 1,
 	-- Party sounds (client only), same rules as CalebSounds: Roblox asset id
 	-- strings, empty = skipped. Music loops for the whole party and speeds up
 	-- per phase (CookiePartyMusicSpeed). Original effects: tools/audio/.
