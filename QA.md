@@ -677,9 +677,28 @@ Player (Client or Server view). Until the Inventory UI exists, equip from the
 ## House security
 
 Needs 2 players (Test > Clients and Servers). Both claim plots and build Walls.
+Tip: `DevUnlimitedCash = true` locally (never commit it) to buy the walls fast.
+Sounds need ids in `Config.HouseSecuritySounds`; with them empty, check the
+rest and mark the sound part "skipped (no id)".
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| HR1 | Claim a plot; before Walls look inside. Then buy Walls. Also look at an unclaimed plot. | Before Walls (and on unclaimed plots): no pad, no bars, no stash, nothing to touch. After Walls: a round **green** pad inside, left of the doorway (a few steps in, not on the straight walk-in line); a gold "STASH STOLEN TROPHIES HERE" pad in the back-right corner; no bars visible in the doorway. | |
+| HR2 | Stash placement: walk around the stash. | It is clear of the conveyor, collector, cookie jar/Collect pad, Trophy Case, stairs and every button; its label reads clearly. | |
+| HR3 | Owner (Player 1) steps on the green pad. | At once: pad turns **red** (glows red), red metal bars rise out of the floor across the whole doorway (round bars + rails, real-looking metal, not invisible/forcefield) with the close sound (whir + clang). Server: Plot1 `SecurityActive = true`, `SecurityEndsAt` ≈ `workspace:GetServerTimeNow() + 30`. | |
+| HR4 | Owner walks out and back in through their bars. | Player 1 passes straight through both ways, no snag. | |
+| HR5 | Player 2 tries to walk / run / jump through Player 1's bars, and squeeze between them. | Player 2 is blocked; no gap fits a character (also check the gaps at the door frame sides and the top). | |
+| HR6 | Player 2 inside Player 1's house when the bars rise. | Player 2 cannot leave through the doorway until the bars drop. | |
+| HR7 | Timing: note when the pad turns red, watch until it turns green (stopwatch or `SecurityEndsAt` vs `GetServerTimeNow()`). | The bars start dropping exactly 30 s after activation (open sound), the pad turns green, `SecurityActive = false`, `SecurityEndsAt = 0`; after the drop the doorway is open for Player 2. | |
+| HR8 | While red, Player 1 steps off and on the pad repeatedly. | Nothing changes; the 30 s timer is not extended or restarted. | |
+| HR9 | No cooldown: step on the pad the moment it turns green (even while the bars are still sinking). | It turns red again at once and the bars rise again, another full 30 s. | |
+| HR10 | Player 2 steps on Player 1's green pad. | Nothing happens (pad stays green, no bars, no attribute change). | |
+| HR11 | No UI: watch both players' screens through a whole cycle. | No "HOUSE LOCKED" text, no countdown, no HUD or pop-up anywhere; only the pad color, the bars and the sounds. | |
+| HR12 | Independent per house: both players activate their own pads a few seconds apart. Then Player 2 tries Player 1's bars and vice versa. | Each house has its own red pad, bars and timer; each owner passes only their own bars; each drops 30 s after its own activation. | |
+| HR13 | Release: Player 1 activates, then leaves before 30 s (watch from Player 2). | Plot 1 goes unclaimed: bars down and hidden, pad hidden (and green when the plot is claimed and walled again), `SecurityActive = false`, `SecurityEndsAt = 0`; no error and no late "bars drop" sound when the old 30 s would have ended. | |
+| HR14 | Ownership change (3 clients): after HR13, Player 3 claims Plot 1 and builds Walls; Player 1 rejoins and claims another plot. Player 3 activates Plot 1. | Player 3 passes through Plot 1's bars; Player 1 and Player 2 are blocked by them (nobody keeps pass-through for a plot they no longer own). | |
+| HR15 | Rejoin with a saved house (Walls restored on claim). | Pad, stash and (down) bars appear with the Walls; activating works the first time. | |
+| HR16 | Exploit (Server view): a non-owner client sets the bars' `CanCollide = false` locally, or fires touches on the pad. | Only that client's own view changes (characters are client-simulated, so an exploiter could clip their own character: a Roblox limitation); the server's `SecurityActive` / `IsProtected` stay correct and theft is still refused while protected. | |
 
 ## Trophy stealing
 
@@ -690,5 +709,23 @@ Needs 2–3 players, the target with a built Trophy Case and equipped trophies.
 
 ## Push
 
+Needs 2 players (Test > Clients and Servers); PU10 needs 3. PU11 needs
+TheftService merged (a working steal). Phone cases: Studio's device emulator
+(a phone) or a real phone.
+
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
+| PU1 | Keyboard: press **F** (not while typing in chat). | Your character does a quick two-handed shove (~0.25 s), a whoosh plays (if `PushSounds.Swing` is set). Typing "f" in chat does not push. Works on an R15 and an R6 avatar (Game Settings → Avatar). | |
+| PU2 | Gamepad: press **X** (ButtonX). | Same as PU1. | |
+| PU3 | Phone (emulator): look at the screen. | A round orange "👊 PUSH" button sits right above the jump button. It doesn't cover the jump button, the thumbstick, the cookie counter or the 🏆 TROPHIES button, on a small phone and on a tablet, portrait and landscape. On PC (no touch) there is no button. | |
+| PU4 | Phone: tap PUSH. | The shove plays, the button pops and a dark disc covers it and shrinks away over 1.2 s. | |
+| PU5 | Cooldown: mash F / tap PUSH fast. | At most one shove per ~1.2 s; extra presses do nothing (no animation, no request). | |
+| PU6 | Range + facing: Player 2 stands 5 studs in front of Player 1 → push; then 10 studs away → push; then 5 studs directly behind → push. | Only the first hits (POW! over Player 2, star burst, hit sound, Player 2 nudged away). The others are misses (swing only). Side-on at ~60° still hits; ~90° does not. | |
+| PU7 | Two targets in front (3 players): Players 2 and 3 at 3 and 6 studs. | Only the closer one (Player 2) is hit. | |
+| PU8 | Others see it: Player 1 pushes (hit and miss); watch from Player 2's window (and a 3rd). | They see Player 1's arms shove and hear the whoosh; on a hit they see the burst + POW! at the target and hear the hit sound. | |
+| PU9 | Non-carrier nudge: Player 1 pushes Player 2 (not carrying), repeatedly. | Player 2 slides a short way (about a third of the thief knockback, a small hop), keeps control, no stagger, no damage (Health unchanged). Never launched far. | |
+| PU10 | Grief check: Players 1 and 3 push Player 2 back and forth. | Each push is only a nudge; Player 2 can always walk away; nothing flings them off the map. | |
+| PU11 | Thief: Player 2 steals a trophy from Player 1's case and runs; Player 1 pushes them. | "STOPPED!" (big, red) over Player 2 + a bigger burst; Player 2 is knocked back hard and a bit up, staggers (~0.4 s, no control), then stands up and walks normally. The carried trophy disappears from Player 2's head and is back in Player 1's case; Player 2's `CarryingTrophy` is empty; their powers come back. A third player pushing the thief works the same. | |
+| PU12 | Spam from an exploiter: client command bar `for i = 1, 50 do game.ReplicatedStorage.Remotes.PushRequest:FireServer() end`, and `FireServer(game.Players:GetPlayers()[2], 999)` next to Player 2. | Only one push is accepted per ~1.2 s (one PushFX); extra/odd args are ignored; no errors in the server Output. | |
+| PU13 | Dead or far away: push while dead (reset and press F during respawn); fire `PushRequest` from the command bar while 30 studs from everyone. | Nothing happens / a miss; never a hit at range. | |
+| PU14 | Leave cleanup: Player 2 pushes then leaves mid-cooldown; Player 2 rejoins and pushes at once. Also leave while staggered. | No errors; the rejoined player can push immediately. | |

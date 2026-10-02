@@ -29,6 +29,7 @@ local CollectorService = require(script.Parent.CollectorService)
 local DataService = require(script.Parent.DataService)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
+local HouseSecurityService = require(script.Parent.HouseSecurityService)
 local PlotStages = require(script.Parent.PlotStages)
 local Purchases = require(script.Parent.Purchases)
 
@@ -119,6 +120,7 @@ end
 local function resetPlot(plot: Model)
 	DropperService.StopAll(plot)
 	CollectorService.ResetPlot(plot)
+	HouseSecurityService.ResetPlot(plot) -- bars down, pad green, timer cancelled
 	plot:SetAttribute("OwnerUserId", nil)
 	setOwnerSign(plot, "UNCLAIMED")
 	PlotStages.ShowUnclaimed(plot)
