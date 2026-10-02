@@ -60,7 +60,7 @@ user's approval first.
 
 ## Caleb Full Event (approved by the user 2026-10-01)
 
-Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user will pick a track); sound effects only for now.
+Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music: the user's own tracks, ids in the MUSIC block at the top of `Config.luau`.
 
 - [x] Contract: `Shared/CalebEvent.luau`, Config settings, architecture section (lead).
 - [x] Core: `CalebCycle` state machine, contributions, eligibility, reset, new cycle id. (code done; Studio test pending: QA CE1–CE10)
@@ -72,7 +72,8 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music comes later (user
 - [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [x] Caleb Trophies: unique variants, 2-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
-- [ ] Celebration music (ask the user for a track).
+- [x] Background music + party music + air horn slots; Caleb spit removed (requested by the user 2026-10-02). (code done; Studio test pending: QA MU1–MU8)
+- [ ] Paste the ids for Tender Static / Air Horn / NO PARTY into Config (user).
 
 ## Cookie Party upgrade (approved by the user 2026-10-01)
 
@@ -84,10 +85,10 @@ No completion screen (only the short "YOU COLLECTED" total), no leaderboard, no 
 - [x] Contract: `Shared/CookieParty.luau`, `Config.CookieParty*`, remotes, architecture section; Celebration is 60 s even in the fast dev cycle (lead).
 - [x] Party server: `CookiePartyService` (+ `CookiePartySpawner`) spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (code done; Studio test pending: QA PS1–PS14)
 - [x] Party cookies (client): pooled collectable cookies, collect pop / floating numbers / sparkles / sounds / earnings counter, rain ramps up with the phases. `CookiePartyCookies.client` + `CookiePartyLook` / `Motion` / `Feedback` / `Numbers` / `HUD`; `CookieRain` ramp. (code done; Studio test pending: QA PK1–PK16)
-- [x] Caleb party: dance energy ramps per phase, throws and spits cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. `CalebAnimator.client` + `CalebPartyPoses` / `CalebPartyMoves` / `CalebMouth`, `CalebPartyBubble.client`. (code done; Studio test pending: QA CD1–CD12)
+- [x] Caleb party: dance energy ramps per phase, throws cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. `CalebAnimator.client` + `CalebPartyPoses` / `CalebPartyMoves` / `CalebMouth`, `CalebPartyBubble.client`. (code done; Studio test pending: QA CD1–CD12)
 - [x] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX; original party SFX + music loop in `tools/audio/`. (code done; Studio test pending: QA PX1–PX14)
 - [x] End-of-party total: "YOU COLLECTED 🍪 N!" (requested by the user 2026-10-01). `CookiePartyTotal` + `CookiePartyTotalBuild`. (code done; Studio test pending: QA PT1–PT9)
-- [ ] Upload the new party sounds and a music track; paste ids into `Config.CookiePartySounds` (user).
+- [ ] Upload the new party sounds; paste ids into `Config.CookiePartySounds` (user).
 
 ## Post-MVP (needs approval)
 

@@ -1,17 +1,18 @@
 -- CookiePartyAudio (client only, ModuleScript)
 -- The Cookie Party's music, countdown ticks and finale boom, driven by
 -- CalebAudio.client.luau (the one place that plays the event's sounds):
---   Music          loops during Celebration; PlaybackSpeed tweens to
---                  Config.CookiePartyMusicSpeed[phase] at each phase change
---                  and the volume swells a little with the intensity. Stops
---                  (quick fade) the moment Celebration ends.
+--   Music          Config.CookiePartyMusic ("NO PARTY"): loops during
+--                  Celebration at normal speed (a real song, so no speed-up:
+--                  that would raise its pitch); the volume fades in and
+--                  swells a little with the intensity. Stops (quick fade)
+--                  the moment Celebration ends.
 --   CountdownTick  once per countdown number (10..1, same ceil-of-seconds-
 --                  left rule as CookiePartyCountdown), pitch rising.
 --   FinaleBoom     on Celebration -> TrophyClaim (only if heard live).
 -- Each Sound is created once, in CalebAudio's SoundService folder; an empty
--- Config.CookiePartySounds id = that sound is skipped silently. The other
--- CookiePartySounds (collects, Caleb's laugh/spit) belong to the cookie and
--- Caleb scripts. Presentation only; never talks to the server.
+-- id = that sound is skipped silently. The other CookiePartySounds
+-- (collects, Caleb's laugh) belong to the cookie and Caleb scripts.
+-- Presentation only; never talks to the server.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -22,44 +23,44 @@ local CookieParty = require(ReplicatedStorage.Shared.CookieParty)
 
 local CookiePartyAudio = {}
 
-local NAMES = { "Music", "CountdownTick", "FinaleBoom" }
 local MUSIC_FADE_IN = 1 -- seconds
 local MUSIC_STOP = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local SPEED_CHANGE = TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 local TICK_PITCH_STEP = 0.05 -- PlaybackSpeed added per second closer to 0
 
 local sounds: { [string]: Sound } = {}
 local statue: Instance? = nil
 local connection: RBXScriptConnection? = nil
-local phase: string? = nil
 local lastNumber: number? = nil
 local startedAt = 0
-local speedTween: Tween? = nil
 local stopTween: Tween? = nil
 
 -- Creates the sounds (once). assetId: CalebAudio's id normalizer. Returns
 -- the names with no id, for CalebAudio's single "skipped" print.
 function CookiePartyAudio.Init(folder: Instance, assetId: (any) -> string?): { string }
 	local missing = {}
-	for _, name in NAMES do
-		local id = assetId(Config.CookiePartySounds[name])
+	local function add(name: string, key: string, value: any, volume: number?)
+		local id = assetId(value)
 		if id then
 			local sound = Instance.new("Sound")
 			sound.Name = "Party" .. name
 			sound.SoundId = id
-			sound.Volume = Config.CookiePartySoundVolumes[name] or 0.5
+			sound.Volume = volume or 0.5
 			sound.Looped = name == "Music"
 			sound.Parent = folder
 			sounds[name] = sound
 		else
-			table.insert(missing, "CookiePartySounds." .. name)
+			table.insert(missing, key)
 		end
+	end
+	add("Music", "CookiePartyMusic", Config.CookiePartyMusic, Config.CookiePartyMusicVolume)
+	for _, name in { "CountdownTick", "FinaleBoom" } do
+		add(name, "CookiePartySounds." .. name, Config.CookiePartySounds[name], Config.CookiePartySoundVolumes[name])
 	end
 	return missing
 end
 
 local function musicVolume(left: number): number
-	local base = Config.CookiePartySoundVolumes.Music or 0.4
+	local base = Config.CookiePartyMusicVolume
 	local swell = 0.85 + 0.3 * CookieParty.Intensity(left)
 	local fadeIn = math.clamp((os.clock() - startedAt) / MUSIC_FADE_IN, 0, 1)
 	return math.min(1, base * swell * fadeIn)
@@ -70,19 +71,10 @@ local function step()
 		return
 	end
 	local left = CookieParty.TimeLeft(statue)
-	local p = CookieParty.GetPhase(left)
 	local music = sounds.Music
 	if music then
-		if p ~= phase then
-			if speedTween then
-				speedTween:Cancel()
-			end
-			speedTween = TweenService:Create(music, SPEED_CHANGE, { PlaybackSpeed = Config.CookiePartyMusicSpeed[p] or 1 })
-			speedTween:Play()
-		end
 		music.Volume = musicVolume(left)
 	end
-	phase = p
 
 	local n = math.ceil(left)
 	local tickSound = sounds.CountdownTick
@@ -96,13 +88,11 @@ local function step()
 	end
 end
 
--- The party started (or we joined mid-party: the music starts at the
--- current phase's speed, no catch-up ticks for numbers already passed).
+-- The party started (or we joined mid-party: the music starts from the
+-- top, no catch-up ticks for numbers already passed).
 function CookiePartyAudio.Start(theStatue: Instance)
 	CookiePartyAudio.Stop()
 	statue = theStatue
-	local left = CookieParty.TimeLeft(theStatue)
-	phase = CookieParty.GetPhase(left)
 	lastNumber = nil
 	startedAt = os.clock()
 	local music = sounds.Music
@@ -111,7 +101,6 @@ function CookiePartyAudio.Start(theStatue: Instance)
 			stopTween:Cancel()
 			stopTween = nil
 		end
-		music.PlaybackSpeed = Config.CookiePartyMusicSpeed[phase] or 1
 		music.Volume = 0
 		music.TimePosition = 0
 		music:Play()
@@ -126,11 +115,6 @@ function CookiePartyAudio.Stop()
 		connection = nil
 	end
 	statue = nil
-	phase = nil
-	if speedTween then
-		speedTween:Cancel()
-		speedTween = nil
-	end
 	local music = sounds.Music
 	if music and music.IsPlaying and not stopTween then
 		local fade = TweenService:Create(music, MUSIC_STOP, { Volume = 0 })

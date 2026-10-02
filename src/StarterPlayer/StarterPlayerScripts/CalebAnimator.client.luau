@@ -175,7 +175,7 @@ local function step()
 	end
 	if animState == State.Celebration then
 		local headCFrame = if headLoaded then (head :: BasePart).CFrame else nil
-		CalebMouth.Update(headCFrame, if headLoaded then (head :: BasePart).Size.Y / 2 else 0, pose.Spit, pose.Laugh)
+		CalebMouth.Update(headCFrame, if headLoaded then (head :: BasePart).Size.Y / 2 else 0, pose.Laugh)
 	end
 end
 

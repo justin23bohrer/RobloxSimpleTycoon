@@ -9,6 +9,18 @@
 -- (StartingCash, DropValue, Cost are all counted in cookies).
 
 local Config = {
+	-- ===================== MUSIC (paste your Roblox audio ids here) =====================
+	-- Format: "rbxassetid://123456789" (or just the number). Empty "" = silent.
+	-- See tools/audio/README.md "Your music" for how to find an asset id.
+	BackgroundMusic = "", -- "Tender Static": loops all game, fades out during the Cookie Party
+	CookiePartyStartSound = "", -- "Air Horn": plays once when the Cookie Party starts
+	CookiePartyMusic = "", -- "NO PARTY": loops during the 60 s Cookie Party
+	BackgroundMusicVolume = 0.3, -- 0..1
+	CookiePartyMusicVolume = 0.5, -- 0..1 (swells a little toward the end)
+	CookiePartyStartVolume = 0.8, -- 0..1
+	MusicFadeSeconds = 1.5, -- background fade out / back in around the party
+	-- ====================================================================================
+
 	-- Cookies every player starts each session with.
 	StartingCash = 100,
 
@@ -192,10 +204,10 @@ local Config = {
 	CookieRainNearPlayerRadius = 45,
 	-- Sound effects (client only). Each is a Roblox audio asset id string
 	-- ("rbxassetid://123..."). Empty = that sound is skipped. See
-	-- tools/audio/ for the original effects to upload. Music comes later.
+	-- tools/audio/ for the original effects to upload. The music and the
+	-- party's start sound are in the MUSIC block at the top of this file.
 	CalebSounds = table.freeze({
 		Full = "",
-		CelebrationStart = "",
 		Grow = "",
 		CookieRain = "",
 		TrophyClaim = "",
@@ -219,7 +231,6 @@ local Config = {
 	-- for the whole Celebration, so keep it quiet; Grow plays on every feed.
 	CalebSoundVolumes = table.freeze({
 		Full = 0.8,
-		CelebrationStart = 0.7,
 		Grow = 0.25,
 		CookieRain = 0.2,
 		TrophyClaim = 0.7,
@@ -266,8 +277,8 @@ local Config = {
 	CookiePartySpawnPerSecond = table.freeze({ Start = 4, Hype = 7, Frenzy = 11, Countdown = 15 }),
 	CookiePartySpawnPerExtraPlayer = 0.5,
 	CookiePartyMaxAlive = 80,
-	-- Share (0..1) of collectable cookies Caleb throws / spits out of his
-	-- mouth (they arc from his head) instead of falling from the sky.
+	-- Share (0..1) of collectable cookies Caleb throws out of his mouth (they
+	-- arc from his head) instead of falling from the sky.
 	CookiePartyFromCalebShare = table.freeze({ Start = 0.15, Hype = 0.25, Frenzy = 0.35, Countdown = 0.4 }),
 	-- Where they land: within SpawnRadius studs of the statue; NearPlayerShare
 	-- of them within NearPlayerRadius studs of a random player.
@@ -307,7 +318,6 @@ local Config = {
 	--     Countdown. WindUpSeconds: the "I'M FULL!" wind-up at the very end (no
 	--     moves then); its last PeakSeconds are the pop (arms flung wide, head
 	--     back, belly PeakBelly bigger, body PeakHeight studs up) landing at 0.
-	--   SpitCrumbsPerSecond: crumbs sprayed from his mouth during a Spit.
 	CookiePartyCaleb = table.freeze({
 		EnergyRampSeconds = 1,
 		CountdownEnergy = 2.3,
@@ -316,14 +326,13 @@ local Config = {
 		MoveEvery = table.freeze({ Start = 3.5, Hype = 2.4, Frenzy = 1.2, Countdown = 1.8 }),
 		MoveSpeed = table.freeze({ Start = 1, Hype = 1.15, Frenzy = 1.5, Countdown = 1.3 }),
 		MoveSize = table.freeze({ Start = 1, Hype = 1.2, Frenzy = 1.5, Countdown = 1.35 }),
-		MoveSeconds = table.freeze({ Throw = 1.2, Spit = 1.5, Laugh = 1.6, Spin = 1.3, Jump = 1.1, Drum = 1.4 }),
+		MoveSeconds = table.freeze({ Throw = 1.2, Laugh = 1.6, Spin = 1.3, Jump = 1.1, Drum = 1.4 }),
 		MoveWeights = table.freeze({
-			Throw = table.freeze({ Start = 4, Hype = 4, Frenzy = 3, Countdown = 2 }),
-			Spit = table.freeze({ Start = 2, Hype = 3, Frenzy = 3, Countdown = 2 }),
-			Laugh = table.freeze({ Start = 3, Hype = 3, Frenzy = 3, Countdown = 3 }),
-			Spin = table.freeze({ Start = 1, Hype = 2, Frenzy = 3, Countdown = 1 }),
-			Jump = table.freeze({ Start = 1, Hype = 2, Frenzy = 3, Countdown = 1 }),
-			Drum = table.freeze({ Start = 2, Hype = 2, Frenzy = 2, Countdown = 3 }),
+			Throw = table.freeze({ Start = 5, Hype = 5, Frenzy = 4, Countdown = 3 }),
+			Laugh = table.freeze({ Start = 4, Hype = 3, Frenzy = 3, Countdown = 4 }),
+			Spin = table.freeze({ Start = 1, Hype = 3, Frenzy = 4, Countdown = 1 }),
+			Jump = table.freeze({ Start = 1, Hype = 2, Frenzy = 4, Countdown = 1 }),
+			Drum = table.freeze({ Start = 2, Hype = 2, Frenzy = 2, Countdown = 4 }),
 		}),
 		ShakeDegrees = table.freeze({ Start = 0, Hype = 0, Frenzy = 4, Countdown = 3 }),
 		CountdownBelly = 0.12,
@@ -331,7 +340,6 @@ local Config = {
 		PeakSeconds = 0.3,
 		PeakBelly = 0.35,
 		PeakHeight = 3,
-		SpitCrumbsPerSecond = 70,
 	}),
 	-- Caleb's speech bubbles (CalebPartyBubble.client): a new line every
 	-- CookiePartyCalebLineSeconds[phase] seconds (counted from the phase's
@@ -347,33 +355,32 @@ local Config = {
 	CookiePartyCalebLineSeconds = table.freeze({ Start = 4, Hype = 3, Frenzy = 2, Countdown = 3 }),
 	CookiePartyCalebFinalLine = "I'M FULL!!!",
 	CookiePartyCalebFinalLineSeconds = 1,
-	-- Party sounds (client only), same rules as CalebSounds: Roblox asset id
-	-- strings, empty = skipped. Music loops for the whole party and speeds up
-	-- per phase (CookiePartyMusicSpeed). Original effects: tools/audio/.
+	-- Party sound effects (client only), same rules as CalebSounds: Roblox
+	-- asset id strings, empty = skipped. Original effects: tools/audio/. The
+	-- party music itself is Config.CookiePartyMusic (MUSIC block at the top).
 	CookiePartySounds = table.freeze({
-		Music = "",
 		Collect = "",
 		CollectGolden = "",
 		CollectGiant = "",
 		CountdownTick = "",
 		FinaleBoom = "",
 		CalebLaugh = "",
-		CalebSpit = "",
 		TotalTick = "",
 		TotalLand = "",
 	}),
 	CookiePartySoundVolumes = table.freeze({
-		Music = 0.4,
 		Collect = 0.5,
 		CollectGolden = 0.6,
 		CollectGiant = 0.7,
 		CountdownTick = 0.6,
 		FinaleBoom = 0.9,
 		CalebLaugh = 0.5,
-		CalebSpit = 0.4,
 		TotalTick = 0.4,
 		TotalLand = 0.7,
 	}),
+	-- Per-phase tempo of the party's light/banner pulse (CookiePartyFX). The
+	-- party music itself always plays at normal speed: speeding up a real
+	-- song raises its pitch too (chipmunk effect).
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
 	-- Collectable cookies on each client (CookiePartyCookies.client). The
 	-- client asks to collect when the player is this many studs inside the
@@ -398,9 +405,9 @@ local Config = {
 	CookiePartyRainMaxCookies = table.freeze({ Start = 120, Hype = 120, Frenzy = 160, Countdown = 170 }),
 	CookiePartyRainGoldenShare = table.freeze({ Start = 0, Hype = 0.08, Frenzy = 0.2, Countdown = 0.3 }),
 	-- Party FX (client only, looks only: CalebEventUI / CookiePartyFX /
-	-- CookiePartyFinale / CalebAudio). The music's tempo at PlaybackSpeed 1
-	-- (tools/audio party_music.wav); the lighting and banner pulse once every
-	-- 2 beats, so never more than ~1.2 pulses per second.
+	-- CookiePartyFinale / CalebAudio). The party music's tempo (set it to
+	-- the song's BPM for an on-beat pulse); the lighting and banner pulse
+	-- once every 2 beats, so never more than ~1.2 pulses per second.
 	CookiePartyMusicBPM = 120,
 	-- Per phase: pulse strength (0..1), seconds between UI confetti bursts,
 	-- and pieces per burst (taken from the CalebConfettiCount pool).
