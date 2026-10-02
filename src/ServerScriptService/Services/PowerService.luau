@@ -24,13 +24,6 @@
 -- * Plot visuals: SetDisplayed also calls PlotPowerVisuals.Apply, which shows
 --   the production / collect powers on the owner's plot (fire on dropper
 --   cups, luck sparkles, a gold ring on the Collect pad).
--- * Suppression (House Raid): while TheftService has SetSuppressed(player,
---   true) (the player carries a stolen trophy), every power is off: Get
---   returns 0 for every stat (so DropperService / CollectorService bonuses
---   stop too), TrophyStats is {} and CanDoubleJump false, WalkSpeed is the
---   base x Config.TheftCarrySpeedMultiplier, JumpHeight the base, no glowing
---   feet, and no plot effects. The displayed totals are kept, so
---   SetSuppressed(player, false) brings back exactly what is displayed.
 --
 -- Requires only Shared modules and two presentation helpers: PowerVisuals
 -- (glowing feet; requires Config only) and PlotPowerVisuals (plot effects;
@@ -40,7 +33,6 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 local PowerVisuals = require(script.Parent.PowerVisuals)
 local PlotPowerVisuals = require(script.Parent.PlotPowerVisuals)
@@ -56,12 +48,6 @@ local BASE_JUMP_ATTR = "BaseJumpHeight"
 
 local totalsByPlayer: { [Player]: { [string]: number } } = {}
 local characterConnections: { [Player]: RBXScriptConnection } = {}
-local suppressed: { [Player]: true } = {} -- carrying a stolen trophy: no powers
-
--- What is active right now: the displayed totals, or nothing while suppressed.
-local function activeTotals(player: Player): { [string]: number }
-	return if suppressed[player] then {} else totalsByPlayer[player] or {}
-end
 
 local function applyMovement(player: Player, character: Model?)
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -79,10 +65,7 @@ local function applyMovement(player: Player, character: Model?)
 		humanoid:SetAttribute(BASE_JUMP_ATTR, baseJump)
 	end
 	humanoid.UseJumpPower = false
-	local walkFactor = if suppressed[player]
-		then Config.TheftCarrySpeedMultiplier
-		else 1 + PowerService.Get(player, Stat.WalkSpeed)
-	humanoid.WalkSpeed = baseWalk * walkFactor
+	humanoid.WalkSpeed = baseWalk * (1 + PowerService.Get(player, Stat.WalkSpeed))
 	humanoid.JumpHeight = baseJump * (1 + PowerService.Get(player, Stat.JumpHeight))
 	PowerVisuals.SetSpeedGlow(character, PowerService.Get(player, Stat.WalkSpeed))
 end
@@ -94,23 +77,15 @@ local function watchCharacter(player: Player, character: Model)
 end
 
 local function publish(player: Player)
-	local totals = activeTotals(player)
+	local totals = totalsByPlayer[player] or {}
 	player:SetAttribute(STATS_ATTR, HttpService:JSONEncode(totals))
 	player:SetAttribute(DOUBLE_JUMP_ATTR, (totals[Stat.DoubleJump] or 0) > 0)
 end
 
--- The player's total bonus for one stat (already capped), or 0 (also 0 for
--- every stat while suppressed).
+-- The player's total bonus for one stat (already capped), or 0.
 function PowerService.Get(player: Player, stat: string): number
-	return activeTotals(player)[stat] or 0
-end
-
--- Republishes the attributes, movement, feet glow and plot effects from the
--- active totals.
-local function applyAll(player: Player)
-	publish(player)
-	applyMovement(player, player.Character)
-	PlotPowerVisuals.Apply(player, activeTotals(player)) -- fire on droppers, shine on the Collect pad
+	local totals = totalsByPlayer[player]
+	return totals and totals[stat] or 0
 end
 
 -- Sets which trophy definitions the player has on display (variant ids, in
@@ -120,20 +95,9 @@ function PowerService.SetDisplayed(player: Player, variantIds: { string })
 		return -- left the game; nothing to keep
 	end
 	totalsByPlayer[player] = TrophyPowers.Compute(variantIds)
-	applyAll(player)
-end
-
--- Server only (TheftService): true turns every trophy power of the player off
--- (carry speed, no double jump, no production / collect bonus, no effects);
--- false brings back exactly what their case displays. Idempotent.
-function PowerService.SetSuppressed(player: Player, on: boolean)
-	if (suppressed[player] == true) == on then
-		return -- already that way
-	end
-	suppressed[player] = if on then true else nil
-	if player.Parent ~= nil then -- a player who left gets nothing applied
-		applyAll(player)
-	end
+	publish(player)
+	applyMovement(player, player.Character)
+	PlotPowerVisuals.Apply(player, totalsByPlayer[player]) -- fire on droppers, shine on the Collect pad
 end
 
 -- Called by ServerMain when a player joins.
@@ -161,7 +125,6 @@ end
 -- Called by ServerMain when a player leaves.
 function PowerService.OnPlayerRemoving(player: Player)
 	totalsByPlayer[player] = nil
-	suppressed[player] = nil
 	local connection = characterConnections[player]
 	if connection then
 		connection:Disconnect()

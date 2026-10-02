@@ -48,14 +48,7 @@ local Config = {
 	--   After - purchase id that unlocks this one (see above).
 	--   Parts - plot parts/models that appear once it is built (hidden before).
 	Builds = table.freeze({
-		-- Walls also brings the House Raid security parts (pad, bars, stash).
-		table.freeze({
-			Id = "Walls",
-			Name = "Build Walls",
-			Cost = 5000,
-			After = "Dropper4",
-			Parts = table.freeze({ "Walls", "SecurityPad", "SecurityBars", "TrophyStash" }),
-		}),
+		table.freeze({ Id = "Walls", Name = "Build Walls", Cost = 5000, After = "Dropper4", Parts = table.freeze({ "Walls" }) }),
 		table.freeze({ Id = "Stairs", Name = "Build Stairs", Cost = 8000, After = "Walls", Parts = table.freeze({ "Stairs" }) }),
 		table.freeze({
 			Id = "SecondFloor",
@@ -493,62 +486,6 @@ local Config = {
 	TrophyPopupSeconds = 20,
 	TrophyPopupSound = "",
 	TrophyPopupVolume = 0.6,
-
-	-- House Raid (ARCHITECTURE.md "House Raid (contract)", approved by the
-	-- user 2026-10-01): house security, trophy stealing, the push.
-	-- Security: the owner steps on the green SecurityPad; red bars block the
-	-- doorway for exactly this many seconds; then they drop. No cooldown.
-	HouseSecuritySeconds = 30,
-	-- How long the bars take to rise out of the floor / sink back (seconds).
-	HouseSecurityBarsSeconds = 0.8,
-	-- The pad's color while open (green) and while the bars are up (red).
-	HouseSecurityPadOpenColor = Color3.fromRGB(40, 200, 70),
-	HouseSecurityPadLockedColor = Color3.fromRGB(230, 30, 30),
-	-- Bars sounds, played from the doorway on the server (everyone nearby
-	-- hears them). Roblox audio asset ids ("rbxassetid://123..."); empty =
-	-- skipped. Originals to upload: tools/audio/out/security_close.wav and
-	-- security_open.wav.
-	HouseSecuritySounds = table.freeze({
-		Close = "",
-		Open = "",
-	}),
-	HouseSecuritySoundVolume = 0.8,
-	-- Stealing a displayed trophy: hold the StealPrompt this long, from at
-	-- most this many studs.
-	TheftHoldSeconds = 3,
-	TheftPromptDistance = 8,
-	-- While carrying: every trophy power is off, and walk speed is the
-	-- character's normal (no-trophy) speed times this.
-	TheftCarrySpeedMultiplier = 0.9,
-	-- Anti-teleport: a thief moving faster than (carry speed + this many
-	-- studs/s, averaged over a short window) has the theft cancelled.
-	TheftMoveSlack = 12,
-	-- The push: range (studs from the pusher's root to the target's root,
-	-- in front of the pusher), seconds between pushes, and knockback speed
-	-- (studs/s, mostly away from the pusher, a little up).
-	PushRange = 7,
-	PushCooldown = 1.2,
-	PushKnockbackSpeed = 70,
-	PushKnockbackUp = 25,
-	-- Push details (PushService + Push.client): the target must be within
-	-- this many degrees of the pusher's facing (a generous cone). A thief
-	-- gets the full knockback and staggers for PushStaggerSeconds; anyone
-	-- else only gets a small nudge (knockback x PushNudgeMultiplier, no
-	-- stagger) so players can't launch each other.
-	PushFacingAngle = 70,
-	PushNudgeMultiplier = 0.35,
-	PushStaggerSeconds = 0.4,
-	-- Push sounds (client only): Roblox audio asset ids ("rbxassetid://123..."),
-	-- empty = skipped. Swing plays on every push, Hit at the target on a hit.
-	-- Original effects: tools/audio/ (push_swing.wav, push_hit.wav).
-	PushSounds = table.freeze({
-		Swing = "",
-		Hit = "",
-	}),
-	PushSoundVolumes = table.freeze({
-		Swing = 0.5,
-		Hit = 0.8,
-	}),
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
 	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim

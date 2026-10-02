@@ -32,9 +32,6 @@ Client code goes here as `Name.client.luau` (a LocalScript).
 - `TrophyPrompt.client.luau` — hides the podium "Claim Caleb Trophy" prompt
   for players who can't claim, and shows the claim result message. The
   server decides every claim.
-- `TheftPrompt.client.luau` — House Raid: hides the "Steal Trophy" prompt on
-  your own case trophies and while you carry one, and shows the server's
-  short theft messages. The server decides every steal.
 
 Client code may handle input, visual effects, and presentation. It must never
 be trusted for cash, ownership, purchases, drops, or collection.

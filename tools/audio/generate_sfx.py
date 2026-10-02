@@ -25,16 +25,6 @@ Cookie Party (Config.CookiePartySounds):
   caleb_laugh.wav        cartoony "ha-ha-ha-ha" (voiced syllables, falling)
   caleb_spit.wav         "ptoo" pop + airy whoosh (Caleb throws a cookie)
 
-Push (Config.PushSounds):
-
-  push_swing.wav         short airy whoosh (every push)
-  push_hit.wav           punchy cartoon "pow": thump + crack + bonk
-
-House security (Config.HouseSecuritySounds):
-
-  security_close.wav     motor whir + ratchet rising, heavy metal clang (bars up)
-  security_open.wav      latch clack, falling motor whir + ratchet, soft thud (bars down)
-
 Run:  python3 tools/audio/generate_sfx.py
 The output is deterministic (fixed random seed), so re-running gives the
 same files. See tools/audio/README.md for uploading them to Roblox.
@@ -501,83 +491,6 @@ def caleb_spit(rng):
     return fade_edges(out, 0.001, 0.05)
 
 
-def push_swing(rng):
-    """Short airy whoosh: noise swept up and back down over ~0.22 s."""
-    length = 0.22
-    whoosh = swept_noise(length, rng, lambda t: 0.05 + 0.45 * math.sin(math.pi * t / length) ** 2, highpass=0.7)
-    env = [math.sin(math.pi * i / len(whoosh)) ** 1.2 for i in range(len(whoosh))]
-    return fade_edges(apply(whoosh, env), 0.002, 0.03)
-
-
-def push_hit(rng):
-    """Punchy cartoon 'pow': a low body thump, a bright crack, a quick bonk."""
-    out = []
-    thump = tone(lambda t: 55 + 120 * math.exp(-t * 35), 0.18, harmonics=((1, 1.0), (2, 0.4)))
-    mix_into(out, apply(thump, envelope(len(thump), 0.001, 0.17, 2.2)), 0.0, 1.0)
-    crack = noise(0.05, rng, highpass=0.5, lowpass=0.8)
-    mix_into(out, apply(crack, envelope(len(crack), 0.0005, 0.045, 2.5)), 0.0, 0.7)
-    bonk = tone(lambda t: 520 - 180 * min(t / 0.12, 1.0), 0.14, harmonics=((1, 1.0), (2.7, 0.3)))
-    mix_into(out, apply(bonk, envelope(len(bonk), 0.002, 0.13, 1.6)), 0.01, 0.35)
-    return fade_edges(out, 0.001, 0.03)
-
-
-def ratchet(seconds, rng, start_rate, end_rate):
-    """Metal ratchet clicks whose rate (clicks/s) slides from start_rate to end_rate."""
-    out = []
-    t = 0.0
-    while t < seconds:
-        click = noise(0.008, rng, highpass=0.75, lowpass=0.9)
-        mix_into(out, apply(click, envelope(len(click), 0.0003, 0.007, 2.0)), t, 0.5)
-        ping = bell(2100 + rng.uniform(-80, 80), 0.03, decay=60.0, bright=0.5)
-        mix_into(out, ping, t, 0.12)
-        rate = start_rate + (end_rate - start_rate) * (t / seconds)
-        t += 1.0 / rate
-    return out
-
-
-def motor(seconds, rng, f_start, f_end):
-    """A gear motor's whir: a buzzy tone sliding f_start -> f_end, plus rumble."""
-    whir = tone(lambda t: f_start + (f_end - f_start) * t / seconds, seconds,
-                harmonics=((1, 1.0), (2, 0.6), (3, 0.4), (5, 0.2)), vibrato=(31, 0.02))
-    rumble = noise(seconds, rng, lowpass=0.08)
-    out = []
-    mix_into(out, apply(whir, envelope(len(whir), 0.05, 0.12, 1.2)), 0.0, 0.35)
-    mix_into(out, apply(rumble, envelope(len(rumble), 0.05, 0.12, 1.2)), 0.0, 0.8)
-    return out
-
-
-def metal_clang(rng, freq=310.0, seconds=1.0):
-    """A heavy metal hit: low thump, crack, and a ringing inharmonic bar."""
-    out = []
-    mix_into(out, kick(0.3), 0.0, 0.8)
-    crack = noise(0.03, rng, highpass=0.6, lowpass=0.9)
-    mix_into(out, apply(crack, envelope(len(crack), 0.0003, 0.028, 2.0)), 0.0, 0.6)
-    for mult, amp in ((1.0, 1.0), (2.76, 0.6), (5.4, 0.35), (8.9, 0.2)):
-        ring = bell(freq * mult, seconds, decay=5.0, bright=0.3)
-        mix_into(out, ring, 0.0, 0.18 * amp)
-    return out
-
-
-def security_close(rng):
-    """Bars rise (about 0.8 s) and slam shut: motor + ratchet, then a clang."""
-    out = []
-    mix_into(out, motor(0.75, rng, 90, 150), 0.0, 1.0)
-    mix_into(out, ratchet(0.72, rng, 14, 30), 0.03, 1.0)
-    mix_into(out, metal_clang(rng, 300.0, 1.1), 0.72, 1.0)
-    return fade_edges(out, 0.003, 0.15)
-
-
-def security_open(rng):
-    """Bars unlatch and sink (about 0.8 s): clack, falling motor + ratchet, thud."""
-    out = []
-    latch = metal_clang(rng, 520.0, 0.25)
-    mix_into(out, latch, 0.0, 0.45)
-    mix_into(out, motor(0.8, rng, 150, 80), 0.06, 0.9)
-    mix_into(out, ratchet(0.75, rng, 28, 12), 0.08, 0.9)
-    mix_into(out, kick(0.3), 0.86, 0.6)
-    return fade_edges(out, 0.002, 0.12)
-
-
 SOUNDS = (
     ("caleb_full.wav", caleb_full),
     ("celebration_start.wav", celebration_start),
@@ -593,10 +506,6 @@ SOUNDS = (
     ("finale_boom.wav", finale_boom),
     ("caleb_laugh.wav", caleb_laugh),
     ("caleb_spit.wav", caleb_spit),
-    ("push_swing.wav", push_swing),
-    ("push_hit.wav", push_hit),
-    ("security_close.wav", security_close),
-    ("security_open.wav", security_open),
 )
 
 
