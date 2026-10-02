@@ -443,21 +443,14 @@ local Config = {
 		Legendary = 3,
 		Mythic = 1,
 	}),
-	-- Most a stat's total bonus can reach (see TrophyPowers for stacking).
-	TrophyStatCaps = table.freeze({
-		CookieMultiplier = 2, -- at most 3x cookies
-		DropperSpeed = 1, -- at most 2x drop rate
-		ExtraCookieChance = 0.5,
-		LuckyCookieChance = 0.25,
-		CollectBonus = 0.5,
-		WalkSpeed = 1.5, -- at most 2.5x walk speed
-		JumpHeight = 1,
-		DoubleJump = 1,
-	}),
+	-- Trophy power totals have no upper limit (duplicates stack too; see
+	-- TrophyPowers). Only the chance stats stop at 100%.
 	-- Glowing feet while a WalkSpeed trophy is displayed (PowerVisuals, made on
 	-- the server so everyone sees it). Each value goes from Min (smallest
-	-- bonus) to Max (bonus at TrophyStatCaps.WalkSpeed). Brightness/Range are
-	-- the PointLight at each foot; Rate is sparkles per second per foot.
+	-- bonus) to Max (bonus at TrophySpeedGlowFullAt or more). Brightness/Range
+	-- are the PointLight at each foot; Rate is sparkles per second per foot.
+	-- Looks only: the speed itself keeps growing past TrophySpeedGlowFullAt.
+	TrophySpeedGlowFullAt = 1.5, -- +150% walk speed = full glow
 	TrophySpeedGlowColor = Color3.fromRGB(90, 200, 255),
 	TrophySpeedGlowBrightnessMin = 0.6,
 	TrophySpeedGlowBrightnessMax = 1.6,

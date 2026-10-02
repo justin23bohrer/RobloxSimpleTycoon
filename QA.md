@@ -552,7 +552,7 @@ checks, in the Server command bar:
 | PW6 | CollectBonus: display +0.5, collect 100 stored. | Cookies +150 (rounded down for odd amounts). | |
 | PW7 | WalkSpeed / JumpHeight: display them. | Visibly faster / higher right away; Humanoid `UseJumpPower` = false. Unequip → back to normal right away. | |
 | PW8 | DoubleJump: display Rocket Caleb. | `CanDoubleJump` = true; press jump, then again in the air → a second jump; only one per air time; landing resets. Holding jump does not fire both at once. Unequip → no air jump. | |
-| PW9 | Caps: display several trophies of one stat whose sum exceeds the cap. | `TrophyStats` shows the cap (e.g. CookieMultiplier 2 → 3× cookies), never more. Two copies of the same definition count once. | |
+| PW9 | No caps: display several trophies of one stat. | `TrophyStats` shows the full sum (no cap). Two copies of the same definition both count. See "Trophy stacking" (ST1–ST7). | |
 | PW10 | Respawn (reset character) with speed/jump trophies. | Same boosted WalkSpeed / JumpHeight after respawn; not compounded (reset twice → same values). | |
 | PW11 | 2 players (Clients and Servers): only Player 1 has trophies. | Player 2's drops, payouts, speed, jump and `TrophyStats` are unaffected; Player 1's bonuses apply only on Player 1's plot. | |
 | PW12 | Unequip every trophy (or release the plot / leave). | All bonuses gone from the next drop; `TrophyStats` empty; movement normal. | |
@@ -561,20 +561,41 @@ checks, in the Server command bar:
 
 Same setup as Trophy powers (built Trophy Case, or the `PowerService.SetDisplayed`
 command bar shortcut). Base WalkSpeed is 16. Read the Humanoid's `WalkSpeed`
-in the Properties window (Server view). Cap: `TrophyStatCaps.WalkSpeed` = 1.5.
+in the Properties window (Server view). No cap; the glow is full at `TrophySpeedGlowFullAt` = 1.5.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | SG1 | Display each speed trophy alone, then put it in the inventory without a built case. | Party 21.6, Speed 28, Cool 24, Midnight 22.4, Rainbow 20.8, King 24 (all = 16 × (1 + bonus)). Equipped but case not built → 16, no glow. | |
 | SG2 | Inventory details and Trophy Case nameplates for those six. | "+35% WALK SPEED", "+75% WALK SPEED", "+50% WALK SPEED", "+40% JUMP, +40% SPEED", "+10% COOKIES/JUMP/DROPPERS, +30% SPEED", "+50% COOKIES, +50% WALK SPEED"; the Rainbow text fits its plate. | |
 | SG3 | Stacking: display Speed + Cool (+1.25). | WalkSpeed 36; `TrophyStats` WalkSpeed = 1.25. | |
-| SG4 | Cap: display Speed + Cool + King + Midnight (+2.15). | WalkSpeed 40 (2.5×), `TrophyStats` WalkSpeed = 1.5, never more. | |
+| SG4 | No cap: display Speed + Cool + King + Midnight (+2.15). | WalkSpeed 50.4 (3.15×), `TrophyStats` WalkSpeed = 2.15. | |
 | SG5 | Any speed trophy displayed. Look at your feet (day and night). | Each foot has a soft light-blue glow and leaves a few sparkles when running; subtle, not blinding. One `SpeedGlow` Attachment per foot in Explorer. | |
-| SG6 | Compare Party (+35%) with the capped stack (SG4). | Capped stack is brighter / more sparkles; both look tasteful. | |
+| SG6 | Compare Party (+35%) with the big stack (SG4). | Big stack is brighter / more sparkles (full glow); both look tasteful. | |
 | SG7 | Unequip the trophy; then re-equip and release the plot; then re-equip and display a JumpHeight-only trophy (Jump Caleb). | Glow disappears right away each time (no `SpeedGlow` left). Jump Caleb alone: no feet glow. | |
 | SG8 | 2 players (Clients and Servers): Player 1 has a speed trophy. | Player 2 sees Player 1's glowing feet; Player 2's own feet do not glow. A 3rd player joining later also sees it. | |
 | SG9 | Respawn (Esc → Reset) with a speed trophy, twice. | Same WalkSpeed after each respawn (not compounded) and the glow is back, still exactly one `SpeedGlow` per foot. | |
 | SG10 | R6: set Game Settings → Avatar → R6, play with a speed trophy. (R15 is covered by SG5.) | Glow on `Left Leg` / `Right Leg` bottoms; same WalkSpeed numbers. | |
+
+## Trophy stacking
+
+No stat caps and duplicates stack (requested by the user 2026-10-02). Needs
+several copies of a trophy: in Studio, the command bar shortcut
+`require(game.ServerScriptService.Services.PowerService).SetDisplayed(game.Players:GetPlayers()[1], {"SpeedCaleb", "SpeedCaleb"})`
+sets displayed ids directly; for the real equip path, give yourself
+duplicate saved trophies (different InstanceIds) and equip them in the
+inventory. Base WalkSpeed 16. Read `TrophyStats` on the Player and the
+Humanoid's `WalkSpeed` (Server view).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| ST1 | Display two different speed trophies: Speed + Cool. | `TrophyStats` WalkSpeed = 1.25, WalkSpeed 36. | |
+| ST2 | Display two copies of the same trophy: 2 × Speed Caleb (equip both in the inventory). | Both equip (ACTIVE TROPHIES 2 / 5), both show in the case; `TrophyStats` WalkSpeed = 1.5, WalkSpeed 40. Two Golden Calebs → CookieMultiplier 2, Dropper1 drops worth 30. | |
+| ST3 | Display 5 × Speed Caleb. | `TrophyStats` WalkSpeed = 3.75, WalkSpeed 76 (4.75×). Inventory "Active powers" says +375% speed. A 6th can't be equipped (slots full). | |
+| ST4 | A chance stat never goes over 100%: command bar `SetDisplayed(player, {"CloneCaleb","CloneCaleb","CloneCaleb","CloneCaleb","CloneCaleb","CloneCaleb","CloneCaleb"})` (7 × 15% = 105%). | `TrophyStats` ExtraCookieChance = 1 (not 1.05); every drop has exactly one extra (never more); UI says 100%. With 5 real Clone Calebs: 0.75. | |
+| ST5 | Display 2 × Rocket Caleb. | `CanDoubleJump` = true, exactly one air jump; JumpHeight +40% (7.2 → 10.08). | |
+| ST6 | From ST3, unequip trophies one by one. | WalkSpeed drops by 12 each time (76 → 64 → 52 → 40 → 28 → 16); `TrophyStats` follows; no glow at 0. | |
+| ST7 | At 5 × Speed Caleb (+375%), look at the feet glow and run around. | Glow looks the same as at +150% (full glow, not blinding, not bigger); one `SpeedGlow` per foot. | |
+| ST8 | 5 × Golden + check droppers; 5 × Neon. | Golden: Dropper1 drops worth 60 (6×), dropper fire no bigger than at +100%. Neon: one drop every 0.8 s per dropper; no errors in Output. | |
 
 ## Power visuals on the plot
 

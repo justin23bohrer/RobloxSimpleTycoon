@@ -1,6 +1,6 @@
 -- PowerService (server only)
--- Holds each player's active Caleb Trophy powers (the capped totals from
--- TrophyPowers.Compute) and applies the movement ones.
+-- Holds each player's active Caleb Trophy powers (the totals from
+-- TrophyPowers.Compute: no upper limit, duplicates stack) and applies the movement ones.
 --
 -- * TrophyService calls SetDisplayed(player, variantIds) whenever what the
 --   player's built Trophy Case displays changes (empty list = no powers).
@@ -82,14 +82,14 @@ local function publish(player: Player)
 	player:SetAttribute(DOUBLE_JUMP_ATTR, (totals[Stat.DoubleJump] or 0) > 0)
 end
 
--- The player's total bonus for one stat (already capped), or 0.
+-- The player's total bonus for one stat (no upper limit; chances <= 1), or 0.
 function PowerService.Get(player: Player, stat: string): number
 	local totals = totalsByPlayer[player]
 	return totals and totals[stat] or 0
 end
 
 -- Sets which trophy definitions the player has on display (variant ids, in
--- any order; repeats count once). Called by TrophyService.
+-- any order; repeats stack: each one counts). Called by TrophyService.
 function PowerService.SetDisplayed(player: Player, variantIds: { string })
 	if player.Parent == nil then
 		return -- left the game; nothing to keep

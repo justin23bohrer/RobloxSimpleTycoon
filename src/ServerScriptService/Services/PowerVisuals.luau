@@ -2,7 +2,8 @@
 -- Glowing feet while a player has a WalkSpeed trophy bonus: one Attachment
 -- named "SpeedGlow" at the bottom of each foot (R15 LeftFoot/RightFoot, R6
 -- Left Leg/Right Leg) holding a soft PointLight and a few sparkles that are
--- left behind as you run. Stronger for bigger bonuses (Config.TrophySpeedGlow*).
+-- left behind as you run. Stronger for bigger bonuses (Config.TrophySpeedGlow*),
+-- full strength at Config.TrophySpeedGlowFullAt and no stronger past it.
 --
 -- Made on the server, inside the character, so it replicates to every client
 -- (everyone sees who is fast, late joiners too) with no client code.
@@ -98,8 +99,10 @@ function PowerVisuals.SetSpeedGlow(character: Model?, bonus: number)
 			end
 			attachment = makeGlow(foot)
 		end
-		local cap = Config.TrophyStatCaps.WalkSpeed
-		local t = if cap > 0 then math.clamp(bonus / cap, 0, 1) else 1
+		-- Looks only: full glow at TrophySpeedGlowFullAt, no brighter past it
+		-- (the speed itself has no limit).
+		local fullAt = Config.TrophySpeedGlowFullAt
+		local t = if fullAt > 0 then math.clamp(bonus / fullAt, 0, 1) else 1
 		local color = Config.TrophySpeedGlowColor
 		local glow = attachment :: Attachment
 		glow.Position = Vector3.new(0, -foot.Size.Y / 2, 0)

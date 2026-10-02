@@ -24,6 +24,8 @@
 --     extra    = with ExtraCookieChance one more drop (same value rules, never
 --                another extra) falls right under the first;
 --     interval = Config.DropInterval / (1 + DropperSpeed), read every cycle.
+--   Totals have no upper limit (duplicates stack); the chances are already
+--   at most 1 (TrophyPowers.Compute: a chance can't go past 100%).
 --   PlotPowerVisuals shows those powers on the cups (fire, luck sparkles).
 -- * Drops are server-simulated (SetNetworkOwner(nil)) and destroyed after
 --   Config.DropLifetime seconds.
@@ -271,7 +273,8 @@ function DropperService.Start(plot: Model, dropperId: string)
 	task.spawn(function()
 		while true do
 			-- Read every cycle so a DropperSpeed change applies from the next drop.
-			task.wait(Config.DropInterval / (1 + ownerPower(plot, Stat.DropperSpeed)))
+			-- Never below 0, so the divisor is always >= 1 (no divide by zero).
+			task.wait(Config.DropInterval / (1 + math.max(ownerPower(plot, Stat.DropperSpeed), 0)))
 			-- Stop/StopAll (or a stop then Start) replaces these entries; end this loop.
 			if runningByPlot[plot] ~= plotRun or plotRun.Droppers[dropperId] ~= dropper then
 				return

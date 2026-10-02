@@ -7,16 +7,15 @@
 -- Stacking (one predictable formula, no exponential multipliers):
 --   * Only trophies DISPLAYED in a built Trophy Case count (equipped, up to
 --     Config.TrophyActiveSlots, and the TrophyCase build is bought).
---   * A definition counts once: two Golden Calebs on display give Golden's
---     bonus once.
---   * Per stat, bonuses ADD: total = sum of every displayed definition's
---     value, then clamped to Config.TrophyStatCaps[stat].
+--   * Every displayed trophy counts, duplicates too: two Speed Calebs give
+--     Speed's bonus twice (+150% walk speed), five give +375%.
+--   * Per stat, bonuses ADD: total = sum of every displayed trophy's value.
+--     There is no upper limit (no stat caps); the lower bound is 0.
 --   * Multiplier stats are applied as (1 + total): Golden (+1.0) + Cookie
 --     (+0.25) = 2.25x cookies, never 2 x 1.25 x ...
---   * Chance stats are probabilities 0..1 per event.
+--   * Chance stats are probabilities per event, so their total is clamped
+--     to 1: a chance can't go past 100%. (Not a balance cap.)
 --   * DoubleJump is a flag: any value > 0 enables it.
-
-local Config = require(script.Parent.Config)
 
 local TrophyPowers = {}
 
@@ -31,26 +30,27 @@ TrophyPowers.Stat = table.freeze({
 	DoubleJump = "DoubleJump", -- flag (> 0 = can jump once more in the air)
 })
 
+-- Stats that are probabilities: a chance can't go past 100%, so their
+-- totals are clamped to 1.
+TrophyPowers.ChanceStats = table.freeze({
+	[TrophyPowers.Stat.ExtraCookieChance] = true,
+	[TrophyPowers.Stat.LuckyCookieChance] = true,
+})
+
 -- The total bonus per stat for a list of displayed variant ids (pure: no
 -- side effects, same input -> same output). Applies the stacking rule above:
--- each distinct definition counts once, values add, each total is clamped to
--- [0, Config.TrophyStatCaps[stat]]. Unknown stats are ignored; stats with no
--- bonus are left out (read them as 0).
+-- every id counts (duplicates too), values add with no upper limit, totals
+-- below 0 are dropped, and chance stats are clamped to 1. Unknown stats are
+-- ignored; stats with no bonus are left out (read them as 0).
 function TrophyPowers.Compute(variantIds: { string }): { [string]: number }
 	-- Required here, not at the top: TrophyVariants may require this module
 	-- for the Stat names, and a top-level require both ways would be a cycle.
 	local TrophyVariants = require(script.Parent.TrophyVariants) :: any
 	local totals: { [string]: number } = {}
-	local counted: { [any]: boolean } = {}
 	for _, id in variantIds do
-		-- Get never returns nil; an unknown id is the Fallback definition,
-		-- which is still counted only once.
-		local definition = TrophyVariants.Get(id) :: any
-		if counted[definition] then
-			continue
-		end
-		counted[definition] = true
-		local powers = definition.Powers
+		-- Get never returns nil; an unknown id is the Fallback definition
+		-- (no powers).
+		local powers = (TrophyVariants.Get(id) :: any).Powers
 		if type(powers) ~= "table" then
 			continue
 		end
@@ -61,9 +61,10 @@ function TrophyPowers.Compute(variantIds: { string }): { [string]: number }
 		end
 	end
 	for stat, total in totals do
-		local cap = Config.TrophyStatCaps[stat] or 0
-		local clamped = math.clamp(total, 0, cap)
-		totals[stat] = if clamped > 0 then clamped else nil
+		if TrophyPowers.ChanceStats[stat] then
+			total = math.min(total, 1) -- a chance can't go past 100%
+		end
+		totals[stat] = if total > 0 then total else nil
 	end
 	return totals
 end
