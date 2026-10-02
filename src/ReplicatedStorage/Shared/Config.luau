@@ -694,6 +694,18 @@ local Config = {
 	-- never applies in a published game. Keep this false in commits.
 	DevAllTrophies = false,
 	DevAllTrophiesCopies = 5,
+
+	-- TESTING ONLY. Photo Mode for icon / thumbnail screenshots, only inside
+	-- Roblox Studio (RunService:IsStudio()); it never applies in a published
+	-- game. When true: each player gets the first free plot fully built for
+	-- free (every dropper, build and trophy build, back door open: dev
+	-- trophies are given as with DevAllTrophies), NOTHING is loaded or saved
+	-- to the DataStore all session, the time of day is DevPhotoClockTime,
+	-- and keys 1-6 / 0 / H move the camera and hide the UI (PhotoCamera).
+	-- See README "Taking icon / thumbnail screenshots". Camera presets are in
+	-- Shared/PhotoMode. Keep this false in commits.
+	DevPhotoMode = false,
+	DevPhotoClockTime = 14, -- Lighting.ClockTime in Photo Mode (14 = 2 pm, bright sun)
 }
 
 return table.freeze(Config)

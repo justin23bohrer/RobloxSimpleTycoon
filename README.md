@@ -93,6 +93,38 @@ The dev trophies are session only: never saved, not auto-equipped, gone when
 you stop. It only works inside Roblox Studio, never in a published game. Set
 it back to `false` before committing.
 
+## Taking icon / thumbnail screenshots (Photo Mode)
+
+Photo Mode gives you a fully built, sunny tycoon and ready-made camera shots
+for the game's icon (512×512) and thumbnails (1920×1080). It only works in
+Roblox Studio and never does anything in the published game.
+
+1. In `src/ReplicatedStorage/Shared/Config.luau` set `DevPhotoMode = true`.
+   (You do **not** need `DevAllTrophies`: Photo Mode gives the trophies
+   that open the back door by itself.)
+2. Let `rojo serve` sync (or rebuild) and press **Play**. Output shows
+   `[DevPhotoMode] Photo Mode is ON`. You get the first free plot right
+   away, fully built: every dropper, the house, furniture, Trophy Case,
+   garage + car, pool, path, hangout, and the back door open. Nothing is
+   saved, so your real save is not touched.
+3. Make the Studio window big (full screen on your Mac). For the icon, a
+   square-ish window works best.
+4. Press a number key for a shot of **your own** plot:
+   **1** whole tycoon from high up, **2** front of the house, **3** backyard
+   pool + hangout, **4** garage + car, **5** Caleb's statue with your plot
+   behind it, **6** droppers + conveyor + cash tank. **0** (or **C**) gives
+   you the normal camera back.
+5. Press **H** to hide all the game's UI (and the Photo Mode hint). Press
+   **H** again to bring it back.
+6. Take the screenshot with **Cmd+Shift+4**, then drag a box over the game
+   view (press Space first to grab the whole window). Crop to 512×512 for
+   the icon and 1920×1080 for thumbnails in Preview.
+7. Set `DevPhotoMode = false` again before committing.
+
+The time of day is `DevPhotoClockTime` (14 = 2 pm) in Config. The camera
+shots are the `Shots` list in `src/ReplicatedStorage/Shared/PhotoMode.luau`
+(change `Eye` / `Target` to move a shot).
+
 ## Testing saving (Studio)
 
 The player's cookies, house, and Caleb trophies are saved with a DataStore

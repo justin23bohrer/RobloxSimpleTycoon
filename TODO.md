@@ -102,6 +102,7 @@ No completion screen (only the short "YOU COLLECTED" total), no leaderboard, no 
 - [x] Purchase/collect feedback (sounds…) (user approved 2026-10-02): buy / build / can't afford / Collect payout / drop-in-jar sounds (`TycoonSounds`, `Config.TycoonSounds`). (code done; Studio test pending: QA TS1–TS8) (The cash display itself is done, see MVP.)
 - [ ] Upload purchase/collect sounds and paste ids into Config.TycoonSounds (user). WAVs: `tools/audio/out/purchase.wav`, `purchase_build.wav`, `cant_afford.wav`, `collect_cookies.wav`, `drop_in_jar.wav` (see `tools/audio/README.md`).
 - [ ] Cleaner prototype visuals (still no theme until approved).
+- [x] Photo Mode for icon / thumbnail screenshots (user approved 2026-10-02): `Config.DevPhotoMode` (Studio only), fully built unsaved plot, sunny lighting, camera keys 1–6 / 0 / H (`DevPhotoMode`, `PhotoCamera`, `Shared/PhotoMode`). (code done; Studio test pending: QA PM1–PM8)
 
 ## Future features (needs approval)
 

@@ -10,6 +10,7 @@ local CalebCycle = require(Services.CalebCycle)
 local CarService = require(Services.CarService)
 local CookiePartyService = require(Services.CookiePartyService)
 local DataService = require(Services.DataService)
+local DevPhotoMode = require(Services.DevPhotoMode)
 local EconomyService = require(Services.EconomyService)
 local PlayerDataService = require(Services.PlayerDataService)
 local PowerService = require(Services.PowerService)
@@ -20,6 +21,7 @@ local TycoonService = require(Services.TycoonService)
 TycoonService.Start()
 BackyardGate.Start() -- back door lock (door, sign); after TycoonService
 CarService.Start() -- drivable garage cars; after TycoonService
+DevPhotoMode.Start() -- TESTING ONLY, Studio only: does nothing unless Config.DevPhotoMode
 local statue = StatueService.Start()
 if statue then
 	CalebCycle.Start(statue)
