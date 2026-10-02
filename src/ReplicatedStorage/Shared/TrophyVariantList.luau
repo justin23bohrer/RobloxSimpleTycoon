@@ -77,7 +77,7 @@ local List: { Variant } = {
 	variant({
 		Id = "PartyCaleb", DisplayName = "Party Caleb", Rarity = "Common", Weight = 10,
 		Description = "He heard there was cake. There was not cake.",
-		Powers = { [Stat.WalkSpeed] = 0.05 }, PowerText = "+5% WALK SPEED",
+		Powers = { [Stat.WalkSpeed] = 0.35 }, PowerText = "+35% WALK SPEED",
 		Figure = figure(rgb(200, 205, 215), M.Metal), Base = DARK_WOOD,
 		Accessories = { "PartyHat" }, Pose = "ArmsUp", Effect = "None", EffectColor = WHITE,
 	}),
@@ -106,7 +106,7 @@ local List: { Variant } = {
 	variant({
 		Id = "SpeedCaleb", DisplayName = "Speed Caleb", Rarity = "Uncommon", Weight = 10,
 		Description = "Runs so fast the cookies can't keep up.",
-		Powers = { [Stat.WalkSpeed] = 0.20 }, PowerText = "+20% WALK SPEED",
+		Powers = { [Stat.WalkSpeed] = 0.75 }, PowerText = "+75% WALK SPEED",
 		Figure = figure(rgb(40, 120, 255)), Base = WHITE_STONE,
 		Accessories = { "LightningBolt", "SpeedLines" }, Pose = "Run", Effect = "None", EffectColor = WHITE,
 	}),
@@ -121,7 +121,7 @@ local List: { Variant } = {
 	variant({
 		Id = "CoolCaleb", DisplayName = "Cool Caleb", Rarity = "Rare", Weight = 10,
 		Description = "Too cool for school, just right for cookies.",
-		Powers = { [Stat.WalkSpeed] = 0.12 }, PowerText = "+12% WALK SPEED",
+		Powers = { [Stat.WalkSpeed] = 0.50 }, PowerText = "+50% WALK SPEED",
 		Figure = figure(rgb(40, 170, 170)), Base = BLACK_STONE,
 		Accessories = { "Sunglasses" }, Pose = "HandOnHip", Effect = "None", EffectColor = WHITE,
 	}),
@@ -178,7 +178,7 @@ local List: { Variant } = {
 	variant({
 		Id = "MidnightCaleb", DisplayName = "Midnight Caleb", Rarity = "Epic", Weight = 10,
 		Description = "Sneaks out at midnight for a cookie run.",
-		Powers = { [Stat.JumpHeight] = 0.40, [Stat.WalkSpeed] = 0.10 }, PowerText = "+40% JUMP, +10% SPEED",
+		Powers = { [Stat.JumpHeight] = 0.40, [Stat.WalkSpeed] = 0.40 }, PowerText = "+40% JUMP, +40% SPEED",
 		Figure = figure(rgb(30, 35, 70), M.Foil), Base = BLACK_STONE,
 		Accessories = { "Crown" }, Pose = "HandOnHip", Effect = "Sparkles", EffectColor = rgb(120, 140, 255),
 	}),
@@ -193,10 +193,10 @@ local List: { Variant } = {
 		Id = "RainbowCaleb", DisplayName = "Rainbow Caleb", Rarity = "Epic", Weight = 10,
 		Description = "A little bit of everything, in every color.",
 		Powers = {
-			[Stat.CookieMultiplier] = 0.10, [Stat.WalkSpeed] = 0.10,
+			[Stat.CookieMultiplier] = 0.10, [Stat.WalkSpeed] = 0.30,
 			[Stat.JumpHeight] = 0.10, [Stat.DropperSpeed] = 0.10,
 		},
-		PowerText = "+10% COOKIES, SPEED, JUMP & DROPPERS",
+		PowerText = "+10% COOKIES/JUMP/DROPPERS, +30% SPEED",
 		Figure = figure(rgb(250, 245, 250)), Base = WHITE_STONE,
 		Accessories = { "RainbowArch" }, Pose = "Wave", Effect = "Sparkles", EffectColor = rgb(255, 180, 230),
 	}),
@@ -219,7 +219,7 @@ local List: { Variant } = {
 	variant({
 		Id = "KingCaleb", DisplayName = "King Caleb", Rarity = "Mythic", Weight = 10,
 		Description = "The one true king of Caleb Town. Bow before the belly.",
-		Powers = { [Stat.CookieMultiplier] = 0.50, [Stat.WalkSpeed] = 0.15 }, PowerText = "+50% COOKIES, +15% WALK SPEED",
+		Powers = { [Stat.CookieMultiplier] = 0.50, [Stat.WalkSpeed] = 0.50 }, PowerText = "+50% COOKIES, +50% WALK SPEED",
 		Figure = figure(rgb(110, 50, 170), M.Foil), Base = BLACK_STONE,
 		Accessories = { "Cape", "Crown" }, Pose = "HandOnHip", Effect = "Sparkles", EffectColor = rgb(255, 220, 90),
 	}),

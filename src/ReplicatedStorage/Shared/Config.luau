@@ -442,10 +442,21 @@ local Config = {
 		ExtraCookieChance = 0.5,
 		LuckyCookieChance = 0.25,
 		CollectBonus = 0.5,
-		WalkSpeed = 0.5,
+		WalkSpeed = 1.5, -- at most 2.5x walk speed
 		JumpHeight = 1,
 		DoubleJump = 1,
 	}),
+	-- Glowing feet while a WalkSpeed trophy is displayed (PowerVisuals, made on
+	-- the server so everyone sees it). Each value goes from Min (smallest
+	-- bonus) to Max (bonus at TrophyStatCaps.WalkSpeed). Brightness/Range are
+	-- the PointLight at each foot; Rate is sparkles per second per foot.
+	TrophySpeedGlowColor = Color3.fromRGB(90, 200, 255),
+	TrophySpeedGlowBrightnessMin = 0.6,
+	TrophySpeedGlowBrightnessMax = 1.6,
+	TrophySpeedGlowRangeMin = 4,
+	TrophySpeedGlowRangeMax = 7,
+	TrophySpeedGlowRateMin = 5,
+	TrophySpeedGlowRateMax = 18,
 	-- A "lucky" drop (LuckyCookieChance) is worth this many times its value.
 	TrophyLuckyCookieMultiplier = 5,
 	-- Fewest seconds between two equip/unequip requests from one player.
