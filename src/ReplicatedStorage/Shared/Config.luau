@@ -12,9 +12,9 @@ local Config = {
 	-- ===================== MUSIC (paste your Roblox audio ids here) =====================
 	-- Format: "rbxassetid://123456789" (or just the number). Empty "" = silent.
 	-- See tools/audio/README.md "Your music" for how to find an asset id.
-	BackgroundMusic = "", -- "Tender Static": loops all game, fades out during the Cookie Party
-	CookiePartyStartSound = "rbxassetid://85895871328445", -- "Air Horn": plays once when the Cookie Party starts (now: celebration_start.wav until the Air Horn id is pasted)
-	CookiePartyMusic = "rbxassetid://104229874714144", -- "NO PARTY": loops during the 60 s Cookie Party (now: party_music.wav until the NO PARTY id is pasted)
+	BackgroundMusic = "rbxassetid://139132289200391", -- "Tender Static": loops all game, fades out during the Cookie Party
+	CookiePartyStartSound = "rbxassetid://118248543183940", -- "Air Horn": plays once when the Cookie Party starts
+	CookiePartyMusic = "rbxassetid://110869546630610", -- "NO PARTY": loops during the 60 s Cookie Party
 	BackgroundMusicVolume = 0.3, -- 0..1
 	CookiePartyMusicVolume = 0.5, -- 0..1 (swells a little toward the end)
 	CookiePartyStartVolume = 0.8, -- 0..1
