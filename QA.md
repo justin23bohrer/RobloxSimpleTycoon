@@ -539,6 +539,25 @@ checks, in the Server command bar:
 | PW11 | 2 players (Clients and Servers): only Player 1 has trophies. | Player 2's drops, payouts, speed, jump and `TrophyStats` are unaffected; Player 1's bonuses apply only on Player 1's plot. | |
 | PW12 | Unequip every trophy (or release the plot / leave). | All bonuses gone from the next drop; `TrophyStats` empty; movement normal. | |
 
+## Speed trophies + glowing feet
+
+Same setup as Trophy powers (built Trophy Case, or the `PowerService.SetDisplayed`
+command bar shortcut). Base WalkSpeed is 16. Read the Humanoid's `WalkSpeed`
+in the Properties window (Server view). Cap: `TrophyStatCaps.WalkSpeed` = 1.5.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| SG1 | Display each speed trophy alone, then put it in the inventory without a built case. | Party 21.6, Speed 28, Cool 24, Midnight 22.4, Rainbow 20.8, King 24 (all = 16 × (1 + bonus)). Equipped but case not built → 16, no glow. | |
+| SG2 | Inventory details and Trophy Case nameplates for those six. | "+35% WALK SPEED", "+75% WALK SPEED", "+50% WALK SPEED", "+40% JUMP, +40% SPEED", "+10% COOKIES/JUMP/DROPPERS, +30% SPEED", "+50% COOKIES, +50% WALK SPEED"; the Rainbow text fits its plate. | |
+| SG3 | Stacking: display Speed + Cool (+1.25). | WalkSpeed 36; `TrophyStats` WalkSpeed = 1.25. | |
+| SG4 | Cap: display Speed + Cool + King + Midnight (+2.15). | WalkSpeed 40 (2.5×), `TrophyStats` WalkSpeed = 1.5, never more. | |
+| SG5 | Any speed trophy displayed. Look at your feet (day and night). | Each foot has a soft light-blue glow and leaves a few sparkles when running; subtle, not blinding. One `SpeedGlow` Attachment per foot in Explorer. | |
+| SG6 | Compare Party (+35%) with the capped stack (SG4). | Capped stack is brighter / more sparkles; both look tasteful. | |
+| SG7 | Unequip the trophy; then re-equip and release the plot; then re-equip and display a JumpHeight-only trophy (Jump Caleb). | Glow disappears right away each time (no `SpeedGlow` left). Jump Caleb alone: no feet glow. | |
+| SG8 | 2 players (Clients and Servers): Player 1 has a speed trophy. | Player 2 sees Player 1's glowing feet; Player 2's own feet do not glow. A 3rd player joining later also sees it. | |
+| SG9 | Respawn (Esc → Reset) with a speed trophy, twice. | Same WalkSpeed after each respawn (not compounded) and the glow is back, still exactly one `SpeedGlow` per foot. | |
+| SG10 | R6: set Game Settings → Avatar → R6, play with a speed trophy. (R15 is covered by SG5.) | Glow on `Left Leg` / `Right Leg` bottoms; same WalkSpeed numbers. | |
+
 ## Trophy inventory UI
 
 Needs the Inventory + Powers server work merged (the `TrophyInventory` and
