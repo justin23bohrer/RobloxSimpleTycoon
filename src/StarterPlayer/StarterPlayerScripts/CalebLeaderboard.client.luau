@@ -3,7 +3,7 @@
 -- (the "Board" part in each Podium/Leaderboard<corner> model), same cartoony
 -- look as the rest of the game. Rows "1  Justin   248,321 🍪", gold / silver
 -- / bronze badges for the top 3, the local player's row highlighted, and the
--- shared total "12,345 / 1,000,000" at the bottom. "FINAL RESULTS" during
+-- shared total "12,345 / <goal>" at the bottom. "FINAL RESULTS" during
 -- TrophyClaim (the server keeps the list until the reset).
 --
 -- Display only: reads the statue's replicated attributes (CalebTopFeeders,

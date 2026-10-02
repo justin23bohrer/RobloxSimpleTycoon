@@ -1,6 +1,6 @@
 -- StatueBar (client only)
 -- A cartoony progress bar floating above Caleb's head that everyone can see:
--- "Caleb: 12,345 / 1,000,000 🍪" over the same cookie bar as the feed pop-up
+-- "Caleb: 12,345 / 350,000 🍪" (the goal grows with the player count) over the same cookie bar as the feed pop-up
 -- (FeedPromptUI.ProgressBar), and "Caleb is FULL!" at the max. During the
 -- Caleb Full Event the text follows the event state (FULL / COOKIE PARTY /
 -- resting); the big screen messages are CalebEventUI's job.
@@ -55,7 +55,8 @@ local function eaten(): number
 	return if typeof(value) == "number" then value else 0
 end
 
--- The goal published by the server, or the contract default before it is set.
+-- The current goal published by the server (changes live when players join
+-- or leave), or the contract fallback before it is set.
 local function maxCookies(): number
 	local value = statue:GetAttribute(CalebEvent.Attr.MaxCookies)
 	return if typeof(value) == "number" and value > 0 then value else CalebEvent.MaxCookies()

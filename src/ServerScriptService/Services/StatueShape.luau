@@ -3,7 +3,7 @@
 -- looks, and hiding him. Presentation only; it never reads or changes cookies.
 --
 -- Apply(progress, seconds) takes progress from 0 (nothing eaten) to 1 (the
--- goal: cookies / CalebEvent.MaxCookies()). Two curves, both in Config:
+-- goal: cookies / CalebCycle.GetGoal()). Two curves, both in Config:
 --   * Fatness, front-loaded so the first feeds show:
 --       log(1 + progress * CalebFatnessCurve) / log(1 + CalebFatnessCurve)
 --     (with 100,000: 0.01% -> 0.21, 0.1% -> 0.40, 1% -> 0.60, 25% -> 0.88,

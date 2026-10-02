@@ -61,22 +61,22 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | FD1 | Turn around at the spawn; walk around the statue. | Four round orange pads with "FEED CALEB!" signs: in front of, behind, and on both sides of the pedestal. | |
-| FD2 | Step on any feed pad. | The pop-up appears with a little bounce: yellow rounded panel, thick dark outline, FredokaOne text: "How many cookies do you want to feed Caleb?", "Caleb has eaten 0 / 1,000,000", empty bar, "You have N", amount box, 10 / 100 / 1K / ALL, Cancel, FEED!. | |
+| FD2 | Step on any feed pad. | The pop-up appears with a little bounce: yellow rounded panel, thick dark outline, FredokaOne text: "How many cookies do you want to feed Caleb?", "Caleb has eaten 0 / 350,000" (solo; the goal is 350,000 per player, see GS1), empty bar, "You have N", amount box, 10 / 100 / 1K / ALL, Cancel, FEED!. | |
 | FD3 | Type `abc12x3` in the amount box. | Only digits stay: `123`. | |
-| FD4 | With 100 cookies, press 10 → FEED!. | Cookies 100 → 90 (counter pops). The pop-up closes right away and a corner notification says "Caleb ate 10 cookies!". Caleb visibly gets a bit fatter (belly, cheeks, chin, wider body) with a bouncy grow. Step off and back on: progress "10 / 1,000,000  (0.00%)" with a thin sliver of bar. | |
+| FD4 | With 100 cookies, press 10 → FEED!. | Cookies 100 → 90 (counter pops). The pop-up closes right away and a corner notification says "Caleb ate 10 cookies!". Caleb visibly gets a bit fatter (belly, cheeks, chin, wider body) with a bouncy grow. Step off and back on: progress "10 / 350,000  (0.00%)" (solo) with a thin sliver of bar. | |
 | FD5 | Feed more than you have (e.g. type 5000 with 90). | "You don't have that many cookies!"; cookies unchanged; Caleb unchanged. | |
 | FD6 | Press Cancel; then walk off and back onto the pad. | Cancel closes it. It doesn't reopen while you stand there, but reopens after stepping off and back on. | |
 | FD7 | Open the pop-up, then walk ~15 studs away. | It closes by itself. | |
 | FD8 | Press FEED! with the box empty. | "Type how many cookies first!"; nothing sent. | |
-| FD9 | With dev cash, feed 10,000 then 1,000,000. | At 10,000 he's about two thirds as fat as the max. The second feed spends only 990,000 (the room left); he's at max size; signs say "CALEB IS FULL!"; the pop-up says "Caleb is FULL!". Further feeds: "Caleb is FULL!", no cookies spent. | |
+| FD9 | Solo, with dev cash, feed 10,000 then 1,000,000. | At 10,000 he's about two thirds as fat as the max. The second feed spends only 340,000 (the room left under the 350,000 goal); he's at max size; signs say "CALEB IS FULL!"; the pop-up says "Caleb is FULL!". Further feeds: "Caleb is FULL!", no cookies spent. | |
 | FD10 | 2 players: Player 1 feeds while Player 2 has the pop-up open. | Player 2's progress and bar update live; both see Caleb grow. | |
 | FD11 | Security (code review / Server view): the client can't feed from far away or feed fractions/negatives. | `StatueService` rejects non-whole, < 1, and players not within `StatueFeedRange` of a pad; only `EconomyService.TrySpend` takes cookies. | |
 | FD12 | Phone (Device emulator): open the pop-up. | Fits the screen, text readable, buttons tappable, keyboard opens for the amount box. | |
 | FD13 | Reset character with the pop-up open; leave and rejoin the server. | Pop-up closes when you walk/teleport away; nothing breaks. Caleb's size stays for the server session (resets only on a new server). | |
 | FD14 | Open the pop-up; click **1K** twice, then **10**. | Amount box reads 2010 (each click adds). Progress text shows "(+2,010)". | |
-| FD15 | With Caleb at 0, click **1K** until the box says 100000. | The lighter preview section grows with each click and ends at exactly 1/10 of the bar; text "+100,000 = 10.0%". Clearing the box makes it slide back. | |
+| FD15 | Solo, with Caleb at 0, click **1K** until the box says 35000. | The lighter preview section grows with each click and ends at exactly 1/10 of the bar; text "+35,000 = 10.0%". Clearing the box makes it slide back. | |
 | FD16 | Pick more than you have (e.g. 1K with 50 cookies). | The preview section turns red. FEED! still says "You don't have that many cookies!" from the server. | |
-| FD17 | Feed 500,000 cookies (dev cash), then reopen. | Bar is exactly half full; text "500,000 / 1,000,000  (50.0%)". The preview before feeding showed the same spot. | |
+| FD17 | Solo, feed 175,000 cookies (dev cash), then reopen. | Bar is exactly half full; text "175,000 / 350,000  (50.0%)". The preview before feeding showed the same spot. | |
 | FD19 | Feed any amount, then click FEED! twice fast on the next feed. | Each successful feed closes the pop-up immediately; it never stays open after a feed. It doesn't reopen until you step off the pad and back on. | |
 | FD20 | Open the pop-up; pick a small amount (10), a medium one (100,000), and feed until the bar is full. Check up close and on a phone (Device emulator). | The cookie-colored fill and the lighter preview always stay inside the white track with a thin white gap; they never touch or cover the dark outline, and the rounded ends stay clean. | |
 | FD18 | Join, walk straight from the spawn to Caleb, and step on each of the 4 feed pads (also after walking far away and coming back). | The pop-up opens every time you step on a pad, on all four pads. It doesn't reopen until you step off after closing it. | |
@@ -104,11 +104,11 @@ back before committing. Feed amounts below are for the 1,000 goal.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| SB1 | Press Play; look at Caleb from the spawn. | A yellow rounded panel with a thick dark outline floats above his head (clear of the hair): "Caleb: 0 / 1,000,000 🍪" in FredokaOne over an empty white bar. It looks like the feed pop-up's bar. | |
+| SB1 | Press Play; look at Caleb from the spawn. | A yellow rounded panel with a thick dark outline floats above his head (clear of the hair): "Caleb: 0 / 350,000 🍪" (solo) in FredokaOne over an empty white bar. It looks like the feed pop-up's bar. | |
 | SB2 | Walk to each plot (and inside a house) and look toward the statue. | The bar is visible and readable from every plot, drawn over roofs; it stays the same size on screen. | |
-| SB3 | Feed 10 cookies. | Text "Caleb: 10 / 1,000,000 🍪"; a thin sliver of fill slides in; the panel pops. | |
-| SB4 | Feed 500,000 (dev cash). | Text "Caleb: 500,010 / 1,000,000 🍪" (commas); bar just over half full. | |
-| SB5 | Feed until 1,000,000. | Text "Caleb is FULL! 1,000,000 🍪"; bar completely full, fill stays inside the outline. As Caleb reaches max size the bar is still clear of his head. | |
+| SB3 | Feed 10 cookies (solo). | Text "Caleb: 10 / 350,000 🍪"; a thin sliver of fill slides in; the panel pops. | |
+| SB4 | Solo, feed 175,000 (dev cash). | Text "Caleb: 175,010 / 350,000 🍪" (commas); bar just over half full. | |
+| SB5 | Solo, feed until 350,000. | Text "Caleb is FULL! 350,000 🍪"; bar completely full, fill stays inside the outline. As Caleb reaches max size the bar is still clear of his head. | |
 | SB6 | 2 players: Player 1 feeds. | Player 2's bar updates at the same time, wherever Player 2 is. | |
 | SB7 | 2 players: Player 1 feeds some cookies, then Player 2 joins (late joiner). | Player 2's bar shows the current total right away, not 0. | |
 | SB8 | Reset character; phone (Device emulator). | The bar stays (no duplicate bars after respawn); readable on a phone. No errors in Output. | |
@@ -128,7 +128,28 @@ Tip: set `DevCalebFastCycle = true` (and `DevUnlimitedCash = true`) in Studio fo
 | CE7 | Player A feeds this cycle, leaves before TrophyClaim, rejoins the same server. | After rejoining, `CalebFed` is restored (same number) and `CalebTrophyClaimed` is unchanged; during TrophyClaim A is still eligible (`CalebCycle.IsEligible(A.UserId)`). | |
 | CE8 | Player B joins after the goal is reached (during Full/Celebration/TrophyClaim). | B's `CalebFed = 0`; B is not eligible. | |
 | CE9 | After the reset (back to Normal). | New `CalebCycleId`; `CookiesEaten = 0`; `CalebTopFeeders = []` right away; everyone's `CalebFed = 0` and `CalebTrophyClaimed = false`; Caleb visible at his smallest size; pads say "FEED CALEB!"; feeding works again and the next goal starts a new event. | |
-| CE10 | Fast cycle off (normal). | Goal 1,000,000; Full 5 s, Celebration 60 s, TrophyClaim 120 s. `DevCalebFastCycle` has no effect in a published game. | |
+| CE10 | Fast cycle off (normal). | Goal 350,000 per player, at most 1,000,000 (see GS1–GS10); Full 5 s, Celebration 60 s, TrophyClaim 120 s. `DevCalebFastCycle` has no effect in a published game. | |
+
+## Caleb goal per player
+
+The goal is `Config.CalebGoalPerPlayer` (350,000) × players in the server,
+at most `Config.StatueMaxCookies` (1,000,000) (requested by the user
+2026-10-02). Use `DevUnlimitedCash = true` and Test > Clients and Servers
+(set it back before committing). Watch the statue's `CalebMaxCookies`,
+`CookiesEaten`, `CalebState` in the Server view.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| GS1 | Solo Play (fast cycle off). | `CalebMaxCookies = 350000`. Bar above Caleb "Caleb: 0 / 350,000 🍪"; pop-up "0 / 350,000"; board "🍪 0 / 350,000". | |
+| GS2 | Solo: feed 100,000. Then a 2nd player joins (Clients and Servers, 2 players). | `CalebMaxCookies = 700000` right away. On both clients the bar reads "100,000 / 700,000" and shrinks to about 1/7; an open pop-up's text, bar, and preview update; the board footer updates. Caleb gets a bit smaller (same cookies, bigger goal). | |
+| GS3 | 3 players, then 4. | 3 players: 1,000,000. 4 players: still 1,000,000 (cap). | |
+| GS4 | 2 players: feed 500,000 total (goal 700,000). Player 2 leaves. | Goal drops to 350,000 ≤ 500,000: `CalebState` goes to Full right away, exactly once (one "CALEB IS FULL" screen message, one burp), then the normal Celebration → TrophyClaim → reset. Both feeders' `CalebFed` are kept; Player 1 can claim a trophy. | |
+| GS5 | 2 players: feed 200,000 total (goal 700,000). Player 2 leaves. | Goal 350,000; still Normal; bar "200,000 / 350,000"; Caleb grows to the new progress. | |
+| GS6 | Reach the goal; during Full, Celebration, and TrophyClaim have a player join and another leave. | `CalebMaxCookies` does not change during the event; nothing restarts or fires twice. | |
+| GS7 | After GS6, wait for the reset. | The new cycle's goal is 350,000 × the players in the server right now (max 1,000,000). | |
+| GS8 | Solo (goal 350,000): type 1,000,000 and FEED! (dev cash). Also press ALL. | Only 350,000 is spent; total exactly 350,000; Caleb is full. ALL fills in at most the room left under the current goal. The server never goes past the goal. | |
+| GS9 | `DevCalebFastCycle = true`, 1 and 2 players. | Goal stays 1,000 regardless of player count; joining/leaving doesn't change it. (Set it back to false.) | |
+| GS10 | Plot: buy Walls, then look at the next buttons. | "Build Stairs / 🍪 5000"; after buying the stairs, "2nd Floor / 🍪 10000". The right amounts are spent. | |
 
 ## Feed pads while Caleb is full, and glare
 
@@ -302,8 +323,8 @@ Needs the Core agent's `CalebCycle` publishing `CalebTopFeeders`. Tip: `DevCaleb
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | LB1 | Press Play; walk all the way around the statue, and look from each spawn. | Four boards at the pedestal's corners, each facing out diagonally, with gold trim, chocolate posts, and a chip cookie on top. From any side at least one board is readable from ~40 studs. They don't block any of the 4 feed pads (all 4 still open the pop-up). Text is not darkened by lighting/night. | |
-| LB2 | Before anyone feeds. | Title "CALEB'S TOP FEEDERS", subtitle "Cookies fed this round", "Be the first to feed Caleb!", total "🍪 0 / 1,000,000". | |
-| LB3 | Feed 10 cookies. | Within ~1 s your row appears: badge 1 (gold), your name, "10 🍪"; your row is green with a thick green outline; total "🍪 10 / 1,000,000". | |
+| LB2 | Before anyone feeds. | Title "CALEB'S TOP FEEDERS", subtitle "Cookies fed this round", "Be the first to feed Caleb!", total "🍪 0 / 350,000" (solo). | |
+| LB3 | Feed 10 cookies. | Within ~1 s your row appears: badge 1 (gold), your name, "10 🍪"; your row is green with a thick green outline; total "🍪 10 / 350,000" (solo). | |
 | LB4 | 2–3 players feed different amounts (e.g. Test > 3 Clients). | Rows are best first with commas (e.g. "248,321 🍪"); badges 1/2/3 are gold/silver/bronze, 4+ brown. Each client sees only its OWN row highlighted. | |
 | LB5 | Late joiner: feed, then a second player joins. | The new player's boards show the current list and total right away. | |
 | LB6 | Player with a long display name (or temporarily make the server send a 40-character name / one containing `<b>` tags). | The name ends in "…" inside its row; it never overlaps the cookie count or leaves the board; tags show as plain text. | |
@@ -351,10 +372,10 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | -- | ---- | -------- | ------ |
 | BF1 | Claim; look at the right side of the plot. Buy Droppers 1–3. | No orange build button, no walls, stairs, or 2nd floor. You can walk straight off the plot on every side. | |
 | BF2 | Buy Dropper 4. | One orange "Build Walls / 🍪 5000" button appears on the right side (x ≈ 16). No other new button. | |
-| BF3 | Before buying the walls, in **Server** view make `BuildButton2` visible and touchable (`Transparency = 0`, `CanTouch = true`) and step on it with ≥ 8000 cookies. | Nothing is built; no cookies spent (Stairs needs Walls first). | |
-| BF4 | Buy the walls. | Cookies −5000. Off-white brick walls with gray trim and dark windows appear around the plot with a gray-framed doorway in the middle of the front; the Build Walls button disappears; "Build Stairs / 🍪 8000" and, further back, "Trophy Case / 🍪 7500" appear. You can walk in and out through the doorway only. The owner sign, conveyor, droppers, collect pad, and cookie jar still work inside. | |
-| BF5 | Buy the stairs. | Cookies −8000. 16 cream steps appear along the right wall; "2nd Floor / 🍪 15000" appears. Walk up them: each step is climbable without jumping. The top reaches the top of the walls, and nothing is there yet (no floor). | |
-| BF6 | Buy the 2nd floor. | Cookies −15000. A floor appears on top of the walls with a railing around the stair hole, plus the brick second story and the gray roof (see HS1). Walk up the stairs onto it. On the **left** side, directly above the first conveyor, is a second conveyor (not moving yet) and a green collector at its back end. "Dropper 5 / 🍪 20000" and its yellow spot appear next to it. Nothing on floor 1 is blocked or hidden by the new floor. | |
+| BF3 | Before buying the walls, in **Server** view make `BuildButton2` visible and touchable (`Transparency = 0`, `CanTouch = true`) and step on it with ≥ 5000 cookies. | Nothing is built; no cookies spent (Stairs needs Walls first). | |
+| BF4 | Buy the walls. | Cookies −5000. Off-white brick walls with gray trim and dark windows appear around the plot with a gray-framed doorway in the middle of the front; the Build Walls button disappears; "Build Stairs / 🍪 5000" and, further back, "Trophy Case / 🍪 7500" appear. You can walk in and out through the doorway only. The owner sign, conveyor, droppers, collect pad, and cookie jar still work inside. | |
+| BF5 | Buy the stairs. | Cookies −5000. 16 cream steps appear along the right wall; "2nd Floor / 🍪 10000" appears. Walk up them: each step is climbable without jumping. The top reaches the top of the walls, and nothing is there yet (no floor). | |
+| BF6 | Buy the 2nd floor. | Cookies −10000. A floor appears on top of the walls with a railing around the stair hole, plus the brick second story and the gray roof (see HS1). Walk up the stairs onto it. On the **left** side, directly above the first conveyor, is a second conveyor (not moving yet) and a green collector at its back end. "Dropper 5 / 🍪 20000" and its yellow spot appear next to it. Nothing on floor 1 is blocked or hidden by the new floor. | |
 | BF7 | Buy Dropper 5. | A dropper appears at spot 5; cookies fall onto the 2nd-floor conveyor, which moves front → back (same as floor 1) into Collector2. Each arrival adds a small cookie to the cookie jar **downstairs**. Dropper 6's button appears. The floor-1 conveyor keeps running. | |
 | BF8 | Go down and step on the Collect pad. | You get the cookies from both floors (e.g. with only Droppers 1 and 5 running: +10 per floor-1 cookie and +300 per floor-2 cookie). | |
 | BF9 | Buy Droppers 6, 7, 8. | Each costs its price; each appears above Conveyor2; after Dropper 8 no buy buttons remain (except "Trophy Case" and any furniture you haven't bought). | |

@@ -32,7 +32,7 @@ CalebEvent.State = table.freeze({
 -- / StatueService); read by anyone.
 CalebEvent.Attr = table.freeze({
 	CookiesEaten = "CookiesEaten", -- number: shared total this cycle
-	MaxCookies = "CalebMaxCookies", -- number: the goal (CalebEvent.MaxCookies())
+	MaxCookies = "CalebMaxCookies", -- number: the current goal (CalebEvent.GoalFor(players); live in Normal)
 	State = "CalebState", -- string: one of CalebEvent.State
 	CycleId = "CalebCycleId", -- string: unique id of the current cycle
 	StateEndsAt = "CalebStateEndsAt", -- number: Workspace:GetServerTimeNow() when this state ends (0 in Normal)
@@ -53,9 +53,20 @@ CalebEvent.PlayerAttr = table.freeze({
 -- published game, same rule as DevUnlimitedCash.
 local fast = Config.DevCalebFastCycle and RunService:IsStudio()
 
--- The cookie goal for a cycle.
+-- The biggest goal there can be. Clients use it only as a fallback until
+-- the statue's CalebMaxCookies attribute (the real, current goal) is set.
 function CalebEvent.MaxCookies(): number
 	return if fast then Config.DevCalebFastMaxCookies else Config.StatueMaxCookies
+end
+
+-- The goal for this many players in the server: CalebGoalPerPlayer each
+-- (an empty server counts as 1), never more than StatueMaxCookies. The fast
+-- dev cycle keeps its small fixed goal.
+function CalebEvent.GoalFor(playerCount: number): number
+	if fast then
+		return Config.DevCalebFastMaxCookies
+	end
+	return math.min(Config.CalebGoalPerPlayer * math.max(playerCount, 1), Config.StatueMaxCookies)
 end
 
 -- Seconds each timed state lasts.
