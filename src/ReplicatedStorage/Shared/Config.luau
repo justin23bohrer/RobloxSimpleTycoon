@@ -260,7 +260,7 @@ local Config = {
 	}),
 	-- Volume (0..1) of each sound above. DropInJar plays often: keep it quiet.
 	TycoonSoundVolumes = table.freeze({
-		Purchase = 0.7,
+		Purchase = 0.4,
 		PurchaseBuild = 0.8,
 		CantAfford = 0.5,
 		Collect = 0.8,
