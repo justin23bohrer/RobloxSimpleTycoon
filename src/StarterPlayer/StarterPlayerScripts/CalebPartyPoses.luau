@@ -263,7 +263,7 @@ function CalebPartyPoses.Pose(elapsed: number, seed: number): Pose
 		local s = e - WIND_UP_AT
 		local target = windUp(s / c.WindUpSeconds, s)
 		CalebPoses.Blend(pose, target, smooth(s / 0.4))
-		pose.Puff, pose.Spit, pose.Laugh = false, false, false
+		pose.Puff, pose.Laugh = false, false
 	end
 	return pose
 end

@@ -1,18 +1,22 @@
 -- CalebAudio (client only)
--- Sound effects and the Cookie Party music for the Caleb Full Event. Driven
--- only by the replicated attributes in Shared/CalebEvent.luau:
+-- The game's music and the Caleb Full Event's sound effects. Driven only by
+-- the replicated attributes in Shared/CalebEvent.luau:
+--   join (not mid-party)   background music fades in (BackgroundMusic)
 --   Normal -> Full         Full (once)
---   -> Celebration         CelebrationStart (once) + CookieRain (quiet loop)
---                          + party music, countdown ticks (CookiePartyAudio)
---   Celebration ends       CookieRain fades out, music stops; on -> TrophyClaim
---                          the FinaleBoom, then EventEnd a moment later
---                          (right away if there is no boom)
+--   -> Celebration         background fades out and pauses; the air horn
+--                          (Config.CookiePartyStartSound, once) + CookieRain
+--                          (quiet loop) + party music, countdown ticks
+--                          (CookiePartyAudio)
+--   Celebration ends       CookieRain fades out, party music stops, the
+--                          background fades back in (resumed); on ->
+--                          TrophyClaim the FinaleBoom, then EventEnd a
+--                          moment later (right away if there is no boom)
 --   CookiesEaten goes up   Grow (quiet, rate-limited; only in Normal)
 --   local player's CalebTrophyClaimed turns true    TrophyClaim (once)
 --
 -- Each Sound is created once (in a SoundService folder) and reused. A sound
--- whose Config.CalebSounds id is empty is skipped silently. Joining mid-event
--- plays no old one-shots; only the loops start if it is Celebration.
+-- whose Config id is empty is skipped silently. Joining mid-event plays no
+-- old one-shots; only the party loops start if it is Celebration.
 -- Presentation only: never changes anything and never talks to the server.
 
 local Players = game:GetService("Players")
@@ -24,6 +28,7 @@ local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local CalebEvent = require(ReplicatedStorage.Shared.CalebEvent)
+local BackgroundMusic = require(script.Parent:WaitForChild("BackgroundMusic"))
 local CookiePartyAudio = require(script.Parent:WaitForChild("CookiePartyAudio"))
 
 local State = CalebEvent.State
@@ -54,25 +59,34 @@ end
 
 local sounds: { [string]: Sound } = {}
 local missing = {}
-for _, name in { "Full", "CelebrationStart", "Grow", "CookieRain", "TrophyClaim", "EventEnd" } do
-	local id = assetId(Config.CalebSounds[name])
+
+local function addSound(name: string, key: string, value: any, volume: number?)
+	local id = assetId(value)
 	if id then
 		local sound = Instance.new("Sound")
 		sound.Name = name
 		sound.SoundId = id
-		sound.Volume = Config.CalebSoundVolumes[name] or 0.5
+		sound.Volume = volume or 0.5
 		sound.Looped = name == "CookieRain"
 		sound.Parent = folder
 		sounds[name] = sound
 	else
+		table.insert(missing, key)
+	end
+end
+
+for _, name in { "Full", "Grow", "CookieRain", "TrophyClaim", "EventEnd" } do
+	addSound(name, name, Config.CalebSounds[name], Config.CalebSoundVolumes[name])
+end
+-- The "Air Horn": the one sound that marks the party's start.
+addSound("PartyStart", "CookiePartyStartSound", Config.CookiePartyStartSound, Config.CookiePartyStartVolume)
+for _, list in { BackgroundMusic.Init(folder, assetId), CookiePartyAudio.Init(folder, assetId) } do
+	for _, name in list do
 		table.insert(missing, name)
 	end
 end
-for _, name in CookiePartyAudio.Init(folder, assetId) do
-	table.insert(missing, name)
-end
 if #missing > 0 and RunService:IsStudio() then
-	print("[CalebAudio] no sound id in Config.CalebSounds / CookiePartySounds for: " .. table.concat(missing, ", ")
+	print("[CalebAudio] no sound id in Config for: " .. table.concat(missing, ", ")
 		.. " (skipped; see tools/audio/README.md)")
 end
 
@@ -133,13 +147,17 @@ local function onStateChanged()
 	if state == State.Full then
 		playOnce("Full")
 	elseif state == State.Celebration then
-		playOnce("CelebrationStart")
+		BackgroundMusic.FadeOut()
+		playOnce("PartyStart")
 		startRain()
 		CookiePartyAudio.Start(statue)
 	end
 	if state ~= State.Celebration then
 		stopRain() -- the loops never outlive the Celebration
 		CookiePartyAudio.Stop()
+	end
+	if previous == State.Celebration then
+		BackgroundMusic.FadeIn()
 	end
 	if previous == State.Celebration then
 		local boomed = state == State.TrophyClaim and CookiePartyAudio.Boom()
@@ -153,10 +171,13 @@ end
 
 statue:GetAttributeChangedSignal(Attr.State):Connect(onStateChanged)
 
--- Joined mid-Celebration: only the loop, no old one-shots.
+-- Joined mid-Celebration: only the party loops (no air horn, no
+-- background until the party ends). Otherwise the background starts.
 if lastState == State.Celebration then
 	startRain()
 	CookiePartyAudio.Start(statue)
+else
+	BackgroundMusic.FadeIn()
 end
 
 -- Grow: Caleb was fed -------------------------------------------------------------

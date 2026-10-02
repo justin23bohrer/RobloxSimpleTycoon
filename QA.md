@@ -263,15 +263,15 @@ Phases by seconds left: Start 60–40, Hype 40–20, Frenzy 20–10, Countdown 1
 | -- | ---- | -------- | ------ |
 | CD1 | Watch the first seconds of the party (Start). | He eases into the dance and opens with a big laugh (head back and shaking, belly jiggling, bouncing, hands on his belly). Then roughly every 3.5 s a move, with plain dancing in between. Bubble: a Start line ("I'M SO FULL!!", "COOKIE PARTYYY!", ...) pops in above the progress bar. | |
 | CD2 | Watch the phase changes at 40 s and 20 s left (Hype, Frenzy). | The dance gets faster and bigger each time **without a jump or snap** (it blends in over about a second; the beat never skips). Moves come more often and are bigger (Frenzy: back to back, spins are double spins, jumps higher). | |
-| CD3 | Watch each move a few times. | THROW: one arm winds back and flings forward, body twists. SPIT: head tilts back with puffed cheeks and a swollen belly, then snaps forward, mouth drops open and brown crumbs spray out of his mouth and fall. LAUGH (as CD1). SPIN: hopping spin with arms out. JUMP: dip, big jump with arms up, squashy landing. DRUM: hands take turns slapping his belly, belly jiggles. Nothing detaches or stays offset; mouth, teeth, chin and cheeks go back into place after. | |
+| CD3 | Watch each move a few times. | THROW: one arm winds back and flings forward, body twists. There is no SPIT move any more (no crumb spray ever). LAUGH (as CD1). SPIN: hopping spin with arms out. JUMP: dip, big jump with arms up, squashy landing. DRUM: hands take turns slapping his belly, belly jiggles. Nothing detaches or stays offset; mouth, teeth, chin and cheeks go back into place after. | |
 | CD4 | Frenzy (20–10 s left). | He goes crazy: fast alternating moves with a wobble/shake on top of everything. | |
 | CD5 | Countdown (10–2.5 s left). | Bounces faster and faster; belly gets bigger and jiggles more; a few moves still. Bubbles: "SOMETHING'S HAPPENING...", "TOO... MANY... COOKIES...", "UH OH...". | |
 | CD6 | Last 2.5 s. | No more moves: he crouches a little, arms pulled in hugging his belly, trembling harder and harder, belly puffing faster, cheeks puffed. In the last ~0.3 s he pops: arms flung wide, head thrown back, body pops up, belly pops big, mouth wide open, landing right at 0 together with the bubble "I'M FULL!!!" (yellow, big, shaking, shown for the last second) and the finale explosion. | |
-| CD7 | The moment the party ends (TrophyClaim). | Caleb is hidden at once (the explosion is CookiePartyFinale's); no crumbs, bubble, or sound are left behind. Client view: `PlayerGui.CalebPartyBubble.Enabled` is false; `Terrain.CalebMouth` emitters are `Enabled = false` with no particles. After the reset he is back in his normal pose and normal belly size (not swollen). | |
+| CD7 | The moment the party ends (TrophyClaim). | Caleb is hidden at once (the explosion is CookiePartyFinale's); no bubble or sound is left behind. Client view: `PlayerGui.CalebPartyBubble.Enabled` is false; the `Terrain.CalebMouth` puff emitter (if any) is `Enabled = false` with no particles. After the reset he is back in his normal pose and normal belly size (not swollen). | |
 | CD8 | 2 players (Test → Clients and Servers): watch both windows side by side. | Same move, same bubble line at the same moment on both (within network lag). | |
 | CD9 | Player 2 joins mid-party (e.g. in Hype, and again in the last 3 s). | Player 2 sees the right phase right away: same dance speed, same move and line as Player 1; joining during the wind-up shows the wind-up (not the start of the dance). | |
 | CD10 | Look at the bubble from right next to the statue, from mid-map, and from a plot. | The bubble is always above the progress bar, never overlapping it, and clear of the center-screen countdown and top banner (it is in world space); disappears beyond the bar's max distance like the bar. | |
-| CD11 | Sounds: with `Config.CookiePartySounds.CalebLaugh` / `CalebSpit` empty, then with real ids. | Empty: no errors, nothing plays. With ids: a laugh at each LAUGH start and a spit sound at each SPIT, heard from Caleb's position (quieter far away). Nothing keeps playing after the party. | |
+| CD11 | Sounds: with `Config.CookiePartySounds.CalebLaugh` empty, then with a real id. | Empty: no errors, nothing plays. With an id: a laugh at each LAUGH start, heard from Caleb's position (quieter far away). Nothing keeps playing after the party. | |
 | CD12 | Performance + cleanup: MicroProfiler / Script Performance in Normal and TrophyClaim. | No per-frame work from `CalebAnimator` or `CalebPartyBubble` outside Full/Celebration. No new instances per party after the first (one `CalebMouth` attachment, one bubble billboard, reused). | |
 
 ## Cookie Party: countdown, VFX, finale, audio
@@ -295,7 +295,7 @@ and dev cash, then feed Caleb to the goal. Sound cases need the
 | PX10 | Player 2 joins mid-party (e.g. during Frenzy, or during the countdown). | Banner in the right phase color, lighting at the right level, no callout for the phase already running; if in the last 10 s, the countdown starts from the current number. At the end Player 2 sees the full finale (PX5–PX7). | |
 | PX11 | Spend the party and finale far from the statue (at your plot). | Everything still runs; the finale still flashes/shakes and the trophy UI appears; no errors if Caleb's head is streamed out (explosion comes from above the pedestal instead). | |
 | PX12 | All `CookiePartySounds` ids empty; run a full cycle. | Silent party (other sounds as configured). Output has at most one `[CalebAudio] no sound id ...` line (listing the missing ones) and no errors or warnings. | |
-| PX13 | With ids: listen through the party. | Upbeat chiptune music starts with the party, loops without a click, gets faster at 40 / 20 / 10 s left and a little louder toward the end. A tick each second from 10 to 1, higher each time. At the finale the music stops at once and a big boom plays; the old descending end chime follows ~1.6 s later. | |
+| PX13 | With ids: listen through the party. | The party music (`Config.CookiePartyMusic`) starts with the party, loops, plays at normal speed (no pitch change at 40 / 20 / 10 s left) and gets a little louder toward the end. A tick each second from 10 to 1, higher each time. At the finale the music stops at once and a big boom plays; the old descending end chime follows ~1.6 s later. | |
 | PX14 | Run `python3 tools/audio/generate_sfx.py` twice. | 14 WAVs in `tools/audio/out/` (16-bit, 44.1 kHz, mono); effects under 300 KB, the music ~700 KB; re-running gives identical files. | |
 
 ## Cookie Party: end total
@@ -344,12 +344,30 @@ Needs the WAVs uploaded and their ids in `Config.CalebSounds` (see
 | CS1 | All `CalebSounds` ids empty; Play; run a full fast cycle. | Silent. Output has at most one `[CalebAudio] no sound id ...` line and no errors or warnings. | |
 | CS2 | Feed Caleb a few times quickly. | A quiet rising "bloop" per feed, never more than about 3 per second; the other game sounds are unchanged. | |
 | CS3 | Feed until the goal. | The "boing/burp/fanfare" plays once when he is Full. | |
-| CS4 | Wait for the Celebration. | Party horn + arpeggio + splash once, then a quiet sparkle loop with no audible click at the loop point. | |
+| CS4 | Wait for the Celebration. | The air horn (`Config.CookiePartyStartSound`) once, then a quiet sparkle loop with no audible click at the loop point. | |
 | CS5 | Wait for the Celebration to end (TrophyClaim starts). | The loop fades out and stops; the descending chime plays once. Nothing keeps playing. In Explorer, `SoundService.CalebAudio.CookieRain.IsPlaying` is false. | |
 | CS6 | Claim your trophy (2 players: only Player 1 claims). | Player 1 hears the "ta-da"; Player 2 does not. | |
-| CS7 | 2 players: Player 2 joins mid-Celebration. | Player 2 hears only the loop (no Full/CelebrationStart); it stops at the end like CS5. | |
+| CS7 | 2 players: Player 2 joins mid-Celebration. | Player 2 hears only the loops (no Full, no air horn); it stops at the end like CS5. | |
 | CS8 | Player 2 joins during TrophyClaim, or after already claiming (rejoin). | No sounds play on join. | |
 | CS9 | Reset character during the Celebration; let the cycle run twice. | Still exactly one `SoundService.CalebAudio` folder; sounds play again in the next cycle; no duplicates. | |
+
+
+## Music
+
+Paste real ids into the MUSIC block at the top of `Config.luau` first
+(`BackgroundMusic`, `CookiePartyStartSound`, `CookiePartyMusic`), except for MU8.
+`DevCalebFastCycle = true` makes the party come quickly (set it back after).
+
+| ID | Steps | Expected | Pass |
+| -- | ----- | -------- | ---- |
+| MU1 | Play (not during a party). | "Tender Static" fades in over ~1.5 s and loops with no gap problems. Explorer: one `SoundService.CalebAudio.BackgroundMusic`, `Looped` true. | |
+| MU2 | Wait for the Cookie Party to start. | The background fades out over ~1.5 s (then `IsPlaying` false, paused); the Air Horn plays once; "NO PARTY" starts and loops. Never two music tracks at full volume together. No old party horn/chime as well. | |
+| MU3 | Listen through the party. | Only "NO PARTY" (+ effects): normal speed and pitch the whole time, a little louder toward the end. | |
+| MU4 | Party ends (finale). | "NO PARTY" stops at once, the finale boom plays, the background fades back in **continuing where it paused** (not from the start). | |
+| MU5 | Let two full cycles run. | Same as MU2–MU4 each time; still exactly one of each music Sound in `SoundService.CalebAudio`. | |
+| MU6 | 2 players: Player 2 joins mid-party. | Player 2 hears "NO PARTY" (no Air Horn, no background); when the party ends the background fades in for them too. | |
+| MU7 | Reset your character during the party and during normal play. | Music keeps going correctly (no restart, no duplicate). | |
+| MU8 | All three music ids empty; Play; run a full cycle. | Silent music, no errors. Output in Studio: one `[CalebAudio] no sound id in Config for: ...` line listing `BackgroundMusic`, `CookiePartyStartSound`, `CookiePartyMusic` (plus any other empty ids). | |
 
 ## Purchase
 

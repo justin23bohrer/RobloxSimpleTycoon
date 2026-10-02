@@ -25,10 +25,12 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   event messages, party countdown, callouts, lighting, finale explosion, the
   end-of-party "YOU COLLECTED 🍪 N" total.
   Display only.
-- `CalebAudio.client.luau` + `CookiePartyAudio.luau` (ModuleScript) — Caleb
-  Full Event sound effects and the party music / countdown ticks / finale
-  boom, driven only by the statue's / player's attributes
-  (`Config.CalebSounds`, `Config.CookiePartySounds`).
+- `CalebAudio.client.luau` + `BackgroundMusic.luau` / `CookiePartyAudio.luau`
+  (ModuleScripts) — the background music (faded out during the Cookie
+  Party), the party's air horn and music, Caleb Full Event sound effects,
+  countdown ticks and finale boom, driven only by the statue's / player's
+  attributes (MUSIC block at the top of `Config`, `Config.CalebSounds`,
+  `Config.CookiePartySounds`).
 - `TrophyPrompt.client.luau` — hides the podium "Claim Caleb Trophy" prompt
   for players who can't claim, and shows the claim result message. The
   server decides every claim.

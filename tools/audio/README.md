@@ -1,15 +1,53 @@
 # tools/audio — Caleb Full Event + Cookie Party audio
 
+## Your music
+
+The game's music is your own Roblox audio. Paste the three ids into the
+**MUSIC block at the very top** of `src/ReplicatedStorage/Shared/Config.luau`:
+
+| Track | Config key | What it does |
+| ----- | ---------- | ------------ |
+| "Tender Static" | `BackgroundMusic` | loops all game; fades out during the Cookie Party, back in after |
+| "Air Horn" | `CookiePartyStartSound` | plays once when the Cookie Party starts |
+| "NO PARTY" | `CookiePartyMusic` | loops during the 60 s Cookie Party |
+
+```lua
+BackgroundMusic = "rbxassetid://123456789",
+CookiePartyStartSound = "rbxassetid://234567890",
+CookiePartyMusic = "rbxassetid://345678901",
+```
+
+Volumes (`BackgroundMusicVolume`, `CookiePartyStartVolume`,
+`CookiePartyMusicVolume`, 0..1) and the fade time (`MusicFadeSeconds`) are
+right below them. Empty `""` = that one is silent.
+
+**Finding an asset id:**
+
+- **Studio Toolbox**: open the audio in the Toolbox (Audio tab), right-click
+  it → **Copy Asset ID**. (Or insert it, select the `Sound`, and copy the
+  number from its `SoundId` property.)
+- **Creator Dashboard** (create.roblox.com → Creations → Development Items →
+  Audio): open the audio; the id is the number in the page's URL
+  (`.../store/asset/123456789/...` or `.../audio/123456789`), or use the
+  **⋯ → Copy Asset ID** menu.
+
+Then commit the change to `Config.luau` in the repo (not only in Studio) so
+Rojo keeps it. If an audio isn't yours or isn't public, the game may need
+permission to use it (see the end of this file).
+
+## Synthesized sound effects
+
 Original sound effects, **synthesized from scratch** by `generate_sfx.py`
 (plain Python 3 standard library: `wave`, `math`, `struct`, `random`). No
 samples, recordings, or third-party audio, so there are no copyright or
-licensing questions. Not synced by Rojo. The Cookie Party music loop is
-synthesized here too (simple chiptune).
+licensing questions. Not synced by Rojo. A chiptune party loop
+(`party_music.wav`) is synthesized here too, but it is no longer used: the
+party music is now `Config.CookiePartyMusic` (above).
 
 | File | `Config.CalebSounds` key | When it plays (`CalebAudio.client`) |
 | ---- | ------------------------ | ----------------------------------- |
 | `out/caleb_full.wav` | `Full` | Caleb reaches the goal (state → `Full`) |
-| `out/celebration_start.wav` | `CelebrationStart` | Celebration starts |
+| `out/celebration_start.wav` | (unused) | was the party start; replaced by `Config.CookiePartyStartSound` |
 | `out/cookie_rain.wav` | `CookieRain` | loops quietly for the whole Celebration (3 s, seamless loop) |
 | `out/caleb_grow.wav` | `Grow` | Caleb is fed (in `Normal`, rate-limited) |
 | `out/trophy_claim.wav` | `TrophyClaim` | you claim your trophy |
@@ -20,20 +58,20 @@ Cookie Party sounds go in `Config.CookiePartySounds` (volumes in
 
 | File | `Config.CookiePartySounds` key | When it plays (who plays it) |
 | ---- | ------------------------------ | ---------------------------- |
-| `out/party_music.wav` | `Music` | loops for the whole party; 120 BPM (`Config.CookiePartyMusicBPM`), 4 bars = 8 s, seamless loop; sped up per phase with `Config.CookiePartyMusicSpeed` (`CalebAudio.client` / `CookiePartyAudio`) |
+| `out/party_music.wav` | (unused) | was the party music; replaced by `Config.CookiePartyMusic` |
 | `out/countdown_tick.wav` | `CountdownTick` | each number of the 10…1 countdown, pitch rising (`CookiePartyAudio`) |
 | `out/finale_boom.wav` | `FinaleBoom` | the finale explosion, Celebration → TrophyClaim (`CookiePartyAudio`) |
 | `out/collect_pop.wav` | `Collect` | you collect a Normal / Chocolate party cookie (party cookies client) |
 | `out/collect_golden.wav` | `CollectGolden` | you collect a Golden cookie (party cookies client) |
 | `out/collect_giant.wav` | `CollectGiant` | you collect a Giant cookie (party cookies client) |
 | `out/caleb_laugh.wav` | `CalebLaugh` | Caleb laughs during the party (Caleb party client) |
-| `out/caleb_spit.wav` | `CalebSpit` | Caleb throws / spits a cookie (Caleb party client) |
+| `out/caleb_spit.wav` | (unused) | Caleb's spit move was removed |
 
 All files: 16-bit WAV, 44.1 kHz, mono, normalized to about −1 dBFS (no
 clipping); every effect is under 300 KB, the 8 s music loop is about 700 KB. They are committed, so you only need to
 re-generate after changing the script.
 
-## Generate
+### Generate
 
 ```bash
 python3 tools/audio/generate_sfx.py
@@ -42,7 +80,7 @@ python3 tools/audio/generate_sfx.py
 Writes the fourteen files to `tools/audio/out/`. The output is deterministic
 (fixed random seeds), so re-running without changes gives identical files.
 
-## Upload to Roblox and use them
+### Upload to Roblox and use them
 
 1. Open the place in Roblox Studio (signed in as the account or group that
    owns the game).
@@ -61,7 +99,6 @@ Writes the fourteen files to `tools/audio/out/`. The output is deterministic
    ```lua
    CalebSounds = table.freeze({
    	Full = "rbxassetid://1111111111",
-   	CelebrationStart = "rbxassetid://2222222222",
    	Grow = "rbxassetid://3333333333",
    	CookieRain = "rbxassetid://4444444444",
    	TrophyClaim = "rbxassetid://5555555555",

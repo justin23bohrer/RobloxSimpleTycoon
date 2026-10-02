@@ -15,8 +15,8 @@
 --   BellyScale                             the Belly's size (1 = as the server set it)
 --   MouthOpen                              studs the mouth, teeth and chin drop
 --   Cheeks                                 studs each cheek puffs out
---   Puff / Spit / Laugh                    flags for CalebMouth (burp puff,
---                                          crumb spray, laugh sound)
+--   Puff / Laugh                           flags for CalebMouth (burp puff,
+--                                          laugh sound)
 -- Caleb faces -Z, his right side is +X. A positive pitch leans back.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -43,7 +43,6 @@ export type Pose = {
 	MouthOpen: number,
 	Cheeks: number,
 	Puff: boolean,
-	Spit: boolean,
 	Laugh: boolean,
 }
 
@@ -112,7 +111,7 @@ function CalebPoses.Rest(): Pose
 		RightArm = 0, RightArmFwd = 0, LeftArm = 0, LeftArmFwd = 0,
 		BellyUp = 0, BellyForward = 0, BellyScale = 1,
 		MouthOpen = 0, Cheeks = 0,
-		Puff = false, Spit = false, Laugh = false,
+		Puff = false, Laugh = false,
 	}
 end
 

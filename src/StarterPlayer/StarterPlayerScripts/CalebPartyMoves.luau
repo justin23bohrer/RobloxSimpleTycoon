@@ -7,8 +7,6 @@
 -- nothing outside the pose it is given.
 --
 --   Throw  one arm winds back and flings forward, body twists into it
---   Spit   head tilts back with puffed cheeks, then snaps forward, mouth
---          drops open and crumbs spray out (Pose.Spit)
 --   Laugh  head back and shaking, belly jiggling hard, bouncing (Pose.Laugh)
 --   Spin   a hopping spin with arms out (two spins when size >= 1.4)
 --   Jump   dip, big jump with arms up, squashy landing
@@ -24,7 +22,7 @@ local keys, hump, smooth = CalebPoses.Keys, CalebPoses.Hump, CalebPoses.Smooth
 local CalebPartyMoves = {}
 
 -- Every move, in a fixed order (CalebPartyPoses picks from these).
-CalebPartyMoves.Names = table.freeze({ "Throw", "Spit", "Laugh", "Spin", "Jump", "Drum" })
+CalebPartyMoves.Names = table.freeze({ "Throw", "Laugh", "Spin", "Jump", "Drum" })
 
 -- 0 -> 1 -> 0 over a move, quick at both ends.
 local function fade(u: number): number
@@ -54,21 +52,6 @@ function moves.Throw(pose, u, _t, size, side)
 	pose.BodyPitch += keys(u, { { 0, 0 }, { 0.35, 0.08 }, { 0.55, -0.15 }, { 1, 0 } }) * size
 	pose.HeadPitch += keys(u, { { 0, 0 }, { 0.35, 0.1 }, { 0.55, -0.12 }, { 1, 0 } })
 	pose.MouthOpen += 0.8 * hump(u, 0.45, 0.85)
-end
-
-function moves.Spit(pose, u, _t, size, _side)
-	local w = fade(u)
-	local big = math.min(size, 1.3)
-	pose.HeadPitch += keys(u, { { 0, 0 }, { 0.4, 0.45 }, { 0.52, -0.3 }, { 0.8, -0.2 }, { 1, 0 } }) * big
-	pose.BodyPitch += keys(u, { { 0, 0 }, { 0.4, 0.12 }, { 0.52, -0.12 }, { 0.8, -0.08 }, { 1, 0 } })
-	pose.Cheeks += keys(u, { { 0, 0 }, { 0.2, 0.6 }, { 0.42, 1.3 }, { 0.52, 0 }, { 1, 0 } }) * size
-	pose.BellyScale += keys(u, { { 0, 0 }, { 0.42, 0.1 }, { 0.52, -0.03 }, { 1, 0 } })
-	pose.MouthOpen += keys(u, { { 0, 0 }, { 0.45, 0 }, { 0.53, 1.6 }, { 0.8, 1.3 }, { 1, 0 } })
-	local out = keys(u, { { 0, 0.8 }, { 0.45, 0.8 }, { 0.55, 1.4 }, { 1, 1 } })
-	local forward = keys(u, { { 0, -0.3 }, { 0.45, -0.3 }, { 0.55, 0.2 }, { 1, 0 } })
-	arm(pose, 1, out, forward, w)
-	arm(pose, -1, out, forward, w)
-	pose.Spit = u >= 0.5 and u <= 0.82
 end
 
 function moves.Laugh(pose, u, t, size, _side)

@@ -1,11 +1,10 @@
 -- CalebMouth (client only)
 -- What comes out of Caleb's mouth, for CalebAnimator.client. Looks only:
 --   * Puff: the white "I'm full" burp cloud (state Full).
---   * Spray: cookie crumbs flying out while he spits at the party.
---   * Sounds: Config.CookiePartySounds.CalebLaugh / CalebSpit when a laugh
---     or spit starts (3D, from his mouth). Empty ids are skipped silently.
+--   * Sound: Config.CookiePartySounds.CalebLaugh when a laugh starts (3D,
+--     from his mouth). An empty id is skipped silently.
 -- One client-local Attachment in Workspace.Terrain ("CalebMouth") holds the
--- emitters and sounds; it is created once and moved to his mouth whenever
+-- emitter and sound; it is created once and moved to his mouth whenever
 -- used. Stop() turns everything off and clears every particle.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -18,16 +17,11 @@ local CalebMouth = {}
 -- Look (presentation only)
 local PARTICLE_TEXTURE = "rbxasset://textures/particles/smoke_main.dds"
 local PUFF_COLOR = Color3.fromRGB(255, 248, 235)
-local CRUMB_LIGHT = Color3.fromRGB(222, 170, 98)
-local CRUMB_DARK = Color3.fromRGB(92, 56, 30)
-local SPRAY_TILT = math.rad(20) -- crumbs fly forward and a little up
 local SOUND_RANGE = 400 -- studs
 
 local attachment: Attachment? = nil
 local puffEmitter: ParticleEmitter? = nil
-local sprayEmitter: ParticleEmitter? = nil
 local sounds: { [string]: Sound | false } = {}
-local wasSpitting = false
 local wasLaughing = false
 
 local function getAttachment(): Attachment
@@ -70,24 +64,6 @@ local function getPuff(): ParticleEmitter
 	return puffEmitter :: ParticleEmitter
 end
 
-local function getSpray(): ParticleEmitter
-	if not sprayEmitter then
-		local emitter = newEmitter()
-		emitter.Color = ColorSequence.new(CRUMB_LIGHT, CRUMB_DARK)
-		emitter.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.4), NumberSequenceKeypoint.new(1, 0.8) })
-		emitter.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.8, 0), NumberSequenceKeypoint.new(1, 1) })
-		emitter.Lifetime = NumberRange.new(0.9, 1.3)
-		emitter.Speed = NumberRange.new(35, 55)
-		emitter.SpreadAngle = Vector2.new(18, 18)
-		emitter.Acceleration = Vector3.new(0, -70, 0)
-		emitter.Rotation = NumberRange.new(0, 360)
-		emitter.RotSpeed = NumberRange.new(-200, 200)
-		emitter.Rate = Config.CookiePartyCaleb.SpitCrumbsPerSecond
-		sprayEmitter = emitter
-	end
-	return sprayEmitter :: ParticleEmitter
-end
-
 local function play(key: string)
 	local sound = sounds[key]
 	if sound == nil then
@@ -118,39 +94,30 @@ function CalebMouth.Puff(head: CFrame, radius: number)
 	getPuff():Emit(Config.CalebFullAnim.PuffParticles)
 end
 
--- Every party frame: spray while `spitting`, sounds when a spit or laugh
--- starts. `head` is nil while the Head is not loaded.
-function CalebMouth.Update(head: CFrame?, radius: number, spitting: boolean, laughing: boolean)
+-- Every party frame: the laugh sound when a laugh starts. `head` is nil
+-- while the Head is not loaded.
+function CalebMouth.Update(head: CFrame?, radius: number, laughing: boolean)
 	if head then
-		place(head, radius, SPRAY_TILT)
-	end
-	local spray = spitting and head ~= nil
-	if spray ~= (sprayEmitter ~= nil and sprayEmitter.Enabled) then
-		getSpray().Enabled = spray
-	end
-	if spitting and not wasSpitting then
-		play("CalebSpit")
+		place(head, radius, 0)
 	end
 	if laughing and not wasLaughing then
 		play("CalebLaugh")
 	end
-	wasSpitting, wasLaughing = spitting, laughing
+	wasLaughing = laughing
 end
 
--- Everything off and gone (no particles left in the air, no sound playing).
+-- Everything off and gone (no puff left in the air, no sound playing).
 function CalebMouth.Stop()
-	for _, emitter in { puffEmitter, sprayEmitter } do
-		if emitter then
-			emitter.Enabled = false
-			emitter:Clear()
-		end
+	if puffEmitter then
+		puffEmitter.Enabled = false
+		puffEmitter:Clear()
 	end
 	for _, sound in sounds do
 		if sound then
 			sound:Stop()
 		end
 	end
-	wasSpitting, wasLaughing = false, false
+	wasLaughing = false
 end
 
 return CalebMouth
