@@ -13,8 +13,8 @@ local Config = {
 	-- Format: "rbxassetid://123456789" (or just the number). Empty "" = silent.
 	-- See tools/audio/README.md "Your music" for how to find an asset id.
 	BackgroundMusic = "", -- "Tender Static": loops all game, fades out during the Cookie Party
-	CookiePartyStartSound = "", -- "Air Horn": plays once when the Cookie Party starts
-	CookiePartyMusic = "", -- "NO PARTY": loops during the 60 s Cookie Party
+	CookiePartyStartSound = "rbxassetid://85895871328445", -- "Air Horn": plays once when the Cookie Party starts (now: celebration_start.wav until the Air Horn id is pasted)
+	CookiePartyMusic = "rbxassetid://104229874714144", -- "NO PARTY": loops during the 60 s Cookie Party (now: party_music.wav until the NO PARTY id is pasted)
 	BackgroundMusicVolume = 0.3, -- 0..1
 	CookiePartyMusicVolume = 0.5, -- 0..1 (swells a little toward the end)
 	CookiePartyStartVolume = 0.8, -- 0..1
@@ -207,11 +207,11 @@ local Config = {
 	-- tools/audio/ for the original effects to upload. The music and the
 	-- party's start sound are in the MUSIC block at the top of this file.
 	CalebSounds = table.freeze({
-		Full = "",
-		Grow = "",
-		CookieRain = "",
-		TrophyClaim = "",
-		EventEnd = "",
+		Full = "rbxassetid://93235179593518",
+		Grow = "rbxassetid://110164237125533",
+		CookieRain = "rbxassetid://87575437616837",
+		TrophyClaim = "rbxassetid://73645199784994",
+		EventEnd = "rbxassetid://81676941695748",
 	}),
 	-- Event UI + screen effects (client only, CalebEventUI.client.luau).
 	-- TickSeconds: how often the countdowns refresh. ConfettiCount: pooled
@@ -359,12 +359,12 @@ local Config = {
 	-- asset id strings, empty = skipped. Original effects: tools/audio/. The
 	-- party music itself is Config.CookiePartyMusic (MUSIC block at the top).
 	CookiePartySounds = table.freeze({
-		Collect = "",
-		CollectGolden = "",
-		CollectGiant = "",
-		CountdownTick = "",
-		FinaleBoom = "",
-		CalebLaugh = "",
+		Collect = "rbxassetid://137978882868933",
+		CollectGolden = "rbxassetid://106482616868600",
+		CollectGiant = "rbxassetid://87166145037610",
+		CountdownTick = "rbxassetid://135083761529590",
+		FinaleBoom = "rbxassetid://120290553484245",
+		CalebLaugh = "rbxassetid://131547940956663",
 		TotalTick = "",
 		TotalLand = "",
 	}),
