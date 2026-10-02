@@ -159,7 +159,7 @@ local Config = {
 	-- StatueBar.client.luau). Height is studs above the top of his Head (his
 	-- head never grows, so this stays clear of him at any size). Size is in
 	-- screen pixels, so it reads the same from near and far. MaxDistance is
-	-- studs from the camera (the map is 300 x 300).
+	-- studs from the camera (the map is 400 x 400).
 	StatueBarHeight = 9,
 	StatueBarSize = Vector2.new(300, 80),
 	StatueBarMaxDistance = 500,

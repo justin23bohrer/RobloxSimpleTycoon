@@ -11,7 +11,8 @@ doorway), and a gray shingle hip roof with a front gable and a chimney.
 Only the children of two plot models are rewritten; everything else in the
 plot file is left exactly as it is:
 
-  Walls        first-floor walls (bought with "Build Walls")
+  Walls        first-floor walls (bought with "Build Walls"), with the
+               front doorway and the back door opening
   SecondFloor  floor slab with the stair hole, second-story walls, and the
                roof (bought with "2nd Floor")
 
@@ -19,6 +20,9 @@ The part names and sizes of the walls and floor slabs match the earlier
 plain version, so the plot layout (doorway, stair hole, heights) is the same.
 Edit the numbers below and re-run this script instead of hand-editing the
 JSON. Plain parts only: no textures, decals, or meshes.
+
+The back door itself (BackDoor) is made by tools/backyard/generate_backyard.py
+from the same BACK_DOOR_* numbers; change both together.
 
 Afterwards run `python3 tools/plots/generate_plots.py` so Plots 2-4 (turned
 copies of Plot1) get the change too.
@@ -52,6 +56,13 @@ FLOOR2_Y = 18  # top of the 2nd floor slab
 WALL2_TOP = 31  # top of the second-story walls = bottom of the roof
 DOOR_HALF = 8  # the front doorway is x -8..8
 DOOR_TOP = 13  # doorway height (a brick header fills 13..17)
+# Back door to the backyard (the door itself, BackDoor, is made by
+# tools/backyard/generate_backyard.py, which uses the same numbers). It
+# replaces the first floor's right back window and misses the Trophy Case
+# (x -12.4..12.4), the stairs (x 26..32, z -20..-52), and the collector.
+BACK_DOOR_X = 20
+BACK_DOOR_HALF = 3  # the opening is x 17..23
+BACK_DOOR_TOP = 12  # opening height (brick fills 12..17 above it)
 ROOF_HEIGHT = 15  # eaves (y 31) to ridge (y 46)
 ROOF_OVERHANG = 1.5  # eaves stick out this far past the walls
 RIDGE_HALF = 10  # the ridge runs x -10..10; the roof slopes down on all four sides
@@ -247,7 +258,8 @@ def corner_posts(prefix, bottom, top):
 
 
 def bands(prefix, y, height, skip_doorway=False):
-    """Gray trim strips around the outside of the house at height y."""
+    """Gray trim strips around the outside of the house at height y.
+    skip_doorway leaves gaps for the front doorway and the back door."""
     thick = 0.3
     out = []
     length_x = 2 * X_OUT + 2 * thick
@@ -257,7 +269,14 @@ def bands(prefix, y, height, skip_doorway=False):
             out.append(trim(f"{prefix}Front{side}", (piece, height, thick), (sign * (DOOR_HALF + piece / 2), y, Z_FRONT + thick / 2)))
     else:
         out.append(trim(f"{prefix}Front", (length_x, height, thick), (0, y, Z_FRONT + thick / 2)))
-    out.append(trim(f"{prefix}Back", (length_x, height, thick), (0, y, Z_BACK - thick / 2)))
+    if skip_doorway:
+        left_end = BACK_DOOR_X - BACK_DOOR_HALF  # back strip: -X end .. door
+        right_start = BACK_DOOR_X + BACK_DOOR_HALF
+        x0, x1 = -X_OUT - thick, X_OUT + thick
+        out.append(trim(f"{prefix}BackLeft", (left_end - x0, height, thick), ((x0 + left_end) / 2, y, Z_BACK - thick / 2)))
+        out.append(trim(f"{prefix}BackRight", (x1 - right_start, height, thick), ((right_start + x1) / 2, y, Z_BACK - thick / 2)))
+    else:
+        out.append(trim(f"{prefix}Back", (length_x, height, thick), (0, y, Z_BACK - thick / 2)))
     length_z = Z_FRONT - Z_BACK
     mid_z = (Z_FRONT + Z_BACK) / 2
     out.append(trim(f"{prefix}Left", (thick, height, length_z), (-X_OUT - thick / 2, y, mid_z)))
@@ -279,10 +298,13 @@ def walls():
     y = GROUND_Y + h / 2
     mid_z = (Z_FRONT + Z_BACK) / 2
     piece = X_OUT - 1 - DOOR_HALF  # front wall piece between corner and doorway
+    back_left, back_right = BACK_DOOR_X - BACK_DOOR_HALF, BACK_DOOR_X + BACK_DOOR_HALF
     children = [
         brick("WallLeft", (1, h, 66), (-X_OUT + 0.5, y, mid_z)),
         brick("WallRight", (1, h, 66), (X_OUT - 0.5, y, mid_z)),
-        brick("WallBack", (64, h, 1), (0, y, Z_BACK + 0.5)),
+        brick("WallBackLeft", (back_left - (-X_OUT + 1), h, 1), (((-X_OUT + 1) + back_left) / 2, y, Z_BACK + 0.5)),
+        brick("WallBackRight", ((X_OUT - 1) - back_right, h, 1), ((back_right + (X_OUT - 1)) / 2, y, Z_BACK + 0.5)),
+        brick("BackDoorHeader", (2 * BACK_DOOR_HALF, FLOOR1_TOP - BACK_DOOR_TOP, 1), (BACK_DOOR_X, (BACK_DOOR_TOP + FLOOR1_TOP) / 2, Z_BACK + 0.5)),
         brick("WallFrontLeft", (piece, h, 1), (-(DOOR_HALF + piece / 2), y, Z_FRONT - 0.5)),
         brick("WallFrontRight", (piece, h, 1), (DOOR_HALF + piece / 2, y, Z_FRONT - 0.5)),
         # Brick above the doorway, so it reads as a garage-style opening.
@@ -291,6 +313,11 @@ def walls():
         trim("DoorFrameLeft", (0.6, DOOR_TOP - GROUND_Y, 1.4), (-DOOR_HALF + 0.3, (GROUND_Y + DOOR_TOP) / 2, Z_FRONT - 0.5)),
         trim("DoorFrameRight", (0.6, DOOR_TOP - GROUND_Y, 1.4), (DOOR_HALF - 0.3, (GROUND_Y + DOOR_TOP) / 2, Z_FRONT - 0.5)),
         trim("DoorFrameTop", (2 * DOOR_HALF, 0.6, 1.4), (0, DOOR_TOP - 0.3, Z_FRONT - 0.5)),
+        # Gray frame lining the back door opening (the door, its outside
+        # casing, and its sign are in the BackDoor model).
+        trim("BackDoorFrameLeft", (0.4, BACK_DOOR_TOP - GROUND_Y, 1.4), (back_left + 0.2, (GROUND_Y + BACK_DOOR_TOP) / 2, Z_BACK + 0.5)),
+        trim("BackDoorFrameRight", (0.4, BACK_DOOR_TOP - GROUND_Y, 1.4), (back_right - 0.2, (GROUND_Y + BACK_DOOR_TOP) / 2, Z_BACK + 0.5)),
+        trim("BackDoorFrameTop", (2 * BACK_DOOR_HALF, 0.4, 1.4), (BACK_DOOR_X, BACK_DOOR_TOP - 0.2, Z_BACK + 0.5)),
     ]
     children += corner_posts("", GROUND_Y, FLOOR1_TOP)
     children += bands("Plinth", GROUND_Y + 0.4, 0.8, skip_doorway=True)
@@ -307,6 +334,8 @@ def walls():
             by_stairs = side == "right" and STAIRS_Z[0] <= z <= STAIRS_Z[1]
             windows.append(window(f"Window{side.title()}{i}", side, z, w_y, w_w, w_h, inside=not by_stairs))
     for i, x in enumerate(BACK_WINDOWS, 1):
+        if abs(x - BACK_DOOR_X) < BACK_DOOR_HALF + w_w / 2 + 1:
+            continue  # the back door is here on the first floor
         windows.append(window(f"WindowBack{i}", "back", x, w_y, w_w, w_h))
     children.append(model("Windows", windows))
     return children

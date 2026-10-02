@@ -865,6 +865,27 @@ quick setup, `Config.DevUnlimitedCash = true` in Studio (set it back to
 | TS7 | Release: leave with a claimed plot, then a new player claims it and buys. | No errors; the new owner's sounds play at the right buttons. | |
 | TS8 | Empty ids: set every `Config.TycoonSounds` id to `""`, Play, buy, step on an unaffordable button, collect. | Everything works silently; no errors; in Studio Output one "[TycoonSounds] no sound id in Config for: …" line (once, not per plot). | |
 
+## Backyard look
+
+Geometry only (`tools/backyard/generate_backyard.py`). Showing/hiding the
+pool, path and hangout, the pads, the door lock, the sign's trophy count and
+the fire's on/off are the game logic's job (see its own QA cases). To see
+everything at once before that logic exists, look in Studio **Edit** mode
+(not Play). Check each case on **all 4 plots**.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| BY1 | Fly above the map. | Every house has a fenced backyard behind it (on the side away from the statue). No backyard or fence touches another plot, another plot's garage area (right side of each house), a spawn, or the statue. All of it is on grass; the 400 × 400 ground reaches past every fence. | |
+| BY2 | Walk along the fence inside the yard; try to walk through it; look at the corners. | White picket fence about 8 studs tall (pickets with pointed tips, posts with caps and balls, rails on the outside) on the left, right and back. It meets the house's back corners with no gap; you can't walk through or squeeze between pickets. | |
+| BY3 | Build the walls, then stand inside the house and look at the back wall's right side; also at night (`Lighting.ClockTime = 0`). | A wooden back door (window with panes, two panels, gold knob) fills a framed opening where the right back window used to be. Above it a gold-framed purple sign reads "🔒 BACKYARD" in chunky white text, readable from inside, not darkened at night. The door doesn't touch the Trophy Case, the stairs, the collector, or `BuildButton4`; no window frame pokes through it. | |
+| BY4 | Look at the back door from the yard. Walk from the step onto the grass. | Gray casing around the door, a small gray awning above it, a stone step below; the door has the same window/panels/knob on this side. Stepping from the house floor to the step to the grass is smooth (no getting stuck). | |
+| BY5 | Pool: walk around it, then into it. | Long pool on the left running front to back: sand-colored rim, light blue floor with a dark blue lane line, see-through blue water, a red brick wall with a stone cap and three piers along its outer side, a diving board at the far end, two beach balls. You step over the rim and stand on the pool floor with the water around your feet (no swimming, no falling through). | |
+| BY6 | Path: walk from the back step to the patio. | Gray flagstones from the step all the way to the patio, with round gray rocks and brown dirt patches along both sides. Rocks and dirt don't block you. | |
+| BY7 | Hangout, in daylight and at night, with the fire turned on (by the game logic, or set `Fire`/`Embers`/`FireLight` `Enabled` in Edit mode). | Square stone patio with a tile grid at the end of the path. Fire pit in the middle: ring of stones, crossed logs, flames, glowing embers rising, warm orange light on the patio at night. Five colorful chairs face the fire with their backs leaning away from it; the path side is open. Nothing floats or sinks into the patio. With the fire off: no flames, embers or glow. | |
+| BY8 | Pads, with nothing in the yard built: walk out of the back door to each pad. | Three gold pads with dark purple rings and purple signs on the grass: right of the pool, left of where the path starts, at the patio's front-left corner. Each is reachable on foot from the back door, and none overlaps the pool rim, a rock, dirt, the path, or the patio. | |
+| BY9 | Select `BackyardZone` in the Explorer (Edit mode). | Invisible; not solid, can't be touched or clicked. Its box covers exactly the inside of the fence from the ground up to y 80, and its face toward the house lies along the house's back wall. | |
+| BY10 | Run `python3 tools/backyard/generate_backyard.py` twice, then `python3 tools/plots/generate_plots.py`, then `git status`. | The second run changes nothing; the plot files have no other changes. `rojo build` still succeeds. | |
+
 ## Garage + car (look)
 
 Look checks for the garage model (`tools/garage/generate_garage.py`); the
