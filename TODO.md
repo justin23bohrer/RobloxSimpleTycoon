@@ -96,7 +96,7 @@ intentional. No weapons, no dropped trophies, no security UI, no prestige houses
 - [x] Contract: `Shared/HouseRaid.luau`, Config block, remotes, service stubs wired into `ServerMain` (lead).
 - [x] Security: `SecurityPad` (green/red), red `SecurityBars` for exactly 30 s, no cooldown, owner passes through, `TrophyStash` pad in the map. `HouseSecurityService`, `HouseSecurity.client`, `tools/security/generate_security.py`, sounds in `tools/audio/`. (code done; Studio test pending: QA HR1–HR16)
 - [ ] Upload `security_close.wav` / `security_open.wav` and paste the ids into `Config.HouseSecuritySounds` (user).
-- [ ] Theft: steal prompt on displayed trophies, carry over head, all powers off while carrying, returns on push/death/leave, permanent transfer at the thief's `TrophyStash`, offline owner handling. (QA TH*)
+- [x] Theft: steal prompt on displayed trophies, carry over head, all powers off while carrying, returns on push/death/leave, permanent transfer at the thief's `TrophyStash`, offline owner handling. `TheftService` (+ `TheftRules` / `TheftCarry` / `TheftTransfer`), `TheftPrompt.client`. (code done; Studio test pending: QA TH1–TH22)
 - [x] Push: input + animation + phone button, server-validated hit, knockback, stops thieves. `PushService` + `Push.client` (`PushAnimation` / `PushButton` / `PushEffects`). (code done; Studio test pending: QA PU1–PU14)
 - [ ] Upload `push_swing.wav` / `push_hit.wav` and paste ids into `Config.PushSounds` (user).
 

@@ -150,27 +150,45 @@ end
 -- slot empty, e.g. while its trophy is being carried by a thief) on the
 -- case's slots, up to Config.TrophyCaseSlots, and turns the case's lights
 -- on. Each trophy is tagged with `ownerUserId` and its InstanceId and gets a
--- StealPrompt. Replaces whatever was shown before.
+-- StealPrompt. A slot that already shows exactly that trophy is left alone
+-- (so a refresh never cancels someone holding its StealPrompt); every other
+-- slot is rebuilt or emptied.
 function TrophyCaseDisplay.Show(plot: Instance, case: Instance, records: { [number]: { Variant: string, InstanceId: string } }, ownerUserId: number)
-	TrophyCaseDisplay.Clear(plot)
-	local folder = Instance.new("Folder")
-	folder.Name = FOLDER
+	local folder = plot:FindFirstChild(FOLDER)
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = FOLDER
+		folder.Parent = plot
+	end
 	for slot = 1, Config.TrophyCaseSlots do
 		local record = records[slot]
 		local spot = case:FindFirstChild(`TrophySlot{slot}`)
-		if record and spot and spot:IsA("BasePart") then
-			local variantId = record.Variant
-			local trophy = TrophyModel.Build(variantId, Config.TrophyCaseScale)
-			trophy.Name = `CaseTrophy{slot}`
-			trophy:SetAttribute(HouseRaid.TrophyAttr.OwnerUserId, ownerUserId)
-			trophy:SetAttribute(HouseRaid.TrophyAttr.InstanceId, record.InstanceId)
-			trophy:PivotTo(spot.CFrame * CFrame.new(0, spot.Size.Y / 2, 0))
-			makeNameplate(spot, variantId).Parent = trophy
-			addStealPrompt(trophy, TrophyVariants.Get(variantId).DisplayName)
-			trophy.Parent = folder
+		local shown = (folder :: Instance):FindFirstChild(`CaseTrophy{slot}`)
+		if not (record and spot and spot:IsA("BasePart")) then
+			if shown then
+				shown:Destroy()
+			end
+			continue
 		end
+		if shown then
+			if shown:GetAttribute(HouseRaid.TrophyAttr.InstanceId) == record.InstanceId
+				and shown:GetAttribute(HouseRaid.TrophyAttr.OwnerUserId) == ownerUserId
+				and shown:GetAttribute("Variant") == record.Variant
+			then
+				continue -- already showing this trophy
+			end
+			shown:Destroy()
+		end
+		local variantId = record.Variant
+		local trophy = TrophyModel.Build(variantId, Config.TrophyCaseScale)
+		trophy.Name = `CaseTrophy{slot}`
+		trophy:SetAttribute(HouseRaid.TrophyAttr.OwnerUserId, ownerUserId)
+		trophy:SetAttribute(HouseRaid.TrophyAttr.InstanceId, record.InstanceId)
+		trophy:PivotTo(spot.CFrame * CFrame.new(0, spot.Size.Y / 2, 0))
+		makeNameplate(spot, variantId).Parent = trophy
+		addStealPrompt(trophy, TrophyVariants.Get(variantId).DisplayName)
+		trophy.Parent = folder
 	end
-	folder.Parent = plot
 	setLights(case, true)
 end
 

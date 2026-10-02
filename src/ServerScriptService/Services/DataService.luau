@@ -526,8 +526,9 @@ local function changeOffline(userId: number, what: string, change: (DataSchema.P
 			end
 			outcome = "ok"
 			local out = toStored(data, nil)
-			out.SessionJobId = stored.SessionJobId -- none, or an expired lock: as it was
-			out.SessionTime = stored.SessionTime
+			local old = if typeof(stored) == "table" then stored else {}
+			out.SessionJobId = old.SessionJobId -- none, or an expired lock: as it was
+			out.SessionTime = old.SessionTime
 			return out, { userId }
 		end)
 	end, OFFLINE_ATTEMPTS)
