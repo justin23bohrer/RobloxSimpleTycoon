@@ -231,18 +231,36 @@ for side, x in (("Right", 1), ("Left", -1)):
     ball(f"{side}Cheek", 2.0, add(HEAD_CENTER, scale(unit((x * 5.0, -1.4, -3.4)), 4.6)), SKIN)
 ball("Chin", 3.0, add(HEAD_CENTER, scale(unit((0, -0.93, -0.37)), 4.0)), SKIN)
 
-# Wide grin: a curved mouth band with a row of teeth along its top edge.
+# Wide grin: a curved mouth band with ONE row of teeth along its top edge.
+# Each tooth is placed in its own mouth segment's frame (same facing), so it
+# is parallel to that segment and sits just in front of it, just below its
+# top edge. (Facing the head at the tooth's own height made the dark mouth
+# face cut through every tooth, which read as two rows.) Each tooth is then
+# rolled to the slope of the smile so the row's top edge follows the curve.
 N = 11
+MOUTH_DEPTH = 0.4
+TOOTH_SIZE = (0.56, 0.55, 0.3)  # a little narrower than the 0.6 spacing: thin gap lines
+TOOTH_INSET = 0.1  # from the segment's top edge down to the tooth's top
+TOOTH_PROUD = 0.05  # how far the tooth's front is in front of the mouth's front
 for i in range(N):
     t = i / (N - 1) * 2 - 1  # -1 .. 1
     x = t * 3.0
     y_mid = -2.9 + 0.9 * t * t  # corners turn up
     p, n = on_head(x, y_mid, 0.05)
     h = 1.9 - 1.1 * t * t  # mouth is tallest in the middle
-    part(f"Mouth{i + 1}", (0.75, h, 0.4), p, MOUTH, rot=facing(n), collide=False)
+    rot = facing(n)
+    part(f"Mouth{i + 1}", (0.75, h, MOUTH_DEPTH), p, MOUTH, rot=rot, collide=False)
     if abs(t) < 0.85:
-        tp, tn = on_head(x, y_mid + h / 2 - 0.35, 0.12)
-        part(f"Tooth{i + 1}", (0.62, 0.6, 0.3), tp, TEETH, rot=facing(tn), collide=False)
+        right, up, back = ([row[k] for row in rot] for k in range(3))
+        lift = h / 2 - TOOTH_INSET - TOOTH_SIZE[1] / 2
+        out = MOUTH_DEPTH / 2 + TOOTH_PROUD - TOOTH_SIZE[2] / 2
+        tp = add(add(p, scale(up, lift)), scale(back, -out))
+        # Top edge y = y_mid + h/2 = -1.95 + 0.35 t^2, so dy/dx = 0.7 t / 3.
+        roll = math.atan(0.7 * t / 3.0)
+        c, s = math.cos(roll), math.sin(roll)
+        tright = add(scale(right, c), scale(up, s))
+        tup = add(scale(up, c), scale(right, -s))
+        part(f"Tooth{i + 1}", TOOTH_SIZE, tp, TEETH, rot=rows_from_columns(tright, tup, back), collide=False)
 
 # Shaggy hair (dark brown, medium length, messy fringe, covers the ears).
 # A smooth "cap" ball set up and back from the head makes the main shape: it

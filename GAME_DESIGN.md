@@ -505,7 +505,8 @@ copies.
 A giant cartoony statue (about **43 studs** tall, roughly two stories)
 standing on a stone pedestal with a gold trim, behind the spawn. Rick and
 Morty-style caricature: huge round head, big white eyes with tiny pupils, a
-wide toothy grin, short dark brows. Its look comes from two reference photos
+wide toothy grin (one even row of white teeth just inside the top edge of
+the dark red mouth, following the smile's curve), short dark brows. Its look comes from two reference photos
 the user provided (`agent-office/assets/IMG_2755.JPEG` for the face, smile,
 dark navy long-sleeve shirt, thin gold chain, and hand-on-hip pose;
 `IMG_9026.jpeg` for the shaggy, medium-length dark-brown hair with a messy
