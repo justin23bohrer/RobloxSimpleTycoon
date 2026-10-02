@@ -20,7 +20,8 @@
 -- * Equipping: the TrophyEquip remote (TrophyInventory.HandleRequest checks
 --   type, cooldown, loading, ownership, and the active slot limit).
 -- * The player is told the claim result through the CalebTrophyNotice
---   player attribute (TrophyPrompt.client shows a notification).
+--   player attribute (Saved/Unsaved carry the new trophy's Variant and
+--   InstanceId; TrophyPrompt.client shows the claim pop-up).
 -- * Display rule: a trophy's power only works while it is displayed, and
 --   only equipped trophies in a BUILT Trophy Case are displayed. On every
 --   change (join/load, trophy added, equip change, case built/restored, plot
@@ -58,9 +59,9 @@ local pending: { [Player]: true } = {} -- refresh scheduled this frame
 local leaving: { [Player]: true } = setmetatable({}, { __mode = "k" }) :: any
 local noticeId = 0
 
-local function notify(player: Player, kind: string, variantId: string?)
+local function notify(player: Player, kind: string, variantId: string?, instanceId: string?)
 	noticeId += 1
-	local notice = { Id = noticeId, Kind = kind, Variant = variantId }
+	local notice = { Id = noticeId, Kind = kind, Variant = variantId, InstanceId = instanceId }
 	player:SetAttribute(CalebEvent.PlayerAttr.TrophyNotice, HttpService:JSONEncode(notice))
 end
 
@@ -141,7 +142,11 @@ local function onClaimTriggered(player: Player)
 		kind = "Unsaved"
 	end
 	CalebCycle.MarkTrophyClaimed(userId)
-	notify(player, kind, if kind == "AlreadyOwned" then nil else record.Variant)
+	if kind == "AlreadyOwned" then
+		notify(player, kind)
+	else
+		notify(player, kind, record.Variant, record.InstanceId)
+	end
 	scheduleRefresh(player)
 end
 

@@ -516,13 +516,13 @@ Services** ON (published place) except TR8. Watch Output (Server view).
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
 | TR1 | Feed Caleb to the goal (1 player). Wait for TrophyClaim. | Caleb is hidden; a big golden Caleb trophy ("CALEB TROPHY / Claim yours!") stands on top of the pedestal where he stood, facing Plot1. Walking up to the pedestal shows the "Claim Caleb Trophy" prompt (hold ~0.5 s). | |
-| TR2 | Claim it (TR1). | A notification "🏆 Caleb Trophy! You got <Name> (<Rarity>)! …". The prompt disappears for you; `CalebTrophyClaimed = true`; the event UI shows "Trophy claimed! 🏆". No errors. | |
+| TR2 | Claim it (TR1). | The "🏆 NEW TROPHY!" pop-up with <Name> and ⭐ <RARITY> (see TP1). The prompt disappears for you; `CalebTrophyClaimed = true`; the event UI shows "Trophy claimed! 🏆". No errors. | |
 | TR3 | 2 players (Clients and Servers): only Player 1 fed. During TrophyClaim, Player 2 walks to the pedestal. | Player 2 sees no prompt. (Optional exploit check: in Player 2's client set the prompt's `Enabled = true` and trigger it → notification "Only players who fed Caleb this round…"; no trophy; `CalebTrophyClaimed` stays false.) | |
 | TR4 | Double claim: hold the prompt again right after claiming / trigger it twice quickly (Player 1, or set `Enabled = true` on the client after claiming). | Only one trophy: the saved list (and the case) gains exactly one; a repeat says "You already have this round's trophy." | |
 | TR5 | Player A feeds, leaves during Celebration, rejoins the same server during TrophyClaim. | A sees the prompt (their `CalebFed` is restored) and can claim (one trophy). | |
 | TR6 | Player B joins after the goal (during Full/Celebration/TrophyClaim). | B never sees the prompt; claiming is refused. | |
 | TR7 | Let TrophyClaim end without claiming. | The podium trophy and prompt disappear at the reset; Caleb is back. Nothing can be claimed afterwards (a held prompt finishing exactly at the end is refused: no trophy). | |
-| TR8 | API access **OFF** (unsaved). Feed, claim. Build the Trophy Case. | Notification says you got <Name> and that it couldn't be saved. The trophy stands in your Trophy Case this session. Stop/Play: it's gone (it was never saved). One "saving is OFF" warning only. | |
+| TR8 | API access **OFF** (unsaved). Feed, claim. Build the Trophy Case. | The "NEW TROPHY!" pop-up shows <Name> and says it couldn't be saved this session. The trophy stands in your Trophy Case this session. Stop/Play: it's gone (it was never saved). One "saving is OFF" warning only. | |
 | TR9 | Trophy Case: claim a plot with Walls built, buy "Trophy Case / 🍪 7500" (button behind the Build 3 spot on the right side). | Cookies −7500. A big dark-wood cabinet (about 25 wide, nearly up to the ceiling) with gold trim, a red velvet back, two shelf rows behind glass, and a red "MY CALEB TROPHIES" sign on top appears against the middle of the back wall (covering the middle back window from inside); it doesn't block the conveyor, collector, cookie jar/Collect pad, stairs, `BuildButton4` area, or doorway, and you can walk all around in front of it. Trophies stand on the bottom row (slot 1 in the middle, then left, right, far left, far right), facing into the room, inside the glass, none poking through the shelf above. Without trophies: empty shelves (no visible slots). Before buying and after leaving: no case and no light glow on the back wall. | |
 | TR10 | Restore after rejoin (API ON): with the case built and 1+ saved trophies, Stop, Play, claim any plot. | The house comes back with the Trophy Case and the same trophies in it (no charge). Same on Plot2–4 (case against that house's back wall, facing in). | |
 | TR11 | New trophy updates the case: with the case built, claim a trophy. | The new trophy appears in the middle slot right away; older ones move outward. | |
@@ -557,6 +557,43 @@ checks, in the Server command bar:
 | PW11 | 2 players (Clients and Servers): only Player 1 has trophies. | Player 2's drops, payouts, speed, jump and `TrophyStats` are unaffected; Player 1's bonuses apply only on Player 1's plot. | |
 | PW12 | Unequip every trophy (or release the plot / leave). | All bonuses gone from the next drop; `TrophyStats` empty; movement normal. | |
 
+## Speed trophies + glowing feet
+
+Same setup as Trophy powers (built Trophy Case, or the `PowerService.SetDisplayed`
+command bar shortcut). Base WalkSpeed is 16. Read the Humanoid's `WalkSpeed`
+in the Properties window (Server view). Cap: `TrophyStatCaps.WalkSpeed` = 1.5.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| SG1 | Display each speed trophy alone, then put it in the inventory without a built case. | Party 21.6, Speed 28, Cool 24, Midnight 22.4, Rainbow 20.8, King 24 (all = 16 × (1 + bonus)). Equipped but case not built → 16, no glow. | |
+| SG2 | Inventory details and Trophy Case nameplates for those six. | "+35% WALK SPEED", "+75% WALK SPEED", "+50% WALK SPEED", "+40% JUMP, +40% SPEED", "+10% COOKIES/JUMP/DROPPERS, +30% SPEED", "+50% COOKIES, +50% WALK SPEED"; the Rainbow text fits its plate. | |
+| SG3 | Stacking: display Speed + Cool (+1.25). | WalkSpeed 36; `TrophyStats` WalkSpeed = 1.25. | |
+| SG4 | Cap: display Speed + Cool + King + Midnight (+2.15). | WalkSpeed 40 (2.5×), `TrophyStats` WalkSpeed = 1.5, never more. | |
+| SG5 | Any speed trophy displayed. Look at your feet (day and night). | Each foot has a soft light-blue glow and leaves a few sparkles when running; subtle, not blinding. One `SpeedGlow` Attachment per foot in Explorer. | |
+| SG6 | Compare Party (+35%) with the capped stack (SG4). | Capped stack is brighter / more sparkles; both look tasteful. | |
+| SG7 | Unequip the trophy; then re-equip and release the plot; then re-equip and display a JumpHeight-only trophy (Jump Caleb). | Glow disappears right away each time (no `SpeedGlow` left). Jump Caleb alone: no feet glow. | |
+| SG8 | 2 players (Clients and Servers): Player 1 has a speed trophy. | Player 2 sees Player 1's glowing feet; Player 2's own feet do not glow. A 3rd player joining later also sees it. | |
+| SG9 | Respawn (Esc → Reset) with a speed trophy, twice. | Same WalkSpeed after each respawn (not compounded) and the glow is back, still exactly one `SpeedGlow` per foot. | |
+| SG10 | R6: set Game Settings → Avatar → R6, play with a speed trophy. (R15 is covered by SG5.) | Glow on `Left Leg` / `Right Leg` bottoms; same WalkSpeed numbers. | |
+
+## Power visuals on the plot
+
+Built Trophy Case and a few droppers bought. Use the inventory UI (or the
+PowerService command-bar line above) to change what is displayed.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PV1 | Equip a CookieMultiplier trophy (e.g. +5%, then Golden +100%). | Every dropper cup has fire on top and a warm light; small flames at +5%, big flames at +100% (no bigger past that). No sparks. Unequip → fire and light gone right away. | |
+| PV2 | Equip a DropperSpeed trophy only. | Same fire on every cup. Equip a CookieMultiplier one as well → orange sparks also fly off the cups. Unequip one → sparks stop, fire stays. | |
+| PV3 | Equip a CollectBonus trophy (e.g. Big Brain). | A golden glowing ring around the Collect pad with rising gold sparkles and a light; brighter at a bigger bonus. Stepping on the pad still collects. Unequip → ring gone. Pad's own "cash waiting" sparkles still work as before. | |
+| PV4 | Equip an ExtraCookieChance or LuckyCookieChance trophy. | A few green/gold sparkles float off each cup (no fire unless a production power is also active). | |
+| PV5 | Equip WalkSpeed / JumpHeight / Double Jump trophies only. | Nothing new on the cups or the pad (those powers show on the player, not the house). | |
+| PV6 | With fire showing, buy another dropper. | The new cup burns too, the same size as the others. | |
+| PV7 | Equip a production trophy with the Trophy Case **not** built (fresh plot). | No fire anywhere. Build the case → fire appears. | |
+| PV8 | With fire + ring showing, leave the game (or release the plot). | Cups, fire and ring all gone; the free plot looks normal. Another player who claims it sees no fire unless they have their own powers. | |
+| PV9 | 2 players (Clients and Servers): Player 1 has fire + ring. | Player 2 sees Player 1's burning cups and gold ring; Player 2's own plot has none. | |
+| PV10 | Rejoin (saved data) with a production + collect trophy equipped. | Once the house is restored, the cups burn and the pad ring is back. | |
+
 ## Trophy inventory UI
 
 Needs the Inventory + Powers server work merged (the `TrophyInventory` and
@@ -583,6 +620,24 @@ Device emulator (a phone in landscape).
 | TI12 | Bad data: set `TrophyInventory` to `"oops"`, then to `'{"Owned":[{"InstanceId":5}],"Equipped":["zzz"]}'`, and a record with Variant `"Nope"`. | No errors. Bad JSON / bad records = empty or skipped; unknown Equipped ids ignored; "Nope" shows as a grey "Mystery Caleb". | |
 | TI13 | Selected trophy disappears (publish a `TrophyInventory` without it). | Details go back to "Tap a trophy to see its power!"; no errors. | |
 | TI14 | Phone (Device emulator, e.g. iPhone landscape) and a big PC window. Open the panel while the feed pop-up is open, and during the Caleb event banners. | Panel fits the screen and stays readable (text scales, clamps); tiles are 3+ per row. The feed pop-up and event banners draw over the panel, not under it. | |
+
+## Trophy claim pop-up
+
+Claim trophies quickly with `DevCalebFastCycle = true` (don't commit it).
+Check on PC and with the Device emulator (a phone in landscape).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| TP1 | Saved: API access ON, Trophy Case built, fewer than 5 equipped. Feed, claim. | A big yellow pop-up pops in at the center with confetti and a spinning shine in the rarity color: "🏆 NEW TROPHY!" banner (rarity color), the trophy icon, its name, "⭐ RARITY" in the rarity color, its power in big text (e.g. "+75% WALK SPEED"), the description in quotes. It was auto-equipped, so it shows green "EQUIPPED ✓" (no EQUIP button) and "Its power is on!". No small notification. | |
+| TP2 | Unsaved: API access OFF. Feed, claim. | Same pop-up, plus "This trophy couldn't be saved this session (you keep it until you leave)." | |
+| TP3 | Case not built (plot without the Trophy Case). Claim. | Orange "Build your Trophy Case to use powers". Still shows EQUIPPED ✓ if a slot was free (it is equipped; powers start once the case is built). | |
+| TP4 | Case full: 5 trophies equipped, case built. Claim. | Green EQUIP button and "Equip it in your Trophy Case to get this power". Tap EQUIP → "..." briefly, then the server's reason in red ("All 5 active slots are full. Unequip a trophy first."); nothing changes; the pop-up stays open. | |
+| TP5 | Equip works: from TP4, unequip one trophy in 🏆 TROPHIES (or claim with a slot freed some other way), then tap EQUIP in the pop-up. If the pop-up already closed, claim again next round with 5 equipped, unequip one, then EQUIP. | "EQUIPPED ✓", then the pop-up closes about a second later. The trophy appears in the Trophy Case, the inventory panel shows its EQUIPPED badge and "ACTIVE TROPHIES" goes up, its power is listed. | |
+| TP6 | Close: tap CLOSE. Claim again another round and just wait. | CLOSE closes it at once. Untouched, it closes by itself after `TrophyPopupSeconds` (20 s). | |
+| TP7 | Spam EQUIP (case full so it fails). | One request at a time (button "..."), at most every `TrophyEquipCooldown`; no errors; any "Slow down a little!" shows in red. | |
+| TP8 | Phone (Device emulator, landscape) and a big PC window. | The pop-up fits the screen and is readable; EQUIP and CLOSE are big enough to tap (about 45 px tall or more). It draws over the trophy inventory and the event banners, under the feed pop-up. | |
+| TP9 | Already owned / not eligible: trigger the prompt again after claiming (or as a player who didn't feed, TR3). | Only the small notification ("already have this round's trophy" / "Only players who fed Caleb…"); no big pop-up. | |
+| TP10 | Respawn (Esc → Reset) with the pop-up open, then claim next round. | No duplicate GUI; the pop-up still works after respawn. | |
 
 ### Trophy definitions (rarities, powers, looks)
 
@@ -616,6 +671,6 @@ Player (Client or Server view). Until the Inventory UI exists, equip from the
 | TE8 | Migration of an old save: in a published test place with a Version 1 save (made before this change, or written via the command bar: `game:GetService("DataStoreService"):GetDataStore("SimpleTycoon_v1"):SetAsync("Player_<UserId>", {Version = 1, Purchases = {}, Trophies = {{Variant = "GoldenCaleb", EventId = "a", EarnedAt = 1}, ...6 more}})` while not in the game), join. | No warnings. Every trophy is kept with a new `InstanceId`; `Equipped` = the newest 5, newest first. Rejoin: the same InstanceIds (written at load). | |
 | TE9 | Case not built: own trophies, plot claimed but no Trophy Case. Then buy it. | Before: `CaseBuilt = false`, nothing displayed, no powers. After buying: `CaseBuilt = true`, equipped trophies appear, powers on. | |
 | TE10 | Release: leave with the case built (2 players: watch from Player 2). | The case and its trophies are removed with the plot; no errors. Player 1's powers stop (they're gone). | |
-| TE11 | Unsaved (API access OFF): claim, then unequip/equip it. | Notification says it couldn't be saved; `Saved = false`; the trophy is auto-equipped and can be unequipped/equipped this session. Leave + rejoin the same server: still owned and equipped. New server: gone. | |
+| TE11 | Unsaved (API access OFF): claim, then unequip/equip it. | The pop-up says it couldn't be saved this session; `Saved = false`; the trophy is auto-equipped and can be unequipped/equipped this session. Leave + rejoin the same server: still owned and equipped. New server: gone. | |
 | TE12 | Exploit: from the client, set your own `TrophyInventory` attribute or call `InvokeServer` with another player's id. | Client-side attribute changes affect only your own view; the server's state, the case, and powers don't change. | |
 
