@@ -10,6 +10,10 @@
 --   X bought    X's button disappears; a build's Parts appear (walls,
 --               stairs, second floor); the buttons of purchases whose After
 --               is X appear.
+--   Maxed       every dropper and build bought: the TrophyButtons of trophy
+--               builds not bought yet appear (garage, backyard spots). A
+--               bought trophy build's Parts appear like a build's, and
+--               their fires/particles/lights switch on.
 --
 -- Hidden parts cannot be touched (see PlotVisibility), so a hidden button or
 -- pad can never be used.
@@ -24,7 +28,26 @@ local PlotStages = {}
 -- CashTank is optional (only looks); the rest are required plot parts.
 local CLAIMED_AREA = { "OwnerSign", "Conveyor", "Collector", "CollectPad", "CashTank" }
 
-local function setVisible(plot: Model, names: { string }, visible: boolean)
+-- Turns on/off every fire, smoke, sparkles, particle emitter and light in
+-- a part or model. A trophy build's effects (e.g. the Hangout's FireCore
+-- Fire, Embers and FireLight) are saved off in the map, like the Trophy
+-- Case's CaseLight, so they burn only while the build is shown.
+local function setEffects(root: Instance, on: boolean)
+	for _, item in root:GetDescendants() do
+		if
+			item:IsA("Fire")
+			or item:IsA("Smoke")
+			or item:IsA("Sparkles")
+			or item:IsA("ParticleEmitter")
+			or item:IsA("Light")
+		then
+			(item :: any).Enabled = on
+		end
+	end
+end
+
+-- withEffects: also switch the parts' effects (trophy builds only).
+local function setVisible(plot: Model, names: { string }, visible: boolean, withEffects: boolean?)
 	for _, name in names do
 		local part = plot:FindFirstChild(name)
 		if part then
@@ -32,6 +55,9 @@ local function setVisible(plot: Model, names: { string }, visible: boolean)
 				PlotVisibility.Show(part)
 			else
 				PlotVisibility.Hide(part)
+			end
+			if withEffects then
+				setEffects(part, visible)
 			end
 		end
 	end
@@ -48,8 +74,8 @@ function PlotStages.ShowUnclaimed(plot: Model)
 	setVisible(plot, CLAIMED_AREA, false)
 	BuyButtons.HideAll(plot)
 	for _, purchase in Purchases.All() do
-		if purchase.Kind == "Build" then
-			setVisible(plot, purchase.Entry.Parts, false)
+		if purchase.Kind ~= "Dropper" then
+			setVisible(plot, purchase.Entry.Parts, false, purchase.Kind == "TrophyBuild")
 		end
 	end
 	PlotVisibility.Show(plot.ClaimPad)
@@ -67,10 +93,20 @@ end
 function PlotStages.ShowAfterPurchase(plot: Model, purchaseId: string)
 	BuyButtons.SetPurchased(plot, purchaseId)
 	local purchase = Purchases.Get(purchaseId)
-	if purchase and purchase.Kind == "Build" then
-		setVisible(plot, purchase.Entry.Parts, true)
+	if purchase and purchase.Kind ~= "Dropper" then
+		setVisible(plot, purchase.Entry.Parts, true, purchase.Kind == "TrophyBuild")
 	end
 	showUnlockedBy(plot, purchaseId)
+end
+
+-- The house is maxed: shows the buttons of the trophy builds not in
+-- `purchased` yet. Safe to call again (shown buttons stay shown).
+function PlotStages.ShowTrophyButtons(plot: Model, purchased: { [string]: boolean })
+	for _, purchase in Purchases.TrophyBuilds() do
+		if not purchased[purchase.Id] then
+			BuyButtons.Show(plot, purchase.Id)
+		end
+	end
 end
 
 return PlotStages

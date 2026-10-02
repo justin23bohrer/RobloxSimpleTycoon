@@ -65,6 +65,7 @@ next, more expensive dropper's button has appeared, so they save up for it.
   | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cookie jar, and the **Dropper 1 / FREE!** button with its yellow spot. | The Claim pad. |
   | Dropper N bought | The dropper at its spot, and the next dropper's button and yellow spot. | Button N and its yellow spot. |
   | Dropper 4 bought | Nothing new (all droppers bought). | Button 4. |
+  | House maxed (every dropper and build) | The gold/purple trophy buttons: Garage, Pool, Path, Fire Pit Hangout (see "Garage + Backyard"). | — |
 
 - When the player leaves, the plot is released and reset: everything hides
   again and the Claim pad comes back for the next player.
@@ -96,6 +97,10 @@ server refuses to sell anything out of order (`After` in `Config`).
 | Shelves + TV (2nd floor) | orange `BuildButton7` | 18000 | — |
 | Mini Fridge (2nd floor) | orange `BuildButton8` | 8000 | — |
 | Ninja Kitchen (2nd floor) | orange `BuildButton9` | 10000 | — |
+| Garage (house maxed) | gold/purple `TrophyButton1` | FREE, needs 🏆 1 Caleb Trophy | — |
+| Pool (house maxed) | gold/purple `TrophyButton2` | FREE, needs 🏆 5 Caleb Trophies | — |
+| Path (house maxed) | gold/purple `TrophyButton3` | FREE, needs 🏆 5 Caleb Trophies | — |
+| Fire Pit Hangout (house maxed) | gold/purple `TrophyButton4` | FREE, needs 🏆 5 Caleb Trophies | — |
 
 - The owner buys something by stepping on its button. The label shows the
   name with the price under it in yellow, e.g. "Dropper 2 / 🍪 300",
@@ -180,6 +185,44 @@ walls both Stairs and the Trophy Case are offered).
     not the JSON). Saved and restored like the other builds.
 - Built parts are hidden (invisible, can't be touched or walked on) until
   bought.
+
+## Garage + Backyard (approved by the user 2026-10-02)
+
+Rewards for Caleb Trophy collectors once the house is done.
+
+- **When:** the moment the house is **maxed** (every dropper and every
+  build in the chain above, furniture and Trophy Case included), four
+  gold/purple trophy buttons appear. They need no cookies.
+- **Garage** (`TrophyButton1`, needs **1** Caleb Trophy): on the house's
+  right side (the stairs side), outside the base: a garage with a parked
+  white VW ID.4.
+- **Backyard** behind the house, inside a fence: **Pool**, **Path** and
+  **Fire Pit Hangout** (`TrophyButton2..4`, each needs **5** Caleb
+  Trophies), in any order. Their buttons are inside the backyard, next to
+  where each build appears.
+- **Buying:** the owner steps on a trophy button. If they **own** at least
+  that many Caleb Trophies (everything in their trophy inventory, equipped
+  or not), it is built for free and the build sound plays. Trophies are
+  **not** spent. Too few: the "can't afford" sound plays and nothing
+  happens. The server counts the trophies; the client is never trusted.
+  The label reads e.g. "Garage" over a gold "🏆 1 Caleb Trophy".
+- Saved like the other builds and rebuilt (after the house) when the owner
+  claims a plot again.
+- **Back door + fence (the teaser):** the backyard fence is always there,
+  on every plot, claimed or not. The house's back wall (from Build Walls)
+  has a **locked back door** with a sign facing into the house: "🔒
+  BACKYARD" over "🏆 x/5 Caleb Trophies" (x = the owner's trophies;
+  unclaimed: "🏆 5 Caleb Trophies").
+- **Nobody** (owner or visitor) can be in a plot's backyard until that
+  plot's **owner** owns 5 Caleb Trophies. Then the door swings open, the
+  sign says "BACKYARD OPEN!", and anyone may walk in (like the house). An
+  unclaimed plot's backyard is locked. If the owner leaves, it locks again.
+- Jump powers can clear the fence, so the server also checks about 4 times
+  a second: anyone inside a locked backyard is put back inside the house,
+  in front of the back door, standing up. This also works before the walls
+  are built (no door yet).
+- Everything is decoration: pool water you can stand in, a parked car, a
+  glowing fire pit. No swimming or driving.
 
 ## Droppers
 

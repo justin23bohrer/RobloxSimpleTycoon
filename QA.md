@@ -818,6 +818,34 @@ before committing). Equip/unequip with the Inventory UI.
 | TC8 | All 4 plots: claim Plot2, Plot3, Plot4 in turn (2 players for two at once). | Each house has the identical case against its own back wall, trophies and plaques facing into the room, names readable the right way round. | |
 | TC9 | Nothing overlaps: case built, walk around it; build the 2nd floor and the bed above. | The case stays inside its old footprint (x −12.4..12.4, z −74.7..−69.55, y 2..16.6 in Plot1): the plaques stick out only ~0.2 from the base; it does not touch the conveyor, collector, cookie jar/Collect pad, stairs, `BuildButton4`, the doorway, or the 2nd floor (the sign top stays below y 17). Output has no "missing TrophySlotN/NameplateN" warnings. | |
 
+## Garage + Backyard
+
+Needs the garage and backyard map parts (other workers' PRs). Quick setup in
+Studio: `Config.DevUnlimitedCash = true` to max the house fast; trophies
+from real claims, or `Config.DevAllTrophies = true` for "many" (set both back
+to **false** before committing). For 0 / 1 / 4 / 5 trophies, use a test save
+or claim trophies one at a time (`DevCalebFastCycle = true`). Count = owned
+trophies (inventory), equipped or not.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| GB1 | Maxed reveal: buy everything except one item (e.g. Mini Fridge), look at the garage side and the backyard; then buy the last item. | No trophy buttons before; the moment the last dropper/build is bought, all four gold/purple buttons appear (Garage in front of the garage; Pool, Path, Fire Pit Hangout inside the backyard). No Garage/Pool/Path/Hangout model shows yet. | |
+| GB2 | Labels. | "Garage" over gold "🏆 1 Caleb Trophy"; "Pool", "Path", "Fire Pit Hangout" each over gold "🏆 5 Caleb Trophies". No cookie price. | |
+| GB3 | 0 trophies, house maxed: step on the Garage button. | "Can't afford" sound (only you hear it, at most every 1.5 s); nothing built; cookies unchanged. | |
+| GB4 | 1 trophy (not equipped): step on Garage. | Garage + white VW ID.4 appear, build sound plays, button disappears. Cookies **unchanged**; you still own the trophy. | |
+| GB5 | 1–4 trophies, house maxed: try to reach the Pool / Path / Hangout buttons (they're inside the backyard). | You can't: the backyard is locked and you're put back in the house (GB9), so nothing is built. The server also refuses them below 5 trophies (can't-afford sound if you somehow touch one). | |
+| GB6 | 5 trophies: buy Pool, Hangout, Path in that (any) order. | Each is free, plays the build sound, its button disappears, its build appears. The fire pit's flames, embers and light show only once Hangout is bought (none while hidden). Trophies still owned. | |
+| GB7 | Door + sign, locked: Walls built, owner owns 0, 3, then 5 trophies (claim one while watching). | Back door closed and solid; sign (inside the house) reads "🔒 BACKYARD" + "🏆 0/5 Caleb Trophies", then "3/5". At 5 the door swings open into the backyard and the sign says "BACKYARD OPEN!" without rejoining. | |
+| GB8 | Unclaimed plot: look at its fence, then walk/jump into its backyard. | The fence shows on every plot, claimed or not. You're put back by the house's back wall (no walls or door shown on an unclaimed plot). On a claimed plot whose owner has < 5, the sign reads "x/5"; once released it would read "🏆 5 Caleb Trophies" (check in Server view: `BackDoor.DoorSign` TextLabel). | |
+| GB9 | Push-out with jump powers: owner with < 5 trophies but jump trophies equipped (big jump, double jump). Jump over the fence from outside, from the 2nd floor, and over the roof. | Within about a quarter second you are placed just inside the house in front of the back door, standing upright, facing into the house, no fall damage, no getting stuck in a wall or under the floor. Also works before the Walls are built. | |
+| GB10 | Open backyard: owner with ≥ 5 trophies. Walk through the back door; Player 2 (visitor) does the same. | Both can walk in freely through the open door and stay; nobody is pushed out. | |
+| GB11 | Locks again: owner (≥ 5) and Player 2 are in the backyard; owner leaves. | The plot resets; within a moment Player 2 is put back by the house spot; the door is closed again (hidden with the walls). | |
+| GB12 | Save/restore: buy Garage and Pool, leave and rejoin (saving on), claim a plot. | The house rebuilds, then the trophy buttons appear and Garage + Pool come back built (no sounds); Path and Hangout still have buttons. | |
+| GB13 | Not maxed: in Server view make `TrophyButton1` visible/touchable on a plot with the house not maxed, step on it with trophies. | Nothing is built (the server checks the house is maxed). | |
+| GB14 | Turned plots: repeat GB1, GB7 and GB9 on Plots 2, 3 and 4. | Buttons, door, sign and push-out work the same on every plot: always put back inside that plot's house, in front of its back door, facing into the house. | |
+| GB15 | 2 players: Player 2 (visitor, 5+ trophies of their own) tries to enter Player 1's backyard while Player 1 owns < 5. Player 2 also steps on Player 1's trophy buttons. | Player 2 is pushed out (it's the owner's count that matters). Player 1's buttons do nothing for Player 2. | |
+| GB16 | Missing map parts (on a branch without the garage/backyard maps). | The game runs normally; Output has one "TycoonService: … has no …" and one "BackyardGate: … has no BackyardZone" warning per plot, no errors. | |
+
 ## Tycoon sounds
 
 Upload the five WAVs from `tools/audio/out/` and paste the ids into

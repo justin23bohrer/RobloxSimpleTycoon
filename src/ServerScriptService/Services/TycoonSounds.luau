@@ -4,10 +4,11 @@
 -- (a purchase went through, a payout was paid) and never decides or changes
 -- anything.
 --
--- * Purchase / PurchaseBuild: 3D at the bought button, heard by players
---   nearby. Played only from TycoonService.TryPurchase, never when a saved
---   house is restored.
--- * CantAfford: only for the player who touched the button, through the
+-- * Purchase (droppers) / PurchaseBuild (builds and trophy builds): 3D at
+--   the bought button, heard by players nearby. Played only from
+--   TycoonService.TryPurchase, never when a saved house is restored.
+-- * CantAfford (too few cookies, or too few Caleb Trophies for a trophy
+--   build): only for the player who touched the button, through the
 --   CantAfford RemoteEvent (CantAffordSound.client plays it), at most once per
 --   Config.TycoonCantAffordSoundInterval per player per button.
 -- * Collect: 3D at the CollectPad on payout; pitch rises a little for bigger
@@ -121,7 +122,7 @@ function TycoonSounds.Purchased(plot: Model, purchaseId: string)
 	if not sounds or not purchase then
 		return
 	end
-	local sound = if purchase.Kind == "Build" then sounds.PurchaseBuild or sounds.Purchase else sounds.Purchase
+	local sound = if purchase.Kind ~= "Dropper" then sounds.PurchaseBuild or sounds.Purchase else sounds.Purchase
 	if not sound then
 		return
 	end
