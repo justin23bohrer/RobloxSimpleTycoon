@@ -80,10 +80,10 @@ funny celebration with collectable cookies, then straight into the existing
 No completion screen, no leaderboard, no mini-events, no trophy changes.
 
 - [x] Contract: `Shared/CookieParty.luau`, `Config.CookieParty*`, remotes, architecture section; Celebration is 60 s even in the fast dev cycle (lead).
-- [ ] Party server: `CookiePartyService` spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (QA PS*)
-- [x] Party cookies (client): pooled collectable cookies, collect pop / floating numbers / sparkles / sounds / earnings counter, rain ramps up with the phases. `CookiePartyCookies.client` + `CookiePartyLook` / `Motion` / `Feedback` / `Numbers` / `HUD`; `CookieRain` ramp. (code done; Studio test pending: QA PK1–PK16; needs the party server)
+- [x] Party server: `CookiePartyService` (+ `CookiePartySpawner`) spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (code done; Studio test pending: QA PS1–PS14)
+- [x] Party cookies (client): pooled collectable cookies, collect pop / floating numbers / sparkles / sounds / earnings counter, rain ramps up with the phases. `CookiePartyCookies.client` + `CookiePartyLook` / `Motion` / `Feedback` / `Numbers` / `HUD`; `CookieRain` ramp. (code done; Studio test pending: QA PK1–PK16)
 - [ ] Caleb party: dance energy ramps per phase, throws and spits cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. (QA CD*)
-- [ ] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX. (QA PX*)
+- [x] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX; original party SFX + music loop in `tools/audio/`. (code done; Studio test pending: QA PX1–PX14)
 - [ ] Upload the new party sounds and a music track; paste ids into `Config.CookiePartySounds` (user).
 
 ## Post-MVP (needs approval)
