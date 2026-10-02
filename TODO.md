@@ -118,4 +118,5 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Trophy claim pop-up: what it does + EQUIP / CLOSE (requested by the user 2026-10-01). `TrophyClaimPopup` + `TrophyClaimPopupUI`, `InstanceId` in `CalebTrophyNotice`. (code done; Studio test pending: QA TP1–TP10)
 - [x] Bigger walk speed trophies (+35%..+75%) and glowing feet (requested by the user 2026-10-01). (code done; Studio test pending: QA SG1–SG10)
 - [x] Trophy powers: no stat caps, duplicates stack (requested by the user 2026-10-02). (code done; Studio test pending: QA ST1–ST8)
+- [x] Studio test switch DevAllTrophies: every trophy × N, session only (requested by the user 2026-10-02). (code done; Studio test pending: QA DT1–DT7)
 

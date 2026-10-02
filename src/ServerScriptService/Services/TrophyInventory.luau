@@ -4,8 +4,9 @@
 -- TrophyService decides when to refresh the case and powers.
 --
 -- * Owned = saved trophies (DataService) + session-only ones (claimed while
---   the player's data was not loaded; kept here by UserId until this server
---   closes, never written).
+--   the player's data was not loaded, or Studio-only DevTrophies; kept here
+--   by UserId until this server closes, never written). Session-only ones
+--   can sit alongside a loaded save.
 -- * Equipped = DataService's saved list, then equipped session-only ones,
 --   at most Config.TrophyActiveSlots in all. Session-only trophies can be
 --   equipped like saved ones; that part of the list is not saved either.
@@ -89,13 +90,13 @@ function TrophyInventory.GetEquippedRecords(player: Player): { TrophyRecord }
 	return records
 end
 
--- Keeps a trophy claimed while the player's data is not loaded, and equips
--- it if an active slot is free (like DataService.AddTrophy).
-function TrophyInventory.AddSessionTrophy(player: Player, record: TrophyRecord)
+-- Keeps a session-only trophy (never saved), and equips it if an active
+-- slot is free (like DataService.AddTrophy) unless autoEquip is false.
+function TrophyInventory.AddSessionTrophy(player: Player, record: TrophyRecord, autoEquip: boolean?)
 	local userId = player.UserId
 	sessionTrophies[userId] = sessionTrophies[userId] or {}
 	table.insert(sessionTrophies[userId], record)
-	if #TrophyInventory.GetEquipped(player) < Config.TrophyActiveSlots then
+	if autoEquip ~= false and #TrophyInventory.GetEquipped(player) < Config.TrophyActiveSlots then
 		sessionEquipped[userId] = sessionEquipped[userId] or {}
 		table.insert(sessionEquipped[userId], record.InstanceId)
 	end
