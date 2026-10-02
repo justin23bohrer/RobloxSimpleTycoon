@@ -18,7 +18,7 @@ local TrophyService = require(Services.TrophyService)
 local TycoonService = require(Services.TycoonService)
 
 TycoonService.Start()
-BackyardGate.Start() -- backyard lock (door, sign, push-out); after TycoonService
+BackyardGate.Start() -- back door lock (door, sign); after TycoonService
 CarService.Start() -- drivable garage cars; after TycoonService
 local statue = StatueService.Start()
 if statue then

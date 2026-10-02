@@ -129,8 +129,8 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 ## Garage + Backyard (approved by the user 2026-10-02)
 
 After the house is maxed: a garage (1 Caleb Trophy, `TrophyButton1`) on the
-house's right side, and a backyard with 3 spots (5 trophies each,
-`TrophyButton2`–`4`) behind the house. Decoration only.
+house's right side. With the Walls: a backyard with 3 spots (5 trophies
+each, `TrophyButton2`–`4`) behind the house. Decoration only.
 
 Contract: ARCHITECTURE.md "Garage + Backyard (contract)". Three workers in parallel (garage model, backyard model, gameplay logic).
 
@@ -140,3 +140,4 @@ Contract: ARCHITECTURE.md "Garage + Backyard (contract)". Three workers in paral
 - [x] Drivable car (requested by the user 2026-10-02): `CarService` + `CarBuild` + `CarSeats`. Once the Garage is built, the plot's car is a physics car built at runtime from the `GarageCar` look (welded body, 4 motor wheels, servo-steered front wheels; no map changes). Only the owner drives (VehicleSeat, server ejects others); one passenger seat for anyone (prompts "Drive"/"Ride"). The driver gets network ownership while driving. Off the map edge / below `CarFallY`: the car re-parks in its garage and riders respawn at their plot's spawn; flipped + still re-parks. Removed on plot reset/leave. Knobs in `Config` (`Car*`). (code done; Studio test + physics tuning pending: QA CAR1–CAR14)
 - [x] Car exit fix (reported by the user 2026-10-02: jumping out left you under the car): `CarSeats.placeBeside` now waits a frame, raycasts to the ground beside the door clear of the car's measured width, moves the body while the server owns it, and re-checks after `Config.CarExitSettleTime`. Knobs `CarExit*`. (code done; Studio test pending: QA CAR5, CAR5b, CAR5c)
 - [x] Walk-in pool (requested by the user 2026-10-02): the pool is a raised basin (coping 3.6 studs above the grass, because the ground is one shared slab) with solid walls and floor, waist-deep walk-through water, and steps up to the coping and back down inside in the front +X corner; Pool pad moved to (−3, −95) to make room for the outside steps. No splash effect (no fitting sound in Config). (built; Studio test pending: QA BY5, WP1–WP6)
+- [x] Backyard lock rework (requested by the user 2026-10-02): `BackyardFence` and the backyard pads (`TrophyButton2`–`4`, `After = "Walls"` in `Config.TrophyBuilds`) appear with the Walls build together with the `BackDoor` (garage pad still waits for the maxed house); no push-out, only the back door locks (`BackyardZone` and `BackyardCheckInterval`/`BackyardPushOut*` removed); door sign "🔒 Unlock this door once you have 5 Caleb Trophies" + small "🏆 x/5"; pads say "Must have N Caleb Trophies". (code done; Studio test pending: QA GB1–GB19, BY2, BY3, BY9)

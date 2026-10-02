@@ -23,14 +23,15 @@ looking out into the yard ("left" is -X):
                  and 5 cartoony outdoor chairs around it
   BackyardFence  a white picket fence (about 8 studs tall) on the yard's
                  left, right and back sides, meeting the house's back corners
-  BackyardZone   an invisible box covering the inside of the fence, from the
-                 ground up to y = 80 (the server pushes players out of a
-                 locked backyard through its house-side face, z = -76)
+                 (looks only: the game shows it with the Walls build and
+                 never keeps anyone out of the yard)
   BackDoor       the door in the house's back wall (the opening itself is cut
                  by tools/house/generate_house.py, BACK_DOOR_* there): the
                  Door panel (its window, panels and knobs are child parts of
-                 Door), the DoorSign above it on the inside, an outside
-                 casing, a little awning, and a stone step down to the grass
+                 Door), the DoorSign above it on the inside (a TextLabel and
+                 a smaller ProgressLabel, both rewritten by the game), an
+                 outside casing, a little awning, and a stone step down to
+                 the grass
   TrophyButton2  gold pad by the pool        (builds Pool)
   TrophyButton3  gold pad by the path start  (builds BackyardPath)
   TrophyButton4  gold pad at the patio's front-left corner (builds Hangout)
@@ -38,12 +39,13 @@ looking out into the yard ("left" is -X):
 The pads copy BuildButton1's structure (pad, <Name>Ring, Label billboard with
 one TextLabel) in gold with a purple ring and panel. They stand on the grass,
 so they can be reached from the back door before anything is built. The game
-code decides what is shown when (Pool, BackyardPath, Hangout and the pads are
-hidden until their time; BackDoor appears with the walls); here they are
+code decides what is shown when (BackDoor, BackyardFence and the pads appear
+with the walls; Pool, BackyardPath and Hangout when built); here they are
 plain visible parts.
 
 Only the instances named in MANAGED are rewritten (in place, or appended if
-missing); every other child of the plot is left exactly as it is, so this can
+missing), and those named in REMOVED (BackyardZone, the old push-out box) are
+deleted; every other child of the plot is left exactly as it is, so this can
 be re-run any time. Edit the numbers here and re-run instead of hand-editing
 the JSON. Plain parts only (no meshes, decals, or Terrain).
 
@@ -72,7 +74,6 @@ BACK_DOOR_TOP = 12
 WALL_INNER = HOUSE_BACK + 1  # inside face of the 1-stud back wall
 
 FENCE_HEIGHT = 8
-ZONE_TOP = 80
 
 IDENTITY = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 PAD_ROT = [[0, -1, 0], [1, 0, 0], [0, 0, 1]]  # a Cylinder with its round face up
@@ -118,9 +119,10 @@ PANEL_COLOR = [150 / 255, 70 / 255, 230 / 255]  # purple, like the owner sign
 DARK = [0.157, 0.11, 0.078]  # the signs' dark outline color
 
 MANAGED = [
-    "Pool", "BackyardPath", "Hangout", "BackyardFence", "BackyardZone",
+    "Pool", "BackyardPath", "Hangout", "BackyardFence",
     "TrophyButton2", "TrophyButton3", "TrophyButton4", "BackDoor",
 ]
+REMOVED = ["BackyardZone"]  # no longer used by the game (no push-out)
 
 
 # --- helpers ----------------------------------------------------------------
@@ -216,7 +218,7 @@ def stroke(thickness, mode):
     }
 
 
-def text_label(text, size, stroke_px, rich):
+def text_label(text, size, stroke_px, rich, name="TextLabel", y=0.5):
     props = {
         "Text": text,
         "Font": "FredokaOne",
@@ -225,12 +227,12 @@ def text_label(text, size, stroke_px, rich):
         "TextStrokeTransparency": 1,
         "BackgroundTransparency": 1,
         "AnchorPoint": [0.5, 0.5],
-        "Position": {"UDim2": [[0.5, 0], [0.5, 0]]},
+        "Position": {"UDim2": [[0.5, 0], [y, 0]]},
         "Size": {"UDim2": [[size[0], 0], [size[1], 0]]},
     }
     if rich:
         props["RichText"] = True
-    return {"name": "TextLabel", "className": "TextLabel", "properties": props,
+    return {"name": name, "className": "TextLabel", "properties": props,
             "children": [stroke(stroke_px, "Contextual")]}
 
 
@@ -612,15 +614,6 @@ def backyard_fence():
     return model("BackyardFence", parts)
 
 
-def backyard_zone():
-    """Invisible box covering the inside of the fence, from the ground to
-    ZONE_TOP. Its +Z face (z = HOUSE_BACK) is the house side, the face
-    nearest the Base's center."""
-    z0, z1 = BACK_FENCE_IN, HOUSE_BACK
-    return part("BackyardZone", (2 * FENCE_IN, ZONE_TOP - G, z1 - z0), (0, (G + ZONE_TOP) / 2, (z0 + z1) / 2), (255, 90, 90),
-                collide=False, touch=False, query=False, transparency=1)
-
-
 # --- back door ----------------------------------------------------------------
 
 def back_door():
@@ -647,8 +640,11 @@ def back_door():
     door = part("Door", (w, h, 0.4), (x, yc, zc), DOOR_WOOD, "Wood", children=door_looks)
 
     # Sign above the door on the inside, facing into the house (its Back
-    # face points +Z, into the room).
-    sign_w, sign_h = 8, 2.6
+    # face points +Z, into the room). The game rewrites both labels
+    # (BackyardDoor.luau): the lock message on top (two lines, TextScaled)
+    # and the owner's "🏆 x/5" smaller under it. Tall enough for that, still
+    # under the 2nd floor slab (y 17).
+    sign_w, sign_h = 8, 3.6
     sign_y = BACK_DOOR_TOP + 0.4 + sign_h / 2
     sign = part("DoorSign", (sign_w, sign_h, 0.3), (x, sign_y, WALL_INNER + 0.15), GOLD, collide=False, query=False, children=[{
         "name": "SignGui",
@@ -667,7 +663,8 @@ def back_door():
             "children": [
                 {"name": "UICorner", "className": "UICorner", "properties": {"CornerRadius": {"UDim": [0.3, 0]}}},
                 stroke(8, "Border"),
-                text_label("🔒 BACKYARD", (0.88, 0.7), 5, False),
+                text_label("🔒 Unlock this door once you have 5 Caleb Trophies", (0.9, 0.56), 4, True, y=0.36),
+                text_label("", (0.5, 0.26), 4, True, name="ProgressLabel", y=0.8),
             ],
         }],
     }])
@@ -708,13 +705,13 @@ def main():
         "BackyardPath": backyard_path(),
         "Hangout": hangout(),
         "BackyardFence": backyard_fence(),
-        "BackyardZone": backyard_zone(),
         "BackDoor": back_door(),
     }
     for index, _, x, z, text in PADS:
         new[f"TrophyButton{index}"] = pad(index, x, z, text)
 
     children = plot["children"]
+    children[:] = [c for c in children if c.get("name") not in REMOVED]
     for name in MANAGED:
         at = [i for i, c in enumerate(children) if c.get("name") == name]
         if at:

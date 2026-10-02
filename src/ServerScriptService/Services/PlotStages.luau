@@ -10,10 +10,13 @@
 --   X bought    X's button disappears; a build's Parts appear (walls,
 --               stairs, second floor); the buttons of purchases whose After
 --               is X appear.
+--   Walls       (a build) also shows the BackDoor and BackyardFence, and
+--               the backyard TrophyButtons (trophy builds with After =
+--               "Walls": pool, path, hangout) appear.
 --   Maxed       every dropper and build bought: the TrophyButtons of trophy
---               builds not bought yet appear (garage, backyard spots). A
---               bought trophy build's Parts appear like a build's, and
---               their fires/particles/lights switch on.
+--               builds with no After (garage) appear. A bought trophy
+--               build's Parts appear like a build's, and their
+--               fires/particles/lights switch on.
 --
 -- Hidden parts cannot be touched (see PlotVisibility), so a hidden button or
 -- pad can never be used.
@@ -99,11 +102,12 @@ function PlotStages.ShowAfterPurchase(plot: Model, purchaseId: string)
 	showUnlockedBy(plot, purchaseId)
 end
 
--- The house is maxed: shows the buttons of the trophy builds not in
--- `purchased` yet. Safe to call again (shown buttons stay shown).
+-- Shows the buttons of the trophy builds that are unlocked
+-- (Purchases.IsUnlocked) and not in `purchased` yet. Safe to call again
+-- (shown buttons stay shown).
 function PlotStages.ShowTrophyButtons(plot: Model, purchased: { [string]: boolean })
 	for _, purchase in Purchases.TrophyBuilds() do
-		if not purchased[purchase.Id] then
+		if not purchased[purchase.Id] and Purchases.IsUnlocked(purchase, purchased) then
 			BuyButtons.Show(plot, purchase.Id)
 		end
 	end

@@ -10,8 +10,9 @@
 -- Hidden buttons cannot be touched.
 --
 -- Label text ("Dropper N" or the build's Name, over a yellow "🍪 Cost", or
--- "FREE!"; a trophy build's Name over a gold "🏆 N Caleb Trophies") is
--- built from Config so prices live in one place. A missing button (e.g. a
+-- "FREE!"; a trophy build's Name over a gold "Must have N Caleb Trophies":
+-- trophies are a requirement, never spent) is built from Config so prices
+-- live in one place. A missing button (e.g. a
 -- map without the trophy buttons yet) is skipped.
 
 local Purchases = require(script.Parent.Purchases)
@@ -52,12 +53,13 @@ local function getParts(plot: Model, purchase: Purchases.Purchase): { Instance }
 	return parts
 end
 
--- Two lines: name, then the price in yellow (the label is RichText).
+-- Two lines: name, then the price in yellow, or a trophy build's "Must have
+-- ..." requirement in gold (the label is RichText).
 local function labelText(purchase: Purchases.Purchase): string
 	local entry = purchase.Entry
 	if purchase.Kind == "TrophyBuild" then
 		local trophies = if entry.Trophies == 1 then "1 Caleb Trophy" else `{entry.Trophies} Caleb Trophies`
-		return `{entry.Name}\n<font color="{TROPHY_COLOR}">🏆 {trophies}</font>`
+		return `{entry.Name}\n<font color="{TROPHY_COLOR}">Must have {trophies}</font>`
 	end
 	local name = if purchase.Kind == "Dropper" then `Dropper {purchase.Index}` else entry.Name
 	local price = if entry.Cost == 0 then "FREE!" else `🍪 {entry.Cost}`

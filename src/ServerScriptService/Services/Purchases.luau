@@ -9,8 +9,9 @@
 -- to buy it (BuyButtonN for droppers, BuildButtonN for builds, TrophyButtonN
 -- for trophy builds). Droppers and builds make up the house: each unlocks
 -- when the purchase named in its Config After field is bought (nil = on
--- claim). Trophy builds have no After: they all unlock once the house is
--- maxed (IsHouseMaxed).
+-- claim). A trophy build unlocks when the house purchase named in its After
+-- is bought, or, with no After, once the house is maxed (IsHouseMaxed). See
+-- IsUnlocked.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -52,6 +53,8 @@ for _, purchase in all do
 	local after = purchase.Entry.After
 	if after ~= nil and not byId[after] then
 		warn(`Purchases: '{purchase.Id}' has After = '{after}', which is not a purchase id, so it can never unlock`)
+	elseif after ~= nil and purchase.Kind == "TrophyBuild" and byId[after].Kind == "TrophyBuild" then
+		warn(`Purchases: '{purchase.Id}' has After = '{after}', a trophy build; a trophy build's After must be a house purchase`)
 	end
 end
 
@@ -71,7 +74,8 @@ function Purchases.IsHouse(purchase: Purchase): boolean
 end
 
 -- The house purchases that unlock when `id` is bought (nil = when the plot
--- is claimed). Never trophy builds: those unlock with IsHouseMaxed.
+-- is claimed). Never trophy builds: see IsUnlocked and
+-- PlotStages.ShowTrophyButtons.
 function Purchases.UnlockedBy(id: string?): { Purchase }
 	local unlocked = {}
 	for _, purchase in all do
@@ -90,6 +94,18 @@ function Purchases.IsHouseMaxed(purchased: { [string]: boolean }): boolean
 		end
 	end
 	return true
+end
+
+-- True if the purchase's button may be shown and bought, given what is in
+-- `purchased` (purchase id -> true): its After is bought (house purchases
+-- with no After: always); a trophy build with no After needs the house
+-- maxed.
+function Purchases.IsUnlocked(purchase: Purchase, purchased: { [string]: boolean }): boolean
+	local after = purchase.Entry.After
+	if after ~= nil then
+		return purchased[after] == true
+	end
+	return Purchases.IsHouse(purchase) or Purchases.IsHouseMaxed(purchased)
 end
 
 -- The trophy builds (Config.TrophyBuilds order).
