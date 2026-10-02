@@ -267,6 +267,10 @@ warns if it does not.
 | ------ | ---- | --------- | ---------- | ------------------------- | ------- |
 | `FeedStatue` | RemoteFunction | client → server (`InvokeServer`) | `StatueService` | `amount`: cookies to feed | `(true, cookiesEaten)` or `(false, reason)` |
 | `TrophyEquip` | RemoteFunction | client → server (`InvokeServer`) | `TrophyService` (`TrophyInventory.HandleRequest`) | `action`: `"Equip"`/`"Unequip"`, `instanceId`: string ≤ 64 | `(true)` or `(false, reason)` |
+| `CookiePartyCollect` | RemoteEvent | client → server | `CookiePartyService` | `id`: number (a cookie id the server sent) | — (answer is `CookiePartyCollected` to everyone) |
+| `CookiePartySpawn` | RemoteEvent | server → all clients | `CookiePartyCookies.client` | `{ CookieParty.Spawn }` batch | — |
+| `CookiePartyCollected` | RemoteEvent | server → all clients | `CookiePartyCookies.client` | `(id, userId, value, cookieType)`; `userId` 0 = expired/removed | — |
+| `CookiePartyFinale` | RemoteEvent | server → each player | `CalebEventUI.client` / `CalebAudio.client` | `(reward)` the final reward just paid | — |
 
 `FeedStatue` exists because typing an amount in a UI is something the server
 cannot see. The server re-checks everything (type, whole number, ≥ 1,
@@ -504,8 +508,79 @@ All presentation is client-side and driven only by the attributes above:
 message, countdowns, trophy prompt text, screen VFX), `CookieRain.client`,
 `CalebAudio.client`, `CalebLeaderboard.client` (podium board),
 `TrophyPrompt.client` (claim prompt visibility + claim messages), and the
-existing `StatueBar.client`. No new RemoteEvents for the event: state is
-attributes; the trophy claim uses a server `ProximityPrompt`.
+existing `StatueBar.client`. The Caleb Full Event itself uses no RemoteEvents (state is
+attributes; the trophy claim uses a server `ProximityPrompt`); only the Cookie Party's collectable cookies do (see "Cookie Party (contract)").
+
+## Cookie Party (contract)
+
+Approved by the user 2026-10-01. Built by several agents in parallel: **this
+section is the contract**; names are fixed (change only with the lead's OK,
+and update this section in the same PR). Names, phases and helpers are in
+`ReplicatedStorage/Shared/CookieParty.luau`; numbers in `Config.CookieParty*`.
+
+User rules: the party is **exactly 60 seconds** (`CalebState` =
+`Celebration`, `Config.CalebCelebrationSeconds`; also in the fast dev cycle).
+It ends with one big finale, then goes straight to the existing 2-minute
+`TrophyClaim`. No completion screen, no leaderboard, no mini-events, no
+changes to the trophy system or the `CalebCycle` states.
+
+### Phases (seconds left in `Celebration`)
+
+| Phase | Seconds left | What happens |
+| ----- | ------------ | ------------ |
+| `Start` | 60–40 | Caleb celebrates, rain + collectable cookies begin, music starts |
+| `Hype` | 40–20 | more and more valuable cookies, Caleb more energetic, music faster |
+| `Frenzy` | 20–10 | heavy rain, lots of Golden, Caleb goes crazy, stronger VFX |
+| `Countdown` | 10–0 | big 10…1 countdown, everything peaks, Caleb's "I'M FULL!" wind-up |
+| finale | 0 | server pays `CookiePartyFinalReward`; on `Celebration → TrophyClaim` clients play the explosion (Caleb is hidden by StatueService at that moment, so the explosion covers it) |
+
+`CookieParty.GetPhase(timeLeft)`, `CookieParty.Intensity(timeLeft)` (0 → 1),
+`CookieParty.TimeLeft(statue)`. Everyone derives the phase from
+`CalebStateEndsAt`, so all clients and the server agree and late joiners
+land in the right phase.
+
+### Collectable cookies (server-authoritative, no server parts)
+
+* `CookiePartyService` (server) is the only thing that creates collectable
+  cookies. During `Celebration` it picks, per phase, how many to spawn
+  (`CookiePartySpawnPerSecond` + `CookiePartySpawnPerExtraPlayer`, at most
+  `CookiePartyMaxAlive` alive), their type (`CookiePartyTypes[t].Weights`),
+  where they land (ground spot found by a server raycast; near players or
+  anywhere in `CookiePartySpawnRadius`), whether Caleb throws them
+  (`CookiePartyFromCalebShare`), `LandAt = now + CookiePartyFallSeconds`, and
+  `ExpiresAt = LandAt + CookiePartyLifetime`. It keeps them in a server table
+  only and sends them in batches with `CookiePartySpawn`.
+* Clients draw them (pooled, client-local parts) and, when their character
+  gets close, fire `CookiePartyCollect(id)`.
+* The server accepts a collect only if: state is `Celebration`; the id is
+  alive (not collected/expired); `now >= LandAt - 0.3` and
+  `now <= ExpiresAt + 0.5`; the player's `HumanoidRootPart` is within the
+  type's `CollectRadius` (+2 studs lag slack, horizontal) and 25 studs
+  vertically of `Position`; the player is under
+  `CookiePartyMaxCollectsPerSecond`. First valid collect wins. Then
+  `EconomyService.AddCash(player, value)`, the player's
+  `CookiePartyEarned` / `CookiePartyCount` attributes go up, and
+  `CookiePartyCollected(id, userId, value, type)` goes to everyone (expired
+  cookies: `(id, 0, 0, type)`, so clients can drop them).
+* At party start all players' `CookiePartyEarned` / `CookiePartyCount` are
+  set to 0. When the party ends (`CalebCycle.StateChanged` → `TrophyClaim`)
+  the server clears every alive cookie, pays `CookiePartyFinalReward` to
+  every player in the server with `EconomyService.AddCash`, and fires
+  `CookiePartyFinale(reward)` to each. A stale timer/cycle can never pay
+  twice (guard by cycle id).
+
+### Who owns what
+
+| Part | Owner | Files |
+| ---- | ----- | ----- |
+| Server cookies + rewards | Party server | `Services/CookiePartyService.luau` (new), `ServerMain` (start it), remotes |
+| Collectable cookies on screen, collect feedback (pop, floating "+N", sparkles, collect sounds, party earnings counter), visual rain ramp | Party cookies | `CookiePartyCookies.client.luau` (new), `CookiePartyLook.luau` (new), `CookieRain.client.luau` / `CookieRainLook.luau` |
+| Caleb at the center: energy ramp, throws/spits, laughs, speech bubbles, "I'M FULL!" finale pose | Caleb party | `CalebAnimator.client.luau`, `CalebPoses.luau`, new `CalebPartyBubble.client.luau` if needed |
+| Countdown 10…1, phase callouts, escalating lighting/VFX, finale explosion + flash + shake, final reward pop, music + party SFX | Party FX | `CalebEventUI.client.luau`, `CalebEventUIBuild.luau`, `CalebEventFX.luau`, new `CookiePartyFinale.luau` if needed, `CalebAudio.client.luau`, `tools/audio/` |
+
+Everything created for the party (client parts, pools, connections, lighting
+effects, server tables) is cleaned up when `Celebration` ends (the finale
+explosion may finish its ~2 s animation into `TrophyClaim`, then is gone).
 
 ## Trophy Collection + Powers (contract)
 

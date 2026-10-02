@@ -219,6 +219,88 @@ local Config = {
 	-- Fewest seconds between two Grow sounds (feeds in between are silent).
 	CalebGrowSoundInterval = 0.35,
 
+	-- Cookie Party (CalebState "Celebration", exactly CalebCelebrationSeconds
+	-- = 60 s). See Shared/CookieParty.luau and ARCHITECTURE.md "Cookie Party
+	-- (contract)". The server (CookiePartyService) decides every collectable
+	-- cookie and pays for it; clients only draw them.
+	-- Phase boundaries, in seconds LEFT: Start 60..Hype, Hype..Frenzy,
+	-- Frenzy..Countdown, Countdown..0.
+	CookiePartyPhases = table.freeze({ Hype = 40, Frenzy = 20, Countdown = 10 }),
+	-- Cookie types. Value = cookies (cash) paid. CollectRadius = studs
+	-- (horizontal) from the player's HumanoidRootPart to the cookie's landing
+	-- spot for the server to accept the collect (the client may use a little
+	-- less). Weights = relative spawn chance in each phase.
+	CookiePartyTypes = table.freeze({
+		Normal = table.freeze({
+			Value = 50,
+			CollectRadius = 6,
+			Weights = table.freeze({ Start = 80, Hype = 55, Frenzy = 35, Countdown = 30 }),
+		}),
+		Chocolate = table.freeze({
+			Value = 150,
+			CollectRadius = 6,
+			Weights = table.freeze({ Start = 20, Hype = 35, Frenzy = 35, Countdown = 32 }),
+		}),
+		Golden = table.freeze({
+			Value = 1_000,
+			CollectRadius = 6,
+			Weights = table.freeze({ Start = 0, Hype = 8, Frenzy = 25, Countdown = 30 }),
+		}),
+		Giant = table.freeze({
+			Value = 5_000,
+			CollectRadius = 10,
+			Weights = table.freeze({ Start = 0, Hype = 2, Frenzy = 5, Countdown = 8 }),
+		}),
+	}),
+	-- New collectable cookies per second (whole server) in each phase, plus
+	-- this many more per extra player; never more than MaxAlive at once.
+	CookiePartySpawnPerSecond = table.freeze({ Start = 4, Hype = 7, Frenzy = 11, Countdown = 15 }),
+	CookiePartySpawnPerExtraPlayer = 0.5,
+	CookiePartyMaxAlive = 80,
+	-- Share (0..1) of collectable cookies Caleb throws / spits out of his
+	-- mouth (they arc from his head) instead of falling from the sky.
+	CookiePartyFromCalebShare = table.freeze({ Start = 0.15, Hype = 0.25, Frenzy = 0.35, Countdown = 0.4 }),
+	-- Where they land: within SpawnRadius studs of the statue; NearPlayerShare
+	-- of them within NearPlayerRadius studs of a random player.
+	CookiePartySpawnRadius = 140,
+	CookiePartyNearPlayerShare = 0.6,
+	CookiePartyNearPlayerRadius = 35,
+	-- Seconds from spawn to landing (sky and Caleb throws), and seconds a
+	-- landed cookie stays collectable before it disappears.
+	CookiePartyFallSeconds = 1.6,
+	CookiePartyLifetime = 8,
+	-- Most collect requests per player per second the server will look at.
+	CookiePartyMaxCollectsPerSecond = 12,
+	-- Paid to every player in the server when the party ends (the finale).
+	CookiePartyFinalReward = 5_000,
+	-- Caleb's party dance gets faster/bigger per phase (CalebAnimator):
+	-- multipliers on CalebDance's beat speed and move sizes.
+	CookiePartyDanceEnergy = table.freeze({ Start = 1, Hype = 1.25, Frenzy = 1.6, Countdown = 2 }),
+	-- Party sounds (client only), same rules as CalebSounds: Roblox asset id
+	-- strings, empty = skipped. Music loops for the whole party and speeds up
+	-- per phase (CookiePartyMusicSpeed). Original effects: tools/audio/.
+	CookiePartySounds = table.freeze({
+		Music = "",
+		Collect = "",
+		CollectGolden = "",
+		CollectGiant = "",
+		CountdownTick = "",
+		FinaleBoom = "",
+		CalebLaugh = "",
+		CalebSpit = "",
+	}),
+	CookiePartySoundVolumes = table.freeze({
+		Music = 0.4,
+		Collect = 0.5,
+		CollectGolden = 0.6,
+		CollectGiant = 0.7,
+		CountdownTick = 0.6,
+		FinaleBoom = 0.9,
+		CalebLaugh = 0.5,
+		CalebSpit = 0.4,
+	}),
+	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
+
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",
 	-- Seconds between autosaves of each player's data.
@@ -267,8 +349,9 @@ local Config = {
 	TrophyClaimHoldSeconds = 0.5,
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
-	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 20 s, TrophyClaim
-	-- 30 s (see CalebEvent.Duration). Keep this false in commits.
+	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim
+	-- 30 s (see CalebEvent.Duration; the Cookie Party always lasts the full
+	-- CalebCelebrationSeconds). Keep this false in commits.
 	DevCalebFastCycle = false,
 	DevCalebFastMaxCookies = 1_000,
 

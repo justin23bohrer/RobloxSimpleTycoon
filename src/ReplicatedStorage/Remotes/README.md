@@ -8,6 +8,11 @@ Remotes here:
 - `FeedStatue.model.json` (RemoteFunction): the feed pop-up asks the server
   to feed the statue an amount of cookies. Handled by `StatueService`.
 
+- `CookiePartyCollect` (RemoteEvent, client → server), `CookiePartySpawn`,
+  `CookiePartyCollected`, `CookiePartyFinale` (RemoteEvents, server →
+  clients): the Cookie Party's collectable cookies. Handled by
+  `CookiePartyService`; see ARCHITECTURE.md "Cookie Party (contract)".
+
 Everything else needs no remote:
 
 - Buying and collecting happen when a character touches a part. The server

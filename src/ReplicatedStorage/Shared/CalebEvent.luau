@@ -63,7 +63,9 @@ function CalebEvent.Duration(state: string): number
 	if state == CalebEvent.State.Full then
 		return if fast then 3 else Config.CalebFullSeconds
 	elseif state == CalebEvent.State.Celebration then
-		return if fast then 20 else Config.CalebCelebrationSeconds
+		-- Always the full party, even in the fast cycle: the Cookie Party's
+		-- phases (Shared/CookieParty) are real seconds.
+		return Config.CalebCelebrationSeconds
 	elseif state == CalebEvent.State.TrophyClaim then
 		return if fast then 30 else Config.CalebTrophyClaimSeconds
 	end

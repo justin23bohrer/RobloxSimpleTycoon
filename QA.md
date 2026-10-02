@@ -84,7 +84,7 @@ Tip: set `DevUnlimitedCash = true` in Studio for the big-number cases (set it ba
 ## Caleb growth and animations
 
 Tip: set `DevCalebFastCycle = true` in Studio (goal 1,000 cookies; Full 3 s,
-Celebration 20 s, TrophyClaim 30 s) and `DevUnlimitedCash = true`. Set both
+Celebration 60 s, TrophyClaim 30 s) and `DevUnlimitedCash = true`. Set both
 back before committing. Feed amounts below are for the 1,000 goal.
 
 | ID | Test | Expected | Status |
@@ -142,7 +142,7 @@ Tip: set `DevCalebFastCycle = true` (and `DevUnlimitedCash = true`) in Studio fo
 ## Cookie rain (Caleb Full Event)
 
 Needs the Caleb cycle (`CalebCycle`) merged. Set `Config.DevCalebFastCycle = true`
-(Studio only; Celebration lasts 20 s) and dev cash, then feed Caleb to the goal.
+(Studio only; Celebration always lasts 60 s) and dev cash, then feed Caleb to the goal.
 Without CalebCycle you can fake it: in the **Server** view, set the attribute
 `CalebState` on `Workspace.Map.Statue` to `Celebration`, then back to `Normal`.
 
@@ -162,7 +162,7 @@ Without CalebCycle you can fake it: in the **Server** view, set the attribute
 ## Caleb event UI
 
 Set `DevCalebFastCycle = true` (Studio only) to run the event quickly
-(goal 1,000; Full 3 s, Celebration 20 s, TrophyClaim 30 s). Needs the Core
+(goal 1,000; Full 3 s, Celebration 60 s, TrophyClaim 30 s). Needs the Core
 `CalebCycle` to be merged to drive the states.
 
 | ID | Test | Expected | Status |
@@ -181,6 +181,29 @@ Set `DevCalebFastCycle = true` (Studio only) to run the event quickly
 | EV12 | Join during Full. | The big text and confetti show; no flash or camera shake. | |
 | EV13 | Reset your character during Celebration / TrophyClaim. | Banners stay (no duplicates); no errors. | |
 | EV14 | Phone (Device emulator) during each state. | Banners readable, inside the screen, not covering the cookie counter. No errors in Output. | |
+
+## Cookie Party: server cookies and rewards
+
+Set `Config.DevCalebFastCycle = true` (Studio only; the party is still 60 s)
+and dev cash, then feed Caleb to the goal.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+
+## Cookie Party: collectable cookies (client)
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+
+## Cookie Party: Caleb
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+
+## Cookie Party: countdown, VFX, finale, audio
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
 
 ## Caleb leaderboard (podium)
 
