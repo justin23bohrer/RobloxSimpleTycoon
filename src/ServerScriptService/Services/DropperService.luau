@@ -24,6 +24,7 @@
 --     extra    = with ExtraCookieChance one more drop (same value rules, never
 --                another extra) falls right under the first;
 --     interval = Config.DropInterval / (1 + DropperSpeed), read every cycle.
+--   PlotPowerVisuals shows those powers on the cups (fire, luck sparkles).
 -- * Drops are server-simulated (SetNetworkOwner(nil)) and destroyed after
 --   Config.DropLifetime seconds.
 -- * CollectorService calls ClaimDrop(drop, plot) to take a drop's value. A
@@ -41,6 +42,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 local DropperCup = require(script.Parent.DropperCup)
 local PowerService = require(script.Parent.PowerService)
+local PlotPowerVisuals = require(script.Parent.PlotPowerVisuals)
 
 local DropperService = {}
 
@@ -259,6 +261,7 @@ function DropperService.Start(plot: Model, dropperId: string)
 
 	local dropper, rim = DropperCup.Build(spot, dropperId) -- named "Dropper1", "Dropper2", ...
 	dropper.Parent = plot
+	PlotPowerVisuals.AddDropper(plot, dropper) -- burns while the owner has a production power
 	plotRun.Droppers[dropperId] = dropper
 	plotRun.ConveyorOf[dropperId] = entry.Conveyor
 

@@ -21,7 +21,13 @@
 --   DoubleJump.client's double jump) are presentation-level: an exploiter
 --   could move faster anyway. Cookie values stay fully server-side.
 --
--- Requires only Shared modules (no TycoonService: avoids a require cycle).
+-- * Plot visuals: SetDisplayed also calls PlotPowerVisuals.Apply, which shows
+--   the production / collect powers on the owner's plot (fire on dropper
+--   cups, luck sparkles, a gold ring on the Collect pad).
+--
+-- Requires only Shared modules and two presentation helpers: PowerVisuals
+-- (glowing feet; requires Config only) and PlotPowerVisuals (plot effects;
+-- requires Shared only). Never TycoonService: that would be a require cycle.
 -- Event-driven: no loops.
 
 local HttpService = game:GetService("HttpService")
@@ -29,6 +35,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 local PowerVisuals = require(script.Parent.PowerVisuals)
+local PlotPowerVisuals = require(script.Parent.PlotPowerVisuals)
 
 local PowerService = {}
 
@@ -90,6 +97,7 @@ function PowerService.SetDisplayed(player: Player, variantIds: { string })
 	totalsByPlayer[player] = TrophyPowers.Compute(variantIds)
 	publish(player)
 	applyMovement(player, player.Character)
+	PlotPowerVisuals.Apply(player, totalsByPlayer[player]) -- fire on droppers, shine on the Collect pad
 end
 
 -- Called by ServerMain when a player joins.

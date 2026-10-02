@@ -558,6 +558,24 @@ in the Properties window (Server view). Cap: `TrophyStatCaps.WalkSpeed` = 1.5.
 | SG9 | Respawn (Esc → Reset) with a speed trophy, twice. | Same WalkSpeed after each respawn (not compounded) and the glow is back, still exactly one `SpeedGlow` per foot. | |
 | SG10 | R6: set Game Settings → Avatar → R6, play with a speed trophy. (R15 is covered by SG5.) | Glow on `Left Leg` / `Right Leg` bottoms; same WalkSpeed numbers. | |
 
+## Power visuals on the plot
+
+Built Trophy Case and a few droppers bought. Use the inventory UI (or the
+PowerService command-bar line above) to change what is displayed.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PV1 | Equip a CookieMultiplier trophy (e.g. +5%, then Golden +100%). | Every dropper cup has fire on top and a warm light; small flames at +5%, big flames at +100% (no bigger past that). No sparks. Unequip → fire and light gone right away. | |
+| PV2 | Equip a DropperSpeed trophy only. | Same fire on every cup. Equip a CookieMultiplier one as well → orange sparks also fly off the cups. Unequip one → sparks stop, fire stays. | |
+| PV3 | Equip a CollectBonus trophy (e.g. Big Brain). | A golden glowing ring around the Collect pad with rising gold sparkles and a light; brighter at a bigger bonus. Stepping on the pad still collects. Unequip → ring gone. Pad's own "cash waiting" sparkles still work as before. | |
+| PV4 | Equip an ExtraCookieChance or LuckyCookieChance trophy. | A few green/gold sparkles float off each cup (no fire unless a production power is also active). | |
+| PV5 | Equip WalkSpeed / JumpHeight / Double Jump trophies only. | Nothing new on the cups or the pad (those powers show on the player, not the house). | |
+| PV6 | With fire showing, buy another dropper. | The new cup burns too, the same size as the others. | |
+| PV7 | Equip a production trophy with the Trophy Case **not** built (fresh plot). | No fire anywhere. Build the case → fire appears. | |
+| PV8 | With fire + ring showing, leave the game (or release the plot). | Cups, fire and ring all gone; the free plot looks normal. Another player who claims it sees no fire unless they have their own powers. | |
+| PV9 | 2 players (Clients and Servers): Player 1 has fire + ring. | Player 2 sees Player 1's burning cups and gold ring; Player 2's own plot has none. | |
+| PV10 | Rejoin (saved data) with a production + collect trophy equipped. | Once the house is restored, the cups burn and the pad ring is back. | |
+
 ## Trophy inventory UI
 
 Needs the Inventory + Powers server work merged (the `TrophyInventory` and
