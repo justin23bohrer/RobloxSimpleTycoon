@@ -927,7 +927,7 @@ Setup: max the house (`Config.DevUnlimitedCash = true`) and build the
 Garage with a Caleb Trophy (`Config.DevAllTrophies = true` helps; set both
 back to **false** before committing). Physics numbers are `Config.Car*`;
 note any you change. Use **Test → Clients and Servers** (2 players) for
-CAR6–CAR8 and CAR13.
+CAR5–CAR5c (passenger), CAR6–CAR8 and CAR13.
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
@@ -935,7 +935,9 @@ CAR6–CAR8 and CAR13.
 | CAR2 | Walk to the driver's side (the car's left); press E on "Drive". | You sit in the driver's seat, visible through the window. Default vehicle controls work. | |
 | CAR3 | Drive: W/S gas and reverse, A/D steer. Drive out of the garage, down the ramp, around the map, up and down the 1-stud plot edges. | W drives forward (nose first), S backs up, D turns right, A left (if any is reversed, report it: a sign in `CarSeats.drive`). Top speed about 60 studs/s; no wheelies, no flipping in normal turns, tires don't sink into the body. Releasing W slows the car to a stop. | |
 | CAR4 | Physics ownership: while driving, in the Server view select the car's `Body` (Studio: show network owner, or check that driving feels lag-free). Get out. | While you drive, your client owns the car (smooth, no input lag). Empty, the server owns it. | |
-| CAR5 | Jump to get out (from the driver and the passenger seat). | You land standing beside your door, facing the way the car points; you can walk normally right away (not frozen or stuck in the car). | |
+| CAR5 | Jump to get out (Space) on flat ground: once from the driver seat, once from the passenger seat (2 players, or switch seats). Try it parked in the garage and out on the grass. | Driver stands on the ground beside the driver's door (car's left), passenger beside the passenger door (right), a step clear of the mirrors, facing the way the car points. Never under the car, inside it, or sunk into the ground/garage floor; you can walk normally right away (not frozen or stuck). | |
+| CAR5b | Jump out on uneven ground: park with the exit side on the driveway ramp, on a 1-stud plot edge, and beside the pool rim (exit side over the rim / water). Do it as driver and as passenger. | You end up standing on top of whatever is beside the door (ramp, plot edge, pool rim, or the pool floor in the water), feet on the surface, not in it and not under the car. No falling through the map. | |
+| CAR5c | Jump out right after driving fast (brake hard, then Space at once). | Same as CAR5: beside your door, standing. At most a quick second snap if the first placement got overruled (it's re-checked after `CarExitSettleTime`). | |
 | CAR6 | 2 players: Player 2 walks to Player 1's car and presses E on "Drive". | Nothing happens for Player 2 (prompt shows "<owner>'s car" but they don't get in). | |
 | CAR7 | 2 players: Player 2 presses F on "Ride". Player 1 then drives around. | Player 2 sits in the passenger seat and rides along; Player 1 drives. Each prompt hides while its seat is taken. | |
 | CAR8 | 2 players: in the Server view, with Player 2's Humanoid, try `DriverSeat:Sit(humanoid)` (simulates a cheat). | Player 2 is thrown out of the driver's seat at once and put beside the door. | |

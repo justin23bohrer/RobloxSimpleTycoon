@@ -144,6 +144,18 @@ local Config = {
 	CarWheelDensity = 4,
 	CarWheelFriction = 1.2,
 	CarUprightTorque = 150_000,
+	-- Getting out (jump): the rider stands beside their door,
+	-- CarExitClearance studs past the car's widest point (the mirrors), on
+	-- whatever a ray straight down finds there (cast from CarExitRayUp above
+	-- the car's Body, reaching CarExitRayDown below the car's bottom),
+	-- CarExitHeightMargin above it. CarExitSettleTime seconds later the
+	-- server checks once more and re-places a rider who ended up under or in
+	-- the car or sunk into the ground.
+	CarExitClearance = 2,
+	CarExitRayUp = 6,
+	CarExitRayDown = 30,
+	CarExitHeightMargin = 0.3,
+	CarExitSettleTime = 0.3,
 	-- CarService checks every car each CarCheckInterval seconds. A car below
 	-- CarFallY (the ground's top is y 1), or past the ground's edge and
 	-- falling faster than CarFallSpeed, is re-parked in its garage and the

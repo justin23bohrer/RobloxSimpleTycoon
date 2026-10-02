@@ -216,7 +216,7 @@ routes join/leave in a fixed order:
 | `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers, builds and trophy builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a trophy build needs the house maxed (`Purchases.IsHouseMaxed`) and the owner to own at least the entry's `Trophies` (`#TrophyInventory.GetOwned(player)`, server data only), costs no cookies and spends no trophies; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free (then, if the house is maxed, the saved trophy builds). Every applied purchase that leaves the house maxed also calls `PlotStages.ShowTrophyButtons`. The Garage + Backyard parts (`TrophyButtonN`, trophy build `Parts`, `BackDoor`) are optional at startup: missing ones are warned about, never make the plot invalid. Tells `PlotStages` what to show. `TryPurchase` calls `TycoonSounds.Purchased` after a successful buy and `TycoonSounds.CantAfford` when `TrySpend` fails or a trophy build's owner has too few trophies (sounds only; never on restore). `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `CarService` | The drivable garage car (see "Garage + Backyard (contract)" → Drivable car). One car per plot while its Garage is built and the plot is owned: spawned on `TycoonService.PurchaseApplied` for the trophy build whose `Parts` include `GarageCar` (bought or restored), removed when the plot's `OwnerUserId` changes. Hides the anchored `GarageCar` look (`PlotVisibility`) while the car exists. Every `Config.CarCheckInterval` re-parks a fallen/edge car (riders respawn) or a flipped, still one. Cars live in `Workspace.Cars` as `<Plot>Car`. Changes no cash and no ownership. | Implemented (`Start`) |
 | `CarBuild` (helper) | Used only by `CarService`. `Build(template)` clones a `GarageCar` look into a physics car: root = `Body`, look parts welded + `Massless`, 4 `Tire<Wheel>` on Motor hinges (`Drive<Wheel>`), front tires on invisible `Knuckle<Wheel>` Servo hinges (`Steer<Wheel>`), tire/body `NoCollisionConstraint`s, invisible untouchable `DriverSeat` (VehicleSeat) + `PassengerSeat` (Seat), an `Upright` AlignOrientation, see-through windows. Returns nil without `Body` or a tire. | Implemented |
-| `CarSeats` (helper) | Used only by `CarService`. `Setup(car, owner)`: "Drive" (E, owner only) and "Ride" (F, anyone) prompts that `Sit` the player (server checks range, alive, not seated, seat free); ejects a non-owner from the `DriverSeat`; places riders who get out beside their door; network owner = driver, else passenger, else server (a rider's own body goes back to them on exit); sets motors/steering from `Throttle`/`Steer`. `Riders(car)`. | Implemented |
+| `CarSeats` (helper) | Used only by `CarService`. `Setup(car, owner)`: "Drive" (E, owner only) and "Ride" (F, anyone) prompts that `Sit` the player (server checks range, alive, not seated, seat free); ejects a non-owner from the `DriverSeat`; places riders who get out beside their door (one frame after exit, raycast to the ground, server owns their body during the move, re-checked after `CarExitSettleTime`); network owner = driver, else passenger, else server (a rider's own body goes back to them on exit); sets motors/steering from `Throttle`/`Steer`. `Riders(car)`. | Implemented |
 | `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's or trophy build's `Parts`, shows the buttons it unlocks), `ShowTrophyButtons(plot, purchased)` (house maxed: shows the `TrophyButtonN` of every trophy build not bought). `ShowUnclaimed` also hides every build's and trophy build's `Parts`; a trophy build's fires/smoke/sparkles/particle emitters/lights (saved `Enabled = false` in the map, like the Trophy Case's `CaseLight`; e.g. `Hangout`'s `FireCore` `Fire`, `Embers`, `FireLight`) are switched on when its `Parts` are shown (bought or restored) and off when hidden. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
 | `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds` + `Config.TrophyBuilds`: `Get(id)`, `All()`, `UnlockedBy(id?)` (house purchases only), `IsHouse(purchase)`, `IsHouseMaxed(purchased)` (every dropper and build bought), `TrophyBuilds()`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`/`"TrophyBuild"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN` / `TrophyButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
@@ -351,7 +351,8 @@ tune `BackyardGate`. The `Car*` values (`CarMaxSpeed`, `CarReverseSpeed`,
 `CarTorque`, `CarBrakeTorque`, `CarWheelAcceleration`, `CarSteerAngle`,
 `CarSteerSpeed`, `CarSteerTorque`, `CarWheelDensity`, `CarWheelFriction`,
 `CarUprightTorque`, `CarCheckInterval`, `CarFallY`, `CarFallSpeed`,
-`CarFlippedSeconds`) tune the drivable car (`CarService`, `CarBuild`,
+`CarFlippedSeconds`, and the exit knobs `CarExitClearance`, `CarExitRayUp`,
+`CarExitRayDown`, `CarExitHeightMargin`, `CarExitSettleTime`) tune the drivable car (`CarService`, `CarBuild`,
 `CarSeats`).
 `NumberOfTycoonPlots` must match the plot models in the map; TycoonService
 warns if it does not.
@@ -898,6 +899,22 @@ are untouched).
   `CanTouch = false`: the only way in is the server-handled prompt. A
   non-owner who ends up in the `DriverSeat` anyway is ejected (its
   `SeatWeld` destroyed). Exiting (jump) puts the rider beside their door.
+- **Getting out** (`CarSeats.placeBeside`): on the frame after a seat's
+  `Occupant` changes (the `SeatWeld` is gone everywhere by then), the
+  server stands the rider `CarExitClearance` studs past the car's widest
+  point (its bounding box in `Body` space, mirrors included, measured once
+  in `Setup`), level with their seat along the car, on their door's side
+  (driver = car's left, passenger = right), facing the nose. Height: a ray
+  straight down from `CarExitRayUp` above the `Body` (excluding the car and
+  all characters, `RespectCanCollide` so zones/water don't count) finds the
+  surface; the HumanoidRootPart goes to surface + `HipHeight` (R6: 2) +
+  half its height + `CarExitHeightMargin`. No hit → level with the car's
+  tires. The server takes network ownership of the body, zeroes its
+  velocity, `PivotTo`s it, then hands ownership back to the player, so the
+  client's mid-jump physics can't undo the move. After `CarExitSettleTime`
+  it re-places the rider once if they ended up under/in the car or sunk at
+  the exit spot. Skipped if they're seated again, dead, or the car is gone;
+  a car on its nose/tail lets them jump out normally.
 - **Driving:** server reads `VehicleSeat.Throttle`/`Steer` and sets the 4
   wheel motors (`CarMaxSpeed`/`CarReverseSpeed` ÷ wheel radius, `CarTorque`;
   no throttle = 0 speed at `CarBrakeTorque`) and the front servos
