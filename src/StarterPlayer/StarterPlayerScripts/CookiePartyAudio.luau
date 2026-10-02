@@ -3,8 +3,11 @@
 -- CalebAudio.client.luau (the one place that plays the event's sounds):
 --   Music          Config.CookiePartyMusic ("NO PARTY"): loops during
 --                  Celebration at normal speed (a real song, so no speed-up:
---                  that would raise its pitch); the volume fades in and
---                  swells a little with the intensity. Stops (quick fade)
+--                  that would raise its pitch). At the party's start it
+--                  begins Config.PartyMusicDelaySeconds after the air horn
+--                  (a short silence), at full volume; joining mid-party it
+--                  fades in at once. The volume swells a little with the
+--                  intensity. Stops (quick fade)
 --                  the moment Celebration ends.
 --   CountdownTick  once per countdown number (10..1, same ceil-of-seconds-
 --                  left rule as CookiePartyCountdown), pitch rising.
@@ -33,6 +36,7 @@ local connection: RBXScriptConnection? = nil
 local lastNumber: number? = nil
 local startedAt = 0
 local stopTween: Tween? = nil
+local generation = 0 -- bumped by Start/Stop: a delayed music start checks it
 
 -- Creates the sounds (once). assetId: CalebAudio's id normalizer. Returns
 -- the names with no id, for CalebAudio's single "skipped" print.
@@ -72,7 +76,7 @@ local function step()
 	end
 	local left = CookieParty.TimeLeft(statue)
 	local music = sounds.Music
-	if music then
+	if music and music.IsPlaying and not stopTween then
 		music.Volume = musicVolume(left)
 	end
 
@@ -88,28 +92,50 @@ local function step()
 	end
 end
 
+local function playMusic(fadeIn: boolean)
+	local music = sounds.Music
+	if not music then
+		return
+	end
+	if stopTween then
+		stopTween:Cancel()
+		stopTween = nil
+	end
+	-- No fade-in: pretend the fade already finished.
+	startedAt = if fadeIn then os.clock() else os.clock() - MUSIC_FADE_IN
+	music.Volume = 0
+	music.TimePosition = 0
+	music:Play()
+	if not fadeIn and statue then
+		music.Volume = musicVolume(CookieParty.TimeLeft(statue))
+	end
+end
+
 -- The party started (or we joined mid-party: the music starts from the
--- top, no catch-up ticks for numbers already passed).
-function CookiePartyAudio.Start(theStatue: Instance)
+-- top, no catch-up ticks for numbers already passed). musicDelay: seconds
+-- of silence before the music (then full volume, no fade-in); nil = start
+-- now with the short fade-in.
+function CookiePartyAudio.Start(theStatue: Instance, musicDelay: number?)
 	CookiePartyAudio.Stop()
+	generation += 1
+	local myGeneration = generation
 	statue = theStatue
 	lastNumber = nil
-	startedAt = os.clock()
-	local music = sounds.Music
-	if music then
-		if stopTween then
-			stopTween:Cancel()
-			stopTween = nil
-		end
-		music.Volume = 0
-		music.TimePosition = 0
-		music:Play()
-	end
 	connection = RunService.Heartbeat:Connect(step)
+	if musicDelay and musicDelay > 0 then
+		task.delay(musicDelay, function()
+			if generation == myGeneration then -- the party has not ended
+				playMusic(false)
+			end
+		end)
+	else
+		playMusic(musicDelay == nil)
+	end
 end
 
 -- The party is over: the music stops right away (tiny fade, no click).
 function CookiePartyAudio.Stop()
+	generation += 1 -- cancels a pending delayed music start
 	if connection then
 		connection:Disconnect()
 		connection = nil

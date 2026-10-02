@@ -361,11 +361,15 @@ Paste real ids into the MUSIC block at the top of `Config.luau` first
 | ID | Steps | Expected | Pass |
 | -- | ----- | -------- | ---- |
 | MU1 | Play (not during a party). | "Tender Static" fades in over ~1.5 s and loops with no gap problems. Explorer: one `SoundService.CalebAudio.BackgroundMusic`, `Looped` true. | |
-| MU2 | Wait for the Cookie Party to start. | The background fades out over ~1.5 s (then `IsPlaying` false, paused); the Air Horn plays once; "NO PARTY" starts and loops. Never two music tracks at full volume together. No old party horn/chime as well. | |
+| MU2 | Feed Caleb until "CALEB IS FULLLL!!!" appears. | The background cuts out almost at once (~0.3 s, then `IsPlaying` false, paused); the Full sound effect still plays. | |
+| MU2a | Stay through the Full state. | No music at all until the party (suspense). | |
+| MU2b | The Cookie Party starts. | The Air Horn plays at once, then ~1 s of silence (no music), then "NO PARTY" starts at normal volume (no slow fade-in) and loops. Never two music tracks together; one Air Horn only. | |
+| MU2c | `DevCalebFastCycle` (do not commit it) or a very short party: make the party end within ~1 s of the horn. | "NO PARTY" never starts; the background fades back in as usual. | |
+| MU2d | 2 players: Player 2 joins while Caleb is Full. | Player 2 hears no music until the party; then horn, gap, "NO PARTY" like Player 1. | |
 | MU3 | Listen through the party. | Only "NO PARTY" (+ effects): normal speed and pitch the whole time, a little louder toward the end. | |
 | MU4 | Party ends (finale). | "NO PARTY" stops at once, the finale boom plays, the background fades back in **continuing where it paused** (not from the start). | |
 | MU5 | Let two full cycles run. | Same as MU2–MU4 each time; still exactly one of each music Sound in `SoundService.CalebAudio`. | |
-| MU6 | 2 players: Player 2 joins mid-party. | Player 2 hears "NO PARTY" (no Air Horn, no background); when the party ends the background fades in for them too. | |
+| MU6 | 2 players: Player 2 joins mid-party. | Player 2 hears "NO PARTY" right away (no Air Horn, no 1 s gap, no background); when the party ends the background fades in for them too. | |
 | MU7 | Reset your character during the party and during normal play. | Music keeps going correctly (no restart, no duplicate). | |
 | MU8 | All three music ids empty; Play; run a full cycle. | Silent music, no errors. Output in Studio: one `[CalebAudio] no sound id in Config for: ...` line listing `BackgroundMusic`, `CookiePartyStartSound`, `CookiePartyMusic` (plus any other empty ids). | |
 

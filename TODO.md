@@ -73,6 +73,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music: the user's own t
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [x] Caleb Trophies: unique variants, 2-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [x] Background music + party music + air horn slots; Caleb spit removed (requested by the user 2026-10-02). (code done; Studio test pending: QA MU1–MU8)
+- [x] Music suspense: cut at Caleb FULL, horn, short silence, then party music (requested by the user 2026-10-02). (code done; Studio test pending: QA MU2–MU2d, MU4, MU6)
 - [ ] Paste the ids for Tender Static / Air Horn / NO PARTY into Config (user).
 
 ## Cookie Party upgrade (approved by the user 2026-10-01)
