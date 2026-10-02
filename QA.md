@@ -864,3 +864,22 @@ quick setup, `Config.DevUnlimitedCash = true` in Studio (set it back to
 | TS6 | No sounds on house restore: own several droppers and builds, leave, rejoin (published test place with API access on, or the same server), claim a plot. | The saved house rebuilds silently: no purchase / build sounds for the restored parts. Buying the next item afterwards plays its sound normally. | |
 | TS7 | Release: leave with a claimed plot, then a new player claims it and buys. | No errors; the new owner's sounds play at the right buttons. | |
 | TS8 | Empty ids: set every `Config.TycoonSounds` id to `""`, Play, buy, step on an unaffordable button, collect. | Everything works silently; no errors; in Studio Output one "[TycoonSounds] no sound id in Config for: …" line (once, not per plot). | |
+
+## Garage + car (look)
+
+Look checks for the garage model (`tools/garage/generate_garage.py`); the
+unlock itself is tested in GB1–GB16. Setup: max the house with
+`Config.DevUnlimitedCash = true` and buy the garage with a Caleb Trophy
+(`Config.DevAllTrophies = true` helps; set both back to **false** before
+committing).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| GG1 | Plot1: stand at the spawn and look at the house's right (stairs) side. | An attached one-car garage next to the house, front flush with the house front: off-white brick, gray corner posts/bands, gray shingle gable roof with a round vent, lanterns by the door. It matches the house and touches it with no gap or poking through (roof meets the house wall below the 2nd-floor windows). | |
+| GG2 | Walk up the driveway ramp into the garage. | The door is rolled up (roll box above the opening inside, white door edge just under the frame). The ramp is walkable from the grass, the floor is solid concrete level with the plot floor, the walls and roof block you, nothing floats. | |
+| GG3 | Look at the car from the front, sides and back. | A white VW ID.4: rounded white body, black roof and pillars, dark windows, black arches/sills/bumpers, slim headlights joined by a white light bar, a VW roundel on the nose and tailgate (V over W, reads right way round from behind), red light bar at the back, 4 side doors + tailgate, silver/black wheels. Parked nose out, wheels on the floor. | |
+| GG4 | Walk around the car inside the garage; jump on it. | You can walk around it (bench and rack behind it, charger cable on the floor on its right); the body is solid, small details (mirrors, lights, logos) do not snag you. | |
+| GG5 | Inside details. | Workbench with pegboard tools, red toolbox and vise at the back right; metal rack with bins, boxes and paint cans at the back left; white wall charger on the house wall with a green light, cable running to the car's right rear. The house's first-floor window at z −22 is visible on the left wall. | |
+| GG6 | Lights: before buying, at night (`Lighting.ClockTime = 0`); then buy the garage. | No glow from the hidden garage before buying (the `GarageLight`s are saved disabled). After buying (or on restore), `PlotStages` turns them on: warm light inside the garage. After the owner leaves, they go off with the garage. | |
+| GG7 | The pad: max the house (logic in). | A gold pad with a dark purple ring and a purple sign on the grass in front of the driveway, same style as the other trophy pads. It does not overlap the ramp. | |
+| GG8 | All 4 plots: walk to Plot2, Plot3 and Plot4 (or claim each). | Each house has the same garage on its own right side, door facing the statue side. No garage touches a neighbor plot, a spawn, the statue, or another plot's garage/pad. | |

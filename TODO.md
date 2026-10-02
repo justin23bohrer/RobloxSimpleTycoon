@@ -129,6 +129,11 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 
 ## Garage + Backyard (approved by the user 2026-10-02)
 
+After the house is maxed: a garage (1 Caleb Trophy, `TrophyButton1`) on the
+house's right side, and a backyard with 3 spots (5 trophies each,
+`TrophyButton2`–`4`) behind the house. Decoration only.
+
 Contract: ARCHITECTURE.md "Garage + Backyard (contract)". Three workers in parallel (garage model, backyard model, gameplay logic).
 
 - [x] Gameplay logic: `Config.TrophyBuilds` + `BackyardTrophies` (Walls also shows `BackDoor`), `TrophyBuild` purchase kind (`TrophyButtonN`, unlock when the house is maxed, free for owners who own enough Caleb Trophies, saved/restored), trophy button labels, `BackyardGate` + `BackyardDoor` (locked back door + sign, push-out loop), trophy builds' fires/particles/lights on only while shown (`PlotStages`). (code done; Studio test pending: QA GB1–GB16)
+- [x] Garage + car model: `tools/garage/generate_garage.py` (+ `id4_car.py`) adds `Garage` (attached brick garage, rolled-up door, workbench, rack, charger, disabled `GarageLight`s), `GarageCar` (white VW ID.4, nose out) and the gold `TrophyButton1` pad to Plot1; Plots 2–4 regenerated. (built; Studio look check pending: QA GG1–GG8)
