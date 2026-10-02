@@ -19260,14 +19260,14 @@
           "properties": {
             "Size": [
               24,
-              2,
+              3.6,
               4.6
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   0,
-                  3,
+                  3.8,
                   -72.4
                 ],
                 "orientation": [
@@ -19309,14 +19309,14 @@
           "properties": {
             "Size": [
               0.8,
-              10.2,
+              8.6,
               4.6
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -11.6,
-                  9.1,
+                  9.9,
                   -72.4
                 ],
                 "orientation": [
@@ -19358,14 +19358,14 @@
           "properties": {
             "Size": [
               0.8,
-              10.2,
+              8.6,
               4.6
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   11.6,
-                  9.1,
+                  9.9,
                   -72.4
                 ],
                 "orientation": [
@@ -19407,14 +19407,14 @@
           "properties": {
             "Size": [
               22.4,
-              10.2,
+              8.6,
               0.4
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   0,
-                  9.1,
+                  9.9,
                   -74.5
                 ],
                 "orientation": [
@@ -19451,19 +19451,19 @@
           }
         },
         {
-          "name": "CaseShelf",
+          "name": "CaseStage",
           "className": "Part",
           "properties": {
             "Size": [
               22.4,
-              0.4,
+              0.6,
               3.95
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   0,
-                  9.1,
+                  5.9,
                   -72.325
                 ],
                 "orientation": [
@@ -19487,36 +19487,17 @@
             },
             "Color": {
               "Color3uint8": [
-                92,
-                60,
-                38
+                120,
+                30,
+                40
               ]
             },
             "Anchored": true,
             "CanTouch": false,
-            "Material": "Wood",
+            "Material": "Fabric",
             "TopSurface": "Smooth",
             "BottomSurface": "Smooth"
-          },
-          "children": [
-            {
-              "name": "RowLight1",
-              "className": "SurfaceLight",
-              "properties": {
-                "Face": "Bottom",
-                "Color": [
-                  1.0,
-                  0.8392156862745098,
-                  0.6274509803921569
-                ],
-                "Brightness": 0.6,
-                "Range": 7,
-                "Angle": 120,
-                "Shadows": false,
-                "Enabled": false
-              }
-            }
-          ]
+          }
         },
         {
           "name": "CaseTop",
@@ -19568,7 +19549,7 @@
           },
           "children": [
             {
-              "name": "RowLight2",
+              "name": "CaseLight",
               "className": "SurfaceLight",
               "properties": {
                 "Face": "Bottom",
@@ -19577,8 +19558,8 @@
                   0.8392156862745098,
                   0.6274509803921569
                 ],
-                "Brightness": 0.6,
-                "Range": 7,
+                "Brightness": 0.7,
+                "Range": 10,
                 "Angle": 120,
                 "Shadows": false,
                 "Enabled": false
@@ -19587,69 +19568,19 @@
           ]
         },
         {
-          "name": "CaseGlassLower",
+          "name": "CaseGlass",
           "className": "Part",
           "properties": {
             "Size": [
               22.4,
-              4.85,
+              8.6,
               0.2
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   0,
-                  6.425,
-                  -70.25
-                ],
-                "orientation": [
-                  [
-                    1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                210,
-                235,
-                255
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "Glass",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "Transparency": 0.65
-          }
-        },
-        {
-          "name": "CaseGlassUpper",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              22.4,
-              4.85,
-              0.2
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  0,
-                  11.775,
+                  9.9,
                   -70.25
                 ],
                 "orientation": [
@@ -19699,7 +19630,7 @@
               "CFrame": {
                 "position": [
                   0,
-                  3.825,
+                  5.425,
                   -70.025
                 ],
                 "orientation": [
@@ -19738,20 +19669,20 @@
           }
         },
         {
-          "name": "GoldShelfRail",
+          "name": "GoldStageLip",
           "className": "Part",
           "properties": {
             "Size": [
               22.4,
-              0.5,
-              0.2
+              0.12,
+              0.12
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   0,
-                  9.1,
-                  -70.25
+                  6.14,
+                  -70.41
                 ],
                 "orientation": [
                   [
@@ -19783,7 +19714,60 @@
             "CanTouch": false,
             "Material": "SmoothPlastic",
             "TopSurface": "Smooth",
-            "BottomSurface": "Smooth"
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "GoldValance",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              22.4,
+              0.35,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  14.025,
+                  -70.41
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
           }
         },
         {
@@ -19792,14 +19776,14 @@
           "properties": {
             "Size": [
               0.8,
-              10.2,
+              8.6,
               0.15
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   -11.6,
-                  9.1,
+                  9.9,
                   -70.025
                 ],
                 "orientation": [
@@ -19843,14 +19827,14 @@
           "properties": {
             "Size": [
               0.8,
-              10.2,
+              8.6,
               0.15
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   11.6,
-                  9.1,
+                  9.9,
                   -70.025
                 ],
                 "orientation": [
@@ -20133,6 +20117,104 @@
           ]
         },
         {
+          "name": "Riser1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.8,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  6.6,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RiserTrim1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.1,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  7.05,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
           "name": "TrophySlot1",
           "className": "Part",
           "properties": {
@@ -20145,8 +20227,8 @@
               "CFrame": {
                 "position": [
                   0,
-                  4.1,
-                  -72.5
+                  7,
+                  -72.4
                 ],
                 "orientation": [
                   [
@@ -20182,6 +20264,323 @@
             "CanCollide": false,
             "CanQuery": false,
             "Transparency": 1
+          }
+        },
+        {
+          "name": "NameplateFrame1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.2,
+              2.5,
+              0.08
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  3.4,
+                  -70.06
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "Nameplate1",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4,
+              2.3,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  0,
+                  3.4,
+                  -69.96
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                40,
+                28,
+                20
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "NameplateGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 100,
+                "LightInfluence": 0,
+                "MaxDistance": 60
+              },
+              "children": [
+                {
+                  "name": "TrophyName",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "EMPTY",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      0.75,
+                      0.68,
+                      0.6
+                    ],
+                    "TextTransparency": 0.4,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.3,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.4,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                },
+                {
+                  "name": "PowerText",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextTransparency": 0,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.6,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.32,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Riser2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.4,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4.48,
+                  6.4,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RiserTrim2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.1,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4.48,
+                  6.65,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
           }
         },
         {
@@ -20197,8 +20596,8 @@
               "CFrame": {
                 "position": [
                   -4.48,
-                  4.1,
-                  -72.5
+                  6.6,
+                  -72.4
                 ],
                 "orientation": [
                   [
@@ -20234,6 +20633,323 @@
             "CanCollide": false,
             "CanQuery": false,
             "Transparency": 1
+          }
+        },
+        {
+          "name": "NameplateFrame2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.2,
+              2.5,
+              0.08
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4.48,
+                  3.4,
+                  -70.06
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "Nameplate2",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4,
+              2.3,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -4.48,
+                  3.4,
+                  -69.96
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                40,
+                28,
+                20
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "NameplateGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 100,
+                "LightInfluence": 0,
+                "MaxDistance": 60
+              },
+              "children": [
+                {
+                  "name": "TrophyName",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "EMPTY",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      0.75,
+                      0.68,
+                      0.6
+                    ],
+                    "TextTransparency": 0.4,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.3,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.4,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                },
+                {
+                  "name": "PowerText",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextTransparency": 0,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.6,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.32,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Riser3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.4,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  4.48,
+                  6.4,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RiserTrim3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.1,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  4.48,
+                  6.65,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
           }
         },
         {
@@ -20249,8 +20965,8 @@
               "CFrame": {
                 "position": [
                   4.48,
-                  4.1,
-                  -72.5
+                  6.6,
+                  -72.4
                 ],
                 "orientation": [
                   [
@@ -20286,6 +21002,323 @@
             "CanCollide": false,
             "CanQuery": false,
             "Transparency": 1
+          }
+        },
+        {
+          "name": "NameplateFrame3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.2,
+              2.5,
+              0.08
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  4.48,
+                  3.4,
+                  -70.06
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "Nameplate3",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4,
+              2.3,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  4.48,
+                  3.4,
+                  -69.96
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                40,
+                28,
+                20
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "NameplateGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 100,
+                "LightInfluence": 0,
+                "MaxDistance": 60
+              },
+              "children": [
+                {
+                  "name": "TrophyName",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "EMPTY",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      0.75,
+                      0.68,
+                      0.6
+                    ],
+                    "TextTransparency": 0.4,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.3,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.4,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                },
+                {
+                  "name": "PowerText",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextTransparency": 0,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.6,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.32,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Riser4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.05,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -8.96,
+                  6.225,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RiserTrim4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.1,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -8.96,
+                  6.3,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
           }
         },
         {
@@ -20301,8 +21334,8 @@
               "CFrame": {
                 "position": [
                   -8.96,
-                  4.1,
-                  -72.5
+                  6.25,
+                  -72.4
                 ],
                 "orientation": [
                   [
@@ -20338,6 +21371,323 @@
             "CanCollide": false,
             "CanQuery": false,
             "Transparency": 1
+          }
+        },
+        {
+          "name": "NameplateFrame4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4.2,
+              2.5,
+              0.08
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -8.96,
+                  3.4,
+                  -70.06
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          }
+        },
+        {
+          "name": "Nameplate4",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4,
+              2.3,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  -8.96,
+                  3.4,
+                  -69.96
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                40,
+                28,
+                20
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "NameplateGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 100,
+                "LightInfluence": 0,
+                "MaxDistance": 60
+              },
+              "children": [
+                {
+                  "name": "TrophyName",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "EMPTY",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      0.75,
+                      0.68,
+                      0.6
+                    ],
+                    "TextTransparency": 0.4,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.3,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.4,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                },
+                {
+                  "name": "PowerText",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextTransparency": 0,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.6,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.32,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Riser5",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.05,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  8.96,
+                  6.225,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                120,
+                30,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "Fabric",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
+          }
+        },
+        {
+          "name": "RiserTrim5",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              3.8,
+              0.1,
+              3.4
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  8.96,
+                  6.3,
+                  -72.4
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                255,
+                200,
+                40
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth"
           }
         },
         {
@@ -20353,8 +21703,8 @@
               "CFrame": {
                 "position": [
                   8.96,
-                  4.1,
-                  -72.5
+                  6.25,
+                  -72.4
                 ],
                 "orientation": [
                   [
@@ -20393,232 +21743,24 @@
           }
         },
         {
-          "name": "TrophySlot6",
+          "name": "NameplateFrame5",
           "className": "Part",
           "properties": {
             "Size": [
-              3.6,
-              0.2,
-              3.4
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  0,
-                  9.4,
-                  -72.5
-                ],
-                "orientation": [
-                  [
-                    -1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    -1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                255,
-                200,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "SmoothPlastic",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false,
-            "Transparency": 1
-          }
-        },
-        {
-          "name": "TrophySlot7",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              3.6,
-              0.2,
-              3.4
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  -4.48,
-                  9.4,
-                  -72.5
-                ],
-                "orientation": [
-                  [
-                    -1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    -1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                255,
-                200,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "SmoothPlastic",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false,
-            "Transparency": 1
-          }
-        },
-        {
-          "name": "TrophySlot8",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              3.6,
-              0.2,
-              3.4
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  4.48,
-                  9.4,
-                  -72.5
-                ],
-                "orientation": [
-                  [
-                    -1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    -1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                255,
-                200,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "SmoothPlastic",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false,
-            "Transparency": 1
-          }
-        },
-        {
-          "name": "TrophySlot9",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              3.6,
-              0.2,
-              3.4
-            ],
-            "CFrame": {
-              "CFrame": {
-                "position": [
-                  -8.96,
-                  9.4,
-                  -72.5
-                ],
-                "orientation": [
-                  [
-                    -1,
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    1,
-                    0
-                  ],
-                  [
-                    0,
-                    0,
-                    -1
-                  ]
-                ]
-              }
-            },
-            "Color": {
-              "Color3uint8": [
-                255,
-                200,
-                40
-              ]
-            },
-            "Anchored": true,
-            "CanTouch": false,
-            "Material": "SmoothPlastic",
-            "TopSurface": "Smooth",
-            "BottomSurface": "Smooth",
-            "CanCollide": false,
-            "CanQuery": false,
-            "Transparency": 1
-          }
-        },
-        {
-          "name": "TrophySlot10",
-          "className": "Part",
-          "properties": {
-            "Size": [
-              3.6,
-              0.2,
-              3.4
+              4.2,
+              2.5,
+              0.08
             ],
             "CFrame": {
               "CFrame": {
                 "position": [
                   8.96,
-                  9.4,
-                  -72.5
+                  3.4,
+                  -70.06
                 ],
                 "orientation": [
                   [
-                    -1,
+                    1,
                     0,
                     0
                   ],
@@ -20630,7 +21772,7 @@
                   [
                     0,
                     0,
-                    -1
+                    1
                   ]
                 ]
               }
@@ -20648,9 +21790,176 @@
             "TopSurface": "Smooth",
             "BottomSurface": "Smooth",
             "CanCollide": false,
-            "CanQuery": false,
-            "Transparency": 1
+            "CanQuery": false
           }
+        },
+        {
+          "name": "Nameplate5",
+          "className": "Part",
+          "properties": {
+            "Size": [
+              4,
+              2.3,
+              0.12
+            ],
+            "CFrame": {
+              "CFrame": {
+                "position": [
+                  8.96,
+                  3.4,
+                  -69.96
+                ],
+                "orientation": [
+                  [
+                    1,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "Color": {
+              "Color3uint8": [
+                40,
+                28,
+                20
+              ]
+            },
+            "Anchored": true,
+            "CanTouch": false,
+            "Material": "SmoothPlastic",
+            "TopSurface": "Smooth",
+            "BottomSurface": "Smooth",
+            "CanCollide": false,
+            "CanQuery": false
+          },
+          "children": [
+            {
+              "name": "NameplateGui",
+              "className": "SurfaceGui",
+              "properties": {
+                "Face": "Back",
+                "SizingMode": "PixelsPerStud",
+                "PixelsPerStud": 100,
+                "LightInfluence": 0,
+                "MaxDistance": 60
+              },
+              "children": [
+                {
+                  "name": "TrophyName",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "EMPTY",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      0.75,
+                      0.68,
+                      0.6
+                    ],
+                    "TextTransparency": 0.4,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.3,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.4,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                },
+                {
+                  "name": "PowerText",
+                  "className": "TextLabel",
+                  "properties": {
+                    "Text": "",
+                    "Font": "FredokaOne",
+                    "TextScaled": true,
+                    "TextColor3": [
+                      1,
+                      1,
+                      1
+                    ],
+                    "TextTransparency": 0,
+                    "TextStrokeColor3": [
+                      0.157,
+                      0.11,
+                      0.078
+                    ],
+                    "TextStrokeTransparency": 1,
+                    "BackgroundTransparency": 1,
+                    "AnchorPoint": [
+                      0.5,
+                      0
+                    ],
+                    "Position": {
+                      "UDim2": [
+                        [
+                          0.5,
+                          0
+                        ],
+                        [
+                          0.6,
+                          0
+                        ]
+                      ]
+                    },
+                    "Size": {
+                      "UDim2": [
+                        [
+                          0.9,
+                          0
+                        ],
+                        [
+                          0.32,
+                          0
+                        ]
+                      ]
+                    },
+                    "TextWrapped": true
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     },

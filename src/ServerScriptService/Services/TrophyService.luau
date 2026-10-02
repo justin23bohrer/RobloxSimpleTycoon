@@ -262,8 +262,10 @@ function TrophyService.Start(statueModel: Instance?)
 	for _, plot in plots:GetChildren() do
 		local case = plot:FindFirstChild(CASE_ID)
 		for slot = 1, Config.TrophyCaseSlots do
-			if case and not case:FindFirstChild(`TrophySlot{slot}`) then
-				warn(`TrophyService: {plot.Name}.{CASE_ID} is missing TrophySlot{slot}`)
+			for _, name in { `TrophySlot{slot}`, `Nameplate{slot}` } do
+				if case and not case:FindFirstChild(name) then
+					warn(`TrophyService: {plot.Name}.{CASE_ID} is missing {name}`)
+				end
 			end
 		end
 		local ownerUserId = plot:GetAttribute("OwnerUserId")
