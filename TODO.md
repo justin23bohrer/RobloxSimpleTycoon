@@ -119,4 +119,5 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Bigger walk speed trophies (+35%..+75%) and glowing feet (requested by the user 2026-10-01). (code done; Studio test pending: QA SG1–SG10)
 - [x] Trophy powers: no stat caps, duplicates stack (requested by the user 2026-10-02). (code done; Studio test pending: QA ST1–ST8)
 - [x] Studio test switch DevAllTrophies: every trophy × N, session only (requested by the user 2026-10-02). (code done; Studio test pending: QA DT1–DT7)
+- [x] Power-up looks: speed trail + glowing feet, jump and double-jump effects (requested by the user 2026-10-02). (code done; Studio test pending: QA PL1–PL11)
 

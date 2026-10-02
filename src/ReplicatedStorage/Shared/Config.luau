@@ -450,14 +450,54 @@ local Config = {
 	-- bonus) to Max (bonus at TrophySpeedGlowFullAt or more). Brightness/Range
 	-- are the PointLight at each foot; Rate is sparkles per second per foot.
 	-- Looks only: the speed itself keeps growing past TrophySpeedGlowFullAt.
-	TrophySpeedGlowFullAt = 1.5, -- +150% walk speed = full glow
+	TrophySpeedGlowFullAt = 1.5, -- +150% walk speed = full glow (and full trail)
 	TrophySpeedGlowColor = Color3.fromRGB(90, 200, 255),
-	TrophySpeedGlowBrightnessMin = 0.6,
-	TrophySpeedGlowBrightnessMax = 1.6,
-	TrophySpeedGlowRangeMin = 4,
-	TrophySpeedGlowRangeMax = 7,
-	TrophySpeedGlowRateMin = 5,
-	TrophySpeedGlowRateMax = 18,
+	TrophySpeedGlowBrightnessMin = 1,
+	TrophySpeedGlowBrightnessMax = 2.4,
+	TrophySpeedGlowRangeMin = 5,
+	TrophySpeedGlowRangeMax = 8,
+	TrophySpeedGlowRateMin = 8,
+	TrophySpeedGlowRateMax = 24,
+	-- Fast electric sparks crackling at each foot (per second per foot).
+	TrophySpeedGlowEnergyRateMin = 6,
+	TrophySpeedGlowEnergyRateMax = 22,
+	-- Speed trail: a glowing ribbon behind the player (Trail on the
+	-- HumanoidRootPart, built by PowerVisuals). Every client shows it only
+	-- while that player runs faster than TrophySpeedTrailMinSpeed (studs/s,
+	-- sideways only; normal walking is 16, so it means "running with super
+	-- speed"). Colors go from the player (Color) to the tail (ColorEnd).
+	-- Min..Max scale with the bonus like the glow (full at
+	-- TrophySpeedGlowFullAt). MaxLength (studs) keeps it short enough that it
+	-- never reaches your own camera. Opacity 1 = solid, 0 = invisible.
+	TrophySpeedTrailMinSpeed = 19,
+	TrophySpeedTrailColor = Color3.fromRGB(190, 250, 255),
+	TrophySpeedTrailColorEnd = Color3.fromRGB(40, 110, 255),
+	TrophySpeedTrailLifetimeMin = 0.25,
+	TrophySpeedTrailLifetimeMax = 0.5,
+	TrophySpeedTrailMaxLengthMin = 5,
+	TrophySpeedTrailMaxLengthMax = 10,
+	TrophySpeedTrailOpacityMin = 0.45,
+	TrophySpeedTrailOpacityMax = 0.85,
+	-- Speed lines that whoosh out behind you when you start sprinting.
+	TrophySpeedBurstCount = 12,
+	-- Jump looks (JumpHeight trophies): a springy ring on the ground and a
+	-- sparkle burst on takeoff, and soft glowing sparkles while in the air.
+	-- Min..Max scale with the JumpHeight bonus, full at TrophyJumpLookFullAt
+	-- (looks only; the jump has no limit). Ring radius is in studs, burst is
+	-- particles per jump, air glow is particles per second.
+	TrophyJumpLookFullAt = 1.0, -- +100% jump height = full look
+	TrophyJumpLookColor = Color3.fromRGB(110, 255, 170),
+	TrophyJumpRingRadiusMin = 3,
+	TrophyJumpRingRadiusMax = 6,
+	TrophyJumpBurstMin = 10,
+	TrophyJumpBurstMax = 26,
+	TrophyJumpAirGlowRateMin = 6,
+	TrophyJumpAirGlowRateMax = 18,
+	-- Double jump (CanDoubleJump): a ring of light and a puff in mid-air when
+	-- the air jump fires. Radius in studs, puff in particles.
+	TrophyDoubleJumpColor = Color3.fromRGB(255, 170, 60),
+	TrophyDoubleJumpRingRadius = 5,
+	TrophyDoubleJumpPuffCount = 14,
 	-- A "lucky" drop (LuckyCookieChance) is worth this many times its value.
 	TrophyLuckyCookieMultiplier = 5,
 	-- Fewest seconds between two equip/unequip requests from one player.
