@@ -53,6 +53,7 @@ Record the date and result when you run a case.
 | ST2 | Look at the statue's face and outfit. | Big round head, shaggy dark-brown hair with fringe over the forehead and ears, big white eyes with tiny pupils, brows, small nose, wide grin with white teeth; dark navy long-sleeve shirt, gold chain, one hand on the hip; gray pants, white sneakers. A black cartoon outline around the whole statue. Nothing is floating or misaligned. | |
 | ST3 | Walk into and jump on the statue/pedestal. | It's solid and doesn't move; nothing happens to cash or the plot. No errors in Output. | |
 | ST4 | Walk around near the statue and look at it from the plot. | No noticeable lag. | |
+| ST5 | Look at Caleb's grin from the front (spawn side) and from the ground right below the statue, a little to each side. Then watch him during the Full event (burp/head jolt) and the Cookie Party laugh and "I'M FULL!" finale, when the mouth opens. | ONE clean row of white teeth along the top of the mouth, following the smile's curve, with thin gap lines between teeth; no second row, no dark stripe through the teeth, no flickering. The dark red mouth shows below the teeth. When the mouth opens, the teeth drop together with the mouth and still look like one row; they go back into place after. | |
 
 ## Feeding Caleb
 
