@@ -219,10 +219,10 @@ command bar: `game.ReplicatedStorage.Remotes.CookiePartySpawn.OnClientEvent:Conn
 | PS3 | Walk onto a landed cookie of each type and fire a collect for its id. | Cookies go up by exactly its value (Normal 50, Chocolate 150, Golden 1,000, Giant 5,000; Giant also accepted from up to ~12 studs away). `CookiePartyEarned` rises by the value and `CookiePartyCount` by 1. Everyone receives `CookiePartyCollected(id, yourUserId, value, type)`. | |
 | PS4 | 2 players stand on the same cookie; both fire a collect for its id (and fire it twice yourself). | Only one player is paid, once; one `CookiePartyCollected` for that id. | |
 | PS5 | Fake ids: `FireServer(999999)`, `FireServer(1.5)`, `FireServer("5")`, `FireServer(0/0)`, `FireServer(math.huge)`, `FireServer(nil)`, `FireServer({})`. | Nothing paid, no errors in server Output, no kick. | |
-| PS6 | Fire a collect for a real cookie that landed far (> 12 studs) from you, and one under/over you by more than 25 studs (e.g. you on a roof, cookie on the ground far below). | Not paid; the cookie stays collectable for someone else. | |
+| PS6 | Standing still, fire a collect for a real cookie that landed far (> 12 studs) from you, and one under/over you by more than 25 studs (e.g. you on a roof, cookie on the ground far below). | Not paid; the cookie stays collectable for someone else. | |
 | PS7 | Fire a collect for a cookie right after it appears (before `LandAt` − 0.3) while standing on its spot. | Not paid. Once it has landed, the same request pays. | |
 | PS8 | Wait until a cookie's `ExpiresAt` passes, then try to collect it. | `CookiePartyCollected(id, 0, 0, type)` arrives within ~0.75 s after `ExpiresAt`; collecting it after that pays nothing. | |
-| PS9 | Spam: fire a collect 100 times in one frame for ids you stand near, plus random ids. | At most 12 requests per second are looked at; only real, valid cookies pay; server stays smooth; no errors. | |
+| PS9 | Spam: fire a collect 100 times in one frame for ids you stand near, plus random ids. | At most 20 requests per second are looked at; only real, valid cookies pay; server stays smooth; no errors. | |
 | PS10 | While dead (reset and fire before respawn), or before Celebration / during TrophyClaim, fire collects with old ids. | Nothing paid. | |
 | PS11 | Let the party end (2 players). | At the switch to `TrophyClaim` each player gets exactly +5,000 (`CookiePartyFinalReward`) once and one `CookiePartyFinale(5000)`. Every still-alive cookie gets `CookiePartyCollected(id, 0, 0, type)`. No spawns in the last 1.6 s or after the party. | |
 | PS12 | Two cycles in a row. | Second party starts at id > the first party's last id, earnings reset to 0 at its start, final reward paid once per party (never twice, never for a stale cycle). No leftover loop (spawns stop between parties). | |
@@ -247,12 +247,33 @@ Sounds need ids in `Config.CookiePartySounds` (empty = silent, no errors).
 | PK8 | Collect 3+ cookies quickly. | "x3 COMBO!", "x4 COMBO!"… under the counter; the collect sound pitch rises a little each time; after ~1.4 s without collecting the combo text hides. | |
 | PK9 | Stand still and let a cookie sit. | It blinks for its last ~1.5 s, then fades out. | |
 | PK10 | 2 players: both run to the same cookie. | Only one gets it (the server decides). The winner sees the pop and "+N"; the other sees a small puff and the cookie vanishes (no "+N", their counter unchanged). | |
-| PK11 | Lag test: Studio network settings with incoming replication lag ~0.5 s; collect cookies, including standing right at the edge of a cookie and sweeping fast through a pile. | No double rewards. A cookie the server refuses comes back within ~1 s and is asked for again while you stay on it (it still picks up; never more than one request in flight per cookie), at most 3 requests per cookie in all. No errors. | |
+| PK11 | Lag test: Studio network settings with incoming replication lag ~0.5 s; collect cookies, including standing right at the edge of a cookie and sweeping fast through a pile. | No double rewards. A cookie the server refuses comes back within ~0.35 s and is asked for again while you stay near it (it still picks up; never more than one request per cookie at a time), at most 6 requests per cookie in all. No errors. | |
 | PK12 | Player 2 joins in the middle of the party. | Counter shows right away; the cookies already on the ground appear (no fall), new ones fall normally. | |
 | PK13 | Party ends (`TrophyClaim`). | The counter hides (no summary screen); all collectable cookies vanish (a pop already playing finishes); within a second the client's `Workspace.CookiePartyCookies` folder, the `CookiePartyBurst` attachment and the `CookiePartyNumber` attachments in `Terrain`, and the `CookiePartyNumber` guis in PlayerGui are gone. | |
 | PK14 | Rain ramp: watch the visual rain from Start to Countdown. | Light rain at the start, clearly heavier in Hype, heavy in Frenzy/Countdown; golden-looking rain cookies appear from Hype and are common at the end. They still can't be picked up (no "+N"). Client view: never more than 170 rain `Cookie` parts in `Workspace.CookieRain`. | |
 | PK15 | Two parties in a row (fast cycle). | Everything works again in the second party; no duplicate folders/guis; the counter starts at 0. | |
 | PK16 | 4 players during Frenzy/Countdown; check FPS (Shift+F5 / MicroProfiler) and Output. | Smooth on every client; no errors or warnings. | |
+
+## Cookie Party: collecting with powers
+
+Bug fix 2026-10-02: with Caleb Trophy powers on, cookies you ran through were
+sometimes not collected. Set `Config.DevCalebFastCycle = true` (goal 1,000
+cookies, Full 3 s) and `Config.DevAllTrophies = true` (every trophy, so you
+can display speed/jump/double-jump trophies in a built Trophy Case), plus
+`DevUnlimitedCash` to build fast; feed Caleb to start the party. Set them all
+back to false before committing. Also try with Studio's incoming
+replication lag (File > Studio Settings > Network > Incoming Replication
+Lag) at 0.2–0.5 s.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| CP1 | No powers displayed. Walk and run through cookies (Normal, Golden, Giant). | Every cookie you pass through is collected (pop, "+N", counter). | |
+| CP2 | Big WalkSpeed: display several speed trophies (they stack). Run at full speed straight through 20+ cookies, also clipping their edges. | Every cookie you pass through (within its glowing disc) is collected, none skipped; no "walked through and nothing happened". | |
+| CP3 | Same as CP2 with incoming replication lag 0.5 s. | Still collected (maybe a moment later: the cookie leans to you, then pops). No double payouts. | |
+| CP4 | JumpHeight trophies + double jump. Jump and double-jump over / onto cookies; land next to them. | Collected while jumping over or right after landing; no cookie stays stuck after you stood on it. | |
+| CP5 | Fast sweep through a big pile in Frenzy (many cookies within a second). | All the cookies along your path are collected; nothing is left behind because of the rate limit. | |
+| CP6 | From a client's command bar, fire `CookiePartyCollect:FireServer(id)` for a cookie 30+ studs away while standing still, and while running away from it. | Never paid. Only cookies your path came within ~reach of (radius + a few studs, a bit more when running fast) pay. | |
+| CP7 | Reset (respawn) during the party, then fire a collect for a cookie near where you died / along the respawn line. | Not paid from the respawn jump (a teleport is not a path); cookies near the new spawn work normally. | |
 
 ## Cookie Party: Caleb
 
