@@ -76,6 +76,8 @@ src/
 │       ├── CalebAudio.client.luau  → LocalScript: Caleb Full Event sound effects + Cookie Party music
 │       ├── CookiePartyAudio.luau   → ModuleScript: party music, countdown ticks, finale boom (for CalebAudio)
 │       ├── TrophyPrompt.client.luau → LocalScript: hides the trophy claim prompt for non-eligible players; claim messages
+│       ├── TrophyClaimPopup.luau   → ModuleScript: the "NEW TROPHY!" pop-up (fill, EQUIP via TrophyEquip, CLOSE)
+│       ├── TrophyClaimPopupUI.luau → ModuleScript: builds that pop-up once
 │       ├── TrophyInventory.client.luau → LocalScript: "🏆 TROPHIES" button + "MY CALEB TROPHIES" panel (equip/unequip)
 │       ├── TrophyInventoryUI.luau  → ModuleScript: builds that panel once (+ grid tiles for the pool)
 │       ├── TrophyInventoryIcon.luau → ModuleScript: tiny trophy icon drawn from frames, recolored per variant
@@ -246,7 +248,8 @@ changes cash, ownership, or purchases, and never talks to the server
 | `StarterPlayerScripts/CalebPartyBubble.client.luau` | Caleb's speech bubbles during `Celebration` only: one `BillboardGui` in PlayerGui (`AlwaysOnTop`, pixel-sized, `MaxDistance = Config.StatueBarMaxDistance`, built once, disabled outside the party) adorned to a `CalebPartyBubbleAnchor` Attachment in `Terrain` at the same spot as StatueBar's anchor (`Config.StatueBarHeight` above the Head, followed every frame). The billboard is twice as tall as needed and the bubble sits in its top half just above the bar's pixel height, so they never overlap. A white rounded bubble with a tail pops in/out (UIScale) with lines from `Config.CookiePartyCalebLines[phase]`, a new one every `CookiePartyCalebLineSeconds[phase]` (shown for 75% of it), in list order (Start/Hype/Frenzy start at an offset from the cycle seed; Countdown always from the first), text color per phase, shaking more later; the last `CookiePartyCalebFinalLineSeconds` show `CookiePartyCalebFinalLine` ("I'M FULL!!!", yellow, bigger). Everything comes from `CalebStateEndsAt`, so all players see the same line. One `Heartbeat` connection only during the party. No remotes; decides nothing. |
 
 | `StarterPlayerScripts/TrophyInventory.client.luau` + `TrophyInventoryUI.luau` + `TrophyInventoryIcon.luau` + `TrophyInventoryData.luau` | The trophy inventory. `TrophyInventoryUI.Build` makes one `TrophyInventory` ScreenGui (`ResetOnSpawn = false`, `DisplayOrder` 4: under the event UI and the feed pop-up) with a yellow "🏆 TROPHIES" button at the left middle (clear of the cookie counter and the phone thumbstick) and a hidden centered panel (scale + `UIAspectRatioConstraint` 1.7 + `UISizeConstraint` 400×235 – 880×518): "MY CALEB TROPHIES", "🏆 COLLECTION N / M" (distinct collectable variants owned / `TrophyVariants.CollectableCount()`, or the count of `Weight > 0` definitions if that function is missing), "ACTIVE TROPHIES: n / Max", an orange "Build your Trophy Case…" note when `CaseBuilt` is false, a scrolling grid (`UIGridLayout`, 3–6 columns sized from the grid width), a details pane, an "Active powers: …" line from `TrophyStats`, and "Saving is off this session" when `Saved` is false. Grid tiles are created on demand and **pooled** (hidden, never destroyed; one `Activated` connection each); the order is equipped first, then rarest, then newest. Each tile: rarity-colored border, frame-drawn icon (`TrophyInventoryIcon`: Base/Figure colors, hat, sparkle), rarity, name, green "EQUIPPED" badge. Details: icon, name, "⭐ RARITY" in the rarity color, `PowerText`, `"Description"`, a message line and EQUIP / UNEQUIP (grey "Case full (n/Max)" when full). The button invokes `Remotes.TrophyEquip` (`"Equip"`/`"Unequip"`, instanceId) in a `pcall`, one request at a time and at most every `Config.TrophyEquipCooldown`, shows the server's reason on failure, and otherwise just waits for the attribute. Reads the `TrophyInventory` / `TrophyStats` attributes at start and on change (JSON decoded in `pcall`; missing/bad = empty inventory, bad records skipped, `Equipped` ids not in `Owned` ignored). Missing definition fields / unknown rarities fall back (name "Mystery Caleb", light grey rarity color, "No power"). Decides nothing. |
-| `StarterPlayerScripts/TrophyPrompt.client.luau` | Watches `Workspace.Map` for `CalebClaimTrophy` (and its descendants, for streaming) and sets its `ProximityPrompt.Enabled` **locally** to whether this player is eligible (`CalebFed > 0` and not `CalebTrophyClaimed`), updating on those attributes; the server re-checks every claim. On `CalebTrophyNotice` changes, shows a `StarterGui:SetCore("SendNotification")` with the result: the variant's name + rarity (saved, or "couldn't be saved"), "already have this round's trophy", or "only players who fed Caleb this round". No remotes. |
+| `StarterPlayerScripts/TrophyPrompt.client.luau` | Watches `Workspace.Map` for `CalebClaimTrophy` (and its descendants, for streaming) and sets its `ProximityPrompt.Enabled` **locally** to whether this player is eligible (`CalebFed > 0` and not `CalebTrophyClaimed`), updating on those attributes; the server re-checks every claim. On `CalebTrophyNotice` changes: `Saved` / `Unsaved` (with a `Variant`) → `TrophyClaimPopup.Show(kind, variant, instanceId?)`; `AlreadyOwned` / `NotEligible` → a small `StarterGui:SetCore("SendNotification")` ("already have this round's trophy" / "only players who fed Caleb this round"). No remotes itself. |
+| `StarterPlayerScripts/TrophyClaimPopup.luau` + `TrophyClaimPopupUI.luau` | The "🏆 NEW TROPHY!" pop-up. `TrophyClaimPopupUI.Build` makes one `TrophyClaimPopup` ScreenGui (`ResetOnSpawn = false`, `DisplayOrder` 8: over the inventory and event UI, under the feed pop-up; disabled until shown) with a centered yellow panel (scale + `UIAspectRatioConstraint` 0.82 + `UISizeConstraint` 250×305 – 400×488; EQUIP / CLOSE are 13.5% of its height, ≥ 41 px), a rarity-colored header, a spinning shine, pooled confetti, the `TrophyInventoryIcon`, name, "⭐ RARITY", `PowerText`, `"Description"`, a Trophy Case note (from `CaseBuilt` and whether it is equipped), and an info line (red server reason, or "couldn't be saved this session" for `Unsaved`). `Show` replaces any open pop-up, pops it in, bursts confetti, plays `Config.TrophyPopupSound` (empty = none), and closes it after `Config.TrophyPopupSeconds`. The trophy's id is the notice's `InstanceId`; if missing (older server), the newest owned record of that `Variant` in `TrophyInventory`, preferring one not owned when the pop-up opened. If that id is in `Equipped` it shows "EQUIPPED ✓" instead of EQUIP (re-checked on every `TrophyInventory` change). EQUIP invokes `Remotes.TrophyEquip` (`"Equip"`, id) in a `pcall`, one at a time and at most every `Config.TrophyEquipCooldown`; failure shows the server's reason, success shows "EQUIPPED ✓" and closes after ~1 s. Decides nothing. |
 
 **Client requires:** LocalScripts in `StarterPlayerScripts` start running
 while the folder is still being copied into the player, so a sibling
@@ -493,7 +496,7 @@ string literals.
 | `Workspace.Map.Statue` | `CalebTopFeeders` | string | JSON `[{UserId, Name, Cookies}]`, best first, ≤ `Config.CalebLeaderboardSize`, updated at most every `Config.CalebLeaderboardInterval` s |
 | each `Player` | `CalebFed` | number | cookies this player fed Caleb this cycle (restored if they rejoin the same server) |
 | each `Player` | `CalebTrophyClaimed` | boolean | claimed this cycle's trophy |
-| each `Player` | `CalebTrophyNotice` | string | JSON `{Id, Kind, Variant?}` set by TrophyService after a claim attempt (`Kind`: `Saved` / `Unsaved` / `AlreadyOwned` / `NotEligible`); `Id` changes every time. `TrophyPrompt.client` shows it. |
+| each `Player` | `CalebTrophyNotice` | string | JSON `{Id, Kind, Variant?, InstanceId?}` set by TrophyService after a claim attempt (`Kind`: `Saved` / `Unsaved` / `AlreadyOwned` / `NotEligible`; `Variant` and `InstanceId` = the new trophy, only for `Saved` / `Unsaved`); `Id` changes every time. `TrophyPrompt.client` shows it (`TrophyClaimPopup` for a new trophy; clients must cope with a missing `InstanceId`). |
 
 A player is **eligible** for this cycle's trophy when `CalebFed > 0` and
 `CalebTrophyClaimed` is not true, during `TrophyClaim`. Players who join
@@ -541,7 +544,8 @@ All presentation is client-side and driven only by the attributes above:
 `CalebAnimator.client` (full animation + dance), `CalebEventUI.client` (big
 message, countdowns, trophy prompt text, screen VFX), `CookieRain.client`,
 `CalebAudio.client`, `CalebLeaderboard.client` (podium board),
-`TrophyPrompt.client` (claim prompt visibility + claim messages), and the
+`TrophyPrompt.client` (claim prompt visibility + claim messages; the "NEW
+TROPHY!" pop-up is `TrophyClaimPopup`), and the
 existing `StatueBar.client`. The Caleb Full Event itself uses no RemoteEvents (state is
 attributes; the trophy claim uses a server `ProximityPrompt`); only the Cookie Party's collectable cookies do (see "Cookie Party (contract)").
 
@@ -681,7 +685,9 @@ client.
 `TrophyInventory.client` (+ UI builder module): "MY CALEB TROPHIES N / M"
 button + panel, trophy details (name, rarity, PowerText, Description),
 EQUIP / UNEQUIP via `TrophyEquip`, "ACTIVE TROPHIES: n / 5", and a note when
-the Trophy Case isn't built. `DoubleJump.client`: second jump when
+the Trophy Case isn't built. `TrophyClaimPopup` (via `TrophyPrompt.client`):
+the "NEW TROPHY!" pop-up after a claim, with EQUIP (same `TrophyEquip`
+remote) / CLOSE. `DoubleJump.client`: second jump when
 `CanDoubleJump` is true.
 
 ### Power formulas (PowerService, DropperService, CollectorService)
