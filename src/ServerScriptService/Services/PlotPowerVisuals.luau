@@ -1,4 +1,4 @@
--- PowerVisuals (server only)
+-- PlotPowerVisuals (server only)
 -- Helper for PowerService and DropperService: shows the plot owner's active
 -- Caleb Trophy powers ON the thing they boost. Presentation only; it decides
 -- nothing and never changes cash or powers.
@@ -31,7 +31,7 @@ local Workspace = game:GetService("Workspace")
 local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 
-local PowerVisuals = {}
+local PlotPowerVisuals = {}
 
 -- Looks only; not gameplay tuning.
 local FULL_FIRE_BONUS = 1 -- CookieMultiplier + DropperSpeed that gives the biggest flames
@@ -209,7 +209,7 @@ end
 
 -- Called by PowerService whenever a player's power totals change (empty =
 -- no powers). Redraws the plot(s) they own.
-function PowerVisuals.Apply(player: Player, totals: { [string]: number })
+function PlotPowerVisuals.Apply(player: Player, totals: { [string]: number })
 	totalsByPlayer[player] = if next(totals) then totals else nil
 	local map = Workspace:FindFirstChild("Map")
 	local plots = map and map:FindFirstChild("Plots")
@@ -229,7 +229,7 @@ end
 -- Called by DropperService for every dropper cup it places on a plot (after
 -- parenting it). The cup shows the owner's powers now and on every change
 -- until it is destroyed.
-function PowerVisuals.AddDropper(plot: Model, cup: Model)
+function PlotPowerVisuals.AddDropper(plot: Model, cup: Model)
 	watch(plot)
 	local cups = droppersByPlot[plot]
 	if not cups then
@@ -243,4 +243,4 @@ function PowerVisuals.AddDropper(plot: Model, cup: Model)
 	drawDropper(cup, ownerTotals(plot))
 end
 
-return PowerVisuals
+return PlotPowerVisuals
