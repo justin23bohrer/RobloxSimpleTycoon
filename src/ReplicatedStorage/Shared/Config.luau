@@ -238,6 +238,40 @@ local Config = {
 	}),
 	-- Fewest seconds between two Grow sounds (feeds in between are silent).
 	CalebGrowSoundInterval = 0.35,
+	-- Tycoon sound effects, same rules as CalebSounds: Roblox asset id
+	-- strings, empty = skipped silently. Original effects: tools/audio/out/
+	-- (purchase.wav, purchase_build.wav, cant_afford.wav, collect_cookies.wav,
+	-- drop_in_jar.wav; see tools/audio/README.md). Played by TycoonSounds
+	-- (server): 3D at the plot, heard by players nearby, except CantAfford,
+	-- which only the player who touched the button hears.
+	--   Purchase       a dropper is bought (at its button)
+	--   PurchaseBuild  a house part is built (at its button); empty = uses Purchase
+	--   CantAfford     you step on a button you can't afford
+	--   Collect        Collect pad payout (pitch rises a little with the payout)
+	--   DropInJar      a cookie drop reaches the collector (quiet, at the jar)
+	TycoonSounds = table.freeze({
+		Purchase = "",
+		PurchaseBuild = "",
+		CantAfford = "",
+		Collect = "",
+		DropInJar = "",
+	}),
+	-- Volume (0..1) of each sound above. DropInJar plays often: keep it quiet.
+	TycoonSoundVolumes = table.freeze({
+		Purchase = 0.7,
+		PurchaseBuild = 0.8,
+		CantAfford = 0.5,
+		Collect = 0.8,
+		DropInJar = 0.15,
+	}),
+	-- Fewest seconds between two CantAfford sounds for one player on one button.
+	TycoonCantAffordSoundInterval = 1.5,
+	-- At most this many DropInJar plinks per second per plot (the rest are silent).
+	TycoonDropSoundsPerSecond = 6,
+	-- Collect sound pitch: +PitchPerTenfold for every x10 of the payout above
+	-- 10 cookies, up to PitchMax (1 = normal pitch).
+	TycoonCollectPitchPerTenfold = 0.05,
+	TycoonCollectPitchMax = 1.25,
 
 	-- Cookie Party (CalebState "Celebration", exactly CalebCelebrationSeconds
 	-- = 60 s). See Shared/CookieParty.luau and ARCHITECTURE.md "Cookie Party

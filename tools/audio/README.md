@@ -1,4 +1,4 @@
-# tools/audio — Caleb Full Event + Cookie Party audio
+# tools/audio — Caleb Full Event, Cookie Party + tycoon audio
 
 ## Your music
 
@@ -67,6 +67,17 @@ Cookie Party sounds go in `Config.CookiePartySounds` (volumes in
 | `out/caleb_laugh.wav` | `CalebLaugh` | Caleb laughs during the party (Caleb party client) |
 | `out/caleb_spit.wav` | (unused) | Caleb's spit move was removed |
 
+Tycoon sounds go in `Config.TycoonSounds` (volumes in
+`Config.TycoonSoundVolumes`; played by the server helper `TycoonSounds`):
+
+| File | `Config.TycoonSounds` key | When it plays (who hears it) |
+| ---- | ------------------------- | ---------------------------- |
+| `out/purchase.wav` | `Purchase` | a dropper is bought (3D at the button, players nearby) |
+| `out/purchase_build.wav` | `PurchaseBuild` | a house part is built (3D at the button); empty = uses `Purchase` |
+| `out/cant_afford.wav` | `CantAfford` | you step on a button you can't afford (only you; at most every 1.5 s per button) |
+| `out/collect_cookies.wav` | `Collect` | Collect pad payout (3D at the pad; pitch rises a little for bigger payouts) |
+| `out/drop_in_jar.wav` | `DropInJar` | a cookie drop reaches the collector (quiet, 3D at the jar, max 6/s per plot) |
+
 All files: 16-bit WAV, 44.1 kHz, mono, normalized to about −1 dBFS (no
 clipping); every effect is under 300 KB, the 8 s music loop is about 700 KB. They are committed, so you only need to
 re-generate after changing the script.
@@ -77,7 +88,7 @@ re-generate after changing the script.
 python3 tools/audio/generate_sfx.py
 ```
 
-Writes the fourteen files to `tools/audio/out/`. The output is deterministic
+Writes the nineteen files to `tools/audio/out/`. The output is deterministic
 (fixed random seeds), so re-running without changes gives identical files.
 
 ### Upload to Roblox and use them
@@ -93,7 +104,7 @@ Writes the fourteen files to `tools/audio/out/`. The output is deterministic
 4. Copy each asset id: in Asset Manager, right-click the audio →
    **Copy Asset ID** (on Creator Hub: the number in the asset's URL).
 5. Paste each one into `src/ReplicatedStorage/Shared/Config.luau`, in
-   `CalebSounds` or `CookiePartySounds` (tables above), as
+   `CalebSounds`, `CookiePartySounds` or `TycoonSounds` (tables above), as
    `"rbxassetid://<id>"` (a bare number also works):
 
    ```lua
@@ -107,7 +118,8 @@ Writes the fourteen files to `tools/audio/out/`. The output is deterministic
    ```
 
 6. Edit the file in the repo (not only in Studio), commit, and let Rojo sync.
-   Volumes are in `Config.CalebSoundVolumes` / `Config.CookiePartySoundVolumes`.
+   Volumes are in `Config.CalebSoundVolumes` / `Config.CookiePartySoundVolumes`
+   / `Config.TycoonSoundVolumes`.
 
 If the audio is uploaded by a different account than the one that owns the
 game, it may not play in the published game (Roblox audio permissions). Upload

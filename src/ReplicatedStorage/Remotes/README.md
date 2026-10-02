@@ -13,6 +13,11 @@ Remotes here:
   clients): the Cookie Party's collectable cookies. Handled by
   `CookiePartyService`; see ARCHITECTURE.md "Cookie Party (contract)".
 
+- `CantAfford.model.json` (RemoteEvent, server → one client, no arguments):
+  the player touched a buy button they can't afford; `CantAffordSound.client`
+  plays `Config.TycoonSounds.CantAfford`. Fired (rate-limited) by the server
+  helper `TycoonSounds`.
+
 Everything else needs no remote:
 
 - Buying and collecting happen when a character touches a part. The server

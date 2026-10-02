@@ -244,6 +244,23 @@ The jar shows the stored amount both as small cookies and as a number:
 - All of this is looks only; the server's stored cookies decide the payout.
   (Requested by the user 2026-10-01; replaces the old "no amount text" rule.)
 
+### Tycoon sounds (approved by the user 2026-10-02)
+
+Original sound effects (synthesized by `tools/audio/generate_sfx.py`), ids in
+`Config.TycoonSounds` (empty = silent), volumes in `Config.TycoonSoundVolumes`.
+They only react to what the server already decided.
+
+- Buying a dropper: a "ka-ching!" at the button. Building a house part
+  (walls, stairs, floor, furniture, Trophy Case): hammer knocks + whoosh +
+  chime. Players nearby hear it too (3D).
+- Stepping on a button you can't afford: a soft "nope" only you hear, at most
+  once every 1.5 s per button.
+- Collecting on the Collect pad: a cascade of coin clinks + a happy chime;
+  the pitch rises a little for bigger payouts. Nearby players hear it.
+- Each cookie reaching the jar: a tiny quiet "plink" (at most 6 per second
+  per plot, however many droppers).
+- Rebuilding your saved house when you claim a plot plays no sounds.
+
 ## Plot layout (prototype)
 
 Plain parts only, no theme. Each plot floor is **66 × 66 studs** (2/3 of the

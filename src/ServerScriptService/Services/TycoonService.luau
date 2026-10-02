@@ -31,6 +31,7 @@ local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 local PlotStages = require(script.Parent.PlotStages)
 local Purchases = require(script.Parent.Purchases)
+local TycoonSounds = require(script.Parent.TycoonSounds)
 
 local TycoonService = {}
 
@@ -165,6 +166,7 @@ function TycoonService.Start()
 
 	for _, plot in plots do
 		CollectorService.SetupPlot(plot) -- before resetPlot: it builds the pad's effects
+		TycoonSounds.Setup(plot)
 		resetPlot(plot)
 		plot.ClaimPad.Touched:Connect(function(hit)
 			onClaimPadTouched(plot, hit)
@@ -210,6 +212,7 @@ function TycoonService.OnPlayerRemoving(player: Player)
 	tycoonsByPlayer[player] = nil
 	ownerByPlot[tycoon.Plot] = nil
 	lastBuyTouch[player] = nil
+	TycoonSounds.OnPlayerRemoving(player)
 	resetPlot(tycoon.Plot)
 end
 
@@ -279,6 +282,8 @@ end
 -- A purchase can only be bought after the one named in its After field; the
 -- price comes only from Config. A Cost of 0 is free (nothing is spent).
 -- Buying a dropper starts it; buying a build shows its parts (PlotStages).
+-- Plays the purchase sound (or the player's "can't afford" sound) after the
+-- result is decided; restoring a saved house never comes through here.
 function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 	local tycoon = tycoonsByPlayer[player]
 	if not tycoon or typeof(purchaseId) ~= "string" then
@@ -300,11 +305,13 @@ function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 	end
 	local cost = purchase.Entry.Cost
 	if cost > 0 and not EconomyService.TrySpend(player, cost) then
+		TycoonSounds.CantAfford(player, purchaseId)
 		return false -- cannot afford it; cash unchanged
 	end
 
 	applyPurchase(tycoon, purchase)
 	DataService.SetPurchased(player, purchaseId)
+	TycoonSounds.Purchased(tycoon.Plot, purchaseId)
 	return true
 end
 

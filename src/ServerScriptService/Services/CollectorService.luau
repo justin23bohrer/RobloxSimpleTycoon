@@ -9,6 +9,8 @@
 -- CollectorDisplay shows the stored amount as small cookies filling the
 -- CashTank ("COOKIE JAR") behind the pad and as a "🍪 1,250" counter on the
 -- jar, updated every time the stored amount changes (presentation only).
+-- TycoonSounds plays a quiet plink per accepted drop (rate-limited) and the
+-- payout sound after a successful payout (presentation only).
 --
 -- Named CollectorService (not CollectionService) to avoid confusion with
 -- Roblox's built-in game:GetService("CollectionService") tagging service.
@@ -32,6 +34,7 @@ local CollectorDisplay = require(script.Parent.CollectorDisplay)
 local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 local PowerService = require(script.Parent.PowerService)
+local TycoonSounds = require(script.Parent.TycoonSounds)
 
 local CollectorService = {}
 
@@ -45,6 +48,7 @@ local function onCollectorTouched(plot: Model, hit: BasePart)
 	storedCashByPlot[plot] = (storedCashByPlot[plot] or 0) + value
 	CollectorDisplay.AddCube(plot)
 	CollectorDisplay.SetAmount(plot, storedCashByPlot[plot])
+	TycoonSounds.DropInJar(plot)
 end
 
 local function onCollectPadTouched(plot: Model, hit: BasePart)
@@ -70,6 +74,7 @@ local function onCollectPadTouched(plot: Model, hit: BasePart)
 	end
 	CollectorDisplay.Clear(plot, true)
 	CollectorDisplay.SetAmount(plot, 0)
+	TycoonSounds.Collected(plot, payout)
 end
 
 -- Connects the collector and CollectPad touch handlers for a plot. Called once
