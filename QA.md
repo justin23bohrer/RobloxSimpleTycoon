@@ -630,6 +630,30 @@ PowerService command-bar line above) to change what is displayed.
 | PV9 | 2 players (Clients and Servers): Player 1 has fire + ring. | Player 2 sees Player 1's burning cups and gold ring; Player 2's own plot has none. | |
 | PV10 | Rejoin (saved data) with a production + collect trophy equipped. | Once the house is restored, the cups burn and the pad ring is back. | |
 
+## Power-up looks
+
+Speed trail + glowing feet, jump and double-jump effects (requested by the
+user 2026-10-02). Built Trophy Case. Quickest setup: in Studio set
+`Config.DevAllTrophies = true` (5 copies of every trophy; **commit it as
+false**) and equip from the inventory, or use the PowerService command-bar
+line in "Trophy stacking". Base WalkSpeed 16; the trail shows above 19
+studs/s (`TrophySpeedTrailMinSpeed`). Check day and night, and keep an eye on
+Output for errors.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PL1 | Display one speed trophy (e.g. Speed Caleb +75%). Stand still, then walk with a light thumbstick touch (phone emulator) or tap a key, then run. | Feet glow light blue with bright sparkles and crackling sparks at all times. **No trail while standing still or moving slowly**; while running, a glowing cyan → blue ribbon streams behind your waist/legs and fades out; stop → it fades away within half a second. A few speed lines whoosh out behind you when you start running (not every frame). | |
+| PL2 | Your own view while running in third person, zoomed in close, and in first person; run in circles and up/down stairs. | The trail never covers the screen or reaches the camera; nothing flickers on/off while running at a steady speed. | |
+| PL3 | Stacked speed: compare Party Caleb (+35%) with 2 × Speed (+150%) and 5 × Speed (+375%). | Bigger bonus → longer, more solid trail, brighter feet, more sparks. +150% and +375% look the same (full look); nothing is blinding. | |
+| PL4 | Display a JumpHeight trophy (Jump Caleb +50%), jump several times on flat ground and on a slope; then 5 × Jump Caleb. | Each takeoff: a mint-green double ring springs out flat on the ground (not floating, not hidden under it) with a sparkle burst; soft green sparkles trail your feet while in the air and stop when you land. 5 × Jump: bigger rings, more sparkles. Jumping without a jump trophy: nothing. | |
+| PL5 | Display Rocket Caleb; jump, then press jump again in the air (also walk off a ledge and jump in the air). | Takeoff: the jump ring (Rocket has +20% jump). The air jump: an orange ring of light + a puff appears right under you in mid-air, exactly once per air jump. Holding jump does not fire it twice. A normal jump never shows the orange ring. | |
+| PL6 | 2 players (Test → Clients and Servers): Player 1 has speed + jump + Rocket. Watch from Player 2; then start a 3rd player late. | Player 2 (and the late 3rd player) see Player 1's glowing feet, the trail only while Player 1 runs, the jump rings/bursts and the orange air-jump burst. Player 2's own body shows nothing. | |
+| PL7 | Unequip each power one by one (and release the plot / unbuilt case). | Each look disappears right away: no `SpeedGlow`, `SpeedTrailTop`/`SpeedTrailBottom`, `JumpFX` left in the character (Explorer, Server and Client views); jumps stop making rings. With only speed left: no `JumpFX`; with only Rocket: `JumpFX` has only `AirBurst`. | |
+| PL8 | Respawn (Esc → Reset) twice with every look on. | All looks come back; still exactly one `SpeedGlow` per foot, one `SpeedTrailTop` + `SpeedTrailBottom` + `SpeedTrail`, one `JumpFX` on the `HumanoidRootPart`. | |
+| PL9 | No duplicates: equip/unequip a speed trophy 10 times fast, and swap between speed trophies. | Still exactly one trail (no doubled ribbon), one `SpeedGlow` per foot; no errors. On the client, `Workspace.PowerLooksFX` never has more than 8 `PowerRing` parts however much you jump. | |
+| PL10 | No powers: a player without trophies runs and jumps; check the MicroProfiler / Script Performance. | No looks, no rings; `PowerLooks` uses ~0 while nobody has a speed trail; no `PowerLooksFX` folder until someone with a jump power jumps. | |
+| PL11 | R6 (Game Settings → Avatar → R6) with speed + jump trophies. | Feet glow on the leg bottoms, trail behind the torso, jump ring at the feet (on the ground). | |
+
 ## Trophy inventory UI
 
 Needs the Inventory + Powers server work merged (the `TrophyInventory` and

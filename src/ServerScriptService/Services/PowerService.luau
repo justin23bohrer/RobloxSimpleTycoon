@@ -14,9 +14,11 @@
 --   character's own value when it spawned (saved on the Humanoid as
 --   attributes), so re-applying never compounds. The Humanoid is switched to
 --   JumpHeight (UseJumpPower = false). CharacterAdded re-applies on respawn.
--- * Glowing feet: whenever movement is applied, PowerVisuals.SetSpeedGlow
---   shows (WalkSpeed bonus > 0) or removes (0) the glow on the character's
---   feet; it is made here on the server so every player sees it.
+-- * Body looks: whenever movement is applied, PowerVisuals.SetLooks builds,
+--   updates or removes the character's power effects (glowing feet + speed
+--   trail for WalkSpeed, jump effects for JumpHeight, the double-jump burst
+--   for DoubleJump); made here on the server so every player sees them
+--   (PowerLooks.client only animates them).
 -- * Character physics is client-owned in Roblox, so movement bonuses (and
 --   DoubleJump.client's double jump) are presentation-level: an exploiter
 --   could move faster anyway. Cookie values stay fully server-side.
@@ -26,8 +28,8 @@
 --   cups, luck sparkles, a gold ring on the Collect pad).
 --
 -- Requires only Shared modules and two presentation helpers: PowerVisuals
--- (glowing feet; requires Config only) and PlotPowerVisuals (plot effects;
--- requires Shared only). Never TycoonService: that would be a require cycle.
+-- (body looks; requires Shared + PowerVisualsRoot only) and PlotPowerVisuals
+-- (plot effects; requires Shared only). Never TycoonService: that would be a require cycle.
 -- Event-driven: no loops.
 
 local HttpService = game:GetService("HttpService")
@@ -49,6 +51,15 @@ local BASE_JUMP_ATTR = "BaseJumpHeight"
 local totalsByPlayer: { [Player]: { [string]: number } } = {}
 local characterConnections: { [Player]: RBXScriptConnection } = {}
 
+-- What the body power effects show for this player (PowerVisuals).
+local function looks(player: Player): PowerVisuals.Looks
+	return {
+		Walk = PowerService.Get(player, Stat.WalkSpeed),
+		Jump = PowerService.Get(player, Stat.JumpHeight),
+		DoubleJump = PowerService.Get(player, Stat.DoubleJump) > 0,
+	}
+end
+
 local function applyMovement(player: Player, character: Model?)
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	if not humanoid then
@@ -67,12 +78,12 @@ local function applyMovement(player: Player, character: Model?)
 	humanoid.UseJumpPower = false
 	humanoid.WalkSpeed = baseWalk * (1 + PowerService.Get(player, Stat.WalkSpeed))
 	humanoid.JumpHeight = baseJump * (1 + PowerService.Get(player, Stat.JumpHeight))
-	PowerVisuals.SetSpeedGlow(character, PowerService.Get(player, Stat.WalkSpeed))
+	PowerVisuals.SetLooks(character, looks(player))
 end
 
 local function watchCharacter(player: Player, character: Model)
 	PowerVisuals.Watch(player, character, function()
-		return PowerService.Get(player, Stat.WalkSpeed)
+		return looks(player)
 	end)
 end
 
