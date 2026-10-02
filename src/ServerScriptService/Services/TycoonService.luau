@@ -27,6 +27,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local PhotoMode = require(ReplicatedStorage.Shared.PhotoMode)
 local BuyButtons = require(script.Parent.BuyButtons)
 local CollectorService = require(script.Parent.CollectorService)
 local DataService = require(script.Parent.DataService)
@@ -278,7 +279,8 @@ end
 -- skipped. Then saved trophy builds that are unlocked (Purchases.IsUnlocked:
 -- their After bought, or the house maxed) are applied too (trophies are not
 -- checked again: they are never spent). If the data did not load, the plot
--- just starts fresh.
+-- just starts fresh. In Photo Mode (Studio only; nothing is loaded or
+-- saved) every purchase is restored as if saved: a fully built showcase plot.
 function TycoonService.RestorePurchases(player: Player)
 	local tycoon = tycoonsByPlayer[player]
 	if not tycoon or not tycoon.Restoring then
@@ -289,8 +291,13 @@ function TycoonService.RestorePurchases(player: Player)
 		return -- left (plot already reset) while loading
 	end
 
-	if loaded then
+	if loaded or PhotoMode.Enabled then
 		local saved = DataService.GetPurchases(player)
+		if PhotoMode.Enabled then
+			for _, purchase in Purchases.All() do
+				saved[purchase.Id] = true
+			end
+		end
 		local queue = table.clone(Purchases.UnlockedBy(nil))
 		local i = 1
 		while i <= #queue do

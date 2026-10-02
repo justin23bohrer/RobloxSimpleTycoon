@@ -28,6 +28,9 @@
 --   for everyone in parallel in game:BindToClose.
 -- * In Studio without "Enable Studio Access to API Services" every DataStore
 --   call errors: that is detected, warned once, and the game runs unsaved.
+-- * Photo Mode (Config.DevPhotoMode, Studio only, see Shared/PhotoMode): the
+--   whole session runs unsaved from the start (nothing loaded or written),
+--   so the free showcase plot can never reach a real save.
 
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
@@ -36,6 +39,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local PhotoMode = require(ReplicatedStorage.Shared.PhotoMode)
 local DataSchema = require(script.Parent.DataSchema)
 local Purchases = require(script.Parent.Purchases)
 
@@ -70,7 +74,10 @@ local removed: { [Player]: boolean } = setmetatable({}, { __mode = "k" }) :: any
 local releasingUserIds: { [number]: boolean } = {} -- leave saves still running
 local busy = 0 -- loads + saves in progress (BindToClose waits for them)
 local closing = false
-local savingDisabled = false
+local savingDisabled = PhotoMode.Enabled -- Photo Mode: never load or save
+if PhotoMode.Enabled then
+	print("[DevPhotoMode] DataStore is OFF this session: nothing is loaded or saved. Set Config.DevPhotoMode = false to turn Photo Mode off.")
+end
 
 local loadFinished = Instance.new("BindableEvent")
 local trophiesChanged = Instance.new("BindableEvent")

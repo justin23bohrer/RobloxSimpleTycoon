@@ -951,3 +951,19 @@ CAR5–CAR5c (passenger), CAR6–CAR8 and CAR13.
 | CAR13 | Turned plots: claim Plot 2, 3 and 4 (or 4 players), build the Garage on each. | Each car spawns in its own garage, nose out of the door; driving, getting in/out, edge respawn (to that plot's spawn) and flip reset work the same. | |
 | CAR14 | Plot without a garage map (branch without `GarageCar`). | No car, no errors (CarService skips the plot). | |
 
+
+## Photo Mode
+
+Setup: `Config.DevPhotoMode = true` (leave `DevAllTrophies` and
+`DevUnlimitedCash` false). Set it back to **false** before committing.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PM1 | `DevPhotoMode = false`: Play. Press 1–6, 0, C, H. | Nothing different from normal: no hint, no auto-claim, keys do nothing new, normal time of day, saving works as before (no `[DevPhotoMode]` lines in Output). | |
+| PM2 | `DevPhotoMode = true`: Play. | Output: `[DevPhotoMode] DataStore is OFF` and `[DevPhotoMode] Photo Mode is ON`. You own Plot1 at once, fully built: droppers 1–8 dropping, walls, stairs, 2nd floor, all furniture, Trophy Case, garage with a drivable car, pool, path, hangout; back door open; no buy buttons left. Bright afternoon sun. No errors. | |
+| PM3 | After PM2, stop, set `DevPhotoMode = false`, Play again (with API access on). | Your real save is unchanged: same cookies and house as before PM2 (not the showcase plot). | |
+| PM4 | Press 1–6 on Plot1. | Each key snaps to its shot: 1 whole tycoon, 2 house front, 3 backyard pool + hangout, 4 garage + car, 5 statue with your plot behind it, 6 droppers + conveyor + cash tank. Note any shot that needs its numbers in `PhotoMode.Shots` changed. | |
+| PM5 | Test → Clients and Servers with 4 players (or claim order): players get Plot1–4. On each, press 1–6. | Each player's shots frame their **own** plot the same way as on Plot1 (turned with the plot). | |
+| PM6 | Press 0, then C. | The normal camera follows your character again, normal zoom/FOV. | |
+| PM7 | Open the 🏆 TROPHIES panel, then press H; press H again. | H hides every ScreenGui (cookie counter, trophies button/panel, hint), the floating labels (statue bar, jar counter) and Roblox's chat / player list; pad labels may stay. Second H shows exactly what was shown before (the panel is still open; nothing that was hidden before comes back). | |
+| PM8 | Type "1" or "h" in chat. | Nothing happens to the camera or UI while typing. | |
