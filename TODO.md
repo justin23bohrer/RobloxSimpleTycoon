@@ -96,7 +96,8 @@ intentional. No weapons, no dropped trophies, no security UI, no prestige houses
 - [x] Contract: `Shared/HouseRaid.luau`, Config block, remotes, service stubs wired into `ServerMain` (lead).
 - [ ] Security: `SecurityPad` (green/red), red `SecurityBars` for exactly 30 s, no cooldown, owner passes through, `TrophyStash` pad in the map. (QA HR*)
 - [ ] Theft: steal prompt on displayed trophies, carry over head, all powers off while carrying, returns on push/death/leave, permanent transfer at the thief's `TrophyStash`, offline owner handling. (QA TH*)
-- [ ] Push: input + animation + phone button, server-validated hit, knockback, stops thieves. (QA PU*)
+- [x] Push: input + animation + phone button, server-validated hit, knockback, stops thieves. `PushService` + `Push.client` (`PushAnimation` / `PushButton` / `PushEffects`). (code done; Studio test pending: QA PU1–PU14)
+- [ ] Upload `push_swing.wav` / `push_hit.wav` and paste ids into `Config.PushSounds` (user).
 
 ## Post-MVP (needs approval)
 

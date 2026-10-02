@@ -1,4 +1,4 @@
-# tools/audio — Caleb Full Event + Cookie Party audio
+# tools/audio — Caleb Full Event, Cookie Party + Push audio
 
 Original sound effects, **synthesized from scratch** by `generate_sfx.py`
 (plain Python 3 standard library: `wave`, `math`, `struct`, `random`). No
@@ -29,6 +29,13 @@ Cookie Party sounds go in `Config.CookiePartySounds` (volumes in
 | `out/caleb_laugh.wav` | `CalebLaugh` | Caleb laughs during the party (Caleb party client) |
 | `out/caleb_spit.wav` | `CalebSpit` | Caleb throws / spits a cookie (Caleb party client) |
 
+Push sounds go in `Config.PushSounds` (volumes in `Config.PushSoundVolumes`):
+
+| File | `Config.PushSounds` key | When it plays (`PushEffects`, via `Push.client`) |
+| ---- | ----------------------- | ------------------------------------------------ |
+| `out/push_swing.wav` | `Swing` | every push (the pusher's whoosh; heard by everyone nearby) |
+| `out/push_hit.wav` | `Hit` | a push hits someone (at the target) |
+
 All files: 16-bit WAV, 44.1 kHz, mono, normalized to about −1 dBFS (no
 clipping); every effect is under 300 KB, the 8 s music loop is about 700 KB. They are committed, so you only need to
 re-generate after changing the script.
@@ -39,7 +46,7 @@ re-generate after changing the script.
 python3 tools/audio/generate_sfx.py
 ```
 
-Writes the fourteen files to `tools/audio/out/`. The output is deterministic
+Writes the sixteen files to `tools/audio/out/`. The output is deterministic
 (fixed random seeds), so re-running without changes gives identical files.
 
 ## Upload to Roblox and use them
@@ -55,7 +62,7 @@ Writes the fourteen files to `tools/audio/out/`. The output is deterministic
 4. Copy each asset id: in Asset Manager, right-click the audio →
    **Copy Asset ID** (on Creator Hub: the number in the asset's URL).
 5. Paste each one into `src/ReplicatedStorage/Shared/Config.luau`, in
-   `CalebSounds` or `CookiePartySounds` (tables above), as
+   `CalebSounds`, `CookiePartySounds` or `PushSounds` (tables above), as
    `"rbxassetid://<id>"` (a bare number also works):
 
    ```lua

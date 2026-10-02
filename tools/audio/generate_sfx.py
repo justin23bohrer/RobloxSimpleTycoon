@@ -25,6 +25,11 @@ Cookie Party (Config.CookiePartySounds):
   caleb_laugh.wav        cartoony "ha-ha-ha-ha" (voiced syllables, falling)
   caleb_spit.wav         "ptoo" pop + airy whoosh (Caleb throws a cookie)
 
+Push (Config.PushSounds):
+
+  push_swing.wav         short airy whoosh (every push)
+  push_hit.wav           punchy cartoon "pow": thump + crack + bonk
+
 Run:  python3 tools/audio/generate_sfx.py
 The output is deterministic (fixed random seed), so re-running gives the
 same files. See tools/audio/README.md for uploading them to Roblox.
@@ -491,6 +496,26 @@ def caleb_spit(rng):
     return fade_edges(out, 0.001, 0.05)
 
 
+def push_swing(rng):
+    """Short airy whoosh: noise swept up and back down over ~0.22 s."""
+    length = 0.22
+    whoosh = swept_noise(length, rng, lambda t: 0.05 + 0.45 * math.sin(math.pi * t / length) ** 2, highpass=0.7)
+    env = [math.sin(math.pi * i / len(whoosh)) ** 1.2 for i in range(len(whoosh))]
+    return fade_edges(apply(whoosh, env), 0.002, 0.03)
+
+
+def push_hit(rng):
+    """Punchy cartoon 'pow': a low body thump, a bright crack, a quick bonk."""
+    out = []
+    thump = tone(lambda t: 55 + 120 * math.exp(-t * 35), 0.18, harmonics=((1, 1.0), (2, 0.4)))
+    mix_into(out, apply(thump, envelope(len(thump), 0.001, 0.17, 2.2)), 0.0, 1.0)
+    crack = noise(0.05, rng, highpass=0.5, lowpass=0.8)
+    mix_into(out, apply(crack, envelope(len(crack), 0.0005, 0.045, 2.5)), 0.0, 0.7)
+    bonk = tone(lambda t: 520 - 180 * min(t / 0.12, 1.0), 0.14, harmonics=((1, 1.0), (2.7, 0.3)))
+    mix_into(out, apply(bonk, envelope(len(bonk), 0.002, 0.13, 1.6)), 0.01, 0.35)
+    return fade_edges(out, 0.001, 0.03)
+
+
 SOUNDS = (
     ("caleb_full.wav", caleb_full),
     ("celebration_start.wav", celebration_start),
@@ -506,6 +531,8 @@ SOUNDS = (
     ("finale_boom.wav", finale_boom),
     ("caleb_laugh.wav", caleb_laugh),
     ("caleb_spit.wav", caleb_spit),
+    ("push_swing.wav", push_swing),
+    ("push_hit.wav", push_hit),
 )
 
 
