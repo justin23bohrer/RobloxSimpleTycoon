@@ -25,6 +25,14 @@ Cookie Party (Config.CookiePartySounds):
   caleb_laugh.wav        cartoony "ha-ha-ha-ha" (voiced syllables, falling)
   caleb_spit.wav         "ptoo" pop + airy whoosh (Caleb throws a cookie)
 
+Tycoon (Config.TycoonSounds):
+
+  purchase.wav           "ka-ching!": register clunk + bell + sparkle (dropper bought)
+  purchase_build.wav     hammer knocks + whoosh + rising chime (house part built)
+  cant_afford.wav        soft low two-note "nope" boop (can't afford a button)
+  collect_cookies.wav    cascade of coin clinks + happy chime (Collect pad payout)
+  drop_in_jar.wav        tiny quiet "plink" (a cookie reaches the jar)
+
 Run:  python3 tools/audio/generate_sfx.py
 The output is deterministic (fixed random seed), so re-running gives the
 same files. See tools/audio/README.md for uploading them to Roblox.
@@ -491,6 +499,89 @@ def caleb_spit(rng):
     return fade_edges(out, 0.001, 0.05)
 
 
+# Tycoon ---------------------------------------------------------------------
+
+
+def coin_clink(freq, seconds=0.25):
+    """A small metallic clink: two close, bright, fast-decaying partials."""
+    out = []
+    mix_into(out, bell(freq, seconds, decay=12.0, bright=0.9), 0.0, 0.6)
+    mix_into(out, bell(freq * 1.37, seconds, decay=16.0, bright=0.5), 0.0, 0.35)
+    return out
+
+
+def purchase(rng):
+    """'Ka-ching!': a register drawer clunk, a bright bell pair, a sparkle."""
+    out = []
+    # "Ka": a low woody clunk with a noisy click.
+    clunk = tone(lambda t: 140 + 120 * math.exp(-t * 40), 0.12, harmonics=((1, 1.0), (2, 0.4), (3, 0.2)))
+    mix_into(out, apply(clunk, envelope(len(clunk), 0.001, 0.1, 2.0)), 0.0, 0.6)
+    click = noise(0.03, rng, highpass=0.6, lowpass=0.8)
+    mix_into(out, apply(click, envelope(len(click), 0.0005, 0.028, 2.0)), 0.0, 0.35)
+    # "Ching!": two bright bells a fifth apart, the second a moment later.
+    mix_into(out, bell(note("E6"), 0.55, decay=4.5, bright=1.0), 0.07, 0.4)
+    mix_into(out, bell(note("B6"), 0.5, decay=4.0, bright=0.9), 0.1, 0.4)
+    for i, name in enumerate(("E7", "G#7", "B7")):
+        mix_into(out, bell(note(name), 0.25, decay=10.0, bright=0.3), 0.14 + i * 0.04, 0.12)
+    sparkle = noise(0.4, rng, highpass=0.96, lowpass=0.7)
+    mix_into(out, apply(sparkle, envelope(len(sparkle), 0.002, 0.38, 2.5)), 0.08, 0.1)
+    return fade_edges(out, 0.001, 0.08)
+
+
+def purchase_build(rng):
+    """Building: two hammer knocks, a whoosh up, then a rising major chime."""
+    out = []
+    for i, at in enumerate((0.0, 0.13)):
+        knock = tone(lambda t: 220 + 180 * math.exp(-t * 60), 0.09, harmonics=((1, 1.0), (2.7, 0.35), (4.1, 0.2)))
+        mix_into(out, apply(knock, envelope(len(knock), 0.0005, 0.085, 2.2)), at, 0.55 + 0.1 * i)
+        tap = noise(0.02, rng, highpass=0.5, lowpass=0.9)
+        mix_into(out, apply(tap, envelope(len(tap), 0.0005, 0.019, 2.0)), at, 0.3)
+    whoosh_len = 0.3
+    whoosh = swept_noise(whoosh_len, rng, lambda t: 0.03 + 0.4 * (t / whoosh_len) ** 2, highpass=0.85)
+    whoosh_env = [math.sin(math.pi * i / len(whoosh)) ** 1.5 for i in range(len(whoosh))]
+    mix_into(out, apply(whoosh, whoosh_env), 0.22, 0.45)
+    for i, name in enumerate(("C6", "E6", "G6", "C7")):
+        mix_into(out, bell(note(name), 0.5, decay=4.5, bright=0.8), 0.42 + i * 0.05, 0.3)
+    sparkle = noise(0.4, rng, highpass=0.96, lowpass=0.7)
+    mix_into(out, apply(sparkle, envelope(len(sparkle), 0.002, 0.38, 2.5)), 0.5, 0.1)
+    return fade_edges(out, 0.001, 0.1)
+
+
+def cant_afford(rng):
+    """A soft, low 'nope': two short rounded boops, the second lower."""
+    out = []
+    for i, (f, at) in enumerate(((330.0, 0.0), (262.0, 0.12))):
+        boop = tone(lambda t, f=f: f * (1 - 0.06 * t / 0.11), 0.11, harmonics=((1, 1.0), (2, 0.15), (3, 0.05)))
+        mix_into(out, apply(boop, envelope(len(boop), 0.006, 0.07, 1.4)), at, 0.6)
+    return fade_edges(out, 0.002, 0.03)
+
+
+def collect_cookies(rng):
+    """Payout: a quick cascade of coin clinks, then a happy major chime."""
+    out = []
+    scale = ("C7", "D7", "E7", "G7", "A7", "C8")
+    t = 0.0
+    for i in range(12):
+        f = note(scale[(i * 2 + rng.randrange(2)) % len(scale)]) * rng.uniform(0.98, 1.02)
+        mix_into(out, coin_clink(f), t, rng.uniform(0.2, 0.32))
+        t += rng.uniform(0.025, 0.04)
+    for i, name in enumerate(("C6", "E6", "G6")):
+        mix_into(out, bell(note(name), 0.6, decay=3.5, bright=0.7), 0.3 + i * 0.06, 0.32)
+    mix_into(out, bell(note("C7"), 0.5, decay=4.0, bright=0.5), 0.48, 0.25)
+    sparkle = noise(0.45, rng, highpass=0.96, lowpass=0.7)
+    mix_into(out, apply(sparkle, envelope(len(sparkle), 0.002, 0.43, 2.5)), 0.3, 0.1)
+    return fade_edges(out, 0.001, 0.08)
+
+
+def drop_in_jar(rng):
+    """A tiny, soft glassy 'plink' (it plays often, so keep it gentle)."""
+    out = []
+    mix_into(out, bell(note("A6"), 0.14, decay=18.0, bright=0.4), 0.0, 0.6)
+    tick = noise(0.008, rng, highpass=0.7, lowpass=0.6)
+    mix_into(out, apply(tick, envelope(len(tick), 0.0005, 0.007, 2.0)), 0.0, 0.15)
+    return fade_edges(out, 0.001, 0.03)
+
+
 SOUNDS = (
     ("caleb_full.wav", caleb_full),
     ("celebration_start.wav", celebration_start),
@@ -506,6 +597,11 @@ SOUNDS = (
     ("finale_boom.wav", finale_boom),
     ("caleb_laugh.wav", caleb_laugh),
     ("caleb_spit.wav", caleb_spit),
+    ("purchase.wav", purchase),
+    ("purchase_build.wav", purchase_build),
+    ("cant_afford.wav", cant_afford),
+    ("collect_cookies.wav", collect_cookies),
+    ("drop_in_jar.wav", drop_in_jar),
 )
 
 

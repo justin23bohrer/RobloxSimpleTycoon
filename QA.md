@@ -813,3 +813,22 @@ before committing). Equip/unequip with the Inventory UI.
 | TC7 | Bigger trophies fit: equip the tallest/widest looks (KingCaleb, RocketCaleb, CookieCaleb, JumpCaleb, CloneCaleb) in all 5 slots. | Trophies are bigger than before (`TrophyCaseScale = 1.6`) but none pokes through the top board/gold valance, the glass, the velvet back, or a neighbor; each stands flush on its riser (not floating). | |
 | TC8 | All 4 plots: claim Plot2, Plot3, Plot4 in turn (2 players for two at once). | Each house has the identical case against its own back wall, trophies and plaques facing into the room, names readable the right way round. | |
 | TC9 | Nothing overlaps: case built, walk around it; build the 2nd floor and the bed above. | The case stays inside its old footprint (x −12.4..12.4, z −74.7..−69.55, y 2..16.6 in Plot1): the plaques stick out only ~0.2 from the base; it does not touch the conveyor, collector, cookie jar/Collect pad, stairs, `BuildButton4`, the doorway, or the 2nd floor (the sign top stays below y 17). Output has no "missing TrophySlotN/NameplateN" warnings. | |
+
+## Tycoon sounds
+
+Upload the five WAVs from `tools/audio/out/` and paste the ids into
+`Config.TycoonSounds` first (see `tools/audio/README.md`); TS8 is the empty-id
+case. Use Test > Clients and Servers with 2 players where it says so. For a
+quick setup, `Config.DevUnlimitedCash = true` in Studio (set it back to
+**false** before committing), except for TS3.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| TS1 | Buy a dropper (claim a plot, step on "Dropper 1"). 2 players: Player 2 stands next to the plot, then far away (~100 studs). | A "ka-ching!" plays once at the button. Player 2 hears it nearby, not from far away. No sound when the purchase fails for another reason (e.g. Player 2 steps on Player 1's button). | |
+| TS2 | Buy a build (Walls, Stairs, 2nd Floor, a furniture piece, Trophy Case). | The bigger build sound (hammer + whoosh + chime) plays at that button, once per purchase. With `PurchaseBuild = ""` the dropper "ka-ching!" plays instead. | |
+| TS3 | Can't afford: with too few cookies, stand on a button for ~5 s, step off and on, then walk onto a second unaffordable button. 2 players: Player 2 stands next to Player 1. | A soft "nope" plays at most once every 1.5 s while standing there (about 3–4 times in 5 s, not a spam), a new button can boop right away, and only Player 1 hears it (Player 2 hears nothing). Cookies are unchanged. | |
+| TS4 | Collect payout: let a few cookies collect, step on the Collect pad; then let a lot collect (e.g. 10,000+) and collect again. 2 players: Player 2 nearby. | Coin cascade + chime plays once per payout, a little higher-pitched for the big payout. Player 2 hears it nearby. No sound when the jar is empty or when Player 2 steps on Player 1's pad. | |
+| TS5 | Jar plink rate limit: buy all 8 droppers (dev cash) and stand near the jar for 20 s. | Quiet plinks as cookies reach the collector, never more than ~6 per second; no "noise soup", no warnings in Output. | |
+| TS6 | No sounds on house restore: own several droppers and builds, leave, rejoin (published test place with API access on, or the same server), claim a plot. | The saved house rebuilds silently: no purchase / build sounds for the restored parts. Buying the next item afterwards plays its sound normally. | |
+| TS7 | Release: leave with a claimed plot, then a new player claims it and buys. | No errors; the new owner's sounds play at the right buttons. | |
+| TS8 | Empty ids: set every `Config.TycoonSounds` id to `""`, Play, buy, step on an unaffordable button, collect. | Everything works silently; no errors; in Studio Output one "[TycoonSounds] no sound id in Config for: …" line (once, not per plot). | |
