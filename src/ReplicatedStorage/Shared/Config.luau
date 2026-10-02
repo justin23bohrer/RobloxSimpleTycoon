@@ -32,7 +32,11 @@ local Config = {
 	-- refuses to sell anything whose After is not bought yet. Today's chain:
 	--   Dropper1-4 -> Walls -> Stairs -> SecondFloor -> Dropper5-8
 	--                Walls -> TrophyCase (side branch)
-	-- Every Id (droppers and builds together) must be unique.
+	--                SecondFloor -> Bed, Gaming Desk, Shelves + TV, Mini
+	--                               Fridge, Ninja Kitchen (any order)
+	-- Once the house is MAXED (every Droppers and Builds entry bought), the
+	-- TrophyBuilds buttons appear (Garage, Pool, Path, Hangout; no After).
+	-- Every Id (droppers, builds and trophy builds together) must be unique.
 
 	-- The droppers a player can buy. Entry N uses the plot's DropperSpotN and
 	-- BuyButtonN parts, so the map must have one of each per entry
@@ -62,7 +66,8 @@ local Config = {
 	--   After - purchase id that unlocks this one (see above).
 	--   Parts - plot parts/models that appear once it is built (hidden before).
 	Builds = table.freeze({
-		table.freeze({ Id = "Walls", Name = "Build Walls", Cost = 5000, After = "Dropper4", Parts = table.freeze({ "Walls" }) }),
+		-- BackDoor: the locked back door to the backyard (BackyardGate).
+		table.freeze({ Id = "Walls", Name = "Build Walls", Cost = 5000, After = "Dropper4", Parts = table.freeze({ "Walls", "BackDoor" }) }),
 		table.freeze({ Id = "Stairs", Name = "Build Stairs", Cost = 5000, After = "Walls", Parts = table.freeze({ "Stairs" }) }),
 		table.freeze({
 			Id = "SecondFloor",
@@ -84,6 +89,33 @@ local Config = {
 		table.freeze({ Id = "MiniFridge", Name = "Mini Fridge", Cost = 8000, After = "SecondFloor", Parts = table.freeze({ "MiniFridge" }) }),
 		table.freeze({ Id = "Kitchen", Name = "Ninja Kitchen", Cost = 10000, After = "SecondFloor", Parts = table.freeze({ "KitchenCounter" }) }),
 	}),
+
+	-- Garage + Backyard: free builds for Caleb Trophy owners. Their buttons
+	-- (entry N uses the plot's TrophyButtonN) appear only once the house is
+	-- maxed (see above). Stepping on one buys it for no cookies if the owner
+	-- OWNS at least Trophies Caleb Trophies (inventory count, equipped or
+	-- not); trophies are not spent. Saved like other purchases. Any order.
+	--   Id       - purchase id (tycoon.Purchased[Id]).
+	--   Name     - text on the button's sign (the trophy count goes under it).
+	--   Trophies - Caleb Trophies the owner must own.
+	--   Parts    - plot parts/models that appear once it is built.
+	TrophyBuilds = table.freeze({
+		table.freeze({ Id = "Garage", Name = "Garage", Trophies = 1, Parts = table.freeze({ "Garage", "GarageCar" }) }),
+		table.freeze({ Id = "Pool", Name = "Pool", Trophies = 5, Parts = table.freeze({ "Pool" }) }),
+		table.freeze({ Id = "BackyardPath", Name = "Path", Trophies = 5, Parts = table.freeze({ "BackyardPath" }) }),
+		table.freeze({ Id = "Hangout", Name = "Fire Pit Hangout", Trophies = 5, Parts = table.freeze({ "Hangout" }) }),
+	}),
+	-- A plot's backyard (BackyardZone, behind the BackDoor) is locked for
+	-- everyone until the plot's owner owns this many Caleb Trophies
+	-- (BackyardGate). Unclaimed plots are always locked.
+	BackyardTrophies = 5,
+	-- BackyardGate: seconds between checks for characters inside a locked
+	-- backyard; how far (studs) inside the house, past the zone's house-side
+	-- face, they are put back; and how high (studs) above the zone's bottom
+	-- (they drop onto the floor from there).
+	BackyardCheckInterval = 0.25,
+	BackyardPushOutDistance = 4,
+	BackyardPushOutHeight = 5,
 
 	-- Seconds between drops (shared by all droppers).
 	DropInterval = 2,
@@ -127,7 +159,7 @@ local Config = {
 	-- StatueBar.client.luau). Height is studs above the top of his Head (his
 	-- head never grows, so this stays clear of him at any size). Size is in
 	-- screen pixels, so it reads the same from near and far. MaxDistance is
-	-- studs from the camera (the map is 300 x 300).
+	-- studs from the camera (the map is 400 x 400).
 	StatueBarHeight = 9,
 	StatueBarSize = Vector2.new(300, 80),
 	StatueBarMaxDistance = 500,

@@ -5,6 +5,7 @@
 local Players = game:GetService("Players")
 
 local Services = script.Parent.Services
+local BackyardGate = require(Services.BackyardGate)
 local CalebCycle = require(Services.CalebCycle)
 local CookiePartyService = require(Services.CookiePartyService)
 local DataService = require(Services.DataService)
@@ -16,6 +17,7 @@ local TrophyService = require(Services.TrophyService)
 local TycoonService = require(Services.TycoonService)
 
 TycoonService.Start()
+BackyardGate.Start() -- backyard lock (door, sign, push-out); after TycoonService
 local statue = StatueService.Start()
 if statue then
 	CalebCycle.Start(statue)

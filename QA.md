@@ -818,6 +818,34 @@ before committing). Equip/unequip with the Inventory UI.
 | TC8 | All 4 plots: claim Plot2, Plot3, Plot4 in turn (2 players for two at once). | Each house has the identical case against its own back wall, trophies and plaques facing into the room, names readable the right way round. | |
 | TC9 | Nothing overlaps: case built, walk around it; build the 2nd floor and the bed above. | The case stays inside its old footprint (x −12.4..12.4, z −74.7..−69.55, y 2..16.6 in Plot1): the plaques stick out only ~0.2 from the base; it does not touch the conveyor, collector, cookie jar/Collect pad, stairs, `BuildButton4`, the doorway, or the 2nd floor (the sign top stays below y 17). Output has no "missing TrophySlotN/NameplateN" warnings. | |
 
+## Garage + Backyard
+
+Needs the garage and backyard map parts (other workers' PRs). Quick setup in
+Studio: `Config.DevUnlimitedCash = true` to max the house fast; trophies
+from real claims, or `Config.DevAllTrophies = true` for "many" (set both back
+to **false** before committing). For 0 / 1 / 4 / 5 trophies, use a test save
+or claim trophies one at a time (`DevCalebFastCycle = true`). Count = owned
+trophies (inventory), equipped or not.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| GB1 | Maxed reveal: buy everything except one item (e.g. Mini Fridge), look at the garage side and the backyard; then buy the last item. | No trophy buttons before; the moment the last dropper/build is bought, all four gold/purple buttons appear (Garage in front of the garage; Pool, Path, Fire Pit Hangout inside the backyard). No Garage/Pool/Path/Hangout model shows yet. | |
+| GB2 | Labels. | "Garage" over gold "🏆 1 Caleb Trophy"; "Pool", "Path", "Fire Pit Hangout" each over gold "🏆 5 Caleb Trophies". No cookie price. | |
+| GB3 | 0 trophies, house maxed: step on the Garage button. | "Can't afford" sound (only you hear it, at most every 1.5 s); nothing built; cookies unchanged. | |
+| GB4 | 1 trophy (not equipped): step on Garage. | Garage + white VW ID.4 appear, build sound plays, button disappears. Cookies **unchanged**; you still own the trophy. | |
+| GB5 | 1–4 trophies, house maxed: try to reach the Pool / Path / Hangout buttons (they're inside the backyard). | You can't: the backyard is locked and you're put back in the house (GB9), so nothing is built. The server also refuses them below 5 trophies (can't-afford sound if you somehow touch one). | |
+| GB6 | 5 trophies: buy Pool, Hangout, Path in that (any) order. | Each is free, plays the build sound, its button disappears, its build appears. The fire pit's flames, embers and light show only once Hangout is bought (none while hidden). Trophies still owned. | |
+| GB7 | Door + sign, locked: Walls built, owner owns 0, 3, then 5 trophies (claim one while watching). | Back door closed and solid; sign (inside the house) reads "🔒 BACKYARD" + "🏆 0/5 Caleb Trophies", then "3/5". At 5 the door swings open into the backyard and the sign says "BACKYARD OPEN!" without rejoining. | |
+| GB8 | Unclaimed plot: look at its fence, then walk/jump into its backyard. | The fence shows on every plot, claimed or not. You're put back by the house's back wall (no walls or door shown on an unclaimed plot). On a claimed plot whose owner has < 5, the sign reads "x/5"; once released it would read "🏆 5 Caleb Trophies" (check in Server view: `BackDoor.DoorSign` TextLabel). | |
+| GB9 | Push-out with jump powers: owner with < 5 trophies but jump trophies equipped (big jump, double jump). Jump over the fence from outside, from the 2nd floor, and over the roof. | Within about a quarter second you are placed just inside the house in front of the back door, standing upright, facing into the house, no fall damage, no getting stuck in a wall or under the floor. Also works before the Walls are built. | |
+| GB10 | Open backyard: owner with ≥ 5 trophies. Walk through the back door; Player 2 (visitor) does the same. | Both can walk in freely through the open door and stay; nobody is pushed out. | |
+| GB11 | Locks again: owner (≥ 5) and Player 2 are in the backyard; owner leaves. | The plot resets; within a moment Player 2 is put back by the house spot; the door is closed again (hidden with the walls). | |
+| GB12 | Save/restore: buy Garage and Pool, leave and rejoin (saving on), claim a plot. | The house rebuilds, then the trophy buttons appear and Garage + Pool come back built (no sounds); Path and Hangout still have buttons. | |
+| GB13 | Not maxed: in Server view make `TrophyButton1` visible/touchable on a plot with the house not maxed, step on it with trophies. | Nothing is built (the server checks the house is maxed). | |
+| GB14 | Turned plots: repeat GB1, GB7 and GB9 on Plots 2, 3 and 4. | Buttons, door, sign and push-out work the same on every plot: always put back inside that plot's house, in front of its back door, facing into the house. | |
+| GB15 | 2 players: Player 2 (visitor, 5+ trophies of their own) tries to enter Player 1's backyard while Player 1 owns < 5. Player 2 also steps on Player 1's trophy buttons. | Player 2 is pushed out (it's the owner's count that matters). Player 1's buttons do nothing for Player 2. | |
+| GB16 | Missing map parts (on a branch without the garage/backyard maps). | The game runs normally; Output has one "TycoonService: … has no …" and one "BackyardGate: … has no BackyardZone" warning per plot, no errors. | |
+
 ## Tycoon sounds
 
 Upload the five WAVs from `tools/audio/out/` and paste the ids into
@@ -857,3 +885,22 @@ everything at once before that logic exists, look in Studio **Edit** mode
 | BY8 | Pads, with nothing in the yard built: walk out of the back door to each pad. | Three gold pads with dark purple rings and purple signs on the grass: right of the pool, left of where the path starts, at the patio's front-left corner. Each is reachable on foot from the back door, and none overlaps the pool rim, a rock, dirt, the path, or the patio. | |
 | BY9 | Select `BackyardZone` in the Explorer (Edit mode). | Invisible; not solid, can't be touched or clicked. Its box covers exactly the inside of the fence from the ground up to y 80, and its face toward the house lies along the house's back wall. | |
 | BY10 | Run `python3 tools/backyard/generate_backyard.py` twice, then `python3 tools/plots/generate_plots.py`, then `git status`. | The second run changes nothing; the plot files have no other changes. `rojo build` still succeeds. | |
+
+## Garage + car (look)
+
+Look checks for the garage model (`tools/garage/generate_garage.py`); the
+unlock itself is tested in GB1–GB16. Setup: max the house with
+`Config.DevUnlimitedCash = true` and buy the garage with a Caleb Trophy
+(`Config.DevAllTrophies = true` helps; set both back to **false** before
+committing).
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| GG1 | Plot1: stand at the spawn and look at the house's right (stairs) side. | An attached one-car garage next to the house, front flush with the house front: off-white brick, gray corner posts/bands, gray shingle gable roof with a round vent, lanterns by the door. It matches the house and touches it with no gap or poking through (roof meets the house wall below the 2nd-floor windows). | |
+| GG2 | Walk up the driveway ramp into the garage. | The door is rolled up (roll box above the opening inside, white door edge just under the frame). The ramp is walkable from the grass, the floor is solid concrete level with the plot floor, the walls and roof block you, nothing floats. | |
+| GG3 | Look at the car from the front, sides and back. | A white VW ID.4: rounded white body, black roof and pillars, dark windows, black arches/sills/bumpers, slim headlights joined by a white light bar, a VW roundel on the nose and tailgate (V over W, reads right way round from behind), red light bar at the back, 4 side doors + tailgate, silver/black wheels. Parked nose out, wheels on the floor. | |
+| GG4 | Walk around the car inside the garage; jump on it. | You can walk around it (bench and rack behind it, charger cable on the floor on its right); the body is solid, small details (mirrors, lights, logos) do not snag you. | |
+| GG5 | Inside details. | Workbench with pegboard tools, red toolbox and vise at the back right; metal rack with bins, boxes and paint cans at the back left; white wall charger on the house wall with a green light, cable running to the car's right rear. The house's first-floor window at z −22 is visible on the left wall. | |
+| GG6 | Lights: before buying, at night (`Lighting.ClockTime = 0`); then buy the garage. | No glow from the hidden garage before buying (the `GarageLight`s are saved disabled). After buying (or on restore), `PlotStages` turns them on: warm light inside the garage. After the owner leaves, they go off with the garage. | |
+| GG7 | The pad: max the house (logic in). | A gold pad with a dark purple ring and a purple sign on the grass in front of the driveway, same style as the other trophy pads. It does not overlap the ramp. | |
+| GG8 | All 4 plots: walk to Plot2, Plot3 and Plot4 (or claim each). | Each house has the same garage on its own right side, door facing the statue side. No garage touches a neighbor plot, a spawn, the statue, or another plot's garage/pad. | |
