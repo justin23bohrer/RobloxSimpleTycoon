@@ -530,6 +530,25 @@ local Config = {
 	PushCooldown = 1.2,
 	PushKnockbackSpeed = 70,
 	PushKnockbackUp = 25,
+	-- Push details (PushService + Push.client): the target must be within
+	-- this many degrees of the pusher's facing (a generous cone). A thief
+	-- gets the full knockback and staggers for PushStaggerSeconds; anyone
+	-- else only gets a small nudge (knockback x PushNudgeMultiplier, no
+	-- stagger) so players can't launch each other.
+	PushFacingAngle = 70,
+	PushNudgeMultiplier = 0.35,
+	PushStaggerSeconds = 0.4,
+	-- Push sounds (client only): Roblox audio asset ids ("rbxassetid://123..."),
+	-- empty = skipped. Swing plays on every push, Hit at the target on a hit.
+	-- Original effects: tools/audio/ (push_swing.wav, push_hit.wav).
+	PushSounds = table.freeze({
+		Swing = "",
+		Hit = "",
+	}),
+	PushSoundVolumes = table.freeze({
+		Swing = 0.5,
+		Hit = 0.8,
+	}),
 
 	-- TESTING ONLY (Studio only, like DevUnlimitedCash): a fast Caleb cycle.
 	-- Goal DevCalebFastMaxCookies; Full 3 s, Celebration 60 s, TrophyClaim

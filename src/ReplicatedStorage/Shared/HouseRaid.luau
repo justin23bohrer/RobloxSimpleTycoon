@@ -44,8 +44,8 @@ HouseRaid.CarriedModelName = "CarriedTrophy"
 -- RemoteEvents in ReplicatedStorage.Remotes.
 HouseRaid.Remote = table.freeze({
 	Push = "PushRequest", -- client -> server: () "I pushed" (untrusted; server finds the target)
-	PushFX = "PushFX", -- server -> all: (pusherUserId: number, targetUserId: number?) play the push / hit
-	Knockback = "PushKnockback", -- server -> the pushed player: (velocity: Vector3) apply it locally
+	PushFX = "PushFX", -- server -> all: (pusherUserId: number, targetUserId: number?, stoppedThief: boolean) play the push / hit
+	Knockback = "PushKnockback", -- server -> the pushed player: (velocity: Vector3, stagger: boolean) apply it locally
 })
 
 function HouseRaid.GetRemote(name: string): RemoteEvent

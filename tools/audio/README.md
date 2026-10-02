@@ -1,4 +1,4 @@
-# tools/audio — Caleb Full Event, Cookie Party + house security audio
+# tools/audio — Caleb Full Event, Cookie Party, Push + house security audio
 
 Original sound effects, **synthesized from scratch** by `generate_sfx.py`
 (plain Python 3 standard library: `wave`, `math`, `struct`, `random`). No
@@ -29,6 +29,13 @@ Cookie Party sounds go in `Config.CookiePartySounds` (volumes in
 | `out/caleb_laugh.wav` | `CalebLaugh` | Caleb laughs during the party (Caleb party client) |
 | `out/caleb_spit.wav` | `CalebSpit` | Caleb throws / spits a cookie (Caleb party client) |
 
+Push sounds go in `Config.PushSounds` (volumes in `Config.PushSoundVolumes`):
+
+| File | `Config.PushSounds` key | When it plays (`PushEffects`, via `Push.client`) |
+| ---- | ----------------------- | ------------------------------------------------ |
+| `out/push_swing.wav` | `Swing` | every push (the pusher's whoosh; heard by everyone nearby) |
+| `out/push_hit.wav` | `Hit` | a push hits someone (at the target) |
+
 House security sounds go in `Config.HouseSecuritySounds` (one volume:
 `Config.HouseSecuritySoundVolume`). The server plays them from the doorway
 bars, so everyone nearby hears them:
@@ -48,7 +55,7 @@ re-generate after changing the script.
 python3 tools/audio/generate_sfx.py
 ```
 
-Writes the sixteen files to `tools/audio/out/`. The output is deterministic
+Writes the eighteen files to `tools/audio/out/`. The output is deterministic
 (fixed random seeds), so re-running without changes gives identical files.
 
 ## Upload to Roblox and use them
@@ -64,7 +71,7 @@ Writes the sixteen files to `tools/audio/out/`. The output is deterministic
 4. Copy each asset id: in Asset Manager, right-click the audio →
    **Copy Asset ID** (on Creator Hub: the number in the asset's URL).
 5. Paste each one into `src/ReplicatedStorage/Shared/Config.luau`, in
-   `CalebSounds` or `CookiePartySounds` (tables above), as
+   `CalebSounds`, `CookiePartySounds` or `PushSounds` (tables above), as
    `"rbxassetid://<id>"` (a bare number also works):
 
    ```lua
