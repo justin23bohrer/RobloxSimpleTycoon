@@ -28,13 +28,13 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
-local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyPowers = require(ReplicatedStorage.Shared.TrophyPowers)
 
 local PlotPowerVisuals = {}
 
 -- Looks only; not gameplay tuning.
 local FULL_FIRE_BONUS = 1 -- CookieMultiplier + DropperSpeed that gives the biggest flames
+local FULL_PAD_BONUS = 0.5 -- CollectBonus that gives the brightest pad ring
 local FIRE_SIZE = NumberRange.new(2, 6) -- Fire.Size at the smallest / biggest bonus
 local FIRE_HEAT = NumberRange.new(5, 14)
 local FIRE_COLOR = Color3.fromRGB(255, 120, 20)
@@ -165,7 +165,7 @@ local function drawPad(plot: Model, totals: { [string]: number })
 		return
 	end
 
-	local t = math.clamp(bonus / (Config.TrophyStatCaps[Stat.CollectBonus] or 1), 0, 1)
+	local t = math.clamp(bonus / FULL_PAD_BONUS, 0, 1) -- looks only; the bonus itself has no limit
 	-- The pad is a Cylinder turned so its X axis points up; a slightly wider,
 	-- slightly thinner neon disc shows as a glowing ring around its edge.
 	local ring = fxPart(PAD_FX_NAME, pad.CFrame, pad.Size + Vector3.new(-0.05, 0.8, 0.8), plot)
