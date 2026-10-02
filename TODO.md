@@ -114,4 +114,5 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Big Trophy Case + nameplates: `tools/trophycase/generate_trophy_case.py` (~25 × 14.6 case, 10 slots, sign, warm lights), `TrophyCaseDisplay` slot order + nameplates, `TrophyCaseSlots = 10`. (code done; Studio test pending: QA TR9, TR16–TR18)
 - [x] Trophy powers show on the house: fire on droppers, shine on the Collect pad (requested by the user 2026-10-01). (code done; Studio test pending: QA PV1–PV10)
 - [x] Inventory UI: `TrophyInventory.client` + `TrophyInventoryUI` / `TrophyInventoryIcon` / `TrophyInventoryData` (needs Studio QA: TI1–TI14).
+- [x] Bigger walk speed trophies (+35%..+75%) and glowing feet (requested by the user 2026-10-01). (code done; Studio test pending: QA SG1–SG10)
 
