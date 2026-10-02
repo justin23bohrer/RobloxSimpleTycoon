@@ -271,6 +271,9 @@ local Config = {
 	CookiePartyLifetime = 8,
 	-- Most collect requests per player per second the server will look at.
 	CookiePartyMaxCollectsPerSecond = 12,
+	-- Seconds between the server's spawn/expire ticks while the party runs
+	-- (CookiePartyService). Each tick's new cookies go out as one batch.
+	CookiePartyTickSeconds = 0.25,
 	-- Paid to every player in the server when the party ends (the finale).
 	CookiePartyFinalReward = 5_000,
 	-- Caleb's party dance gets faster/bigger per phase (CalebAnimator):

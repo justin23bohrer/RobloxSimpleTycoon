@@ -80,7 +80,7 @@ funny celebration with collectable cookies, then straight into the existing
 No completion screen, no leaderboard, no mini-events, no trophy changes.
 
 - [x] Contract: `Shared/CookieParty.luau`, `Config.CookieParty*`, remotes, architecture section; Celebration is 60 s even in the fast dev cycle (lead).
-- [ ] Party server: `CookiePartyService` spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (QA PS*)
+- [x] Party server: `CookiePartyService` (+ `CookiePartySpawner`) spawns collectable cookies (Normal / Chocolate / Golden / Giant), validates collects, pays with EconomyService, final reward. (code done; Studio test pending: QA PS1–PS14)
 - [ ] Party cookies (client): pooled collectable cookies, collect pop / floating numbers / sparkles / sounds / earnings counter, rain ramps up with the phases. (QA PK*)
 - [ ] Caleb party: dance energy ramps per phase, throws and spits cookies, laughs, speech bubbles, big "I'M FULL!" finale pose. (QA CD*)
 - [ ] Party FX: 10…1 countdown, phase callouts, escalating lighting/VFX, finale explosion + reward pop, music + party SFX. (QA PX*)

@@ -547,6 +547,22 @@ pop-up does not open; they go back to orange on reset. The podium's gold trim,
 the leaderboard frames, and Caleb's chain are plain gold (not Neon) so they
 don't glare, and the party bloom is soft (`Config.CalebPartyBloom` 0.12).
 
+### Cookie Party: collectable cookies and rewards
+
+- During the 60-second party (Celebration) the server drops collectable
+  cookies around the statue and near players: **Normal**, **Chocolate**,
+  **Golden**, **Giant**. Their values, how often each appears in each phase,
+  how many fall per second, and how close you must be are all in Config
+  (`CookiePartyTypes`, `CookiePartySpawnPerSecond`, …); more valuable ones
+  show up as the party gets crazier, and more fall with more players.
+- Walk into a landed cookie to collect it; the first player to reach it gets
+  its value in cookies. Uncollected cookies vanish after
+  `CookiePartyLifetime` seconds.
+- When the party ends, every player in the server gets
+  `CookiePartyFinalReward` cookies (once), then the trophy claim starts.
+- Party cookies only appear during the party, and the server checks every
+  pickup (distance, timing, rate), so they cannot be faked.
+
 ### Caleb's animations (Caleb Full Event)
 
 Client-side only, driven by the statue's `CalebState`; everyone sees the
