@@ -3,10 +3,10 @@
 -- It shows whatever number it is given and never reads or changes cash.
 --
 -- The counter is a small pink-framed plaque (a runtime Part named
--- "JarCounter" in the CashTank) sitting on top of the jar's gold frame, above
--- the "COOKIE JAR" sign, with a gold panel facing the Collect pad (the same
--- side as the sign). It sits below the 2nd floor (y 17) and clear of the sign
--- and the glass. Built from the TankSign's CFrame, so it works on plots
+-- "JarCounter" in the CashTank) sitting directly on top of the "COOKIE JAR"
+-- sign, with a gold panel facing the Collect pad (the same side as the sign).
+-- Its front is a hair in front of the sign's, so nothing hides it from the
+-- pad. It stays clear of the 2nd floor (y 17), the sign, and the glass. Built from the TankSign's CFrame, so it works on plots
 -- turned any way.
 --
 -- It is made in CollectorService.SetupPlot, before the plot is first hidden,
@@ -20,9 +20,11 @@ local JarCounter = {}
 -- Looks only; not gameplay tuning.
 local PLAQUE_SIZE = Vector3.new(7, 1.8, 0.6)
 -- From the TankSign's center to the plaque's center, in the sign's space:
--- up onto the top of the jar's gold frame (top at sign center + 1.8), and
--- back onto the frame (the sign's front faces the pad along +Z).
-local PLAQUE_OFFSET = Vector3.new(0, 2.7, -1.3)
+-- up so the plaque's bottom rests on the sign's top (sign half height 1.1 +
+-- plaque half height 0.9), and 0.1 toward the pad (+Z) so its front face is
+-- 0.2 in front of the sign's (no z-fighting) and its back touches the wall.
+-- On Plot1: y 14.3..16.1, front face z -46.4.
+local PLAQUE_OFFSET = Vector3.new(0, 2.0, 0.1)
 local PINK = Color3.fromRGB(255, 90, 160)
 local GOLD = Color3.fromRGB(255, 200, 40)
 local WHITE = Color3.new(1, 1, 1)

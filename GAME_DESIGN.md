@@ -216,8 +216,8 @@ The jar shows the stored amount both as small cookies and as a number:
 - Each drop that reaches the collector drops one small cookie into the jar,
   so it fills up as cookies wait (it stops adding at 60, when it looks
   full; the stored cookies keep adding up).
-- A cartoony counter on top of the jar (a pink-framed gold plaque above the
-  "COOKIE JAR" sign, facing the Collect pad) shows how many cookies are
+- A cartoony counter on top of the jar (a pink-framed gold plaque sitting
+  right on top of the "COOKIE JAR" sign, facing the Collect pad) shows how many cookies are
   stored, e.g. "🍪 1,250" (with commas), and "🍪 0" when the jar is empty.
   It pops a little each time the number goes up, goes back to 0 when the
   owner collects or the plot is released, and is hidden with the jar while
@@ -304,7 +304,7 @@ as an outline:
 | `Conveyor`, `Conveyor2` | Dark strips that carry drops (floor 1, floor 2). Each has `RailLeft`/`RailRight`/`RailFront` children: gray `Metal` guard rails, 0.4 thick, from the floor to 2 studs above the belt (`CanTouch`/`CanQuery` off). The collectors have `RailLeft`/`RailRight`/`RailBack`. |
 | `Collector`, `Collector2` | Green blocks at the end of each conveyor.     |
 | `CollectPad`       | Round green pad with a dark green ring. Pays the owner their stored cookies. |
-| `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime, and the counter plaque (`JarCounter` part, made at runtime) sits on top of the gold frame above `TankSign`. |
+| `CashTank`         | Model behind the Collect pad: `TankWallBorder`, `TankWall`, `TankSign`, `TankStand`, glass `TankLeft`/`TankRight`/`TankFront`/`TankLid`. The small cookies (`TankCookie` parts) go in a `TankCubes` folder made at runtime, and the counter plaque (`JarCounter` part, made at runtime) sits directly on top of `TankSign`. |
 | `SpawnLocation`, `SpawnLocation2`–`4` | Invisible 14 × 14 spawn areas (`Block`, `Transparency = 1`, `Anchored`, no ring or decal) sunk into the ground so the top is flush with the grass (center Y = 0.5, top Y = 1), in `Map` (not the plots), one between each plot and the statue. Where players appear (a random one). `SpawnLocation2`–`4` are generated. |
 | `Statue`           | In `Map` (not the plot), behind the spawn at z ≈ 44, facing it: turn around after spawning to see it. See below. |
 
@@ -715,8 +715,9 @@ Cookie jar sign: the `TankSign` part (on the jar wall, 10 × 2.2) is gold
 `TextLabel` "COOKIE JAR" (86% × 70%, centered, `TextScaled`) with a 3.5 px
 dark Contextual `UIStroke`. No code touches it.
 Cookie jar counter: a runtime `JarCounter` part (7 × 1.8 × 0.6, pink
-`255,90,160` frame) on top of the jar's gold frame (y 15..16.8 on Plot1,
-below the 2nd floor at y 17), with a `SurfaceGui` `CounterGui` on the
+`255,90,160` frame) directly on top of the `TankSign` (y 14.3..16.1 on
+Plot1, front face z −46.4, 0.2 in front of the sign's; below the 2nd floor
+at y 17), with a `SurfaceGui` `CounterGui` on the
 pad-facing face (`PixelsPerStud` 50, `LightInfluence = 0`, `MaxDistance`
 120) → gold (`255,200,40`) `Panel` (94% × 82%) with `UICorner` (0.35), a
 6 px dark `UIStroke`, and a `UIScale` for the pop → white `FredokaOne`
