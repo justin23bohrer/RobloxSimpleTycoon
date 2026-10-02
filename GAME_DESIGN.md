@@ -65,7 +65,8 @@ next, more expensive dropper's button has appeared, so they save up for it.
   | Claimed | Owner sign ("<name>'s Tycoon"), conveyor, collector, Collect pad with its cookie jar, and the **Dropper 1 / FREE!** button with its yellow spot. | The Claim pad. |
   | Dropper N bought | The dropper at its spot, and the next dropper's button and yellow spot. | Button N and its yellow spot. |
   | Dropper 4 bought | Nothing new (all droppers bought). | Button 4. |
-  | House maxed (every dropper and build) | The gold/purple trophy buttons: Garage, Pool, Path, Fire Pit Hangout (see "Garage + Backyard"). | — |
+  | Walls bought | The walls with the locked back door, the backyard's picket fence, and the three gold/purple backyard trophy buttons: Pool, Path, Fire Pit Hangout (see "Garage + Backyard"). | The Walls button. |
+  | House maxed (every dropper and build) | The gold/purple Garage trophy button. | — |
 
 - When the player leaves, the plot is released and reset: everything hides
   again and the Claim pad comes back for the next player.
@@ -97,10 +98,10 @@ server refuses to sell anything out of order (`After` in `Config`).
 | Shelves + TV (2nd floor) | orange `BuildButton7` | 18000 | — |
 | Mini Fridge (2nd floor) | orange `BuildButton8` | 8000 | — |
 | Ninja Kitchen (2nd floor) | orange `BuildButton9` | 10000 | — |
-| Garage (house maxed) | gold/purple `TrophyButton1` | FREE, needs 🏆 1 Caleb Trophy | — |
-| Pool (house maxed) | gold/purple `TrophyButton2` | FREE, needs 🏆 5 Caleb Trophies | — |
-| Path (house maxed) | gold/purple `TrophyButton3` | FREE, needs 🏆 5 Caleb Trophies | — |
-| Fire Pit Hangout (house maxed) | gold/purple `TrophyButton4` | FREE, needs 🏆 5 Caleb Trophies | — |
+| Garage (house maxed) | gold/purple `TrophyButton1` | FREE, "Must have 1 Caleb Trophy" | — |
+| Pool (with the Walls) | gold/purple `TrophyButton2` | FREE, "Must have 5 Caleb Trophies" | — |
+| Path (with the Walls) | gold/purple `TrophyButton3` | FREE, "Must have 5 Caleb Trophies" | — |
+| Fire Pit Hangout (with the Walls) | gold/purple `TrophyButton4` | FREE, "Must have 5 Caleb Trophies" | — |
 
 - The owner buys something by stepping on its button. The label shows the
   name with the price under it in yellow, e.g. "Dropper 2 / 🍪 300",
@@ -124,7 +125,8 @@ walls both Stairs and the Trophy Case are offered).
   grilles, and sills. The front has a gray-framed, garage-style doorway
   (16 wide, 11 high) in the middle. The back wall has a **back door** to the
   backyard (x 17..23 on Plot1, 10 high, where the right back window used to
-  be; see "Backyard" below). It appears with the walls.
+  be; see "Backyard" below). It appears with the walls, together with the
+  backyard's picket fence and the three backyard trophy buttons.
 - **Stairs:** 16 cream steps along the right wall, climbing from the front
   (z −20) to the back (z −52), ending level with the top of the walls.
 - **2nd Floor:** a floor on top of the walls with a hole where the stairs
@@ -190,39 +192,48 @@ walls both Stairs and the Trophy Case are offered).
 
 ## Garage + Backyard (approved by the user 2026-10-02)
 
-Rewards for Caleb Trophy collectors once the house is done.
+Rewards for Caleb Trophy collectors. Four gold/purple trophy buttons; they
+need no cookies.
 
-- **When:** the moment the house is **maxed** (every dropper and every
-  build in the chain above, furniture and Trophy Case included), four
-  gold/purple trophy buttons appear. They need no cookies.
+- **When:** the three **backyard** buttons (Pool, Path, Fire Pit Hangout)
+  appear the moment the owner buys **Build Walls**, together with the back
+  door and the fence, so players see them waiting behind the locked door.
+  The **Garage** button appears once the house is **maxed** (every dropper
+  and every build in the chain above, furniture and Trophy Case included).
 - **Garage** (`TrophyButton1`, needs **1** Caleb Trophy): on the house's
   right side (the stairs side), outside the base: a garage with a white
   VW ID.4 the owner can **drive** (see "Driving the garage car").
 - **Backyard** behind the house, inside a fence: **Pool**, **Path** and
   **Fire Pit Hangout** (`TrophyButton2..4`, each needs **5** Caleb
   Trophies), in any order. Their buttons are inside the backyard, next to
-  where each build appears.
+  where each build appears. They can be bought before the house is maxed
+  (the Walls are enough).
 - **Buying:** the owner steps on a trophy button. If they **own** at least
   that many Caleb Trophies (everything in their trophy inventory, equipped
   or not), it is built for free and the build sound plays. Trophies are
   **not** spent. Too few: the "can't afford" sound plays and nothing
   happens. The server counts the trophies; the client is never trusted.
-  The label reads e.g. "Garage" over a gold "🏆 1 Caleb Trophy".
+  The label reads e.g. "Garage" over a gold "Must have 1 Caleb Trophy" (or
+  "Must have 5 Caleb Trophies"): always "Must have", never anything that
+  looks like a price, because trophies are not spent.
 - Saved like the other builds and rebuilt (after the house) when the owner
   claims a plot again.
-- **Back door + fence (the teaser):** the backyard fence is always there,
-  on every plot, claimed or not. The house's back wall (from Build Walls)
-  has a **locked back door** with a sign facing into the house: "🔒
-  BACKYARD" over "🏆 x/5 Caleb Trophies" (x = the owner's trophies;
-  unclaimed: "🏆 5 Caleb Trophies").
-- **Nobody** (owner or visitor) can be in a plot's backyard until that
-  plot's **owner** owns 5 Caleb Trophies. Then the door swings open, the
-  sign says "BACKYARD OPEN!", and anyone may walk in (like the house). An
-  unclaimed plot's backyard is locked. If the owner leaves, it locks again.
-- Jump powers can clear the fence, so the server also checks about 4 times
-  a second: anyone inside a locked backyard is put back inside the house,
-  in front of the back door, standing up. This also works before the walls
-  are built (no door yet).
+- **Back door + fence (the teaser):** both come with **Build Walls**
+  (hidden and not solid before, like any build; back again when the owner
+  rejoins with the walls saved). The house's back wall has a **locked back
+  door** with a sign facing into the house: "🔒 Unlock this door once you
+  have 5 Caleb Trophies" with a smaller gold "🏆 x/5" under it (x = the
+  owner's trophies; an unclaimed plot shows no progress line).
+- **Only the back door is locked.** It stays closed and solid for everyone
+  (owner or visitor) until that plot's **owner** owns 5 Caleb Trophies.
+  Then the door swings open, the sign says "BACKYARD OPEN!", and anyone may
+  walk through (like the house). An unclaimed plot's door is locked. If the
+  owner leaves, it locks again.
+- Nothing pushes players out of the yard. Before the walls there is no
+  fence, so anyone may walk around the outside of the house into the yard;
+  after, the house and fence close it, but jumping the fence (jump powers)
+  is allowed too. Building there still needs the trophies, checked by the
+  server.
 - The backyard is decoration: a walk-in pool (hop in, run around waist
   deep, climb out by the steps), a glowing fire pit. No swimming. The
   garage car can be driven (below).
@@ -385,11 +396,10 @@ the same left-side layout, directly above floor 1 — `Conveyor2` with
 | `Bed`, `GamingDesk`, `ShelvesTV`, `MiniFridge`, `KitchenCounter` (models) | 2nd-floor furniture (y 18 up to < 31). Shelves + TV along the front wall x 2.5..19.3; kitchen counter x −12.7..−3.3 on the front wall; straight desk against the back wall (x 8.1..28.4, out to z −69.4) and bed x −9.6..3.6, z −74.75..−56.5 against the back wall (both drawn big, `BED_GROW` / `DESK_GROW` in the generator, to fill the room); mini fridge against the back wall left of the bed (x −15.2..−11.8), foam roller next to it. Clear of the stair hole, Conveyor2, the dropper buttons, and the front windows except the wide one behind the bookshelf. **Generated** by `tools/furniture/generate_furniture.py`. |
 | `TrophyCase` (model) | Against the middle of the back wall, x −12.4..12.4, z −74.7..−69.55, y 2..16.6 (the 2nd floor starts at y 17): `CaseBase` (y 2..5.6), `CaseSideLeft`/`Right`, velvet `CaseBack`, velvet `CaseStage` (top y 6.2), `CaseTop` (y 14.2..14.8), glass `CaseGlass` (y 5.6..14.2, Transparency 0.65), gold `GoldBase`/`GoldStageLip`/`GoldValance` (y 13.85..14.2)/`GoldEdgeLeft`/`Right`/`GoldTop`, `CaseSign` ("MY CALEB TROPHIES", y 14.8..16.6), warm `SurfaceLight` `CaseLight` on `CaseTop` (starts disabled); per slot N = 1–5 at x 0 / −4.48 / 4.48 / −8.96 / 8.96 (middle outward, as seen from the room): velvet `RiserN` + gold `RiserTrimN` (3.8 × 3.4, tops y 7.1 / 6.7 / 6.7 / 6.35 / 6.35), invisible `TrophySlotN` (z −72.4, top flush with the riser, turned to face into the room), and on the base's front a gold `NameplateFrameN` with a dark `NameplateN` (4 × 2.3, y 2.25..4.55, front at z −69.9) holding the `NameplateGui` SurfaceGui (`TrophyName`, `PowerText`; saved as a dim "EMPTY"). Covers the middle back window from inside; clear of the conveyor, collector, cookie jar/Collect pad (≥ 21 studs), stairs, `BuildButton4`, and doorway. **Generated** by `tools/trophycase/generate_trophy_case.py`. |
 | `Walls` (model) | `WallLeft`/`WallRight` (x ±32.5), `WallBackLeft`/`WallBackRight` (z −75.5, back door opening x 17..23, y 2..12) with `BackDoorHeader` (y 12..17), `WallFrontLeft`/`WallFrontRight` (z −10.5, doorway x −8..8) and `DoorHeader` (y 13..17); 1 thick, y 2..17. Plus gray trim (`Corner*`, `Plinth*`, `FloorBand*`, `DoorFrame*`, `BackDoorFrame*`) and a `Windows` model (no first-floor window at x 20 on the back: the door is there). **Generated** by `tools/house/generate_house.py`. |
-| `BackDoor` (model) | In the back door opening (x 20). `Door`: the blocking panel (5.2 × 9.6 × 0.4, x 17.4..22.6, y 2..11.6, z −75.5, wood `156,92,52`, `CanCollide` on) whose looks (window, panels, gold knobs, both sides) are child parts of `Door`. `DoorSign`: gold 8 × 2.6 plaque above the door on the inside (y 12.4..15, z −75..−74.7) with a `SurfaceGui` `SignGui` facing into the house (purple panel, white FredokaOne `TextLabel`, saved as "🔒 BACKYARD"). Outside: gray `Casing*`, a slate `Awning`, and a stone `BackStep` (y 1..1.5) down to the grass. Shown with the walls. **Generated** by `tools/backyard/generate_backyard.py`. |
+| `BackDoor` (model) | In the back door opening (x 20). `Door`: the blocking panel (5.2 × 9.6 × 0.4, x 17.4..22.6, y 2..11.6, z −75.5, wood `156,92,52`, `CanCollide` on) whose looks (window, panels, gold knobs, both sides) are child parts of `Door`. `DoorSign`: gold 8 × 3.6 plaque above the door on the inside (y 12.4..16, z −75..−74.7) with a `SurfaceGui` `SignGui` facing into the house (purple panel, white FredokaOne TextScaled `TextLabel`, saved as "🔒 Unlock this door once you have 5 Caleb Trophies", and a smaller `ProgressLabel` under it, saved empty). Outside: gray `Casing*`, a slate `Awning`, and a stone `BackStep` (y 1..1.5) down to the grass. Shown with the walls. **Generated** by `tools/backyard/generate_backyard.py`. |
 | `Pool`, `BackyardPath`, `Hangout` (models) | The backyard (see "Backyard" below), behind the back wall between z −76 and −121. Hidden until built with Caleb Trophies. **Generated** by `tools/backyard/generate_backyard.py`. |
-| `TrophyButton2`–`4` | Gold pads with purple rings on the grass behind the house: Pool (−3, −95), Path (10.5, −85), Hangout (5.5, −104), y 1.2. |
-| `BackyardFence` (model) | White picket fence about 8 tall (posts to y 9, pickets to y 8.85), on x ±32.5 from the house's back corners (z −76.8) to z −120.5, and along z −120.5. Solid (`CanCollide` on). Always there. |
-| `BackyardZone` | Invisible box over the inside of the fence: center (0, 40.5, −98), 64 × 79 × 44 (x −32..32, y 1..80, z −120..−76). `Transparency 1`, `CanCollide`/`CanTouch`/`CanQuery` off. Its +Z face (z −76, the back wall) is the house side. Always there. |
+| `TrophyButton2`–`4` | Gold pads with purple rings on the grass behind the house: Pool (−3, −95), Path (10.5, −85), Hangout (5.5, −104), y 1.2. Shown with the Walls. |
+| `BackyardFence` (model) | White picket fence about 8 tall (posts to y 9, pickets to y 8.85), on x ±32.5 from the house's back corners (z −76.8) to z −120.5, and along z −120.5. Solid (`CanCollide` on) once shown. Hidden until the Walls are built. |
 | `Stairs` (model) | `Step1`–`Step16`, x 26..32; step k is k studs high (top at y 2 + k), 2 deep, from z −20 back to z −52 |
 | `SecondFloor` (model) | Slab y 17..18 in four pieces (`FloorMain`, `FloorBackRight`, `FloorFrontRight`, `FloorRightEdge`) leaving a hole at x 26..32, z −20..−52; `HoleRailSide`/`HoleRailFront` around the hole; second-story walls `Wall2Left`/`Wall2Right`/`Wall2Back`/`Wall2Front` (y 18..31) with `UpperCorner*` posts and a `Windows` model; `Roof` model (hip roof: `RoofFront*`/`RoofBack*`/`RoofLeft*`/`RoofRight*` triangles made of WedgeParts from the eaves at y 31 to the ridge x −10..10 at y 46, 1.5-stud overhang; `RidgeCap`, `Hip*Cap`, `Soffit`, `Fascia*`, the `FrontGable` model, and the `Chimney` model). **Generated** by `tools/house/generate_house.py`. |
 | `Conveyor2` | (−28, 18.5, −42), 4 × 1 × 48, above `Conveyor` |
@@ -428,18 +438,17 @@ house, from the back wall (z −76 on Plot1) to z −121, across the whole plot
 meshes, or decals). Laid out like the user's sketch, seen from the back door
 (left is −X):
 
-- **Fence** (`BackyardFence`, always there): a white picket fence about 8
+- **Fence** (`BackyardFence`, appears with the walls): a white picket fence about 8
   studs tall on the yard's left, right and back sides. Its first posts touch
   the house's back corner posts, so the house and the fence close the yard.
   Square posts with a cap and a ball on top, two rails on the outside,
-  pickets with pointed (diamond) tips. Solid, but a strong jump power can
-  clear it (the server pushes anyone out of a locked backyard using the
-  invisible `BackyardZone`).
+  pickets with pointed (diamond) tips. Solid; it is only looks and does not
+  lock anything (people may walk around the house or jump it).
 - **Back door** (`BackDoor`, with the walls): a wooden door with a 4-pane
   window, two panels and gold knobs on both sides, a gray casing, a small
   slate awning and a stone step outside, and a gold-framed purple sign above
-  it on the inside ("🔒 BACKYARD" until the game code writes the trophy
-  count).
+  it on the inside ("🔒 Unlock this door once you have 5 Caleb Trophies",
+  with a smaller progress label under it that the game code fills).
 - **Pool** (left, x −30..−8, z −117..−80): a long walk-in pool running front
   to back. The ground is one shared slab, so the pool is a raised basin
   standing on the grass: solid stone walls 2 studs thick with a sand-colored
@@ -469,7 +478,7 @@ meshes, or decals). Laid out like the user's sketch, seen from the back door
   purple sign (BuildButton1's structure), on the grass next to their build:
   Pool pad right of the pool, Path pad left of where the path starts,
   Hangout pad at the patio's front-left corner. All reachable from the back
-  door before anything is built.
+  door before anything is built. They appear with the walls.
 
 Generated by `tools/backyard/generate_backyard.py` (edit the script, not the
 JSON; re-running it only replaces its own instances), then

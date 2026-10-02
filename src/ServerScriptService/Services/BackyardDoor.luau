@@ -9,9 +9,12 @@
 --   backyard, so the doorway is free. Only CFrames change: Transparency and
 --   CanCollide stay with PlotVisibility (the BackDoor is hidden until the
 --   Walls are built), so the two never fight.
--- * DoorSign's TextLabels (facing into the house): "🔒 BACKYARD" over a gold
---   "🏆 x/5 Caleb Trophies" (unclaimed: "🏆 5 Caleb Trophies"), or
---   "BACKYARD OPEN!".
+-- * DoorSign (facing into the house): its TextLabel says "🔒 Unlock this
+--   door once you have 5 Caleb Trophies" (the number from Config, "Caleb
+--   Trophy" if it is 1), and its smaller ProgressLabel the owner's gold
+--   "🏆 x/5" (empty on an unclaimed plot). Open: "BACKYARD OPEN!" and no
+--   progress. A sign without a ProgressLabel shows the progress on the
+--   TextLabel's second line instead.
 
 local BackyardDoor = {}
 
@@ -22,7 +25,8 @@ export type Door = {
 	Closed: { CFrame }, -- each part's CFrame as the map built it
 	Swing: CFrame, -- world transform from closed to open
 	Position: Vector3, -- the closed Door's center
-	Labels: { TextLabel },
+	Labels: { TextLabel }, -- the main text (every TextLabel but ProgressLabel)
+	Progress: TextLabel?, -- the small "🏆 x/5" line
 }
 
 -- The Door's widest horizontal axis (its width) and that size.
@@ -89,10 +93,14 @@ function BackyardDoor.Find(plot: Model, houseCenter: Vector3): (Door?, { string 
 		swing = other
 	end
 
-	local labels = {}
+	local labels, progress = {}, nil
 	for _, item in (sign :: Instance):GetDescendants() do
 		if item:IsA("TextLabel") then
-			table.insert(labels, item)
+			if item.Name == "ProgressLabel" then
+				progress = item
+			else
+				table.insert(labels, item)
+			end
 		end
 	end
 
@@ -102,6 +110,7 @@ function BackyardDoor.Find(plot: Model, houseCenter: Vector3): (Door?, { string 
 		Swing = swing,
 		Position = doorPart.Position,
 		Labels = labels,
+		Progress = progress,
 	}, {}
 end
 
@@ -111,13 +120,20 @@ function BackyardDoor.Show(door: Door, locked: boolean, owned: number?, needed: 
 	for i, part in door.Parts do
 		part.CFrame = if locked then door.Closed[i] else door.Swing * door.Closed[i]
 	end
-	local text
-	if not locked then
-		text = "BACKYARD OPEN!"
-	else
-		local count = if owned then `{owned}/{needed}` else `{needed}`
+	local text, progress = "BACKYARD OPEN!", ""
+	if locked then
 		local noun = if needed == 1 then "Caleb Trophy" else "Caleb Trophies"
-		text = `🔒 BACKYARD\n<font color="{TROPHY_COLOR}">🏆 {count} {noun}</font>`
+		text = `🔒 Unlock this door once you have {needed} {noun}`
+		if owned then
+			progress = `<font color="{TROPHY_COLOR}">🏆 {owned}/{needed}</font>`
+		end
+	end
+	if door.Progress then
+		door.Progress.RichText = true
+		door.Progress.Text = progress
+		door.Progress.Visible = progress ~= ""
+	elseif progress ~= "" then
+		text = `{text}\n{progress}`
 	end
 	for _, label in door.Labels do
 		label.RichText = true

@@ -28,8 +28,8 @@ src/
 │       ├── PlotVisibility.luau → helper: hide/show a part or model and restore it
 │       ├── BuyButtons.luau     → helper for TycoonService (buy button labels/touches/visibility)
 │       ├── Purchases.luau      → read-only catalog of droppers, builds + trophy builds (ids, buttons, unlock order)
-│       ├── BackyardGate.luau   → locks each plot's backyard until its owner owns 5 Caleb Trophies (push-out loop)
-│       ├── BackyardDoor.luau   → helper for BackyardGate (back door swing + "x/5 Caleb Trophies" sign)
+│       ├── BackyardGate.luau   → keeps each plot's back door locked until its owner owns 5 Caleb Trophies
+│       ├── BackyardDoor.luau   → helper for BackyardGate (back door swing + "Unlock this door once you have 5 Caleb Trophies" sign)
 │       ├── CarService.luau     → the drivable garage car per plot (spawn, remove, fall/flip re-park)
 │       ├── CarBuild.luau       → helper for CarService (turns a GarageCar copy into a physics car)
 │       ├── CarSeats.luau       → helper for CarService (Drive/Ride prompts, owner-only seat, wheels, network owner)
@@ -149,10 +149,11 @@ equal `Config.TrophyCaseSlots`, 5). It does not touch
 behind the house: `Pool`, `BackyardPath`, `Hangout` (its fire pit's `Fire`,
 `Embers` and `FireLight` are saved disabled, because `PlotVisibility` does
 not hide effects or lights; `PlotStages` switches them on while the Hangout
-is shown), `BackyardFence`, the invisible `BackyardZone`,
+is shown), `BackyardFence`,
 the gold `TrophyButton2`–`4` pads, and the `BackDoor` model (`Door` panel +
 `DoorSign`). Each is replaced in place (or appended), so it can run in any
-order with the other plot generators. The back door *opening* is cut by
+order with the other plot generators. It also deletes the old `BackyardZone`
+part (no longer used) if a plot still has it. The back door *opening* is cut by
 `tools/house/generate_house.py` (`BACK_DOOR_*`, same numbers in both).
 `tools/garage/generate_garage.py` (same idea; the car is in
 `tools/garage/id4_car.py`, shared part helpers in `tools/garage/parts.py`)
@@ -213,14 +214,14 @@ routes join/leave in a fixed order:
 | `DataService` | Saves/loads each player's cookies (`GetSavedCash`, `SetSavedCash`: the saved copy only, set by `EconomyService`), house purchases, Caleb trophies, and equipped trophy ids with a DataStore. Contract API (see "Caleb Full Event (contract)"). Retries, session lock, autosave, `BindToClose`; see **Persistence** below. | Implemented |
 | `DataSchema` (helper) | Used only by `DataService`: `Default()`, `FromStored(raw)` (migrate by `Version`, clean `Cash`, drop unknown purchase ids, bad/duplicate trophies, and bad `Equipped` ids; refuses non-tables and newer versions), `ToStored(data)`, `CleanCash(value)`, `CleanTrophy(record)`, `CopyTrophies`, `NewInstanceId()`, `IsInstanceId(value)`. | Implemented |
 | `EconomyService` | **Only** writer of cash: `GetCash`, `AddCash`, `TrySpend` (positive whole numbers, no overspending; refused while `IsCashLoading`). `OnPlayerAdded` applies the saved cookies once `DataService` loaded (saved + earned while loading); every later change goes to `DataService.SetSavedCash` (not with dev cash). `OnPlayerRemoving` forgets the player. | Implemented |
-| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers, builds and trophy builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a trophy build needs the house maxed (`Purchases.IsHouseMaxed`) and the owner to own at least the entry's `Trophies` (`#TrophyInventory.GetOwned(player)`, server data only), costs no cookies and spends no trophies; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free (then, if the house is maxed, the saved trophy builds). Every applied purchase that leaves the house maxed also calls `PlotStages.ShowTrophyButtons`. The Garage + Backyard parts (`TrophyButtonN`, trophy build `Parts`, `BackDoor`) are optional at startup: missing ones are warned about, never make the plot invalid. Tells `PlotStages` what to show. `TryPurchase` calls `TycoonSounds.Purchased` after a successful buy and `TycoonSounds.CantAfford` when `TrySpend` fails or a trophy build's owner has too few trophies (sounds only; never on restore). `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
+| `TycoonService` | Finds and validates plots, gives a free plot to a player who touches its `ClaimPad` (`TryClaimPlot(player, plot)`; one plot per player), releases and resets it on leave, holds tycoon data, decides purchases (`TryPurchase(player, purchaseId)` for droppers, builds and trophy builds; only after the purchase in the entry's `After` is bought; `Cost = 0` spends nothing; a trophy build needs to be unlocked (`Purchases.IsUnlocked`: its `After` bought, or with no `After` the house maxed) and the owner to own at least the entry's `Trophies` (`#TrophyInventory.GetOwned(player)`, server data only), costs no cookies and spends no trophies; a dropper is started with `DropperService.Start`; records it with `DataService.SetPurchased`). On claim, `RestorePurchases(player)` rebuilds the player's saved house for free (then the saved trophy builds that are unlocked). Every applied purchase also calls `PlotStages.ShowTrophyButtons`. The Garage + Backyard parts (`TrophyButtonN`, trophy build `Parts`, `BackDoor`, `BackyardFence`) are optional at startup: missing ones are warned about, never make the plot invalid. Tells `PlotStages` what to show. `TryPurchase` calls `TycoonSounds.Purchased` after a successful buy and `TycoonSounds.CantAfford` when `TrySpend` fails or a trophy build's owner has too few trophies (sounds only; never on restore). `PurchaseApplied: RBXScriptSignal` fires `(player, plot, purchaseId)` from `applyPurchase`, i.e. both when something is bought and when a saved purchase is restored (used by `TrophyService` for the Trophy Case). | Implemented (claiming + ordered purchases) |
 | `CarService` | The drivable garage car (see "Garage + Backyard (contract)" → Drivable car). One car per plot while its Garage is built and the plot is owned: spawned on `TycoonService.PurchaseApplied` for the trophy build whose `Parts` include `GarageCar` (bought or restored), removed when the plot's `OwnerUserId` changes. Hides the anchored `GarageCar` look (`PlotVisibility`) while the car exists. Every `Config.CarCheckInterval` re-parks a fallen/edge car (riders respawn) or a flipped, still one. Cars live in `Workspace.Cars` as `<Plot>Car`. Changes no cash and no ownership. | Implemented (`Start`) |
 | `CarBuild` (helper) | Used only by `CarService`. `Build(template)` clones a `GarageCar` look into a physics car: root = `Body`, look parts welded + `Massless`, 4 `Tire<Wheel>` on Motor hinges (`Drive<Wheel>`), front tires on invisible `Knuckle<Wheel>` Servo hinges (`Steer<Wheel>`), tire/body `NoCollisionConstraint`s, invisible untouchable `DriverSeat` (VehicleSeat) + `PassengerSeat` (Seat), an `Upright` AlignOrientation, see-through windows. Returns nil without `Body` or a tire. | Implemented |
 | `CarSeats` (helper) | Used only by `CarService`. `Setup(car, owner)`: "Drive" (E, owner only) and "Ride" (F, anyone) prompts that `Sit` the player (server checks range, alive, not seated, seat free); ejects a non-owner from the `DriverSeat`; places riders who get out beside their door (one frame after exit, raycast to the ground, server owns their body during the move, re-checked after `CarExitSettleTime`); network owner = driver, else passenger, else server (a rider's own body goes back to them on exit); sets motors/steering from `Throttle`/`Steer`. `Riders(car)`. | Implemented |
-| `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's or trophy build's `Parts`, shows the buttons it unlocks), `ShowTrophyButtons(plot, purchased)` (house maxed: shows the `TrophyButtonN` of every trophy build not bought). `ShowUnclaimed` also hides every build's and trophy build's `Parts`; a trophy build's fires/smoke/sparkles/particle emitters/lights (saved `Enabled = false` in the map, like the Trophy Case's `CaseLight`; e.g. `Hangout`'s `FireCore` `Fire`, `Embers`, `FireLight`) are switched on when its `Parts` are shown (bought or restored) and off when hidden. Decides nothing. | Implemented |
+| `PlotStages` (helper) | Used only by `TycoonService`: `ShowUnclaimed(plot)` (only `Base` + `ClaimPad`), `ShowClaimed(plot)` (hides `ClaimPad`; shows `OwnerSign`, `Conveyor`, `Collector`, `CollectPad`, `CashTank`, and the buttons of purchases with no `After`), `ShowAfterPurchase(plot, purchaseId)` (hides that button, shows a build's or trophy build's `Parts`, shows the buttons it unlocks), `ShowTrophyButtons(plot, purchased)` (shows the `TrophyButtonN` of every unlocked trophy build not bought: the backyard ones once Walls is bought, the garage once the house is maxed). `ShowUnclaimed` also hides every build's and trophy build's `Parts`; a trophy build's fires/smoke/sparkles/particle emitters/lights (saved `Enabled = false` in the map, like the Trophy Case's `CaseLight`; e.g. `Hangout`'s `FireCore` `Fire`, `Embers`, `FireLight`) are switched on when its `Parts` are shown (bought or restored) and off when hidden. Decides nothing. | Implemented |
 | `PlotVisibility` (helper) | `Hide(root)` / `Show(root)` for a part or model and all its descendants: hidden parts get `Transparency = 1` and no collide/touch/query; Billboard/Surface GUIs are disabled. Original values are saved and restored exactly. A hidden part cannot fire `Touched`. | Implemented |
-| `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds` + `Config.TrophyBuilds`: `Get(id)`, `All()`, `UnlockedBy(id?)` (house purchases only), `IsHouse(purchase)`, `IsHouseMaxed(purchased)` (every dropper and build bought), `TrophyBuilds()`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`/`"TrophyBuild"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN` / `TrophyButtonN`). Warns at startup about duplicate ids or an `After` that names no purchase. | Implemented |
-| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects every purchase button's touch to a callback with the purchase id, sets RichText labels from `Config` ("Dropper N" or the build's `Name`, over a yellow "🍪 Cost" / "FREE!"; a trophy build's `Name` over a gold "🏆 1 Caleb Trophy" / "🏆 5 Caleb Trophies"), resets colors (droppers red, builds orange; trophy buttons keep the map's gold/purple), skips buttons missing from the map, and hides/shows each button (a dropper's together with its `DropperSpotN`) by purchase id (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
+| `Purchases` (helper) | Read-only catalog built from `Config.Droppers` + `Config.Builds` + `Config.TrophyBuilds`: `Get(id)`, `All()`, `UnlockedBy(id?)` (house purchases only), `IsHouse(purchase)`, `IsHouseMaxed(purchased)` (every dropper and build bought), `IsUnlocked(purchase, purchased)` (its `After` bought; a trophy build with no `After` needs the house maxed), `TrophyBuilds()`. Each purchase has `Id`, `Kind` (`"Dropper"`/`"Build"`/`"TrophyBuild"`), `Index` (in its own list), `Entry` (the Config entry), `ButtonName` (`BuyButtonN` / `BuildButtonN` / `TrophyButtonN`). Warns at startup about duplicate ids, an `After` that names no purchase, or a trophy build whose `After` is another trophy build. | Implemented |
+| `BuyButtons` (helper) | Used only by `TycoonService`/`PlotStages`: connects every purchase button's touch to a callback with the purchase id, sets RichText labels from `Config` ("Dropper N" or the build's `Name`, over a yellow "🍪 Cost" / "FREE!"; a trophy build's `Name` over a gold "Must have 1 Caleb Trophy" / "Must have 5 Caleb Trophies": a requirement, never a price), resets colors (droppers red, builds orange; trophy buttons keep the map's gold/purple), skips buttons missing from the map, and hides/shows each button (a dropper's together with its `DropperSpotN`) by purchase id (`HideAll`, `Show`, `SetPurchased`). Decides nothing. | Implemented |
 | `DropperService` | Runs a plot's droppers: `Start(plot, dropperId)` places an upside-down red cup (a Model named after the id, built by `DropperCup`) at `DropperSpotN`, spawns cookie-shaped `Drop` parts (a Cylinder disc with welded `Chip` balls that have `CanTouch`/`CanQuery`/`CanCollide` off and are `Massless`) worth that dropper's `DropValue` into the plot's `Drops` folder every `DropInterval`; each dropper drops onto its Config `Conveyor` (`Conveyor` or `Conveyor2`), and a conveyor moves while any of its droppers runs; drops are destroyed after `DropLifetime`. Drop value and plot live only in server tables; `ClaimDrop(drop, plot)` returns the value once, only for the drop's own plot. `GetConfig(dropperId)` returns the Config entry and index. `CollectorFor(conveyorName)` names a conveyor's collector (`Conveyor2` → `Collector2`); `CollectorNames()` lists every collector the droppers use. | Implemented (`Start`, `Stop`, `StopAll`, `ClaimDrop`, `GetConfig`, `CollectorFor`, `CollectorNames`) |
 | `DropperCup` (helper) | Used only by `DropperService`; presentation only. `Build(spot, name)` returns a Model that fills the spot's box (stacked red cylinders narrowing toward the top, two darker ridges, a rolled lip, a white inside disc) and the CFrame of the center of its open rim, where drops start. Parts are anchored with `CanTouch`/`CanQuery` off. | Implemented |
 | `CollectorService` | Stores drop value per plot (one server-side total for all floors) when `DropperService.ClaimDrop` accepts a drop at any of the plot's collectors (`DropperService.CollectorNames()`: `Collector`, `Collector2`); pays the owner on the Collect pad via `EconomyService.AddCash`. Every time the stored amount changes (drop collected, payout, failed payout put back, `ResetPlot`) it calls `CollectorDisplay.SetAmount(plot, amount)` so the jar's counter shows it. Calls `TycoonSounds.DropInJar(plot)` for each accepted drop and `TycoonSounds.Collected(plot, payout)` after a successful payout. The counter shows the stored amount; the owner's CollectBonus is added on top at payout. | Implemented (`SetupPlot`, `ResetPlot`) |
@@ -341,13 +342,15 @@ plot part `BuildButtonN`; `Parts` are the plot parts/models it shows when
 built. `After` (both lists) is the purchase id that must be bought first
 (`nil` = available as soon as the plot is claimed); ids are unique across
 all lists. TycoonService requires every part these entries name (except
-`BackDoor`). To add a dropper or build: add an entry and its parts to the map.
-`TrophyBuilds` is a list of `{ Id, Name, Trophies, Parts }` (no `After`,
-no `Cost`). Entry N uses the plot part `TrophyButtonN`; all appear once the
-house is maxed. `Trophies` = Caleb Trophies the owner must own (not spent).
-Their buttons and `Parts` are optional on a plot. `BackyardTrophies` (5),
-`BackyardCheckInterval`, `BackyardPushOutDistance`, `BackyardPushOutHeight`
-tune `BackyardGate`. The `Car*` values (`CarMaxSpeed`, `CarReverseSpeed`,
+`BackDoor` and `BackyardFence`, which the Walls build shows). To add a
+dropper or build: add an entry and its parts to the map.
+`TrophyBuilds` is a list of `{ Id, Name, Trophies, After?, Parts }` (no
+`Cost`). Entry N uses the plot part `TrophyButtonN`. Its button appears once
+the house purchase named in `After` is bought (Pool, Path, Hangout:
+`After = "Walls"`), or, with no `After` (Garage), once the house is maxed.
+`Trophies` = Caleb Trophies the owner must own (not spent). Their buttons
+and `Parts` are optional on a plot. `BackyardTrophies` (5) tunes
+`BackyardGate` (the back door lock). The `Car*` values (`CarMaxSpeed`, `CarReverseSpeed`,
 `CarTorque`, `CarBrakeTorque`, `CarWheelAcceleration`, `CarSteerAngle`,
 `CarSteerSpeed`, `CarSteerTorque`, `CarWheelDensity`, `CarWheelFriction`,
 `CarUprightTorque`, `CarCheckInterval`, `CarFallY`, `CarFallSpeed`,
@@ -490,8 +493,10 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   and applies every saved purchase whose `After` is already applied, the
   same way as a purchase (`PlotStages.ShowAfterPurchase` + `DropperService.Start`)
   but without spending. Saved ids that no longer exist, or whose `After`
-  wasn't saved, are skipped. Then, if the house is maxed, every saved trophy
-  build is applied too (trophies are not re-checked; they are never spent).
+  wasn't saved, are skipped. Then every saved trophy build that is unlocked
+  (`Purchases.IsUnlocked`: Walls restored for the backyard ones, the house
+  maxed for the garage) is applied too (trophies are not re-checked; they
+  are never spent).
   Until it finishes, `TryPurchase` refuses, so a player is never charged for
   something they own.
 - **Cookies:** `DataService` only keeps the saved copy; `EconomyService`
@@ -549,7 +554,7 @@ Saved record, key `"Player_" .. UserId` in DataStore `Config.DataStoreName`:
   plot, the id is a real purchase id, it has not already been bought, the
   purchase named in its `After` **has** been bought, and
   `TrySpend(entry.Cost)` succeeds (skipped when `Cost` is 0; a trophy build
-  instead needs the house maxed and `#TrophyInventory.GetOwned(player) >=
+  instead needs `Purchases.IsUnlocked` and `#TrophyInventory.GetOwned(player) >=
   entry.Trophies`, else the CantAfford sound) → marks
   `Purchased[purchaseId]`, calls `PlotStages.ShowAfterPurchase` (hide that
   button, show a build's parts, show the next button), and for a dropper
@@ -841,11 +846,16 @@ not security-relevant.
 
 ## Garage + Backyard (contract)
 
-Approved by the user 2026-10-02. After the house is maxed (every
-`Config.Droppers` and `Config.Builds` entry bought), four free trophy builds
-(`Config.TrophyBuilds`) appear; a locked back door keeps everyone out of the
-backyard until the plot's owner owns `Config.BackyardTrophies` (5) Caleb
-Trophies. "Own" = `#TrophyInventory.GetOwned(player)` (saved + session/dev
+Approved by the user 2026-10-02. Four free trophy builds
+(`Config.TrophyBuilds`): the three backyard pads (Pool, Path, Hangout,
+`After = "Walls"`) appear with the Walls build, together with the
+`BackDoor` and the `BackyardFence`; the Garage pad (no `After`) appears once
+the house is maxed (every `Config.Droppers` and `Config.Builds` entry
+bought). The back door stays locked (closed, solid) until the plot's owner
+owns `Config.BackyardTrophies` (5) Caleb Trophies. **Only the door is
+locked**: nothing pushes players out of the yard; walking around the
+outside of the house into it (before the walls/fence) or jumping the fence
+is allowed (changed 2026-10-02; the old `BackyardZone` push-out is gone). "Own" = `#TrophyInventory.GetOwned(player)` (saved + session/dev
 trophies, equipped or not).
 
 Plot part names (top-level children of each plot; edit Plot1 only, Plot2-4
@@ -856,30 +866,29 @@ come from `tools/plots/generate_plots.py`):
 | `TrophyButton1..4` | Step pads like `BuildButtonN` (with a sign `TextLabel`), gold/purple. 1 Garage, 2 Pool, 3 Path, 4 Hangout | `BuyButtons`, `TycoonService` |
 | `Garage`, `GarageCar` | The Garage build (right/stairs side, outside the base). Its two `GarageLight` SurfaceLights are saved `Enabled = false`; `PlotStages` turns them on while Garage is shown | `Config.TrophyBuilds[1].Parts` |
 | `Pool`, `BackyardPath`, `Hangout` | The three backyard builds. Hangout's `FirePit.FireCore` has `Fire`, `Embers` (ParticleEmitter), `FireLight` (PointLight), saved `Enabled = false`; `PlotStages` turns them on while Hangout is shown | `Config.TrophyBuilds[2..4].Parts` |
-| `BackDoor` (Model) | Shown with the Walls build. `Door` (blocking panel + child look parts) and `DoorSign` (SurfaceGui + TextLabel facing into the house) | `BackyardDoor` |
-| `BackyardFence` | Always visible, claimed or not | map only |
-| `BackyardZone` (Part) | Invisible box over the backyard (ground to y = 80), Anchored, no collide/touch/query. Its house-side face is the one nearest the plot's `Base` center | `BackyardGate` |
+| `BackDoor` (Model) | Shown with the Walls build. `Door` (blocking panel + child look parts) and `DoorSign` (SurfaceGui facing into the house: `TextLabel` for the lock message, smaller `ProgressLabel` for "🏆 x/5") | `BackyardDoor` |
+| `BackyardFence` | Shown with the Walls build (`Config.Builds` Walls `Parts`), hidden and non-solid before, like any build part; restored with the Walls on rejoin. Looks only | `PlotStages` (via Config) |
+
+`BackyardZone` was removed (2026-10-02): nothing used it after the push-out
+was dropped; `generate_backyard.py` deletes it from Plot1.
 
 - **TrophyBuild purchases**: see `Purchases`, `TycoonService.TryPurchase`
   above. Free (no cookies), trophies not spent, saved with
   `DataService.SetPurchased` (ids are ordinary purchase ids, so `DataSchema`
   keeps them), restored on claim after the house.
-- **BackyardGate** (server): per plot, `Locked` unless the plot has an owner
-  owning ≥ `BackyardTrophies`. Re-checked on the plot's `OwnerUserId`
-  change (claim/release/leave), `DataService.TrophiesChanged`, and the
-  owner's `TrophyInventory` attribute changing (data load, dev and
-  session-only trophies). Every `BackyardCheckInterval` s any character whose
-  `HumanoidRootPart` is inside a locked plot's `BackyardZone` (zone object
-  space) is pivoted to `BackyardPushOutDistance` studs past the house-side
-  face, in front of the door, `BackyardPushOutHeight` above the zone's
-  bottom, upright and facing the house, with its velocity zeroed. Enforced
-  even while `BackDoor` is hidden. No `BackyardZone` → one warning, plot
-  skipped; no `BackDoor`/`Door`/`DoorSign` → one warning, zone still enforced.
+- **BackyardGate** (server): per plot, the back door is locked unless the
+  plot has an owner owning ≥ `BackyardTrophies`. Re-checked on the plot's
+  `OwnerUserId` change (claim/release/leave), `DataService.TrophiesChanged`,
+  and the owner's `TrophyInventory` attribute changing (data load, dev and
+  session-only trophies). No loop, no push-out, no zone. No
+  `BackDoor`/`Door`/`DoorSign` → one warning, plot skipped.
 - **BackyardDoor** (helper, looks only): locked = `Door` (and its child
   parts) at the map's CFrame; open = swung 90° on its hinge edge, away from
   the house. Only CFrames change, never Transparency/CanCollide, so it never
-  fights `PlotVisibility`. Sign: "🔒 BACKYARD" + gold "🏆 x/5 Caleb Trophies"
-  (unclaimed: "🏆 5 Caleb Trophies"), or "BACKYARD OPEN!".
+  fights `PlotVisibility`. Sign (TextScaled): "🔒 Unlock this door once you
+  have 5 Caleb Trophies" (number from `BackyardTrophies`; "Caleb Trophy" if
+  1) and, on a claimed plot, a smaller gold "🏆 x/5" (`ProgressLabel`;
+  hidden when empty); open: "BACKYARD OPEN!" and no progress.
 
 ### Drivable car (CarService)
 
