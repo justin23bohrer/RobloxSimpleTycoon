@@ -1,4 +1,4 @@
-# tools/audio — Caleb Full Event, Cookie Party + Push audio
+# tools/audio — Caleb Full Event, Cookie Party, Push + house security audio
 
 Original sound effects, **synthesized from scratch** by `generate_sfx.py`
 (plain Python 3 standard library: `wave`, `math`, `struct`, `random`). No
@@ -36,6 +36,15 @@ Push sounds go in `Config.PushSounds` (volumes in `Config.PushSoundVolumes`):
 | `out/push_swing.wav` | `Swing` | every push (the pusher's whoosh; heard by everyone nearby) |
 | `out/push_hit.wav` | `Hit` | a push hits someone (at the target) |
 
+House security sounds go in `Config.HouseSecuritySounds` (one volume:
+`Config.HouseSecuritySoundVolume`). The server plays them from the doorway
+bars, so everyone nearby hears them:
+
+| File | `Config.HouseSecuritySounds` key | When it plays (`HouseSecurityService`) |
+| ---- | -------------------------------- | -------------------------------------- |
+| `out/security_close.wav` | `Close` | the owner steps on the green pad: motor whir + ratchet as the bars rise, heavy metal clang as they shut (~0.8 s in) |
+| `out/security_open.wav` | `Open` | 30 s later: latch clack, falling motor whir + ratchet as the bars sink, soft thud |
+
 All files: 16-bit WAV, 44.1 kHz, mono, normalized to about −1 dBFS (no
 clipping); every effect is under 300 KB, the 8 s music loop is about 700 KB. They are committed, so you only need to
 re-generate after changing the script.
@@ -46,7 +55,7 @@ re-generate after changing the script.
 python3 tools/audio/generate_sfx.py
 ```
 
-Writes the sixteen files to `tools/audio/out/`. The output is deterministic
+Writes the eighteen files to `tools/audio/out/`. The output is deterministic
 (fixed random seeds), so re-running without changes gives identical files.
 
 ## Upload to Roblox and use them
