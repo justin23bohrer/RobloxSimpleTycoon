@@ -1,7 +1,7 @@
 -- BuyButtons (server only)
 -- Helper for TycoonService: finds, labels, shows/hides, and connects a plot's
--- buy buttons (dropper BuyButtonN and build BuildButtonN parts, see
--- Purchases). It never decides a purchase; it only reports touches to the
+-- buy buttons (dropper BuyButtonN, build BuildButtonN and trophy build
+-- TrophyButtonN parts, see Purchases). It never decides a purchase; it only reports touches to the
 -- callback TycoonService passes in.
 --
 -- Buttons are hidden until TycoonService unlocks them (see PlotStages). A
@@ -10,7 +10,9 @@
 -- Hidden buttons cannot be touched.
 --
 -- Label text ("Dropper N" or the build's Name, over a yellow "🍪 Cost", or
--- "FREE!") is built from Config so prices live in one place.
+-- "FREE!"; a trophy build's Name over a gold "🏆 N Caleb Trophies") is
+-- built from Config so prices live in one place. A missing button (e.g. a
+-- map without the trophy buttons yet) is skipped.
 
 local Purchases = require(script.Parent.Purchases)
 local PlotVisibility = require(script.Parent.PlotVisibility)
@@ -18,11 +20,13 @@ local PlotVisibility = require(script.Parent.PlotVisibility)
 local BuyButtons = {}
 
 -- Looks only. The map's dropper buttons start red, build buttons orange.
+-- Trophy buttons keep the map's own gold/purple color.
 local FOR_SALE_COLORS = {
 	Dropper = Color3.fromRGB(255, 0, 0),
 	Build = Color3.fromRGB(255, 140, 0),
 }
 local PRICE_COLOR = "#FFE14D" -- sunny yellow
+local TROPHY_COLOR = "#FFC83D" -- trophy gold
 
 local function getButton(plot: Model, purchase: Purchases.Purchase): BasePart?
 	local button = plot:FindFirstChild(purchase.ButtonName)
@@ -51,6 +55,10 @@ end
 -- Two lines: name, then the price in yellow (the label is RichText).
 local function labelText(purchase: Purchases.Purchase): string
 	local entry = purchase.Entry
+	if purchase.Kind == "TrophyBuild" then
+		local trophies = if entry.Trophies == 1 then "1 Caleb Trophy" else `{entry.Trophies} Caleb Trophies`
+		return `{entry.Name}\n<font color="{TROPHY_COLOR}">🏆 {trophies}</font>`
+	end
 	local name = if purchase.Kind == "Dropper" then `Dropper {purchase.Index}` else entry.Name
 	local price = if entry.Cost == 0 then "FREE!" else `🍪 {entry.Cost}`
 	return `{name}\n<font color="{PRICE_COLOR}">{price}</font>`
@@ -60,10 +68,12 @@ end
 -- buy buttons. Call once per plot.
 function BuyButtons.Connect(plot: Model, onTouched: (hit: BasePart, purchaseId: string) -> ())
 	for _, purchase in Purchases.All() do
-		local button = plot:FindFirstChild(purchase.ButtonName) :: BasePart
-		button.Touched:Connect(function(hit)
-			onTouched(hit, purchase.Id)
-		end)
+		local button = getButton(plot, purchase)
+		if button then
+			button.Touched:Connect(function(hit)
+				onTouched(hit, purchase.Id)
+			end)
+		end
 	end
 end
 
@@ -72,9 +82,10 @@ function BuyButtons.HideAll(plot: Model)
 	for _, purchase in Purchases.All() do
 		local button = getButton(plot, purchase)
 		if button then
-			button.Color = FOR_SALE_COLORS[purchase.Kind]
+			button.Color = FOR_SALE_COLORS[purchase.Kind] or button.Color
 			local label = button:FindFirstChild("TextLabel", true)
 			if label and label:IsA("TextLabel") then
+				label.RichText = true
 				label.Text = labelText(purchase)
 			end
 		end

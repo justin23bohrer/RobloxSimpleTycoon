@@ -126,3 +126,9 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 - [x] Studio test switch DevAllTrophies: every trophy × N, session only (requested by the user 2026-10-02). (code done; Studio test pending: QA DT1–DT7)
 - [x] Power-up looks: speed trail + glowing feet, jump and double-jump effects (requested by the user 2026-10-02). (code done; Studio test pending: QA PL1–PL11)
 
+
+## Garage + Backyard (approved by the user 2026-10-02)
+
+Contract: ARCHITECTURE.md "Garage + Backyard (contract)". Three workers in parallel (garage model, backyard model, gameplay logic).
+
+- [x] Gameplay logic: `Config.TrophyBuilds` + `BackyardTrophies` (Walls also shows `BackDoor`), `TrophyBuild` purchase kind (`TrophyButtonN`, unlock when the house is maxed, free for owners who own enough Caleb Trophies, saved/restored), trophy button labels, `BackyardGate` + `BackyardDoor` (locked back door + sign, push-out loop), fire/particles/lights hidden with trophy builds (`PlotVisibility`). (code done; Studio test pending: QA GB1–GB16)

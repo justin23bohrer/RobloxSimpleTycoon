@@ -7,8 +7,11 @@
 -- * Is the single place that decides purchases for a tycoon (droppers and
 --   builds, see Purchases). Each one unlocks only after the purchase named in
 --   its Config After field: Dropper1-4 -> Walls -> Stairs -> SecondFloor ->
---   Dropper5-8 (and Walls -> TrophyCase). PurchaseApplied fires for every
---   purchase applied to a plot (bought or restored).
+--   Dropper5-8 (and Walls -> TrophyCase, SecondFloor -> furniture). Once
+--   the house is maxed (every dropper and build bought), the trophy builds
+--   (garage, backyard) unlock: free, for owners who own enough Caleb
+--   Trophies. PurchaseApplied fires for every purchase applied to a plot
+--   (bought or restored).
 -- * Restores a player's saved purchases (DataService) when they claim a plot,
 --   in unlock order, without charging cookies, and records new purchases.
 -- * Tells PlotStages what to show: only the ClaimPad while unclaimed, then the
@@ -31,6 +34,7 @@ local DropperService = require(script.Parent.DropperService)
 local EconomyService = require(script.Parent.EconomyService)
 local PlotStages = require(script.Parent.PlotStages)
 local Purchases = require(script.Parent.Purchases)
+local TrophyInventory = require(script.Parent.TrophyInventory)
 local TycoonSounds = require(script.Parent.TycoonSounds)
 
 local TycoonService = {}
@@ -41,7 +45,8 @@ export type Tycoon = {
 	Plot: Model,
 	Owner: Player,
 	-- Purchase id -> true once bought. Ids are Config.Droppers[N].Id
-	-- ("Dropper1", ...) and Config.Builds[N].Id ("Walls", "Stairs", ...).
+	-- ("Dropper1", ...), Config.Builds[N].Id ("Walls", "Stairs", ...) and
+	-- Config.TrophyBuilds[N].Id ("Garage", "Pool", ...).
 	-- Add new upgrades as new ids; the service that runs the upgrade keeps its
 	-- own runtime state keyed by plot.
 	Purchased: { [string]: boolean },
@@ -50,8 +55,17 @@ export type Tycoon = {
 }
 
 -- Parts every plot model must contain (see src/Workspace/Map/Plots), plus
--- every purchase's button, each dropper's DropperSpotN, conveyor, and
--- collector, and each build's Parts.
+-- every house purchase's button, each dropper's DropperSpotN, conveyor, and
+-- collector, and each build's Parts. The Garage + Backyard parts (trophy
+-- builds' buttons and Parts, BackDoor) are optional: a plot without them
+-- still works and only warns; those purchases are just never shown.
+local OPTIONAL_PARTS = { "BackDoor" }
+for _, purchase in Purchases.TrophyBuilds() do
+	table.insert(OPTIONAL_PARTS, purchase.ButtonName)
+	for _, name in purchase.Entry.Parts do
+		table.insert(OPTIONAL_PARTS, name)
+	end
+end
 local REQUIRED_PARTS = {
 	"Base",
 	"ClaimPad",
@@ -66,9 +80,11 @@ for _, purchase in Purchases.All() do
 		table.insert(REQUIRED_PARTS, `DropperSpot{purchase.Index}`)
 		table.insert(REQUIRED_PARTS, purchase.Entry.Conveyor)
 		table.insert(REQUIRED_PARTS, DropperService.CollectorFor(purchase.Entry.Conveyor))
-	else
+	elseif purchase.Kind == "Build" then
 		for _, name in purchase.Entry.Parts do
-			table.insert(REQUIRED_PARTS, name)
+			if not table.find(OPTIONAL_PARTS, name) then
+				table.insert(REQUIRED_PARTS, name)
+			end
 		end
 	end
 end
@@ -97,6 +113,15 @@ local function isValidPlot(plot: Instance): boolean
 			warn(`TycoonService: {plot.Name} is missing '{partName}' and will not be used`)
 			return false
 		end
+	end
+	local missing = {}
+	for _, partName in OPTIONAL_PARTS do
+		if not plot:FindFirstChild(partName) then
+			table.insert(missing, partName)
+		end
+	end
+	if #missing > 0 then
+		warn(`TycoonService: {plot.Name} has no {table.concat(missing, ", ")} (Garage + Backyard); those are skipped`)
 	end
 	return true
 end
@@ -237,6 +262,9 @@ end
 local function applyPurchase(tycoon: Tycoon, purchase: Purchases.Purchase)
 	tycoon.Purchased[purchase.Id] = true
 	PlotStages.ShowAfterPurchase(tycoon.Plot, purchase.Id)
+	if Purchases.IsHouseMaxed(tycoon.Purchased) then
+		PlotStages.ShowTrophyButtons(tycoon.Plot, tycoon.Purchased)
+	end
 	if purchase.Kind == "Dropper" then
 		DropperService.Start(tycoon.Plot, purchase.Id)
 	end
@@ -248,7 +276,9 @@ end
 -- purchase in unlock order (walking the After chain from the first buttons),
 -- so every purchase's After is in place before it. Free: no cookies spent.
 -- Saved ids that are no longer purchases, or whose After was not saved, are
--- skipped. If the data did not load, the plot just starts fresh.
+-- skipped. Then, if the house is maxed, saved trophy builds are applied too
+-- (trophies are not checked again: they are never spent). If the data did
+-- not load, the plot just starts fresh.
 function TycoonService.RestorePurchases(player: Player)
 	local tycoon = tycoonsByPlayer[player]
 	if not tycoon or not tycoon.Restoring then
@@ -273,14 +303,24 @@ function TycoonService.RestorePurchases(player: Player)
 				end
 			end
 		end
+		if Purchases.IsHouseMaxed(tycoon.Purchased) then
+			for _, purchase in Purchases.TrophyBuilds() do
+				if saved[purchase.Id] and not tycoon.Purchased[purchase.Id] then
+					applyPurchase(tycoon, purchase)
+				end
+			end
+		end
 	end
 	tycoon.Restoring = false
 end
 
--- Buys one purchase (a Config.Droppers or Config.Builds Id) for the player's
--- own plot. Returns true on success. Called when the owner touches its button.
--- A purchase can only be bought after the one named in its After field; the
--- price comes only from Config. A Cost of 0 is free (nothing is spent).
+-- Buys one purchase (a Config.Droppers, Builds or TrophyBuilds Id) for the
+-- player's own plot. Returns true on success. Called when the owner touches
+-- its button. A purchase can only be bought after the one named in its After
+-- field; the price comes only from Config. A Cost of 0 is free (nothing is
+-- spent). A trophy build needs the house maxed and the owner to own at
+-- least its Trophies Caleb Trophies (counted on the server); it costs no
+-- cookies and spends no trophies.
 -- Buying a dropper starts it; buying a build shows its parts (PlotStages).
 -- Plays the purchase sound (or the player's "can't afford" sound) after the
 -- result is decided; restoring a saved house never comes through here.
@@ -303,8 +343,15 @@ function TycoonService.TryPurchase(player: Player, purchaseId: string): boolean
 	if after ~= nil and not tycoon.Purchased[after] then
 		return false -- not unlocked yet; buy the one before it first
 	end
-	local cost = purchase.Entry.Cost
-	if cost > 0 and not EconomyService.TrySpend(player, cost) then
+	if purchase.Kind == "TrophyBuild" then
+		if not Purchases.IsHouseMaxed(tycoon.Purchased) then
+			return false -- the house is not maxed yet
+		end
+		if #TrophyInventory.GetOwned(player) < purchase.Entry.Trophies then
+			TycoonSounds.CantAfford(player, purchaseId)
+			return false -- not enough Caleb Trophies
+		end
+	elseif purchase.Entry.Cost > 0 and not EconomyService.TrySpend(player, purchase.Entry.Cost) then
 		TycoonSounds.CantAfford(player, purchaseId)
 		return false -- cannot afford it; cash unchanged
 	end
