@@ -721,6 +721,28 @@ yet (the user will pick a track).
 - A sound whose id in `Config.CalebSounds` is empty is silent. Volumes are
   `Config.CalebSoundVolumes`.
 
+### Push (House Raid)
+
+The defender's move for stopping someone running off with a stolen trophy.
+Not combat: no weapons, no damage, no health, no combos.
+
+- **Controls:** **F** on keyboard, **X** (ButtonX) on a gamepad, and on
+  phones/tablets a round orange **PUSH** button right above the jump button.
+- Pressing it plays a quick two-handed shove and a whoosh. It recharges in
+  `Config.PushCooldown` (1.2 s); the phone button shows a dark disc that
+  shrinks away while it recharges. Pressing early does nothing.
+- The server picks who gets pushed: the closest other player within
+  `Config.PushRange` (7 studs) roughly in front of you (within 70°). Missing
+  is fine: you just swing at the air.
+- **A thief** (someone carrying a stolen trophy) is stopped: the trophy goes
+  straight back to its owner's case, the thief is knocked back hard (a bit
+  up) and staggers for a moment, and everyone sees a big red **"STOPPED!"**
+  and a burst of stars.
+- **Anyone else** only gets a small nudge (about a third of the knockback, no
+  stagger) and a small **"POW!"**, so players can't launch each other around.
+- Sounds: `Config.PushSounds` (Swing, Hit); empty = silent. Original
+  effects in `tools/audio/` (`push_swing.wav`, `push_hit.wav`).
+
 ### Pad style (copy this for new pads)
 
 | Piece | Setting |
