@@ -12,7 +12,8 @@
 --               is X appear.
 --   Maxed       every dropper and build bought: the TrophyButtons of trophy
 --               builds not bought yet appear (garage, backyard spots). A
---               bought trophy build's Parts appear like a build's.
+--               bought trophy build's Parts appear like a build's, and
+--               their fires/particles/lights switch on.
 --
 -- Hidden parts cannot be touched (see PlotVisibility), so a hidden button or
 -- pad can never be used.
@@ -27,16 +28,36 @@ local PlotStages = {}
 -- CashTank is optional (only looks); the rest are required plot parts.
 local CLAIMED_AREA = { "OwnerSign", "Conveyor", "Collector", "CollectPad", "CashTank" }
 
--- includeEffects: also switch the parts' fires/particles/lights (trophy
--- builds only, see PlotVisibility).
-local function setVisible(plot: Model, names: { string }, visible: boolean, includeEffects: boolean?)
+-- Turns on/off every fire, smoke, sparkles, particle emitter and light in
+-- a part or model. A trophy build's effects (e.g. the Hangout's FireCore
+-- Fire, Embers and FireLight) are saved off in the map, like the Trophy
+-- Case's CaseLight, so they burn only while the build is shown.
+local function setEffects(root: Instance, on: boolean)
+	for _, item in root:GetDescendants() do
+		if
+			item:IsA("Fire")
+			or item:IsA("Smoke")
+			or item:IsA("Sparkles")
+			or item:IsA("ParticleEmitter")
+			or item:IsA("Light")
+		then
+			(item :: any).Enabled = on
+		end
+	end
+end
+
+-- withEffects: also switch the parts' effects (trophy builds only).
+local function setVisible(plot: Model, names: { string }, visible: boolean, withEffects: boolean?)
 	for _, name in names do
 		local part = plot:FindFirstChild(name)
 		if part then
 			if visible then
 				PlotVisibility.Show(part)
 			else
-				PlotVisibility.Hide(part, includeEffects)
+				PlotVisibility.Hide(part)
+			end
+			if withEffects then
+				setEffects(part, visible)
 			end
 		end
 	end
@@ -73,7 +94,7 @@ function PlotStages.ShowAfterPurchase(plot: Model, purchaseId: string)
 	BuyButtons.SetPurchased(plot, purchaseId)
 	local purchase = Purchases.Get(purchaseId)
 	if purchase and purchase.Kind ~= "Dropper" then
-		setVisible(plot, purchase.Entry.Parts, true)
+		setVisible(plot, purchase.Entry.Parts, true, purchase.Kind == "TrophyBuild")
 	end
 	showUnlockedBy(plot, purchaseId)
 end

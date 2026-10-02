@@ -131,4 +131,4 @@ Contract: ARCHITECTURE.md "Trophy Collection + Powers (contract)".
 
 Contract: ARCHITECTURE.md "Garage + Backyard (contract)". Three workers in parallel (garage model, backyard model, gameplay logic).
 
-- [x] Gameplay logic: `Config.TrophyBuilds` + `BackyardTrophies` (Walls also shows `BackDoor`), `TrophyBuild` purchase kind (`TrophyButtonN`, unlock when the house is maxed, free for owners who own enough Caleb Trophies, saved/restored), trophy button labels, `BackyardGate` + `BackyardDoor` (locked back door + sign, push-out loop), fire/particles/lights hidden with trophy builds (`PlotVisibility`). (code done; Studio test pending: QA GB1–GB16)
+- [x] Gameplay logic: `Config.TrophyBuilds` + `BackyardTrophies` (Walls also shows `BackDoor`), `TrophyBuild` purchase kind (`TrophyButtonN`, unlock when the house is maxed, free for owners who own enough Caleb Trophies, saved/restored), trophy button labels, `BackyardGate` + `BackyardDoor` (locked back door + sign, push-out loop), trophy builds' fires/particles/lights on only while shown (`PlotStages`). (code done; Studio test pending: QA GB1–GB16)

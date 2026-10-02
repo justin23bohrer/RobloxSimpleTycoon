@@ -7,11 +7,6 @@
 -- original values the first time, and Show puts them back. Hiding something
 -- already hidden, or showing something never hidden, does nothing.
 --
--- With includeEffects, Hide also turns off map-built effects (Fire, Smoke,
--- Sparkles, ParticleEmitters, lights, Beams, Trails) and Show turns them back
--- on. Only for models whose effects no service switches on and off itself
--- (e.g. the Hangout's fire pit), since Show puts back the saved Enabled.
---
 -- A hidden part cannot be touched, so its Touched handlers never fire.
 -- Used by PlotStages and BuyButtons. Presentation only; it decides nothing.
 
@@ -25,19 +20,9 @@ type SavedPart = {
 }
 
 local savedParts: { [BasePart]: SavedPart } = {}
-local savedEnabled: { [Instance]: boolean } = {} -- GUIs and effects
+local savedGuis: { [LayerCollector]: boolean } = {}
 
-local function isEffect(item: Instance): boolean
-	return item:IsA("Fire")
-		or item:IsA("Smoke")
-		or item:IsA("Sparkles")
-		or item:IsA("ParticleEmitter")
-		or item:IsA("Light")
-		or item:IsA("Beam")
-		or item:IsA("Trail")
-end
-
-local function hideOne(item: Instance, includeEffects: boolean?)
+local function hideOne(item: Instance)
 	if item:IsA("BasePart") then
 		if savedParts[item] then
 			return
@@ -52,12 +37,12 @@ local function hideOne(item: Instance, includeEffects: boolean?)
 		item.CanCollide = false
 		item.CanTouch = false
 		item.CanQuery = false
-	elseif item:IsA("LayerCollector") or (includeEffects and isEffect(item)) then
-		if savedEnabled[item] ~= nil then
+	elseif item:IsA("LayerCollector") then
+		if savedGuis[item] ~= nil then
 			return
 		end
-		savedEnabled[item] = (item :: any).Enabled;
-		(item :: any).Enabled = false
+		savedGuis[item] = item.Enabled
+		item.Enabled = false
 	end
 end
 
@@ -72,20 +57,20 @@ local function showOne(item: Instance)
 		item.CanCollide = saved.CanCollide -- before CanQuery: CanQuery needs it
 		item.CanQuery = saved.CanQuery
 		item.CanTouch = saved.CanTouch
-	else
-		local enabled = savedEnabled[item]
+	elseif item:IsA("LayerCollector") then
+		local enabled = savedGuis[item]
 		if enabled == nil then
 			return
 		end
-		savedEnabled[item] = nil;
-		(item :: any).Enabled = enabled
+		savedGuis[item] = nil
+		item.Enabled = enabled
 	end
 end
 
-function PlotVisibility.Hide(root: Instance, includeEffects: boolean?)
-	hideOne(root, includeEffects)
+function PlotVisibility.Hide(root: Instance)
+	hideOne(root)
 	for _, item in root:GetDescendants() do
-		hideOne(item, includeEffects)
+		hideOne(item)
 	end
 end
 
