@@ -18,7 +18,9 @@ local Config = {
 	BackgroundMusicVolume = 0.3, -- 0..1
 	CookiePartyMusicVolume = 0.5, -- 0..1 (swells a little toward the end)
 	CookiePartyStartVolume = 0.8, -- 0..1
-	MusicFadeSeconds = 1.5, -- background fade out / back in around the party
+	MusicFadeSeconds = 1.5, -- background fades back in over this after the party
+	MusicSuspenseCutSeconds = 0.3, -- "CALEB IS FULLLL!!!": the background cuts out this fast (suspense, no music while Full)
+	PartyMusicDelaySeconds = 1.0, -- silence between the Air Horn and the party music starting
 	-- ====================================================================================
 
 	-- Cookies every player starts each session with.

@@ -1,12 +1,15 @@
 -- CalebAudio (client only)
 -- The game's music and the Caleb Full Event's sound effects. Driven only by
 -- the replicated attributes in Shared/CalebEvent.luau:
---   join (not mid-party)   background music fades in (BackgroundMusic)
---   Normal -> Full         Full (once)
---   -> Celebration         background fades out and pauses; the air horn
---                          (Config.CookiePartyStartSound, once) + CookieRain
---                          (quiet loop) + party music, countdown ticks
---                          (CookiePartyAudio)
+--   join (not Full/party)  background music fades in (BackgroundMusic)
+--   Normal -> Full         Full (once); the background cuts out fast
+--                          (Config.MusicSuspenseCutSeconds) and pauses:
+--                          suspense, no music while Full
+--   -> Celebration         (background cut, if Full was skipped) the air
+--                          horn (Config.CookiePartyStartSound, once) +
+--                          CookieRain (quiet loop) + countdown ticks; the
+--                          party music starts Config.PartyMusicDelaySeconds
+--                          later, at full volume (CookiePartyAudio)
 --   Celebration ends       CookieRain fades out, party music stops, the
 --                          background fades back in (resumed); on ->
 --                          TrophyClaim the FinaleBoom, then EventEnd a
@@ -145,18 +148,19 @@ local function onStateChanged()
 	lastState = state
 
 	if state == State.Full then
+		BackgroundMusic.FadeOut(Config.MusicSuspenseCutSeconds)
 		playOnce("Full")
 	elseif state == State.Celebration then
-		BackgroundMusic.FadeOut()
+		BackgroundMusic.FadeOut(Config.MusicSuspenseCutSeconds) -- no-op if Full already cut it
 		playOnce("PartyStart")
 		startRain()
-		CookiePartyAudio.Start(statue)
+		CookiePartyAudio.Start(statue, Config.PartyMusicDelaySeconds)
 	end
 	if state ~= State.Celebration then
 		stopRain() -- the loops never outlive the Celebration
 		CookiePartyAudio.Stop()
 	end
-	if previous == State.Celebration then
+	if previous == State.Celebration or (previous == State.Full and state ~= State.Celebration) then
 		BackgroundMusic.FadeIn()
 	end
 	if previous == State.Celebration then
@@ -171,12 +175,13 @@ end
 
 statue:GetAttributeChangedSignal(Attr.State):Connect(onStateChanged)
 
--- Joined mid-Celebration: only the party loops (no air horn, no
--- background until the party ends). Otherwise the background starts.
+-- Joined mid-Celebration: only the party loops, music right away (no air
+-- horn, no delay, no background until the party ends). Joined during Full:
+-- silence until the party. Otherwise the background starts.
 if lastState == State.Celebration then
 	startRain()
 	CookiePartyAudio.Start(statue)
-else
+elseif lastState ~= State.Full then
 	BackgroundMusic.FadeIn()
 end
 

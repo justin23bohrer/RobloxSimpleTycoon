@@ -1,8 +1,9 @@
 -- BackgroundMusic (client only, ModuleScript)
 -- The game's background music (Config.BackgroundMusic), driven by
 -- CalebAudio.client.luau (the one place that knows when the Cookie Party
--- runs): FadeIn when the player joins and when the party ends, FadeOut
--- while the party music plays. One looping Sound, created once in
+-- runs): FadeIn when the player joins and when the party ends, a fast
+-- FadeOut (Config.MusicSuspenseCutSeconds) the moment Caleb is Full, so
+-- there is no music until the party. One looping Sound, created once in
 -- CalebAudio's SoundService folder. FadeOut pauses it, so FadeIn resumes
 -- the song where it stopped instead of starting it over. An empty id = no
 -- background music (every call does nothing). Presentation only.
@@ -17,8 +18,8 @@ local BackgroundMusic = {}
 local sound: Sound? = nil
 local fade: Tween? = nil
 
-local function fadeInfo(): TweenInfo
-	return TweenInfo.new(math.max(Config.MusicFadeSeconds, 0), Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+local function fadeInfo(seconds: number?): TweenInfo
+	return TweenInfo.new(math.max(seconds or Config.MusicFadeSeconds, 0), Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 end
 
 -- Creates the Sound (once). assetId: CalebAudio's id normalizer. Returns
@@ -56,8 +57,9 @@ function BackgroundMusic.FadeIn()
 	tween:Play()
 end
 
--- Fade to silence, then pause (keeps the song's position).
-function BackgroundMusic.FadeOut()
+-- Fade to silence over `seconds` (default Config.MusicFadeSeconds), then
+-- pause (keeps the song's position).
+function BackgroundMusic.FadeOut(seconds: number?)
 	local s = sound
 	if not s or not s.IsPlaying then
 		return
@@ -65,7 +67,7 @@ function BackgroundMusic.FadeOut()
 	if fade then
 		fade:Cancel()
 	end
-	local tween = TweenService:Create(s, fadeInfo(), { Volume = 0 })
+	local tween = TweenService:Create(s, fadeInfo(seconds), { Volume = 0 })
 	fade = tween
 	tween.Completed:Connect(function(state)
 		if fade == tween and state == Enum.PlaybackState.Completed then
