@@ -117,6 +117,43 @@ local Config = {
 	BackyardPushOutDistance = 4,
 	BackyardPushOutHeight = 5,
 
+	-- The drivable garage car (CarService, CarBuild, CarSeats). Once a plot's
+	-- Garage is built, its car can be driven by the plot's owner (plus one
+	-- passenger, anyone). Physics knobs: tune in Studio.
+	--   CarMaxSpeed / CarReverseSpeed - top speed forward / backward (studs/s).
+	--   CarTorque      - each wheel motor's max torque while driving.
+	--   CarBrakeTorque - each wheel motor's torque holding the wheels still
+	--                    when nobody presses gas (0 = roll freely).
+	--   CarWheelAcceleration - how fast the wheels spin up (rad/s per s);
+	--                    lower = gentler starts, fewer wheelies.
+	--   CarSteerAngle  - front wheels' max turn (degrees); CarSteerSpeed how
+	--                    fast they turn to it (rad/s), with at most
+	--                    CarSteerTorque.
+	--   CarWheelDensity / CarWheelFriction - tires (heavy tires keep the
+	--                    car low and stable; friction 0..2).
+	--   CarUprightTorque - a gentle torque that keeps the car's roof up
+	--                    (0 = off). Too high and it fights ramps.
+	CarMaxSpeed = 60,
+	CarReverseSpeed = 25,
+	CarTorque = 30_000,
+	CarBrakeTorque = 3_000,
+	CarWheelAcceleration = 40,
+	CarSteerAngle = 30,
+	CarSteerSpeed = 4,
+	CarSteerTorque = 100_000,
+	CarWheelDensity = 4,
+	CarWheelFriction = 1.2,
+	CarUprightTorque = 150_000,
+	-- CarService checks every car each CarCheckInterval seconds. A car below
+	-- CarFallY (the ground's top is y 1), or past the ground's edge and
+	-- falling faster than CarFallSpeed, is re-parked in its garage and the
+	-- people in it respawn. A car lying on its side/roof, nearly still, for
+	-- CarFlippedSeconds is re-parked too (nobody respawns).
+	CarCheckInterval = 0.5,
+	CarFallY = -20,
+	CarFallSpeed = 10,
+	CarFlippedSeconds = 4,
+
 	-- Seconds between drops (shared by all droppers).
 	DropInterval = 2,
 
