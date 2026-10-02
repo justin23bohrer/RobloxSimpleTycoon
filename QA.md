@@ -408,6 +408,21 @@ Tip: set `DevUnlimitedCash = true` (Studio only) so you can buy everything quick
 | DV2 | Set `DevUnlimitedCash = false`, Play. | No "[DEV]" line; cash shows 100. | |
 | DV3 | Code review: dev cash is gated by `RunService:IsStudio()` in `PlayerDataService`, and `DevUnlimitedCash` is `false` in the committed `Config.luau`. | Both true. | |
 
+## Dev: all trophies
+
+Set `Config.DevAllTrophies = true` (Studio only; `DevUnlimitedCash = true`
+helps to buy the Trophy Case). Set both back to false before committing.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| DT1 | `DevAllTrophies = true`, Play (API access on or off). | Output shows one "[DevAllTrophies] gave N trophies (session only, not saved)" line (N = 5 × collectable variants). 🏆 TROPHIES shows every variant 5 times; COLLECTION is full (M / M); no Mystery Caleb. Nothing is auto-equipped (ACTIVE 0 / 5, or only your saved equipped ones). | |
+| DT2 | Buy the Trophy Case, equip 5 copies of one trophy (e.g. SpeedCaleb). | All 5 show in the case; the power stacks (5×, no cap), "Active powers" in the panel matches. A 6th equip says the slots are full. | |
+| DT3 | With a saved trophy already equipped (API access on), equip dev trophies into the free slots, then unequip / re-equip the saved one. | Saved and dev trophies mix freely up to 5; no errors; the saved one's state saves as usual. | |
+| DT4 | With dev trophies equipped, Stop. Set `DevAllTrophies = false`, Play (API access on). | No dev trophies; only your real saved trophies and their saved equipped list (no missing/unknown ids, no warnings). | |
+| DT5 | `DevAllTrophies = false`, Play. | No "[DevAllTrophies]" line; inventory is normal. | |
+| DT6 | Claim a Caleb trophy with dev trophies on (`DevCalebFastCycle = true`). | Claim works as usual (one per cycle); it is saved (API on) and auto-equips only if a slot is free. | |
+| DT7 | Code review: `DevTrophies` is gated by `RunService:IsStudio()`, and `DevAllTrophies` is `false` in the committed `Config.luau`. | Both true (a published game ignores it). | |
+
 ## Visuals
 
 | ID | Test | Expected | Status |

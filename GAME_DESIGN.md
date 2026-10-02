@@ -195,6 +195,11 @@ each collector, so cookies can't fall off.
   `Config.DevStartingCash` (1,000,000,000 cookies) instead of 100, **only** in
   Roblox Studio. It never applies in a published game. Buying still spends
   cookies normally. Must be `false` in commits.
+- `Config.DevAllTrophies = true` (Studio only) gives each player
+  `Config.DevAllTrophiesCopies` (5) copies of every collectable Caleb Trophy
+  when they join, to test every trophy and stacking: buy the Trophy Case,
+  open 🏆 TROPHIES, equip. They are session only (never saved) and not
+  auto-equipped. Must be `false` in commits.
 
 ## Collector
 

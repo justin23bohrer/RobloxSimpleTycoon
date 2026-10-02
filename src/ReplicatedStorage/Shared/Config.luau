@@ -492,6 +492,14 @@ local Config = {
 	-- never applies in a published game. Keep this false in commits.
 	DevUnlimitedCash = false,
 	DevStartingCash = 1_000_000_000,
+
+	-- TESTING ONLY. When true, every player gets DevAllTrophiesCopies copies
+	-- of every collectable trophy (Weight > 0) once their data load finishes,
+	-- but only inside Roblox Studio (RunService:IsStudio()). They are
+	-- session only (never saved) and not auto-equipped (see DevTrophies). It
+	-- never applies in a published game. Keep this false in commits.
+	DevAllTrophies = false,
+	DevAllTrophiesCopies = 5,
 }
 
 return table.freeze(Config)

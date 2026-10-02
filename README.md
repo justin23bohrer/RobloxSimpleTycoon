@@ -76,6 +76,22 @@ To try every dropper without grinding for cookies:
 It only works inside Roblox Studio (`RunService:IsStudio()`), never in a
 published game. Set it back to `false` before committing.
 
+## Testing every trophy (Studio only)
+
+To try every Caleb Trophy and power stacking without claiming them:
+
+1. In `src/ReplicatedStorage/Shared/Config.luau` set `DevAllTrophies = true`
+   (`DevAllTrophiesCopies` = copies of each trophy, default 5). Setting
+   `DevUnlimitedCash = true` too makes buying the Trophy Case quick.
+2. Rebuild (or let `rojo serve` sync) and press **Play**. Output shows
+   `[DevAllTrophies] gave N trophies (session only, not saved)`.
+3. Claim a plot and buy the **Trophy Case**, open **🏆 TROPHIES**, and equip
+   up to 5 (e.g. 5 copies of one trophy to see its power stack).
+
+The dev trophies are session only: never saved, not auto-equipped, gone when
+you stop. It only works inside Roblox Studio, never in a published game. Set
+it back to `false` before committing.
+
 ## Testing saving (Studio)
 
 The player's house and Caleb trophies are saved with a DataStore (cookies

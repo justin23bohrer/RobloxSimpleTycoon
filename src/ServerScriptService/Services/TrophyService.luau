@@ -40,6 +40,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local TrophyVariants = require(ReplicatedStorage.Shared.TrophyVariants)
 local CalebCycle = require(script.Parent.CalebCycle)
 local DataService = require(script.Parent.DataService)
+local DevTrophies = require(script.Parent.DevTrophies)
 local PowerService = require(script.Parent.PowerService)
 local TrophyCaseDisplay = require(script.Parent.TrophyCaseDisplay)
 local TrophyInventory = require(script.Parent.TrophyInventory)
@@ -234,11 +235,15 @@ function TrophyService.Start(statueModel: Instance?)
 	DataService.TrophiesChanged:Connect(scheduleRefresh)
 	DataService.EquippedChanged:Connect(scheduleRefresh)
 
-	-- Join: publish at once (nothing owned yet), again once their data loaded.
+	-- Join: publish at once (nothing owned yet), again once their data loaded
+	-- (or failed to load). Studio-only dev trophies are added at that point.
 	local function onPlayerAdded(player: Player)
 		scheduleRefresh(player)
 		task.spawn(function()
 			DataService.WaitForData(player)
+			if player.Parent == Players then
+				DevTrophies.Give(player)
+			end
 			scheduleRefresh(player)
 		end)
 	end
