@@ -33,6 +33,7 @@ export type Parts = {
 	FullScale: UIScale,
 	PartyBanner: Frame,
 	PartyScale: UIScale,
+	PartyTitle: TextLabel,
 	PartyTimer: TextLabel,
 	TrophyBanner: Frame,
 	TrophyScale: UIScale,
@@ -162,7 +163,7 @@ function CalebEventUIBuild.Build(parent: Instance): Parts
 
 	-- Celebration: "COOKIE PARTY!" + time left.
 	local party, partyScale = panel(gui, "PartyBanner", PARTY_COLOR, 0.4, 3.6, Vector2.new(250, 69), Vector2.new(460, 128))
-	label(party, "Title", UDim2.fromScale(0.05, 0.06), UDim2.fromScale(0.9, 0.56), "🎉 COOKIE PARTY! 🎉")
+	local partyTitle = label(party, "Title", UDim2.fromScale(0.05, 0.06), UDim2.fromScale(0.9, 0.56), "🎉 COOKIE PARTY! 🎉")
 	local partyTimer = label(party, "Timer", UDim2.fromScale(0.25, 0.62), UDim2.fromScale(0.5, 0.3), "")
 
 	-- TrophyClaim, eligible player.
@@ -187,6 +188,7 @@ function CalebEventUIBuild.Build(parent: Instance): Parts
 		FullScale = fullScale,
 		PartyBanner = party,
 		PartyScale = partyScale,
+		PartyTitle = partyTitle,
 		PartyTimer = partyTimer,
 		TrophyBanner = trophy,
 		TrophyScale = trophyScale,

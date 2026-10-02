@@ -303,6 +303,33 @@ local Config = {
 		CalebSpit = 0.4,
 	}),
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
+	-- Party FX (client only, looks only: CalebEventUI / CookiePartyFX /
+	-- CookiePartyFinale / CalebAudio). The music's tempo at PlaybackSpeed 1
+	-- (tools/audio party_music.wav); the lighting and banner pulse once every
+	-- 2 beats, so never more than ~1.2 pulses per second.
+	CookiePartyMusicBPM = 120,
+	-- Per phase: pulse strength (0..1), seconds between UI confetti bursts,
+	-- and pieces per burst (taken from the CalebConfettiCount pool).
+	CookiePartyPulse = table.freeze({ Start = 0.15, Hype = 0.45, Frenzy = 0.75, Countdown = 1 }),
+	CookiePartyConfettiEvery = table.freeze({ Start = 8, Hype = 5, Frenzy = 3, Countdown = 2 }),
+	CookiePartyConfettiPieces = 20,
+	-- Added on top of CalebPartySaturation / CalebPartyBloom as the party
+	-- goes from 0 to 1 (CookieParty.Intensity).
+	CookiePartyExtraSaturation = 0.2,
+	CookiePartyExtraBloom = 0.25,
+	-- Countdown 10..1: camera FieldOfView punch in degrees (Big = 3, 2, 1).
+	CookiePartyCountdownFOVPunch = 2,
+	CookiePartyCountdownFOVPunchBig = 4,
+	-- Finale explosion (CookiePartyFinale): cookies thrown out of Caleb, how
+	-- long it lasts before everything is removed, launch speed range
+	-- (studs/s), gravity (studs/s²), and the camera shake.
+	CookiePartyFinaleCookies = 48,
+	CookiePartyFinaleSeconds = 2.5,
+	CookiePartyFinaleSpeedMin = 30,
+	CookiePartyFinaleSpeedMax = 65,
+	CookiePartyFinaleGravity = 80,
+	CookiePartyFinaleShakeStuds = 1.4,
+	CookiePartyFinaleShakeSeconds = 0.8,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthesize SimpleTycoon's original Caleb Full Event sound effects.
+"""Synthesize SimpleTycoon's original Caleb Full Event / Cookie Party audio.
 
 Plain Python 3 standard library only (wave, math, struct, random). Every
 sound is made from scratch here (sine/square-ish tones, pitch sweeps,
@@ -13,6 +13,17 @@ Writes 16-bit, 44.1 kHz, mono WAV files to tools/audio/out/:
   cookie_rain.wav        soft sparkle/patter that loops cleanly
   trophy_claim.wav       bright "ta-da" chime
   event_end.wav          descending gentle chime
+
+Cookie Party (Config.CookiePartySounds):
+
+  party_music.wav        upbeat chiptune loop, 120 BPM, 4 bars (8 s), seamless
+  collect_pop.wav        tiny bubbly pop (Normal / Chocolate cookie)
+  collect_golden.wav     bright two-note chime + sparkle (Golden cookie)
+  collect_giant.wav      thump + fast rising arpeggio + splash (Giant cookie)
+  countdown_tick.wav     short woodblock tick (pitched up per second in game)
+  finale_boom.wav        huge boom: sub drop, rumble, crack, crash, chord stab
+  caleb_laugh.wav        cartoony "ha-ha-ha-ha" (voiced syllables, falling)
+  caleb_spit.wav         "ptoo" pop + airy whoosh (Caleb throws a cookie)
 
 Run:  python3 tools/audio/generate_sfx.py
 The output is deterministic (fixed random seed), so re-running gives the
@@ -306,6 +317,180 @@ def event_end(rng):
     return fade_edges(out, 0.004, 0.15)
 
 
+# Cookie Party ---------------------------------------------------------------
+
+
+def swept_noise(seconds, rng, lowpass_fn, highpass=0.0):
+    """Noise through a one-pole lowpass whose coefficient follows lowpass_fn(t)."""
+    n = int(seconds * RATE)
+    out = []
+    lp = 0.0
+    prev_in = 0.0
+    hp = 0.0
+    for i in range(n):
+        x = rng.uniform(-1.0, 1.0)
+        lp += lowpass_fn(i / RATE) * (x - lp)
+        y = lp
+        if highpass:
+            hp = highpass * (hp + y - prev_in)
+            prev_in = y
+            y = hp
+        out.append(y)
+    return out
+
+
+def kick(seconds=0.28):
+    k = tone(lambda t: 45 + 110 * math.exp(-t * 28), seconds, harmonics=((1, 1.0), (2, 0.12)))
+    return apply(k, envelope(len(k), 0.001, seconds * 0.9, 2.0))
+
+
+SQUARE = ((1, 1.0), (3, 0.33), (5, 0.2), (7, 0.14))  # chiptune-ish
+BASS = ((1, 1.0), (2, 0.5), (3, 0.3), (4, 0.18))
+
+
+def party_music(rng):
+    """Upbeat chiptune loop: 120 BPM, 4 bars of C - G - Am - F (8 s).
+
+    Like cookie_rain, every note is placed on a circular timeline, so tails
+    that run past the end wrap to the start and the loop has no seam.
+    """
+    beat = 0.5  # 120 BPM
+    bars = (
+        ("C3", ("C5", "E5", "G5", "C6"), ("E5", "G5", "C6", "G5")),
+        ("G2", ("B4", "D5", "G5", "B5"), ("D5", "G5", "B5", "G5")),
+        ("A2", ("C5", "E5", "A5", "C6"), ("C5", "E5", "A5", "E5")),
+        ("F2", ("C5", "F5", "A5", "C6"), ("C5", "F5", "A5", "C6")),
+    )
+    length = beat * 4 * len(bars)
+    n = int(length * RATE)
+    out = [0.0] * n
+
+    def add(src, at, gain):
+        start = int(at * RATE)
+        for i, s in enumerate(src):
+            out[(start + i) % n] += s * gain
+
+    kick_sound = kick()
+    for bar, (root, arp, melody) in enumerate(bars):
+        bar_start = bar * 4 * beat
+        root_hz = note(root)
+        for b in range(4):
+            t = bar_start + b * beat
+            add(kick_sound, t, 0.9)
+            # Clap on beats 2 and 4.
+            if b % 2 == 1:
+                clap = noise(0.16, rng, highpass=0.75, lowpass=0.55)
+                add(apply(clap, envelope(len(clap), 0.002, 0.15, 2.2)), t, 0.35)
+            # Melody: one bell per beat.
+            add(bell(note(melody[b]), 0.45, decay=5.0, bright=0.7), t, 0.22)
+        for e in range(8):
+            t = bar_start + e * beat / 2
+            # Bass: octave bounce on 8th notes.
+            f = root_hz * (2 if e % 2 else 1)
+            bass = tone(lambda _t, f=f: f, beat / 2 * 0.9, harmonics=BASS)
+            add(apply(bass, envelope(len(bass), 0.004, 0.1, 1.5)), t, 0.32)
+            # Hi-hat on every 8th (off-beats a bit louder).
+            hat = noise(0.045, rng, highpass=0.95, lowpass=0.9)
+            add(apply(hat, envelope(len(hat), 0.001, 0.04, 3.0)), t, 0.12 if e % 2 == 0 else 0.2)
+        for x in range(16):
+            # Chip arpeggio on 16th notes, quiet.
+            f = note(arp[x % 4])
+            chip = tone(lambda _t, f=f: f, beat / 4 * 0.8, harmonics=SQUARE)
+            add(apply(chip, envelope(len(chip), 0.003, 0.05, 1.5)), bar_start + x * beat / 4, 0.07)
+
+    mean = sum(out) / n
+    return [s - mean for s in out]
+
+
+def collect_pop(rng):
+    """Tiny bubbly pop: a fast upward sine blip with a little sparkle."""
+    out = []
+    blip = tone(lambda t: 480 + 650 * min(1.0, t / 0.07), 0.09, harmonics=((1, 1.0), (2, 0.2)))
+    mix_into(out, apply(blip, envelope(len(blip), 0.002, 0.06, 1.6)), 0.0, 0.8)
+    mix_into(out, bell(note("C7"), 0.18, decay=14.0, bright=0.4), 0.03, 0.25)
+    return fade_edges(out, 0.002, 0.02)
+
+
+def collect_golden(rng):
+    """Bright two-note chime (E6 -> B6) with a high sparkle on top."""
+    out = []
+    mix_into(out, bell(note("E6"), 0.7, decay=4.0), 0.0, 0.45)
+    mix_into(out, bell(note("B6"), 0.8, decay=3.5), 0.07, 0.45)
+    mix_into(out, bell(note("E7"), 0.5, decay=6.0, bright=0.5), 0.14, 0.2)
+    sparkle = noise(0.5, rng, highpass=0.96, lowpass=0.7)
+    mix_into(out, apply(sparkle, envelope(len(sparkle), 0.002, 0.45, 2.5)), 0.05, 0.12)
+    return fade_edges(out, 0.002, 0.1)
+
+
+def collect_giant(rng):
+    """Big score: a low thump, a fast rising arpeggio, then a splash."""
+    out = []
+    mix_into(out, kick(0.4), 0.0, 0.8)
+    for i, name in enumerate(("C5", "E5", "G5", "C6", "E6", "G6", "C7")):
+        mix_into(out, bell(note(name), 0.6, decay=4.0, bright=0.8), 0.04 + i * 0.045, 0.3)
+    crash = noise(0.9, rng, highpass=0.92, lowpass=0.7)
+    mix_into(out, apply(crash, envelope(len(crash), 0.002, 0.85, 2.6)), 0.32, 0.25)
+    return fade_edges(out, 0.002, 0.1)
+
+
+def countdown_tick(rng):
+    """Short woodblock tick (the game raises its pitch each second)."""
+    out = []
+    block = bell(880, 0.16, decay=22.0, bright=0.6)
+    mix_into(out, block, 0.0, 0.8)
+    click = noise(0.012, rng, highpass=0.7, lowpass=0.8)
+    mix_into(out, apply(click, envelope(len(click), 0.0005, 0.011, 2.0)), 0.0, 0.4)
+    return fade_edges(out, 0.001, 0.02)
+
+
+def finale_boom(rng):
+    """The finale: sub drop + rumble + crack + crash + a big major chord."""
+    out = []
+    sub = tone(lambda t: 30 + 90 * math.exp(-t * 4), 2.0, harmonics=((1, 1.0), (2, 0.25)))
+    mix_into(out, apply(sub, envelope(len(sub), 0.003, 1.9, 1.8)), 0.0, 1.0)
+    rumble = noise(1.8, rng, lowpass=0.05)
+    mix_into(out, apply(rumble, envelope(len(rumble), 0.005, 1.7, 2.0)), 0.0, 1.4)
+    crack = noise(0.06, rng, highpass=0.6, lowpass=0.9)
+    mix_into(out, apply(crack, envelope(len(crack), 0.0005, 0.055, 2.0)), 0.0, 0.6)
+    crash = noise(2.2, rng, highpass=0.93, lowpass=0.65)
+    mix_into(out, apply(crash, envelope(len(crash), 0.002, 2.1, 2.8)), 0.02, 0.35)
+    for name, amp in (("C4", 1.0), ("G4", 0.8), ("C5", 0.8), ("E5", 0.7), ("G5", 0.5)):
+        f = note(name)
+        stab = tone(lambda t, f=f: f, 1.6, harmonics=((1, 1.0), (2, 0.5), (3, 0.3), (4, 0.15)), vibrato=(5.5, 0.004))
+        mix_into(out, apply(stab, envelope(len(stab), 0.01, 1.3, 1.6)), 0.05, 0.16 * amp)
+    for i, name in enumerate(("C7", "G6", "E6", "C6")):
+        mix_into(out, bell(note(name), 0.8, decay=3.5, bright=0.5), 0.15 + i * 0.09, 0.12)
+    return fade_edges(out, 0.001, 0.3)
+
+
+def caleb_laugh(rng):
+    """Cartoony 'ha-ha-ha-ha-ha': voiced syllables that fall in pitch."""
+    out = []
+    vowel = ((1, 0.6), (2, 1.0), (3, 0.8), (4, 0.45), (5, 0.25), (6, 0.12))
+    for i in range(5):
+        start = i * 0.17
+        f0 = 300 - i * 18
+        syl = tone(lambda t, f0=f0: f0 * (1.05 - 0.6 * t), 0.13, harmonics=vowel, vibrato=(9, 0.015))
+        mix_into(out, apply(syl, envelope(len(syl), 0.015, 0.09, 1.4)), start + 0.02, 0.3)
+        breath = noise(0.05, rng, highpass=0.5, lowpass=0.4)
+        mix_into(out, apply(breath, envelope(len(breath), 0.005, 0.04, 1.5)), start, 0.25)
+    return fade_edges(out, 0.003, 0.05)
+
+
+def caleb_spit(rng):
+    """'Ptoo': a lip pop, then an airy whoosh that sweeps up and away."""
+    out = []
+    pop = tone(lambda t: 60 + 140 * math.exp(-t * 40), 0.07, harmonics=((1, 1.0), (2, 0.3)))
+    mix_into(out, apply(pop, envelope(len(pop), 0.001, 0.06, 1.8)), 0.0, 0.7)
+    click = noise(0.01, rng, highpass=0.6, lowpass=0.9)
+    mix_into(out, apply(click, envelope(len(click), 0.0005, 0.009, 2.0)), 0.0, 0.4)
+    whoosh_len = 0.5
+    whoosh = swept_noise(whoosh_len, rng, lambda t: 0.04 + 0.5 * math.sin(math.pi * t / whoosh_len) ** 2, highpass=0.8)
+    whoosh_env = [math.sin(math.pi * i / len(whoosh)) ** 1.5 for i in range(len(whoosh))]
+    mix_into(out, apply(whoosh, whoosh_env), 0.04, 0.8)
+    return fade_edges(out, 0.001, 0.05)
+
+
 SOUNDS = (
     ("caleb_full.wav", caleb_full),
     ("celebration_start.wav", celebration_start),
@@ -313,6 +498,14 @@ SOUNDS = (
     ("cookie_rain.wav", cookie_rain),
     ("trophy_claim.wav", trophy_claim),
     ("event_end.wav", event_end),
+    ("party_music.wav", party_music),
+    ("collect_pop.wav", collect_pop),
+    ("collect_golden.wav", collect_golden),
+    ("collect_giant.wav", collect_giant),
+    ("countdown_tick.wav", countdown_tick),
+    ("finale_boom.wav", finale_boom),
+    ("caleb_laugh.wav", caleb_laugh),
+    ("caleb_spit.wav", caleb_spit),
 )
 
 
