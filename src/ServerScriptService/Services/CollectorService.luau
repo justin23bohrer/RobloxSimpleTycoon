@@ -6,8 +6,9 @@
 --      (uncollected) cash. DropperService.ClaimDrop validates and destroys it.
 --   2. The plot's owner touching plot.CollectPad moves the stored cash into
 --      their cash via EconomyService.AddCash.
--- The stored amount is never shown as text. CollectorDisplay shows it as
--- small cookies filling the CashTank ("COOKIE JAR") behind the pad (presentation only).
+-- CollectorDisplay shows the stored amount as small cookies filling the
+-- CashTank ("COOKIE JAR") behind the pad and as a "🍪 1,250" counter on the
+-- jar, updated every time the stored amount changes (presentation only).
 --
 -- Named CollectorService (not CollectionService) to avoid confusion with
 -- Roblox's built-in game:GetService("CollectionService") tagging service.
@@ -43,6 +44,7 @@ local function onCollectorTouched(plot: Model, hit: BasePart)
 	end
 	storedCashByPlot[plot] = (storedCashByPlot[plot] or 0) + value
 	CollectorDisplay.AddCube(plot)
+	CollectorDisplay.SetAmount(plot, storedCashByPlot[plot])
 end
 
 local function onCollectPadTouched(plot: Model, hit: BasePart)
@@ -63,9 +65,11 @@ local function onCollectPadTouched(plot: Model, hit: BasePart)
 		-- Payout failed (e.g. player data missing); keep the cash (and the
 		-- cubes in the tank) on the plot.
 		storedCashByPlot[plot] += amount
+		CollectorDisplay.SetAmount(plot, storedCashByPlot[plot])
 		return
 	end
 	CollectorDisplay.Clear(plot, true)
+	CollectorDisplay.SetAmount(plot, 0)
 end
 
 -- Connects the collector and CollectPad touch handlers for a plot. Called once
@@ -94,6 +98,7 @@ end
 function CollectorService.ResetPlot(plot: Model)
 	storedCashByPlot[plot] = 0
 	CollectorDisplay.Clear(plot, false)
+	CollectorDisplay.SetAmount(plot, 0)
 end
 
 return CollectorService

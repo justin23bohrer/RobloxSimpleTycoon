@@ -1,11 +1,13 @@
 -- CollectorDisplay (server only)
 -- Helper for CollectorService: the fun, presentation-only side of a plot's
--- collect area. It never reads or changes cash.
+-- collect area. It never changes cash; it only shows the stored amount
+-- CollectorService hands it.
 --
 -- * Every drop the Collector accepts drops a small cookie into the plot's
 --   glass CashTank (the "COOKIE JAR" on the wall behind the CollectPad), so
---   the jar fills up as cookies wait to be picked up. No amounts are shown as
---   text.
+--   the jar fills up as cookies wait to be picked up.
+-- * A "🍪 1,250" counter on top of the jar shows the stored amount
+--   (JarCounter).
 -- * While cash is waiting, the CollectPad sparkles and glows.
 -- * A bouncing arrow above the pad invites the owner to step on it.
 -- * On payout the tank empties with a burst of gold sparkles.
@@ -14,6 +16,8 @@
 -- Missing CashTank parts only skip the cubes; the pad still works.
 
 local TweenService = game:GetService("TweenService")
+
+local JarCounter = require(script.Parent.JarCounter)
 
 local CollectorDisplay = {}
 
@@ -114,6 +118,7 @@ function CollectorDisplay.Setup(plot: Model)
 	else
 		warn(`CollectorDisplay: {plot.Name} has no CashTank with a TankLid; the tank will stay empty`)
 	end
+	JarCounter.Setup(plot, tank)
 
 	displayByPlot[plot] = {
 		Tank = tank,
@@ -158,6 +163,11 @@ function CollectorDisplay.AddCube(plot: Model)
 		* CFrame.Angles(0, math.random() * math.pi, math.pi / 2 + (math.random() - 0.5)) -- roughly flat, tilted; tumbles onto the pile
 	cube.Parent = cubes
 	cube:SetNetworkOwner(nil)
+end
+
+-- Shows the plot's stored amount on the jar's counter.
+function CollectorDisplay.SetAmount(plot: Model, amount: number)
+	JarCounter.SetAmount(plot, amount)
 end
 
 -- Empties the tank and stops the sparkles. With celebrate = true (a payout)
