@@ -267,16 +267,34 @@ and dev cash, then feed Caleb to the goal. Sound cases need the
 | PX3 | Last 10 seconds. | Huge numbers 10, 9, … 1 in the middle of the screen, each exactly once, slamming in (big + tilted → normal) in changing colors, with a small camera zoom punch. 3, 2, 1 are red, bigger, with a gold glow on the screen edges and a stronger punch. No "0". | |
 | PX4 | 2 players (Test > Clients and Servers), both watching the countdown. | Both show the same number at the same time (within a frame or two of each other); neither skips or repeats a number. | |
 | PX5 | Moment the party ends (Celebration → TrophyClaim), standing near the statue. | ~48 cookies (some golden) burst out of Caleb's head in every direction, arc, spin, bounce on the ground and fade; a crumb/sparkle burst, a quick glowing ball, an expanding ring on the ground, a white flash, a strong short camera shake, full confetti. | |
-| PX6 | Same moment, as a player who fed. | The gold "🏆 CALEB TROPHY AVAILABLE!" banner with "TROPHY CLAIM: m:ss" shows immediately (during the explosion), exactly as before. No "Cookie Party Complete" screen, no party leaderboard. The trophy claim works as before. | |
-| PX7 | Same moment: watch the middle of the screen. | "+5,000 🍪 PARTY BONUS!" pops, then flies down toward the cookie counter and fades, gone within ~2 s. The counter goes up by 5,000 (the server paid it). | |
+| PX6 | Same moment, as a player who fed. | The gold "🏆 CALEB TROPHY AVAILABLE!" banner with "TROPHY CLAIM: m:ss" shows immediately (during the explosion), exactly as before. Only the short "YOU COLLECTED" card (no results screen, no party leaderboard). The trophy claim works as before. | |
+| PX7 | Same moment: watch the middle of the screen. | The "YOU COLLECTED" card with "+5,000 PARTY BONUS!" plays (see "Cookie Party: end total"). The counter goes up by 5,000 (the server paid it). | |
 | PX8 | ~3 s after the finale: check Workspace (client view) and the camera. | No `CookiePartyFinale` folder and no finale cookies/ring/ball left. Countdown, callout, edge glow are hidden; the party banner is gone; `Camera.FieldOfView` is back to its normal value (70 by default). Run 2 cycles: still nothing left over, no errors in Output. | |
-| PX9 | Player 2 joins during TrophyClaim. | No explosion, flash, shake, boom or reward pop for Player 2; just the TrophyClaim UI. | |
+| PX9 | Player 2 joins during TrophyClaim. | No explosion, flash, shake, boom or total card for Player 2; just the TrophyClaim UI. | |
 | PX10 | Player 2 joins mid-party (e.g. during Frenzy, or during the countdown). | Banner in the right phase color, lighting at the right level, no callout for the phase already running; if in the last 10 s, the countdown starts from the current number. At the end Player 2 sees the full finale (PX5–PX7). | |
 | PX11 | Spend the party and finale far from the statue (at your plot). | Everything still runs; the finale still flashes/shakes and the trophy UI appears; no errors if Caleb's head is streamed out (explosion comes from above the pedestal instead). | |
 | PX12 | All `CookiePartySounds` ids empty; run a full cycle. | Silent party (other sounds as configured). Output has at most one `[CalebAudio] no sound id ...` line (listing the missing ones) and no errors or warnings. | |
 | PX13 | With ids: listen through the party. | Upbeat chiptune music starts with the party, loops without a click, gets faster at 40 / 20 / 10 s left and a little louder toward the end. A tick each second from 10 to 1, higher each time. At the finale the music stops at once and a big boom plays; the old descending end chime follows ~1.6 s later. | |
 | PX14 | Run `python3 tools/audio/generate_sfx.py` twice. | 14 WAVs in `tools/audio/out/` (16-bit, 44.1 kHz, mono); effects under 300 KB, the music ~700 KB; re-running gives identical files. | |
 
+## Cookie Party: end total
+
+The "YOU COLLECTED 🍪 N" card at the finale (`CookiePartyTotal`). Same setup
+as above (`Config.DevCalebFastCycle = true` in Studio only; set it back).
+Sound ticks need `Config.CookiePartySounds.TotalTick` / `TotalLand` ids;
+with empty ids it must be silent with no errors.
+
+| ID | Test | Expected | Status |
+| -- | ---- | -------- | ------ |
+| PT1 | Collect some party cookies, note the HUD "🍪 +N" just before the end. | At the finale the card says "YOU COLLECTED" and the big number ends exactly at that N (commas, e.g. "🍪 12,450"); the sub-line shows how many cookies you grabbed ("1 cookie grabbed" for one). | |
+| PT2 | Collect nothing during the party. | "🍪 0" (no count-up) and "Next time grab some cookies!", then "+5,000 PARTY BONUS!". Shorter, no ring burst. | |
+| PT3 | Watch the number. | Counts up fast from 0 (~1 s, slowing at the end), with ticks rising in pitch if a TotalTick id is set; lands with a punchy scale bump, a white shine sweeping across the gold number, a gold ring bursting out and a little confetti. | |
+| PT4 | Watch under the number. | "+5,000 PARTY BONUS!" (green) slams in just after the number lands; the amount matches `Config.CookiePartyFinalReward`, and the cash counter goes up by it. | |
+| PT5 | Time it from the finale. | The card flies down toward the cookie counter, shrinking and fading; it is completely gone within ~4 s. Nothing left on screen; no errors in Output. | |
+| PT6 | As a player who fed (trophy banner) and as one who didn't (resting pill). | The trophy banner / pill at the top is visible the whole time and the card never overlaps it; the card never covers the cash display at the bottom center. | |
+| PT7 | Player 2 joins during TrophyClaim. | Player 2 sees no total card at all. | |
+| PT8 | Phone layout: Studio device emulator (e.g. iPhone landscape) and a small PC window. | The card fits between the trophy banner and the cash display, text readable, nothing overlaps (at worst a couple of pixels on the smallest screens). | |
+| PT9 | 2 players with different totals (Test > Clients and Servers); run 2 cycles. | Each sees only their own total. The second party's card shows the second party's numbers (earned resets at the next party start); no leftovers between parties. | |
 ## Caleb leaderboard (podium)
 
 Needs the Core agent's `CalebCycle` publishing `CalebTopFeeders`. Tip: `DevCalebFastCycle = true` + `DevUnlimitedCash = true` in Studio for the end-of-cycle cases (set back before committing).

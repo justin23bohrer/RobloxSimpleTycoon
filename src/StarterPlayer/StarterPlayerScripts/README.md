@@ -20,8 +20,10 @@ Client code goes here as `Name.client.luau` (a LocalScript).
   collect feedback + party earnings counter.
 - `CalebEventUI.client.luau` + `CalebEventUIBuild.luau` / `CalebEventFX.luau`
   and the Cookie Party's `CookiePartyUIBuild.luau` / `CookiePartyFX.luau` /
-  `CookiePartyCountdown.luau` / `CookiePartyFinale.luau` (ModuleScripts) —
-  event messages, party countdown, callouts, lighting, finale explosion.
+  `CookiePartyCountdown.luau` / `CookiePartyFinale.luau` /
+  `CookiePartyTotal.luau` / `CookiePartyTotalBuild.luau` (ModuleScripts) —
+  event messages, party countdown, callouts, lighting, finale explosion, the
+  end-of-party "YOU COLLECTED 🍪 N" total.
   Display only.
 - `CalebAudio.client.luau` + `CookiePartyAudio.luau` (ModuleScript) — Caleb
   Full Event sound effects and the party music / countdown ticks / finale
