@@ -4,7 +4,6 @@
 --   Countdown  the huge 10..1 numbers in the middle of the screen
 --   Callout    the short phase slam ("MORE COOKIES!", "GOLDEN COOKIE FRENZY!")
 --   EdgeGlow   four soft gradient strips on the screen edges (3, 2, 1)
---   Toast      "+5,000 🍪 PARTY BONUS!" (the finale reward pop)
 -- Same cartoony style as the rest of the event UI. CookiePartyFX animates
 -- them. Looks only; never talks to the server.
 
@@ -13,7 +12,6 @@ local CookiePartyUIBuild = {}
 local OUTLINE_COLOR = Color3.fromRGB(40, 28, 20)
 local TEXT_COLOR = Color3.fromRGB(255, 255, 255)
 local GLOW_COLOR = Color3.fromRGB(255, 200, 60)
-local TOAST_COLOR = Color3.fromRGB(255, 214, 64)
 local FONT = Enum.Font.FredokaOne
 local GLOW_DEPTH = 0.14 -- how far each edge strip reaches in (share of the screen)
 
@@ -25,9 +23,6 @@ export type Parts = {
 	CalloutScale: UIScale,
 	CalloutStroke: UIStroke,
 	EdgeGlow: { Frame },
-	Toast: TextLabel,
-	ToastScale: UIScale,
-	ToastStroke: UIStroke,
 }
 
 local function bigText(parent: Instance, name: string, position: UDim2, size: UDim2, strokeSize: number, zIndex: number): (TextLabel, UIScale, UIStroke)
@@ -96,10 +91,6 @@ function CookiePartyUIBuild.Build(gui: ScreenGui): Parts
 		edge(gui, "GlowBottom", UDim2.fromScale(0, 1), UDim2.fromScale(1, GLOW_DEPTH), Vector2.new(0, 1), 270),
 	}
 
-	local toast, toastScale, toastStroke =
-		bigText(gui, "PartyBonusToast", UDim2.fromScale(0.5, 0.42), UDim2.fromScale(0.7, 0.1), 5, 6)
-	toast.TextColor3 = TOAST_COLOR
-
 	return {
 		Countdown = countdown,
 		CountdownScale = countdownScale,
@@ -108,9 +99,6 @@ function CookiePartyUIBuild.Build(gui: ScreenGui): Parts
 		CalloutScale = calloutScale,
 		CalloutStroke = calloutStroke,
 		EdgeGlow = glow,
-		Toast = toast,
-		ToastScale = toastScale,
-		ToastStroke = toastStroke,
 	}
 end
 

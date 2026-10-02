@@ -12,7 +12,8 @@
 --   * drops small UI confetti bursts, more often in later phases;
 --   * shows the 10..1 countdown: each number once (ceil of seconds left),
 --     drawn by CookiePartyCountdown. (The tick sound is CalebAudio's.)
--- Stop() undoes everything. ShowReward pops the finale's "+N PARTY BONUS!".
+-- Stop() undoes everything. ShowReward plays the finale's "YOU COLLECTED"
+-- total + party bonus (CookiePartyTotal).
 -- Looks only: never changes game state, never talks to the server.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -23,6 +24,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local CookieParty = require(ReplicatedStorage.Shared.CookieParty)
 local CalebEventFX = require(script.Parent:WaitForChild("CalebEventFX"))
 local CookiePartyCountdown = require(script.Parent:WaitForChild("CookiePartyCountdown"))
+local CookiePartyTotal = require(script.Parent:WaitForChild("CookiePartyTotal"))
 
 local CookiePartyFX = {}
 
@@ -94,12 +96,14 @@ end
 function CookiePartyFX.Init(uiParts, partyParts)
 	ui = uiParts
 	CookiePartyCountdown.Init(partyParts)
+	CookiePartyTotal.Init(uiParts)
 end
 
 -- The party is on (also when joining mid-party: no callout for the phase
 -- we land in; the countdown shows the current number).
 function CookiePartyFX.Start(theStatue: Instance)
 	CookiePartyFX.Stop()
+	CookiePartyTotal.Hide()
 	statue = theStatue
 	phase = CookieParty.GetPhase(CookieParty.TimeLeft(theStatue))
 	lastNumber = nil
@@ -124,9 +128,10 @@ function CookiePartyFX.Stop()
 	ui.PartyBanner.BackgroundColor3 = BANNER_COLORS.Start
 end
 
--- The finale reward pop (CookiePartyFinale remote; display only).
+-- The finale: "YOU COLLECTED" total + party bonus (CookiePartyFinale
+-- remote; display only).
 function CookiePartyFX.ShowReward(reward: any)
-	CookiePartyCountdown.ShowReward(reward)
+	CookiePartyTotal.Show(reward)
 end
 
 return CookiePartyFX

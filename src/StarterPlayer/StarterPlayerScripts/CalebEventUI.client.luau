@@ -8,7 +8,8 @@
 --   finale       Celebration -> TrophyClaim, seen live: cookie explosion
 --                (CookiePartyFinale), white flash, big shake, confetti; the
 --                trophy UI shows right away. CookiePartyFinale(reward) from
---                the server pops "+N 🍪 PARTY BONUS!".
+--                the server shows the short "YOU COLLECTED 🍪 N" card +
+--                "+N PARTY BONUS!" (CookiePartyTotal), gone in ~3.5 s.
 --   TrophyClaim  eligible: trophy banner with "TROPHY CLAIM: 1:52";
 --                claimed: "Trophy claimed! 🏆"; not eligible: "CALEB IS
 --                RESTING — new round soon" with the countdown.
@@ -191,7 +192,7 @@ end
 player:GetAttributeChangedSignal(CalebEvent.PlayerAttr.Fed):Connect(onPlayerAttr)
 player:GetAttributeChangedSignal(CalebEvent.PlayerAttr.TrophyClaimed):Connect(onPlayerAttr)
 
--- The server paid the party's final reward: a short pop (display only; the
+-- The server paid the party's final reward: the short total card (display only; the
 -- cash itself is EconomyService's). Waits for the remote off the main path.
 task.spawn(function()
 	CookieParty.GetRemote(CookieParty.Remote.Finale).OnClientEvent:Connect(CookiePartyFX.ShowReward)

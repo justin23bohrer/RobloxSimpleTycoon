@@ -351,6 +351,8 @@ local Config = {
 		FinaleBoom = "",
 		CalebLaugh = "",
 		CalebSpit = "",
+		TotalTick = "",
+		TotalLand = "",
 	}),
 	CookiePartySoundVolumes = table.freeze({
 		Music = 0.4,
@@ -361,6 +363,8 @@ local Config = {
 		FinaleBoom = 0.9,
 		CalebLaugh = 0.5,
 		CalebSpit = 0.4,
+		TotalTick = 0.4,
+		TotalLand = 0.7,
 	}),
 	CookiePartyMusicSpeed = table.freeze({ Start = 1, Hype = 1.06, Frenzy = 1.12, Countdown = 1.18 }),
 	-- Collectable cookies on each client (CookiePartyCookies.client). The
@@ -412,6 +416,10 @@ local Config = {
 	CookiePartyFinaleGravity = 80,
 	CookiePartyFinaleShakeStuds = 1.4,
 	CookiePartyFinaleShakeSeconds = 0.8,
+	-- End-of-party "YOU COLLECTED" card (CookiePartyTotal): count-up length,
+	-- and how long it holds after the bonus before flying away (seconds).
+	CookiePartyTotalCountSeconds = 1.1,
+	CookiePartyTotalHoldSeconds = 1.3,
 
 	-- Saving (DataService, DataStore). Bump the name only to wipe all saves.
 	DataStoreName = "SimpleTycoon_v1",
