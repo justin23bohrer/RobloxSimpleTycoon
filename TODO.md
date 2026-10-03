@@ -53,7 +53,7 @@ user's approval first.
 - [x] Feeder upgrade: 10 / 100 / 1K add on every click; progress bar is exact (eaten / 1,000,000, exact % in the text) with a preview of the picked amount; pop-up closes right after a successful feed (approved by the user 2026-10-01). (code done; Studio test pending: QA FD4, FD14–FD17, FD19)
 - [x] Cookie jar sign restyle: the "COOKIE JAR" sign on the jar wall uses the cartoony sign style (pink rounded panel, thick dark outline, gold frame, FredokaOne), facing the Collect pad (requested by the user 2026-10-01). (done; Studio test pending: QA V6, CT1)
 - [x] Cookie jar shows how many cookies are in it (requested by the user 2026-10-01). (code done; Studio test pending: QA JC1–JC9)
-- [x] Brown cookie jar: the `CashTank` wall is chocolate brown, the stand and the counter frame dark chocolate, the sign panel milk chocolate; gold frame/sign/counter panel and clear glass kept, to match the brown "CALEB'S TOP FEEDERS" boards (requested by the user 2026-10-03). (done; Studio test pending: QA CT1, CT8, V6, JC1)
+- [x] Brown cookie jar: the `CashTank` wall is chocolate brown, the stand and the counter frame dark chocolate, the sign panel milk chocolate; gold frame/sign/counter panel and clear glass kept (requested by the user 2026-10-03). (done; Studio test pending: QA CT1, CT8, V6, JC1)
 - [x] Progress bar above Caleb's head that everyone sees: "Caleb: N / 1,000,000 🍪" in the pop-up's style, "FULL!" at the max; client only, reads `CookiesEaten` (requested by the user 2026-10-01). (code done; Studio test pending: QA SB1–SB8)
 - [x] Decide what happens when Caleb reaches 1,000,000 cookies: the Caleb Full Event (approved by the user 2026-10-01; see below).
 
@@ -72,7 +72,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music: the user's own t
 - [x] Sound effects: `tools/audio/generate_sfx.py` + `CalebAudio.client` (original, synthesized).
 - [ ] Upload `tools/audio/out/*.wav` to Roblox and paste the ids into `Config.CalebSounds` (user; steps in `tools/audio/README.md`).
 - [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
-- [x] Leaderboard boards brown instead of yellow: chocolate panel + matching `Board` part, cream rows, dark chocolate rank badges (requested by the user 2026-10-02). (code done; Studio test pending: QA LB1, LB4)
+- [x] Leaderboard boards back to yellow: yellow panel + cookie dough `Board` part, as before PR #94 (requested by the user 2026-10-03); the cookie jar stays brown. (code done; Studio test pending: QA LB1, LB4)
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [x] Caleb Trophies: unique variants, 2-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [x] Background music + party music + air horn slots; Caleb spit removed (requested by the user 2026-10-02). (code done; Studio test pending: QA MU1–MU8)
