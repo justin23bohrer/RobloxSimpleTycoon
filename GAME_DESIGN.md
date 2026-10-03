@@ -303,7 +303,7 @@ The jar shows the stored amount both as small cookies and as a number:
   facing the front (the spawn side). The Collect pad is only on its front;
   behind it is a chocolate brown wall with a gold frame, a cartoony "COOKIE JAR" sign, and
   a clear glass tank on a dark chocolate stand (the `CashTank` model). The jar is
-  brown with gold trim, like the "CALEB'S TOP FEEDERS" boards; the dough-colored
+  chocolate brown with gold trim; the dough-colored
   cookies stay clearly visible through the glass. The wall's plain
   back faces the back of the room, so you can only collect from the front.
 - Each drop that reaches the collector drops one small cookie into the jar,
@@ -912,8 +912,8 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
 - Four leaderboard boards stand on the grass at the pedestal's four
   **corners**, each facing outward along a diagonal (21 studs from the
   statue's center), so one is readable from any direction and none is near
-  a feed pad (those are on the sides). Each board is cookie-themed: a chocolate
-  brown board, a gold trim frame, two chocolate posts, and a big chocolate chip cookie on
+  a feed pad (those are on the sides). Each board is cookie-themed: a gold
+  trim frame, two chocolate posts, and a big chocolate chip cookie on
   top. They stay clear of Caleb even at his biggest
   (`Config.CalebMaxScale`). Generated in the statue's `Podium` folder
   (`Leaderboard<corner>` models) by `tools/statue/generate_statue.py`.
@@ -926,11 +926,8 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
 - It counts cookies **fed to Caleb** this round (tracked by the server), not
   cookies produced. During the trophy claim it says **"FINAL RESULTS"** above
   the list (the server keeps the list until the reset, which clears it).
-- Same style as the rest of the game (rounded panel, thick dark outline,
-  FredokaOne, not affected by lighting), but the panel is **chocolate brown**
-  instead of yellow (requested by the user 2026-10-02): white outlined title
-  and total, cream rows, dark chocolate badges for rank 4+. Readable from
-  ~40 studs.
+- Same look as the rest of the game (yellow rounded panel, thick dark
+  outline, FredokaOne, not affected by lighting), readable from ~40 studs.
   Display only (`CalebLeaderboard.client.luau` reads the statue's
   `CalebTopFeeders` attribute). Names are plain text, never markup.
 
@@ -1001,7 +998,7 @@ Cookie jar sign: the `TankSign` part (on the jar wall, 10 × 2.2) is gold
 `TextLabel` "COOKIE JAR" (86% × 70%, centered, `TextScaled`) with a 3.5 px
 dark Contextual `UIStroke`. No code touches it.
 Cookie jar colors (`CashTank`, saved in Plot1; no generator builds it): `TankWall`
-chocolate brown `122,74,42` (the leaderboard panel's brown), `TankStand` dark
+chocolate brown `122,74,42`, `TankStand` dark
 chocolate `78,44,24`, `TankWallBorder` and `TankSign` gold `255,200,40`, glass
 `180,230,255` at Transparency 0.6 (kept clear so the `214,160,90` cookies show
 against the darker wall).

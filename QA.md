@@ -344,10 +344,10 @@ Needs the Core agent's `CalebCycle` publishing `CalebTopFeeders`. Tip: `DevCaleb
 
 | ID | Test | Expected | Status |
 | -- | ---- | -------- | ------ |
-| LB1 | Press Play; walk all the way around the statue, and look from each spawn. | Four boards at the pedestal's corners, each facing out diagonally: a chocolate-brown board and panel (not yellow; no yellow/tan edge showing), white outlined title/subtitle/total, cream rows with easy-to-read names and numbers, gold trim, chocolate posts, and a chip cookie on top. From any side at least one board is readable from ~40 studs. They don't block any of the 4 feed pads (all 4 still open the pop-up). Text is not darkened by lighting/night. | |
+| LB1 | Press Play; walk all the way around the statue, and look from each spawn. | Four boards at the pedestal's corners, each facing out diagonally, with gold trim, chocolate posts, and a chip cookie on top. From any side at least one board is readable from ~40 studs. They don't block any of the 4 feed pads (all 4 still open the pop-up). Text is not darkened by lighting/night. | |
 | LB2 | Before anyone feeds. | Title "CALEB'S TOP FEEDERS", subtitle "Cookies fed this round", "Be the first to feed Caleb!", total "🍪 0 / 350,000" (solo). | |
 | LB3 | Feed 10 cookies. | Within ~1 s your row appears: badge 1 (gold), your name, "10 🍪"; your row is green with a thick green outline; total "🍪 10 / 350,000" (solo). | |
-| LB4 | 2–3 players feed different amounts (e.g. Test > 3 Clients). | Rows are best first with commas (e.g. "248,321 🍪"); badges 1/2/3 are gold/silver/bronze, 4+ dark chocolate (clearly visible on the cream rows and the brown panel). Each client sees only its OWN row highlighted. | |
+| LB4 | 2–3 players feed different amounts (e.g. Test > 3 Clients). | Rows are best first with commas (e.g. "248,321 🍪"); badges 1/2/3 are gold/silver/bronze, 4+ brown. Each client sees only its OWN row highlighted. | |
 | LB5 | Late joiner: feed, then a second player joins. | The new player's boards show the current list and total right away. | |
 | LB6 | Player with a long display name (or temporarily make the server send a 40-character name / one containing `<b>` tags). | The name ends in "…" inside its row; it never overlaps the cookie count or leaves the board; tags show as plain text. | |
 | LB7 | Feed until Caleb is full (fast cycle) and wait for TrophyClaim. Also check Caleb at max size. | At max size Caleb never touches a board. During TrophyClaim the subtitle says "FINAL RESULTS" (red) and the list stays. | |
