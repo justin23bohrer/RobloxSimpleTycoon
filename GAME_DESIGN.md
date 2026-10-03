@@ -301,13 +301,15 @@ The jar shows the stored amount both as small cookies and as a number:
 
 - The cookie jar stands on its own in the **middle of the first floor**,
   facing the front (the spawn side). The Collect pad is only on its front;
-  behind it is a purple wall with a gold frame, a cartoony "COOKIE JAR" sign, and
-  a glass tank on an orange stand (the `CashTank` model). The wall's plain
+  behind it is a chocolate brown wall with a gold frame, a cartoony "COOKIE JAR" sign, and
+  a clear glass tank on a dark chocolate stand (the `CashTank` model). The jar is
+  brown with gold trim, like the "CALEB'S TOP FEEDERS" boards; the dough-colored
+  cookies stay clearly visible through the glass. The wall's plain
   back faces the back of the room, so you can only collect from the front.
 - Each drop that reaches the collector drops one small cookie into the jar,
   so it fills up as cookies wait (it stops adding at 60, when it looks
   full; the stored cookies keep adding up).
-- A cartoony counter on top of the jar (a pink-framed gold plaque sitting
+- A cartoony counter on top of the jar (a dark-chocolate-framed gold plaque sitting
   right on top of the "COOKIE JAR" sign, facing the Collect pad) shows how many cookies are
   stored, e.g. "🍪 1,250" (with commas), and "🍪 0" when the jar is empty.
   It pops a little each time the number goes up, goes back to 0 when the
@@ -994,12 +996,17 @@ TextLabel on the sign.
 Cookie jar sign: the `TankSign` part (on the jar wall, 10 × 2.2) is gold
 (`255,200,40`) and acts as the frame, like the owner sign. Its pad-facing
 `Back` face has a `SurfaceGui` `SignGui` (`PixelsPerStud` 50,
-`LightInfluence = 0`) → pink (`255,90,160`) `Panel` (94% × 84%) with
+`LightInfluence = 0`) → milk chocolate (`160,98,54`) `Panel` (94% × 84%) with
 `UICorner` (0.35 scale) and a 6 px dark `UIStroke` → white `FredokaOne`
 `TextLabel` "COOKIE JAR" (86% × 70%, centered, `TextScaled`) with a 3.5 px
 dark Contextual `UIStroke`. No code touches it.
-Cookie jar counter: a runtime `JarCounter` part (7 × 1.8 × 0.6, pink
-`255,90,160` frame) directly on top of the `TankSign` (y 14.3..16.1 on
+Cookie jar colors (`CashTank`, saved in Plot1; no generator builds it): `TankWall`
+chocolate brown `122,74,42` (the leaderboard panel's brown), `TankStand` dark
+chocolate `78,44,24`, `TankWallBorder` and `TankSign` gold `255,200,40`, glass
+`180,230,255` at Transparency 0.6 (kept clear so the `214,160,90` cookies show
+against the darker wall).
+Cookie jar counter: a runtime `JarCounter` part (7 × 1.8 × 0.6, dark chocolate
+`78,44,24` frame) directly on top of the `TankSign` (y 14.3..16.1 on
 Plot1, front face z −46.4, 0.2 in front of the sign's; below the 2nd floor
 at y 17), with a `SurfaceGui` `CounterGui` on the
 pad-facing face (`PixelsPerStud` 50, `LightInfluence = 0`, `MaxDistance`

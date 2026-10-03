@@ -2,7 +2,7 @@
 -- Helper for CollectorDisplay: the "🍪 1,250" counter on a plot's cookie jar.
 -- It shows whatever number it is given and never reads or changes cash.
 --
--- The counter is a small pink-framed plaque (a runtime Part named
+-- The counter is a small chocolate-brown-framed plaque (a runtime Part named
 -- "JarCounter" in the CashTank) sitting directly on top of the "COOKIE JAR"
 -- sign, with a gold panel facing the Collect pad (the same side as the sign).
 -- Its front is a hair in front of the sign's, so nothing hides it from the
@@ -25,7 +25,7 @@ local PLAQUE_SIZE = Vector3.new(7, 1.8, 0.6)
 -- 0.2 in front of the sign's (no z-fighting) and its back touches the wall.
 -- On Plot1: y 14.3..16.1, front face z -46.4.
 local PLAQUE_OFFSET = Vector3.new(0, 2.0, 0.1)
-local PINK = Color3.fromRGB(255, 90, 160)
+local FRAME_BROWN = Color3.fromRGB(78, 44, 24) -- dark chocolate, same as the TankStand
 local GOLD = Color3.fromRGB(255, 200, 40)
 local WHITE = Color3.new(1, 1, 1)
 local OUTLINE_COLOR = Color3.fromRGB(40, 28, 20)
@@ -72,7 +72,7 @@ function JarCounter.Setup(plot: Model, tank: Model?)
 	local plaque = Instance.new("Part")
 	plaque.Name = "JarCounter"
 	plaque.Size = PLAQUE_SIZE
-	plaque.Color = PINK
+	plaque.Color = FRAME_BROWN
 	plaque.Material = Enum.Material.SmoothPlastic
 	plaque.Anchored = true
 	plaque.CanCollide = false
