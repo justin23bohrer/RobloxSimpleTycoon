@@ -71,6 +71,7 @@ Contract: ARCHITECTURE.md "Caleb Full Event (contract)". Music: the user's own t
 - [x] Sound effects: `tools/audio/generate_sfx.py` + `CalebAudio.client` (original, synthesized).
 - [ ] Upload `tools/audio/out/*.wav` to Roblox and paste the ids into `Config.CalebSounds` (user; steps in `tools/audio/README.md`).
 - [x] Podium leaderboard "CALEB'S TOP FEEDERS": 4 corner boards in the statue's `Podium` folder + `CalebLeaderboard.client.luau`. (code done; needs Core's `CalebTopFeeders`; Studio test pending: QA LB1–LB9)
+- [x] Leaderboard boards brown instead of yellow: chocolate panel + matching `Board` part, cream rows, dark chocolate rank badges (requested by the user 2026-10-02). (code done; Studio test pending: QA LB1, LB4)
 - [x] Saving with DataStore: house purchases and trophies (user approved saving 2026-10-01). `DataService` + house restore on claim. (code done; Studio test pending: QA SV1–SV9)
 - [x] Caleb Trophies: unique variants, 2-minute claim on the podium, Trophy Case build (5 slots) in the house that shows them. `TrophyVariants`, `TrophyService` (+ `TrophyModel`, `TrophyAccessories`), `TrophyPrompt.client`, `TrophyCase` build. (code done; Studio test pending: QA TR1–TR15, BF4, BF9, BF11)
 - [x] Background music + party music + air horn slots; Caleb spit removed (requested by the user 2026-10-02). (code done; Studio test pending: QA MU1–MU8)

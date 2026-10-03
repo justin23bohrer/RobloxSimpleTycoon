@@ -910,8 +910,8 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
 - Four leaderboard boards stand on the grass at the pedestal's four
   **corners**, each facing outward along a diagonal (21 studs from the
   statue's center), so one is readable from any direction and none is near
-  a feed pad (those are on the sides). Each board is cookie-themed: a gold
-  neon trim frame, two chocolate posts, and a big chocolate chip cookie on
+  a feed pad (those are on the sides). Each board is cookie-themed: a chocolate
+  brown board, a gold trim frame, two chocolate posts, and a big chocolate chip cookie on
   top. They stay clear of Caleb even at his biggest
   (`Config.CalebMaxScale`). Generated in the statue's `Podium` folder
   (`Leaderboard<corner>` models) by `tools/statue/generate_statue.py`.
@@ -924,8 +924,11 @@ same moment (timed from `CalebStateEndsAt`), including late joiners.
 - It counts cookies **fed to Caleb** this round (tracked by the server), not
   cookies produced. During the trophy claim it says **"FINAL RESULTS"** above
   the list (the server keeps the list until the reset, which clears it).
-- Same look as the rest of the game (yellow rounded panel, thick dark
-  outline, FredokaOne, not affected by lighting), readable from ~40 studs.
+- Same style as the rest of the game (rounded panel, thick dark outline,
+  FredokaOne, not affected by lighting), but the panel is **chocolate brown**
+  instead of yellow (requested by the user 2026-10-02): white outlined title
+  and total, cream rows, dark chocolate badges for rank 4+. Readable from
+  ~40 studs.
   Display only (`CalebLeaderboard.client.luau` reads the statue's
   `CalebTopFeeders` attribute). Names are plain text, never markup.
 
