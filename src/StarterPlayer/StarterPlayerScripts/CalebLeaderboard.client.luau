@@ -28,14 +28,14 @@ local statue = Workspace:WaitForChild("Map"):WaitForChild("Statue")
 
 local ROWS = Config.CalebLeaderboardSize
 
--- Look (presentation only, same as StatueBar / FeedPromptUI)
-local PANEL_COLOR = Color3.fromRGB(255, 214, 64)
+-- Look (presentation only; same style as StatueBar / FeedPromptUI, but a brown panel)
+local PANEL_COLOR = Color3.fromRGB(122, 74, 42) -- chocolate cookie brown (matches the Board part)
 local OUTLINE_COLOR = Color3.fromRGB(40, 28, 20)
 local TEXT_COLOR = Color3.fromRGB(255, 255, 255)
-local ROW_COLOR = Color3.fromRGB(255, 244, 205)
+local ROW_COLOR = Color3.fromRGB(255, 241, 200) -- warm cream, readable on the brown
 local MY_ROW_COLOR = Color3.fromRGB(150, 230, 120)
 local MY_ROW_STROKE = Color3.fromRGB(40, 150, 50)
-local BADGE_COLOR = Color3.fromRGB(150, 96, 52)
+local BADGE_COLOR = Color3.fromRGB(78, 44, 24) -- dark chocolate: stands out from the panel and the cream rows
 local MEDAL_COLORS = { Color3.fromRGB(255, 190, 30), Color3.fromRGB(200, 208, 220), Color3.fromRGB(215, 135, 70) }
 local FINAL_COLOR = Color3.fromRGB(235, 70, 70)
 local FONT = Enum.Font.FredokaOne

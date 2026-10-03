@@ -373,7 +373,7 @@ for side, (x, z) in (("Front", (0, -18)), ("Back", (0, 18)), ("Left", (-18, 0)),
 BOARD_DIST = 21.0
 BOARD_SIZE = (14.0, 12.0, 0.8)  # 40 px/stud on the client -> 560 x 480 px
 BOARD_BOTTOM = 1.2
-BOARD_COLOR = (214, 160, 90)  # cookie dough (mostly covered by the panel)
+BOARD_COLOR = (122, 74, 42)  # chocolate brown, same as the client panel (edges show around it)
 POST_COLOR = (92, 56, 30)  # chocolate
 COOKIE = (214, 160, 90)
 CHIP = (70, 40, 22)
